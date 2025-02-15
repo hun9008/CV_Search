@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import os
 
 def extract_korean_lines(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -17,10 +18,23 @@ def extract_korean_lines(html_content):
     return korean_lines
 
 if __name__ == "__main__":
-    with open('./NAVER Careers.html', 'r', encoding='utf-8') as file:
-        html_content = file.read()
+    naver_data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/naver/'))
+
+    htmls = sorted(os.listdir(naver_data_path))
     
-    korean_lines = extract_korean_lines(html_content)
+    for html in htmls:
+        with open(naver_data_path + '/' + html, 'r', encoding='utf-8') as file:
+            html_content = file.read()
+        
+        korean_lines = extract_korean_lines(html_content)
+        
+        with open(naver_data_path + '/' + html.split('.')[0] + '_kr.txt', 'w', encoding='utf-8') as file:
+            for line in korean_lines:
+                file.write(line + '\n')
+
+    # print(htmls)
     
-    for line in korean_lines:
-        print(line)
+    # korean_lines = extract_korean_lines(html_content)
+    
+    # for line in korean_lines:
+    #     print(line)
