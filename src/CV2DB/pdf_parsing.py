@@ -55,7 +55,7 @@ def save_text(pred_tokens, txt_path):
     print(f'Text saved to {txt_path}')
 
 
-pdf_path = os.path.join(data_path, 'cv_example.pdf')
+pdf_path = os.path.join(data_path, 'cv_kr_example.pdf')
 
 pdf_extractor = PDFExtractor(pdf_extractor_name="pdfplumber")
 vision_model = lp.EfficientDetLayoutModel("lp://PubLayNet")
@@ -70,5 +70,5 @@ pred_tokens = vila_predict(pdf_path, pdf_extractor, vision_model, pdf_predictor)
 
 visualize_predictions(pdf_path, pdf_extractor, vision_model, pdf_predictor)
 
-txt_path = os.path.join(data_path, 'cv_example_vila.txt')
+txt_path = os.path.join(data_path, 'cv_kr_example_vila.txt')
 save_text(pred_tokens, txt_path)
