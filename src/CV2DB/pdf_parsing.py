@@ -161,35 +161,31 @@ def save_text(pred_tokens, txt_path):
 
 
 pdf_path = os.path.join(data_path, 'cv_kr_example.pdf')
+txt_path = os.path.join(data_path, 'cv_kr_example_vila.txt')
 
-pdf_extractor = PDFExtractor(pdf_extractor_name="pdfplumber")
-vision_model = lp.EfficientDetLayoutModel("lp://PubLayNet")
-pdf_predictor = HierarchicalPDFPredictor.from_pretrained("allenai/hvila-block-layoutlm-finetuned-docbank")
+def load_vila_models():
+    pdf_extractor = PDFExtractor(pdf_extractor_name="pdfplumber")
+    vision_model = lp.EfficientDetLayoutModel("lp://PubLayNet")
+    pdf_predictor = HierarchicalPDFPredictor.from_pretrained("allenai/hvila-block-layoutlm-finetuned-docbank")
+
+    return pdf_extractor, vision_model, pdf_predictor
 
 
-print("====== ViLA Prediction ======")
+# print("====== ViLA Prediction ======")
 
-pred_tokens = vila_predict(pdf_path, pdf_extractor, vision_model, pdf_predictor)
-# for token in pred_tokens:
-#     print(token)
-merge_tokens = merge_tokens_to_sentences(pred_tokens)
-# valid check
-# for token in merge_tokens:
-#     print(token)
+def extract_cv_info(pdf_path):
+    pdf_extractor, vision_model, pdf_predictor = load_vila_models()
 
-# token_groups = construct_token_groups(merge_tokens)
-# # valid check 
-# for group in token_groups:
-#     print('group')
-#     for token in group:
-#         print(token.text, token.type)
-# print(token_groups)
-# section_groups = construct_section_groups(token_groups)
-# # # valid check 
-# for section, text in section_groups.items():
-#     print(f'{section}: {text}')
+    pred_tokens = vila_predict(pdf_path, pdf_extractor, vision_model, pdf_predictor)
+
+    merge_tokens = merge_tokens_to_sentences(pred_tokens)
+
+    return merge_tokens
+
+def run_vila(pdf_path, txt_path):
+    merge_tokens = extract_cv_info(pdf_path)
+
+    save_text(merge_tokens, txt_path)
 
 # visualize_predictions(pdf_path, pdf_extractor, vision_model, pdf_predictor)
 
-txt_path = os.path.join(data_path, 'cv_kr_example_vila.txt')
-save_text(merge_tokens, txt_path)
