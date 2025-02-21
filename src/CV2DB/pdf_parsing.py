@@ -7,6 +7,8 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+from collections import defaultdict
+
 import os
 
 data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/cv/'))
@@ -23,6 +25,109 @@ def vila_predict(pdf_path, pdf_extractor, vision_model, layout_model):
         pred_tokens += layout_model.predict(pdf_data, page_token.page_size)
 
     return pred_tokens
+
+def construct_token_groups(pred_tokens):
+    groups, group, group_type, prev_bbox = [], [], None, None
+    
+    for token in pred_tokens:
+        if group_type is None:
+            is_continued = True
+            
+        elif token.type == group_type:
+            if group_type == 'section':
+                is_continued = abs(prev_bbox[3] - token.coordinates[3]) < 1.
+            else:
+                is_continued = True
+
+        else:
+            is_continued = False
+
+        
+        # print(token.text, token.type, is_continued)
+        group_type = token.type
+        prev_bbox = token.coordinates
+        if is_continued:
+            group.append(token)
+        
+        else:
+            groups.append(group)
+            group = [token]
+    
+    if group:
+        groups.append(group)
+
+    return groups
+
+def join_group_text(group):
+    text = ''
+    prev_bbox = None
+    for token in group:
+        if not text:
+            text += token.text
+    
+        else:        
+            if abs(prev_bbox[2] - token.coordinates[0]) > 2:
+                text += ' ' + token.text
+    
+            else:
+                text += token.text
+    
+        prev_bbox = token.coordinates
+    return text
+
+def construct_section_groups(token_groups):
+    section_groups = defaultdict(list)
+
+    section = None
+    for group in token_groups:
+        group_type = group[0].type
+        group_text = join_group_text(group)
+        
+        if group_type == 'section':
+            section = group_text
+            section_groups[section]
+    
+        elif group_type == 'paragraph' and section is not None:
+            section_groups[section].append(group_text)
+
+    section_groups = {k: ' '.join(v) for k,v in section_groups.items()}
+    return section_groups
+
+class MergedTextBlock:
+    def __init__(self, text, type, coordinates):
+        self.text = text
+        self.type = type
+        self.coordinates = coordinates
+
+def merge_tokens_to_sentences(pred_tokens):
+    sentences = []
+    sentence = []
+    prev_bbox = None
+    
+    for token in pred_tokens:
+        token_text = token.text
+        token_type = token.type
+        token_coordinates = token.coordinates
+
+        if not sentence:
+            sentence.append(token)
+        else:
+            if prev_bbox and abs(prev_bbox[2] - token_coordinates[0]) > 10:
+                sentences.append(sentence)
+                sentence = [token]
+            else:
+                sentence.append(token)
+
+        prev_bbox = token_coordinates
+    
+    if sentence:
+        sentences.append(sentence)
+
+    return [MergedTextBlock(
+                text=" ".join([t.text for t in sentence]), 
+                type=sentence[0].type, 
+                coordinates=sentence[0].coordinates) 
+            for sentence in sentences]
 
 def visualize_predictions(pdf_path, pdf_extractor, vision_model, layout_model):
     page_tokens, page_images = pdf_extractor.load_tokens_and_image(pdf_path)
@@ -67,8 +172,24 @@ print("====== ViLA Prediction ======")
 pred_tokens = vila_predict(pdf_path, pdf_extractor, vision_model, pdf_predictor)
 # for token in pred_tokens:
 #     print(token)
+merge_tokens = merge_tokens_to_sentences(pred_tokens)
+# valid check
+# for token in merge_tokens:
+#     print(token)
 
-visualize_predictions(pdf_path, pdf_extractor, vision_model, pdf_predictor)
+# token_groups = construct_token_groups(merge_tokens)
+# # valid check 
+# for group in token_groups:
+#     print('group')
+#     for token in group:
+#         print(token.text, token.type)
+# print(token_groups)
+# section_groups = construct_section_groups(token_groups)
+# # # valid check 
+# for section, text in section_groups.items():
+#     print(f'{section}: {text}')
+
+# visualize_predictions(pdf_path, pdf_extractor, vision_model, pdf_predictor)
 
 txt_path = os.path.join(data_path, 'cv_kr_example_vila.txt')
-save_text(pred_tokens, txt_path)
+save_text(merge_tokens, txt_path)

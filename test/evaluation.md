@@ -16,7 +16,3 @@ How to eval : Personal Info 와 Skill Info 모두 유효해야 한다.
 ## Scraping & Crawling
 
 seed url, sub urls.
-
-
-
-
