@@ -2,3 +2,4 @@ cv_env
 .env
 /src/CV2DB/vila
 __pycache__
+.pytest_cache

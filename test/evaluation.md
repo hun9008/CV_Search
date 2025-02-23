@@ -24,7 +24,9 @@ How to eval : Personal Info 와 Skill Info 모두 유효해야 한다.
 
 seed url, sub urls.
 
-...
+1. sub urls valid check : seed url로 부터 생성된 sub url의 list가 1개 이상을 가지고 있고 html 형식이 맞는지 확인 (+ 404, 500 error check)
+
+2. contents check : 직무 기반 corpus 구성 후 valid check.
 
 하루 한번 update만 되면 되고 user 활동과는 독립으로 실행시간은 고려되지 않는다.
 
