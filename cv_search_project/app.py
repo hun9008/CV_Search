@@ -1,7 +1,8 @@
 from fastapi import FastAPI, UploadFile, File
 import os
 from pdf_extractor import extract_text_from_pdf
-from elasticsearch_client import index_cv, search_jobs
+from elasticsearch_service import save_cv_to_elasticsearch, save_job_posting, search_jobs
+from models import JobPosting
 
 app = FastAPI()
 
@@ -21,11 +22,19 @@ async def upload_cv(file: UploadFile = File(...)):
 
     # PDF에서 텍스트 추출
     cv_text = extract_text_from_pdf(file_path)
-    
+
     # Elasticsearch에 저장
-    response = index_cv(file.filename, cv_text)
+    response = save_cv_to_elasticsearch(file.filename, cv_text)
     
     return {"message": "CV uploaded and indexed", "response": response}
+
+@app.post("/save_job/")
+async def save_job(job: JobPosting):
+    """
+    크롤링된 채용 공고 데이터를 Elasticsearch에 저장
+    """
+    response = save_job_posting(job.dict())
+    return {"message": "Job posting saved", "response": response}
 
 @app.get("/search_jobs/")
 def search_jobs_api(query: str):
