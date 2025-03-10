@@ -1,0 +1,904 @@
+[
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "\n\t\twindow.dataLayer = window.dataLayer || [];\n\t\tfunction gtag(){dataLayer.push(arguments);}\n\t\tgtag('js', new Date());\n\n\t\tgtag('config', 'G-V80K13HMHF'...",
+    "sourceType": "inline-script",
+    "index": 1
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "\n    $(document).ready(function(){\n    \t\n    \tlet totalMn_open = false;\n    \t$('.total_menu').on(\"mouseenter\",function(){\n    \t\t\n    \t\t$(this).parent(...",
+    "sourceType": "inline-script",
+    "index": 2
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "\n\tvar pathname = window.location.pathname;\n\tif(pathname == '/'){\n\t\tpathname = \"/main.do\";\n\t}\n\n    (function getCookie() {    \t\n       \t\n        if (do...",
+    "sourceType": "inline-script",
+    "index": 3
+  },
+  {
+    "success": false,
+    "error": "KakaoError: Kakao.init: Already initialized",
+    "message": "스크립트 실행 중 오류 발생",
+    "originalScript": "\nKakao.init('0d61be93086e72c6767af5d278b53e9e');\n\nvar pageSize=\"10\"*1,page=\"1\"*1,totalRows=\"18\"*1;\nvar startNum=0,endNum=0;\nvar loadMoreFlag = true;\nv...",
+    "sourceType": "inline-script",
+    "index": 4
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "\n//filter ajax\nfunction loadJobListRefresh() {\n\tloadMoreFlag = true;\n\t\n\t// 필터옵션 세팅\n\tsetFilter();\n\t\n\tvar pgmUrl = \"list\";\n\tif(pgmUrl == \"view\"){\n\t\n\t\tva...",
+    "sourceType": "inline-script",
+    "index": 5
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "\n    $(document).ready(function(){\n        $('.search_core').click(function(){\n            $(this).parents('.search_box').addClass(\"active\");\n        ...",
+    "sourceType": "inline-script",
+    "index": 6
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "\n    $(document).ready(function(){\n        //footer\n        $('.site_now').click(function(){\n            $(this).parent('.relate_site').toggleClass(\"a...",
+    "sourceType": "inline-script",
+    "index": 7
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "javascript:closeWin();",
+    "sourceType": "onclick",
+    "index": 1,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "mainpop_close popup_close",
+      "text": "닫기"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/list.do?subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=&sw=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "loadJobListRefresh();",
+    "sourceType": "onclick",
+    "index": 2,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "search_button",
+      "text": "검색 아이콘"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003075&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show('30003075')",
+    "sourceType": "onclick",
+    "index": 3,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "2025 팀네이버 신입 공채 : Tech\n\t\t                            \n\t\t                                Recruiting department\n\t\t                                \n\t\t\t                            \t\n\t\t\t                            \t\n\t\t\t                            \t\t Tech\n\t\t\t                            \t\n\t\t                                \n\t\t                                Job positions\n\t\t                                \n\t\t                                \t\n\t\t\t                            \t\n\t\t\t                            \t\t Common\n\t\t\t                            \t\n\t\t                                \n\t\t                                Career required\n\t\t                                New hire\n\t\t                                Working conditions\n\t\t                                Full time\n\t\t                                Application period\n\t\t                                \n\t\t                                \n\t\t                                \n\t\t                                \t2025.03.05 ~ 2025.03.17"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this,'30003075')",
+    "sourceType": "onclick",
+    "index": 4,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003075');",
+    "sourceType": "onclick",
+    "index": 5,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003076&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show('30003076')",
+    "sourceType": "onclick",
+    "index": 6,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "2025 팀네이버 신입 공채 : Service & Business\n\t\t                            \n\t\t                                Recruiting department\n\t\t                                \n\t\t\t                            \t\n\t\t\t                            \t\n\t\t\t                            \t\t Service & Business\n\t\t\t                            \t\n\t\t                                \n\t\t                                Job positions\n\t\t                                \n\t\t                                \t\n\t\t\t                            \t\n\t\t\t                            \t\t Common\n\t\t\t                            \t\n\t\t                                \n\t\t                                Career required\n\t\t                                New hire\n\t\t                                Working conditions\n\t\t                                Full time\n\t\t                                Application period\n\t\t                                \n\t\t                                \n\t\t                                \n\t\t                                \t2025.03.05 ~ 2025.03.17"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this,'30003076')",
+    "sourceType": "onclick",
+    "index": 7,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003076');",
+    "sourceType": "onclick",
+    "index": 8,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003077&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show('30003077')",
+    "sourceType": "onclick",
+    "index": 9,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "2025 팀네이버 신입 공채 : Design\n\t\t                            \n\t\t                                Recruiting department\n\t\t                                \n\t\t\t                            \t\n\t\t\t                            \t\n\t\t\t                            \t\t Design\n\t\t\t                            \t\n\t\t                                \n\t\t                                Job positions\n\t\t                                \n\t\t                                \t\n\t\t\t                            \t\n\t\t\t                            \t\t Common\n\t\t\t                            \t\n\t\t                                \n\t\t                                Career required\n\t\t                                New hire\n\t\t                                Working conditions\n\t\t                                Full time\n\t\t                                Application period\n\t\t                                \n\t\t                                \n\t\t                                \n\t\t                                \t2025.03.05 ~ 2025.03.17"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this,'30003077')",
+    "sourceType": "onclick",
+    "index": 10,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003077');",
+    "sourceType": "onclick",
+    "index": 11,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003078&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show('30003078')",
+    "sourceType": "onclick",
+    "index": 12,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "2025 팀네이버 신입 공채 : Corporate\n\t\t                            \n\t\t                                Recruiting department\n\t\t                                \n\t\t\t                            \t\n\t\t\t                            \t\n\t\t\t                            \t\t Corporate\n\t\t\t                            \t\n\t\t                                \n\t\t                                Job positions\n\t\t                                \n\t\t                                \t\n\t\t\t                            \t\n\t\t\t                            \t\t Common\n\t\t\t                            \t\n\t\t                                \n\t\t                                Career required\n\t\t                                New hire\n\t\t                                Working conditions\n\t\t                                Full time\n\t\t                                Application period\n\t\t                                \n\t\t                                \n\t\t                                \n\t\t                                \t2025.03.05 ~ 2025.03.17"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this,'30003078')",
+    "sourceType": "onclick",
+    "index": 13,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003078');",
+    "sourceType": "onclick",
+    "index": 14,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30002734&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show('30002734')",
+    "sourceType": "onclick",
+    "index": 15,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] 플레이스 사업 개발 및 제휴(경력)\n\t\t                            \n\t\t                                Recruiting department\n\t\t                                \n\t\t\t                            \t\n\t\t\t                            \t\n\t\t\t                            \t\t Service & Business\n\t\t\t                            \t\n\t\t                                \n\t\t                                Job positions\n\t\t                                \n\t\t                                \t\n\t\t\t                            \t\n\t\t\t                            \t\t Business Development\n\t\t\t                            \t\n\t\t                                \n\t\t                                Career required\n\t\t                                Experienced hire\n\t\t                                Working conditions\n\t\t                                Full time\n\t\t                                Application period\n\t\t                                \n\t\t                                \n\t\t                                \n\t\t                                \t2025.03.10 ~ 2025.03.24"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this,'30002734')",
+    "sourceType": "onclick",
+    "index": 16,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30002734');",
+    "sourceType": "onclick",
+    "index": 17,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30002951&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show('30002951')",
+    "sourceType": "onclick",
+    "index": 18,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] 카페 서비스 기획 (경력)\n\t\t                            \n\t\t                                Recruiting department\n\t\t                                \n\t\t\t                            \t\n\t\t\t                            \t\n\t\t\t                            \t\t Service & Business\n\t\t\t                            \t\n\t\t                                \n\t\t                                Job positions\n\t\t                                \n\t\t                                \t\n\t\t\t                            \t\n\t\t\t                            \t\t Product Development\n\t\t\t                            \t\n\t\t                                \n\t\t                                Career required\n\t\t                                Experienced hire\n\t\t                                Working conditions\n\t\t                                Full time\n\t\t                                Application period\n\t\t                                \n\t\t                                \n\t\t                                \n\t\t                                \t2025.02.28 ~ 2025.03.11"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this,'30002951')",
+    "sourceType": "onclick",
+    "index": 19,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30002951');",
+    "sourceType": "onclick",
+    "index": 20,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003055&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show('30003055')",
+    "sourceType": "onclick",
+    "index": 21,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] Tech Scout 기술 스타트업 탐색/투자/지원 담당 (경력)\n\t\t                            \n\t\t                                Recruiting department\n\t\t                                \n\t\t\t                            \t\n\t\t\t                            \t\n\t\t\t                            \t\t Tech\n\t\t\t                            \t\n\t\t                                \n\t\t                                Job positions\n\t\t                                \n\t\t                                \t\n\t\t\t                            \t\n\t\t\t                            \t\t Tech Staff\n\t\t\t                            \t\n\t\t                                \n\t\t                                Career required\n\t\t                                Experienced hire\n\t\t                                Working conditions\n\t\t                                Full time\n\t\t                                Application period\n\t\t                                \n\t\t                                \n\t\t                                \n\t\t                                \t2025.02.28 ~ 2025.03.11"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this,'30003055')",
+    "sourceType": "onclick",
+    "index": 22,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003055');",
+    "sourceType": "onclick",
+    "index": 23,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003080&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show('30003080')",
+    "sourceType": "onclick",
+    "index": 24,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] AI 플랫폼 (경력)\n\t\t                            \n\t\t                                Recruiting department\n\t\t                                \n\t\t\t                            \t\n\t\t\t                            \t\n\t\t\t                            \t\t Tech\n\t\t\t                            \t\n\t\t                                \n\t\t                                Job positions\n\t\t                                \n\t\t                                \t\n\t\t\t                            \t\n\t\t\t                            \t\t Backend\n\t\t\t                            \t\n\t\t                                \n\t\t                                Career required\n\t\t                                Experienced hire\n\t\t                                Working conditions\n\t\t                                Full time\n\t\t                                Application period\n\t\t                                \n\t\t                                \n\t\t                                \n\t\t                                \t2025.02.27 ~ 2025.03.11"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this,'30003080')",
+    "sourceType": "onclick",
+    "index": 25,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003080');",
+    "sourceType": "onclick",
+    "index": 26,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003084&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show('30003084')",
+    "sourceType": "onclick",
+    "index": 27,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] 입법 분석 및 정책 커뮤니케이션 변호사 (경력)\n\t\t                            \n\t\t                                Recruiting department\n\t\t                                \n\t\t\t                            \t\n\t\t\t                            \t\n\t\t\t                            \t\t Corporate\n\t\t\t                            \t\n\t\t                                \n\t\t                                Job positions\n\t\t                                \n\t\t                                \t\n\t\t\t                            \t\n\t\t\t                            \t\t Industry and Policy Research\n\t\t\t                            \t\n\t\t                                \n\t\t                                Career required\n\t\t                                Experienced hire\n\t\t                                Working conditions\n\t\t                                Full time\n\t\t                                Application period\n\t\t                                \n\t\t                                \n\t\t                                \n\t\t                                \t2025.02.27 ~ 2025.03.11"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this,'30003084')",
+    "sourceType": "onclick",
+    "index": 28,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003084');",
+    "sourceType": "onclick",
+    "index": 29,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003101&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show('30003101')",
+    "sourceType": "onclick",
+    "index": 30,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] Product Design 담당 (경력)\n\t\t                            \n\t\t                                Recruiting department\n\t\t                                \n\t\t\t                            \t\n\t\t\t                            \t\n\t\t\t                            \t\t Design\n\t\t\t                            \t\n\t\t                                \n\t\t                                Job positions\n\t\t                                \n\t\t                                \t\n\t\t\t                            \t\n\t\t\t                            \t\t Product Design\n\t\t\t                            \t\n\t\t                                \n\t\t                                Career required\n\t\t                                Experienced hire\n\t\t                                Working conditions\n\t\t                                Full time\n\t\t                                Application period\n\t\t                                \n\t\t                                \n\t\t                                \n\t\t                                \t2025.02.27 ~ 2025.03.11"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this,'30003101')",
+    "sourceType": "onclick",
+    "index": 31,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003101');",
+    "sourceType": "onclick",
+    "index": 32,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003103&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show(30003103)",
+    "sourceType": "onclick",
+    "index": 33,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] 치지직 정산 운영/관리 담당 (보훈/계약)\t\t\tRecruiting department\t\tService & Business\t\tJob positions\t\tProduct Development\t\tCareer required\t\tExperienced hire\t\tWorking conditions\t\tTemporary\t\tApplication period\t\t2025.02.27 ~ 2025.03.11"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this, 30003103)",
+    "sourceType": "onclick",
+    "index": 34,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003103');",
+    "sourceType": "onclick",
+    "index": 35,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003104&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show(30003104)",
+    "sourceType": "onclick",
+    "index": 36,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] 웨일 교육 플랫폼 콘텐츠 기획/운영 (보훈/계약)\t\t\tRecruiting department\t\tService & Business\t\tJob positions\t\tBusiness Development\t\tCareer required\t\tExperienced hire\t\tWorking conditions\t\tTemporary\t\tApplication period\t\t2025.02.27 ~ 2025.03.11"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this, 30003104)",
+    "sourceType": "onclick",
+    "index": 37,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003104');",
+    "sourceType": "onclick",
+    "index": 38,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003105&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show(30003105)",
+    "sourceType": "onclick",
+    "index": 39,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] 웨일 국내 및 글로벌 사업 개발 담당 (경력)\t\t\tRecruiting department\t\tService & Business\t\tJob positions\t\tBusiness Development\t\tCareer required\t\tExperienced hire\t\tWorking conditions\t\tFull time\t\tApplication period\t\t2025.02.27 ~ 2025.03.11"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this, 30003105)",
+    "sourceType": "onclick",
+    "index": 40,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003105');",
+    "sourceType": "onclick",
+    "index": 41,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003106&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show(30003106)",
+    "sourceType": "onclick",
+    "index": 42,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[CFO] 연결/별도 회계 담당자 모집 (경력)\t\t\tRecruiting department\t\tCorporate\t\tJob positions\t\tAccounting\t\tCareer required\t\tExperienced hire\t\tWorking conditions\t\tFull time\t\tApplication period\t\t2025.02.27 ~ 2025.03.11"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this, 30003106)",
+    "sourceType": "onclick",
+    "index": 43,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003106');",
+    "sourceType": "onclick",
+    "index": 44,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003108&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show(30003108)",
+    "sourceType": "onclick",
+    "index": 45,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] Experience Insight & Planning (경력)\t\t\tRecruiting department\t\tDesign\t\tJob positions\t\tExperience Insight & Planning\t\tCareer required\t\tExperienced hire\t\tWorking conditions\t\tFull time\t\tApplication period\t\t2025.02.27 ~ 2025.03.11"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this, 30003108)",
+    "sourceType": "onclick",
+    "index": 46,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003108');",
+    "sourceType": "onclick",
+    "index": 47,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003123&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show(30003123)",
+    "sourceType": "onclick",
+    "index": 48,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] 광고 플랫폼 개발 (경력)\t\t\tRecruiting department\t\tTech\t\tJob positions\t\tBackend\t\tCareer required\t\tExperienced hire\t\tWorking conditions\t\tFull time\t\tApplication period\t\t2025.03.10 ~ 2025.03.24"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this, 30003123)",
+    "sourceType": "onclick",
+    "index": 49,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003123');",
+    "sourceType": "onclick",
+    "index": 50,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003124&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show(30003124)",
+    "sourceType": "onclick",
+    "index": 51,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] 광고 AX AI/ML 모델&서빙 개발 (경력)\t\t\tRecruiting department\t\tTech\t\tJob positions\t\tAI/MLOther than AI/ML\t\tCareer required\t\tExperienced hire\t\tWorking conditions\t\tFull time\t\tApplication period\t\t2025.03.10 ~ 2025.03.24"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this, 30003124)",
+    "sourceType": "onclick",
+    "index": 52,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003124');",
+    "sourceType": "onclick",
+    "index": 53,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003127&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "urlChanged": true,
+    "message": "URL 변경 감지됨 (페이지 이동 확인)",
+    "originalScript": "show(30003127)",
+    "sourceType": "onclick",
+    "index": 54,
+    "elementInfo": {
+      "tagName": "A",
+      "id": null,
+      "className": "card_link",
+      "text": "[NAVER] 광고 플랫폼 기획/광고 프로덕트 전략 (경력)\t\t\tRecruiting department\t\tService & BusinessOther than Service & Business\t\tJob positions\t\tProduct DevelopmentOther than Product Development\t\tCareer required\t\tExperienced hire\t\tWorking conditions\t\tFull time\t\tApplication period\t\t2025.03.10 ~ 2025.03.24"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "setIntrst(this, 30003127)",
+    "sourceType": "onclick",
+    "index": 55,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "btn_save ",
+      "text": "Save"
+    }
+  },
+  {
+    "success": true,
+    "detectedUrl": null,
+    "urlChanged": false,
+    "message": "실행 완료 (URL 변경 없음)",
+    "originalScript": "copyUrl('30003127');",
+    "sourceType": "onclick",
+    "index": 56,
+    "elementInfo": {
+      "tagName": "BUTTON",
+      "id": null,
+      "className": "link_type",
+      "text": "URL Copy"
+    }
+  }
+]
