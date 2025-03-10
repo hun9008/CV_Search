@@ -1,6 +1,6 @@
 {
   "baseUrl": "https://recruit.navercorp.com/rcrt/list.do",
-  "totalUrls": 52,
+  "totalUrls": 60,
   "urls": [
     "https://blog.naver.com/naver_diary",
     "https://channeltech.naver.com/",
@@ -37,6 +37,14 @@
     "https://recruit.navercorp.com/rcrt/view.do?annoId=30003080&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
     "https://recruit.navercorp.com/rcrt/view.do?annoId=30003084&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
     "https://recruit.navercorp.com/rcrt/view.do?annoId=30003101&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "https://recruit.navercorp.com/rcrt/view.do?annoId=30003103&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "https://recruit.navercorp.com/rcrt/view.do?annoId=30003104&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "https://recruit.navercorp.com/rcrt/view.do?annoId=30003105&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "https://recruit.navercorp.com/rcrt/view.do?annoId=30003106&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "https://recruit.navercorp.com/rcrt/view.do?annoId=30003108&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "https://recruit.navercorp.com/rcrt/view.do?annoId=30003123&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "https://recruit.navercorp.com/rcrt/view.do?annoId=30003124&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "https://recruit.navercorp.com/rcrt/view.do?annoId=30003127&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
     "https://recruit.navercorp.com/share/cmm/js/jquery/jquery-ui.min.js",
     "https://recruit.navercorp.com/share/cmm/js/jquery/jquery.timepicker.js",
     "https://recruit.navercorp.com/share/cmm/js/popup.js?ver=250305",
@@ -52,7 +60,7 @@
     "https://recruit.webtoonscorp.com/",
     "https://tv.naver.com/playnaver",
     "https://www.googletagmanager.com/gtag/js?id=G-V80K13HMHF",
-    "https://www.googletagmanager.com/gtag/js?id=G-ZCRKYPWLZM&l=dataLayer&cx=c&gtm=45je5362v897883325za200&tag_exp=102067808~102482433~102539968~102587591~102640600~102696397~102717422~102788824~102791783~102825837",
+    "https://www.googletagmanager.com/gtag/js?id=G-ZCRKYPWLZM&l=dataLayer&cx=c&gtm=45je5362v897883325za200&tag_exp=102067808~102482433~102539968~102587591~102640600~102717422~102788824~102814059~102825837",
     "https://www.navercorp.com/policy/personal"
   ]
 }

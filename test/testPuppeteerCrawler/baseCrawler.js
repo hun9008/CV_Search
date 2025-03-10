@@ -1,6 +1,35 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
+
+async function scrollToBottom(page) {
+  await page.evaluate(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+}
+
+async function infiniteScroll(page, maxScrolls = 20) {
+  let previousHeight = 0;
+  let scrollCount = 0;
+
+  while (scrollCount < maxScrolls) {
+    scrollCount++;
+
+    // 이전 높이 저장
+    previousHeight = await page.evaluate('document.body.scrollHeight');
+
+    // 맨 아래로 스크롤
+    await scrollToBottom(page);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    // 현재 높이 확인
+    const currentHeight = await page.evaluate('document.body.scrollHeight');
+    console.log(`스크롤 ${scrollCount}/${maxScrolls} 수행 중... (높이: ${previousHeight} → ${currentHeight})`);
+  }
+
+  return scrollCount;
+}
+
+
 async function extractAndExecuteScripts(url) {
   // headless 모드를 비활성화하여 브라우저를 볼 수 있도록 설정
   const browser = await puppeteer.launch({
@@ -23,7 +52,11 @@ async function extractAndExecuteScripts(url) {
       await dialog.dismiss(); // 대화상자 닫기
     });
 
-    await page.goto(url, { waitUntil: 'networkidle2' });
+    await page.goto(url, {
+      waitUntil: 'networkidle2',
+      timeout: 60000
+    });
+
     console.log(`페이지 로드 완료: ${url}`);
 
     // 현재 URL 저장
@@ -36,6 +69,8 @@ async function extractAndExecuteScripts(url) {
     }
 
     // 스크립트와 링크 추출
+    await infiniteScroll(page);
+
     const pageData = await page.evaluate(() => {
       // 모든 스크립트 태그 수집
       const scriptElements = Array.from(document.querySelectorAll('script'));
@@ -303,6 +338,7 @@ async function extractAndExecuteScripts(url) {
 
     // 2. onclick 스크립트 처리
     console.log("=== onclick 스크립트 처리 중... ===");
+    
     for (let i = 0; i < pageData.onclicks.length; i++) {
       const onclickItem = pageData.onclicks[i];
 
