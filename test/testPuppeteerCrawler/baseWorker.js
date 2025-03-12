@@ -30,15 +30,74 @@ async function infiniteScroll(page, maxScrolls = 20) {
   return scrollCount;
 }
 
+/**
+ * total_url.json 파일을 업데이트하는 함수
+ * 기존 파일이 있으면 그 내용을 유지하고 새 URL을 추가합니다
+ * @param {string} baseUrl 기본 URL
+ * @param {Set<string>} newUrls 새로 발견된 URL 집합
+ * @returns {Promise<number>} 최종 저장된 URL 수
+ */
+async function updateTotalUrlsJson(baseUrl, newUrls) {
+  // 기존 URL 데이터 로드
+  let urlData = {
+    baseUrl: baseUrl,
+    totalUrls: 0,
+    urls: []
+  };
 
+  try {
+    // 파일이 존재하는지 확인
+    if (fs.existsSync('total_url.json')) {
+      const fileContent = fs.readFileSync('total_url.json', 'utf8');
+      const existingData = JSON.parse(fileContent);
+
+      // 기존 데이터가 유효한 형식인지 확인
+      if (existingData && Array.isArray(existingData.urls)) {
+        console.log(`기존 total_url.json 파일에서 ${existingData.urls.length}개의 URL을 로드했습니다.`);
+        urlData = existingData;
+      }
+    }
+  } catch (error) {
+    console.error('total_url.json 파일 읽기 오류:', error);
+    console.log('새 파일을 생성합니다.');
+  }
+
+  // 새 URL 필터링 및 추가
+  const urlArray = Array.from(newUrls).filter(url => url && typeof url === 'string' && url.startsWith('http'));
+
+  // 중복 없이 URL 병합
+  const allUrlsSet = new Set([...urlData.urls, ...urlArray]);
+  const mergedUrls = Array.from(allUrlsSet).sort();
+
+  // 업데이트된 데이터 생성
+  const updatedData = {
+    baseUrl: baseUrl,
+    totalUrls: mergedUrls.length,
+    urls: mergedUrls
+  };
+
+  // 파일에 저장
+  fs.writeFileSync('total_url.json', JSON.stringify(updatedData, null, 2));
+
+  const newUrlsCount = mergedUrls.length - urlData.urls.length;
+  console.log(`total_url.json 파일이 업데이트되었습니다.`);
+  console.log(`- 기존 URL: ${urlData.urls.length}개`);
+  console.log(`- 새로 추가된 URL: ${newUrlsCount}개`);
+  console.log(`- 총 URL: ${mergedUrls.length}개`);
+
+  return mergedUrls.length;
+}
 async function extractAndExecuteScripts(url) {
   // headless 모드를 비활성화하여 브라우저를 볼 수 있도록 설정
   const browser = await puppeteer.launch({
-    headless: true,  // 브라우저 UI를 표시
+    headless: true,
+    urls: []
+     // 브라우저 UI를 표시
   });
   let result = [];
   // 모든 URL을 저장할 집합 (중복 제거)
   const allUrls = new Set();
+
 
   // 초기 URL 추가
   allUrls.add(url);
@@ -389,16 +448,7 @@ async function extractAndExecuteScripts(url) {
         fs.writeFileSync('script_execution_results.json', JSON.stringify(result, null, 2));
         console.log(`실행 결과를 script_execution_results.json 파일에 저장했습니다.`);
 
-        // 모든 URL을 저장한 total_url.json 파일 생성
-        const urlArray = Array.from(allUrls).filter(url => url && typeof url === 'string' && url.startsWith('http'));
-        const urlData = {
-          baseUrl: url,
-          totalUrls: urlArray.length,
-          urls: urlArray.sort()
-        };
-
-        fs.writeFileSync('total_url.json', JSON.stringify(urlData, null, 2));
-        console.log(`총 ${urlArray.length}개의 URL을 total_url.json 파일에 저장했습니다.`);
+        await updateTotalUrlsJson(url, allUrls);
 
         return result;
 
@@ -433,3 +483,5 @@ extractAndExecuteScripts(targetUrl).then(results => {
     });
   }
 });
+
+module.exports = { extractAndExecuteScripts };

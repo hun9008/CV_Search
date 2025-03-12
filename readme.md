@@ -1,3 +1,4 @@
+
 # CV Search
 
 service intro...
@@ -20,9 +21,9 @@ service intro...
 <td></td>
 </tr>
 <tr>
-<td>...</td>
-<td>blk</td>
-<td>blk</td>
+<td>[팀원] 육세현</td>
+<td>BE,DM</td>
+<td>모든 직무 데이터를 크롤링합니다.</td>
 </tr>
 <tr>
 <td>...</td>
