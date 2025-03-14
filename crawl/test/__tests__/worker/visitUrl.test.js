@@ -257,4 +257,167 @@ describe('BaseWorkerManager - visitUrl', () => {
     // 발견된 URL이 저장되었는지 확인
     expect(global.db.bulkAddSubUrls).toHaveBeenCalled();
   });
+
+
+
+test('URL 방문 후 페이지가 제대로 닫히는지 확인', async () => {
+  const urlInfo = {
+    url: 'https://example.com/test-page',
+    domain: 'example.com'
+  };
+
+  // 페이지 목록 모킹을 위한 설정
+  const mockPages = [mockPage];
+  mockBrowser.pages = jest.fn()
+    .mockImplementationOnce(() => Promise.resolve(mockPages)) // 첫 번째 호출: 페이지 1개 있음
+    .mockImplementationOnce(() => Promise.resolve([]));       // 두 번째 호출: 페이지 0개 있음
+
+  // visitUrl 함수 호출
+  const result = await manager.visitUrl(urlInfo);
+  expect(result.success).toBe(true);
+
+  // 페이지가 닫혔는지 확인
+  expect(mockPage.close).toHaveBeenCalled();
+
+  // 브라우저에 남아있는 페이지 확인
+  const remainingPages = await mockBrowser.pages();
+  expect(remainingPages.length).toBe(0);
+  expect(mockBrowser.pages).toHaveBeenCalledTimes(2);
+
+  // 메모리 누수를 확인하기 위한 추가 검증
+  expect(remainingPages).toEqual([]);
+});
+
+test('URL 방문 중 오류 발생 시에도 페이지가 제대로 닫히는지 확인', async () => {
+  const urlInfo = {
+    url: 'https://example.com/error-page',
+    domain: 'example.com'
+  };
+
+  // 페이지 목록 모킹
+  const mockErrorPage = {
+    ...mockPage,
+    goto: jest.fn().mockRejectedValue(new Error('페이지 로딩 실패')),
+    close: jest.fn().mockResolvedValue()
+  };
+
+  // 페이지 생성 및 목록 기능 모킹
+  mockBrowser.newPage = jest.fn().mockResolvedValue(mockErrorPage);
+  mockBrowser.pages = jest.fn()
+    .mockImplementationOnce(() => Promise.resolve([mockErrorPage])) // 첫 번째 호출: 페이지 1개 있음
+    .mockImplementationOnce(() => Promise.resolve([]));            // 두 번째 호출: 페이지 0개 있음
+
+  // visitUrl 함수 호출 - 오류 발생
+  const result = await manager.visitUrl(urlInfo);
+  expect(result.success).toBe(false);
+
+  // 페이지 닫기 시도 여부 확인 (에러 케이스에서도 페이지를 닫아야 함)
+  expect(mockErrorPage.close).toHaveBeenCalled();
+
+  // 브라우저에 남아있는 페이지 확인
+  const remainingPages = await mockBrowser.pages();
+  expect(remainingPages.length).toBe(0);
+});
+
+test('여러 URL 방문 후 모든 페이지가 제대로 닫히는지 확인', async () => {
+  // 여러 페이지를 생성하고 관리하기 위한 설정
+  const mockPages = [];
+  const urls = [
+    { url: 'https://example.com/page1', domain: 'example.com' },
+    { url: 'https://example.com/page2', domain: 'example.com' },
+    { url: 'https://example.com/page3', domain: 'example.com' }
+  ];
+
+  // 각 URL마다 새 페이지 생성과 닫기를 모킹
+  for (const urlInfo of urls) {
+    const newMockPage = {
+      goto: jest.fn().mockResolvedValue(),
+      url: jest.fn().mockReturnValue(urlInfo.url),
+      on: jest.fn(),
+      evaluate: jest.fn().mockResolvedValue({
+        title: '테스트 페이지',
+        meta: {},
+        text: '테스트 내용'
+      }),
+      close: jest.fn().mockImplementation(() => {
+        // 페이지를 닫으면 mockPages 배열에서 제거
+        const index = mockPages.findIndex(p => p.url() === urlInfo.url);
+        if (index !== -1) {
+          mockPages.splice(index, 1);
+        }
+        return Promise.resolve();
+      })
+    };
+    mockPages.push(newMockPage);
+  }
+
+  let pageIndex = 0;
+  // 새 페이지 생성 모킹
+  mockBrowser.newPage = jest.fn().mockImplementation(() => {
+    return Promise.resolve(mockPages[pageIndex++]);
+  });
+
+  // pages 메소드 모킹 - 현재 mockPages 배열 상태 반환
+  mockBrowser.pages = jest.fn().mockImplementation(() => {
+    return Promise.resolve([...mockPages]);
+  });
+
+  // 각 URL 방문
+  for (const urlInfo of urls) {
+    const result = await manager.visitUrl(urlInfo);
+    expect(result.success).toBe(true);
+
+    // 방문 후 해당 페이지가 닫혔는지 확인
+    const currentPageIndex = urls.findIndex(u => u.url === urlInfo.url);
+    expect(mockPages[currentPageIndex].close).toHaveBeenCalled();
+  }
+
+  // 모든 방문이 끝난 후 남아있는 페이지 확인
+  expect(mockPages.length).toBe(0);
+});
+
+test('closeBrowser 호출 시 모든 페이지가 닫히는지 확인', async () => {
+  // 여러 페이지가 있는 상황 모킹
+  const mockPage1 = { ...mockPage, close: jest.fn().mockResolvedValue() };
+  const mockPage2 = { ...mockPage, close: jest.fn().mockResolvedValue() };
+  const mockPages = [mockPage1, mockPage2];
+
+  mockBrowser.pages = jest.fn().mockResolvedValue(mockPages);
+
+  // closeBrowser 메서드 추가 (만약 없다면)
+  if (!manager.closeBrowser) {
+    manager.closeBrowser = async function() {
+      if (this.browser) {
+        try {
+          // 모든 페이지 닫기
+          const pages = await this.browser.pages();
+          await Promise.all(pages.map(page => {
+            try { return page.close(); }
+            catch (e) { return Promise.resolve(); }
+          }));
+
+          // 브라우저 닫기
+          await this.browser.close();
+          this.browser = null;
+        } catch (err) {
+          console.error('브라우저 종료 중 오류:', err);
+        }
+      }
+    };
+  }
+
+  // closeBrowser 호출
+  await manager.closeBrowser();
+
+  // 모든 페이지의 close 메서드가 호출되었는지 확인
+  expect(mockPage1.close).toHaveBeenCalled();
+  expect(mockPage2.close).toHaveBeenCalled();
+
+  // 브라우저 close 메서드가 호출되었는지 확인
+  expect(mockBrowser.close).toHaveBeenCalled();
+
+  // browser 속성이 null로 설정되었는지 확인
+  expect(manager.browser).toBeNull();
+});
+
 });

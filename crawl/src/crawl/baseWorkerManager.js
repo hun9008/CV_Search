@@ -517,6 +517,29 @@ async visitUrl(urlInfo) {
       visitedAt: new Date().toISOString()
     };
   }
+  finally {
+        // 추가: 남아있는 페이지 확인 및 정리
+    try {
+      if (this.browser) {
+        const pages = await this.browser.pages();
+        if (pages.length > 0) {
+          console.log(`방문 후 ${pages.length}개의 미닫힘 페이지 발견, 정리 중...`);
+          await Promise.all(pages.map(page => {
+            try {
+              return page.close();
+            } catch (e) {
+              console.warn('페이지 닫기 실패:', e.message);
+              return Promise.resolve();
+            }
+          }));
+          console.log('모든 페이지가 정리되었습니다.');
+        }
+      }
+    } catch (pageCloseError) {
+      console.error('페이지 정리 중 오류:', pageCloseError);
+    }
+
+  }
 }
 
 /**
