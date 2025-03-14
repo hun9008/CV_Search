@@ -60,14 +60,15 @@ const BROWSER = {
 // 크롤링 설정
 const CRAWLER = {
   // 최대 방문 URL 수
-  MAX_URLS: parseInt(process.env.MAX_URLS || '1000'),
+  MAX_URLS: parseInt(process.env.MAX_URLS || '100000000'),
 
-  STRATEGY:'sequential',
+  STRATEGY:'random',
   // 병렬 처리 수
   CONCURRENCY: {
     PAGES: parseInt(process.env.CONCURRENCY_PAGES || '3'),    // 동시에 열 수 있는 페이지 수
     SCRIPTS: parseInt(process.env.CONCURRENCY_SCRIPTS || '5') // 동시에 실행할 스크립트 수
   },
+  BASE_DOMAIN:'career.naver.com',
 
   // 요청 사이 지연 시간 (밀리초)
   DELAY_BETWEEN_REQUESTS: parseInt(process.env.DELAY || '3000'),

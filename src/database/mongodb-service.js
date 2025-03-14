@@ -15,6 +15,206 @@ class MongoDBService {
   /**
    * MongoDB 서비스에 연결합니다. Docker가 실행 중이 아니면 시작을 시도합니다.
    */
+/**
+ * 모든 도메인을 URL 개수 기준으로 정렬하여 가져옵니다.
+ * @param {Object} options 옵션 객체
+ * @param {string} options.sortBy 정렬 기준 ('total', 'visited', 'pending', 기본값: 'total')
+ * @param {number} options.sortOrder 정렬 순서 (1: 오름차순, -1: 내림차순, 기본값: -1)
+ * @param {number} options.limit 결과 제한 개수 (기본값: 0 = 모든 결과)
+ * @returns {Promise<Array<Object>>} 도메인 통계 배열
+ */
+async getDomainsByUrlCount(options = {}) {
+  await this.connect();
+
+  try {
+    const {
+      sortBy = 'total',
+      sortOrder = -1,
+      limit = 0
+    } = options;
+
+    console.log(`도메인 통계 조회 중... 정렬 기준: ${sortBy}, 정렬 순서: ${sortOrder === 1 ? '오름차순' : '내림차순'}`);
+
+    // 정렬 필드 설정
+    let sortField;
+    switch (sortBy) {
+      case 'visited':
+        sortField = 'stats.visited';
+        break;
+      case 'pending':
+        sortField = 'stats.pending';
+        break;
+      case 'total':
+      default:
+        sortField = 'stats.total';
+        break;
+    }
+
+    // 도메인 목록과 URL 통계를 가져오는 집계 파이프라인
+    const result = await this.domainsCollection.aggregate([
+      // 각 도메인의 URL 관련 통계 계산
+      {
+        $project: {
+          _id: 0,
+          domain: 1,
+          url: 1,
+          created_at: 1,
+          updated_at: 1,
+          stats: {
+            total: { $size: { $ifNull: ['$suburl_list', []] } },
+            visited: {
+              $size: {
+                $filter: {
+                  input: { $ifNull: ['$suburl_list', []] },
+                  as: 'url',
+                  cond: '$$url.visited'
+                }
+              }
+            }
+          }
+        }
+      },
+      // 미방문 URL 수 계산
+      {
+        $addFields: {
+          'stats.pending': { $subtract: ['$stats.total', '$stats.visited'] }
+        }
+      },
+      // 방문된 URL 비율 계산 (총 URL이 0이 아닐 경우에만)
+      {
+        $addFields: {
+          'stats.visitedRatio': {
+            $cond: [
+              { $eq: ['$stats.total', 0] },
+              0,
+              { $divide: ['$stats.visited', '$stats.total'] }
+            ]
+          }
+        }
+      },
+      // 결과 정렬
+      {
+        $sort: { [sortField]: sortOrder, domain: 1 }
+      },
+      // 결과 제한
+      ...(limit > 0 ? [{ $limit: limit }] : [])
+    ]).toArray();
+
+    console.log(`총 ${result.length}개 도메인 통계 조회 완료`);
+
+    // 결과를 콘솔에 표 형식으로 출력 (선택적)
+    if (result.length > 0) {
+      console.table(result.map(item => ({
+        domain: item.domain,
+        total: item.stats.total,
+        visited: item.stats.visited,
+        pending: item.stats.pending,
+        visitedRatio: `${Math.round(item.stats.visitedRatio * 100)}%`
+      })));
+    }
+
+    return result;
+  } catch (error) {
+    console.error('URL 개수 기준 도메인 조회 중 오류:', error);
+    throw error;
+  }
+}
+
+  /**
+ * URL 총 개수와 기타 통계를 가져옵니다.
+ * @param {Object} options 검색 옵션 (getAllUrls와 동일)
+ * @returns {Promise<Object>} 통계 정보
+ */
+async getUrlStats(options = {}) {
+  await this.connect();
+
+  try {
+    const {
+      domain = null,
+      onlyVisited = null,
+      searchText = null
+    } = options;
+
+    // 파이프라인 구성
+    const pipeline = [];
+
+    // 도메인 필터링
+    if (domain) {
+      pipeline.push({ $match: { domain } });
+    }
+
+    // unwind로 suburl_list 펼치기
+    pipeline.push({
+      $unwind: {
+        path: '$suburl_list',
+        preserveNullAndEmptyArrays: false
+      }
+    });
+
+    // 방문 여부 필터링
+    if (onlyVisited !== null) {
+      pipeline.push({
+        $match: { 'suburl_list.visited': onlyVisited }
+      });
+    }
+
+    // 텍스트 검색
+    if (searchText) {
+      pipeline.push({
+        $match: {
+          $or: [
+            { 'suburl_list.url': { $regex: searchText, $options: 'i' } },
+            { 'suburl_list.text': { $regex: searchText, $options: 'i' } }
+          ]
+        }
+      });
+    }
+
+    // 통계 계산
+    pipeline.push({
+      $group: {
+        _id: null,
+        totalUrls: { $sum: 1 },
+        visitedUrls: { $sum: { $cond: ['$suburl_list.visited', 1, 0] } },
+        urlsWithText: { $sum: { $cond: [{ $ne: ['$suburl_list.text', null] }, 1, 0] } },
+        visitedUrlsNoText: { $sum: { $cond: [{ $and: ['$suburl_list.visited', { $eq: ['$suburl_list.text', null] }] }, 1, 0] } },
+        domains: { $addToSet: '$domain' }
+      }
+    });
+
+    // 최종 형식
+    pipeline.push({
+      $project: {
+        _id: 0,
+        totalUrls: 1,
+        visitedUrls: 1,
+        pendingUrls: { $subtract: ['$totalUrls', '$visitedUrls'] },
+        urlsWithText: 1,
+        visitedUrlsNoText: 1,
+        uniqueDomains: { $size: '$domains' }
+      }
+    });
+
+    // 집계 실행
+    const results = await this.domainsCollection.aggregate(pipeline).toArray();
+
+    // 결과가 없으면 기본값 반환
+    if (results.length === 0) {
+      return {
+        totalUrls: 0,
+        visitedUrls: 0,
+        pendingUrls: 0,
+        urlsWithText: 0,
+        uniqueDomains: 0
+      };
+    }
+
+    return results[0];
+  } catch (error) {
+    console.error('URL 통계 가져오기 실패:', error);
+    throw error;
+  }
+}
 
   async setUri(uri) {
     this.uri = uri;

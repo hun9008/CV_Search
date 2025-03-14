@@ -29,8 +29,11 @@ class BaseWorkerManager {
     this.startUrl = options.startUrl || CONFIG.DOMAINS.DEFAULT_URL;
     this.delayBetweenRequests = options.delayBetweenRequests || CONFIG.CRAWLER.DELAY_BETWEEN_REQUESTS;
     this.headless = options.headless !== undefined ? options.headless : CONFIG.BROWSER.HEADLESS;
-    this.maxUrls = options.maxUrls || CONFIG.CRAWLER.MAX_URLS;
+    this.maxUrls = CONFIG.CRAWLER.MAX_URLS;
     this.strategy = CONFIG.CRAWLER.STRATEGY;
+    if (this.strategy == "specific") {
+      this.specificDomain = CONFIG.CRAWLER.BASE_DOMAIN;
+    }
     // 결과 저장 배열
     this.results = [];
 
@@ -78,22 +81,82 @@ class BaseWorkerManager {
     }
   }
 
-  /**
-   * URL이 방문 가능한지 확인 (허용된 도메인인지)
-   * @param {string} url 확인할 URL
-   * @returns {boolean} 방문 가능 여부
-   */
-  isUrlAllowed(url ,originalDomain) {
-    try {
-      const domain = this.extractDomain(url);
-      return originalDomain.some(allowedDomain =>
-        domain === allowedDomain || domain.endsWith(`.${allowedDomain}`)
-      );
-    } catch (error) {
-      return false;
-    }
-  }
+/**
+ * 주어진 URL이 허용된 도메인에 속하는지 확인합니다.
+ * @param {string} url - 확인할 URL
+ * @param {string[]} allowedDomains - 허용된 도메인 목록
+ * @returns {boolean} - URL이 허용되면 true, 그렇지 않으면 false
+    */
+    isUrlAllowed(url, allowedDomains) {
+      try {
+        // URL이 유효한지 검증
+        const parsedUrl = new URL(url);
 
+        // 지원되는 프로토콜인지 확인 (http 또는 https만 허용)
+        if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+          return false;
+        }
+
+        // 도메인 추출
+        const domain = parsedUrl.host;
+        console.log('domain :', domain);
+        // 허용된 도메인인지 확인
+        return allowedDomains.some(allowedDomain =>
+          domain === allowedDomain ||
+          domain.endsWith(`.${allowedDomain}`)
+        );
+      } catch (error) {
+        // URL 파싱에 실패하면 (잘못된 URL 형식) false 반환
+        return false;
+      }
+    }
+
+
+
+
+  resolveUrl(base, relative) {
+      try {
+        // 이미 절대 URL인 경우
+        if (relative.startsWith('http://') || relative.startsWith('https://')) {
+          return relative;
+        }
+
+        // 빈 링크, 자바스크립트 링크, 앵커 링크, 메일 링크 건너뛰기
+        if (!relative || relative === '#' ||
+            relative.startsWith('javascript:') ||
+            relative.startsWith('mailto:') ||
+            relative.startsWith('tel:')) {
+          return null;
+        }
+
+        // 루트 경로인 경우
+        if (relative.startsWith('/')) {
+          return new URL(relative, base).href;
+        }
+
+        // 프로토콜 상대 URL인 경우
+        if (relative.startsWith('//')) {
+          return new URL(`https:${relative}`).href;
+        }
+
+        // 상대 경로인 경우
+        // 현재 경로의 마지막 부분 제거 (파일명이나 마지막 디렉토리)
+        const pathParts = currentPath.split('/');
+        // 파일 확장자가 있거나 마지막 요소가 비어있지 않은 경우 마지막 부분 제거
+        if (pathParts[pathParts.length - 1].includes('.') || pathParts[pathParts.length - 1] !== '') {
+          pathParts.pop();
+        }
+        let basePath = pathParts.join('/');
+        if (!basePath.endsWith('/')) {
+          basePath += '/';
+        }
+
+        return new URL(basePath + relative, base).href;
+      } catch (e) {
+        console.warn(`URL 변환 실패: ${relative}`, e);
+        return null;
+      }
+    }
   /**
    * 페이지의 내용을 추출
    * @param {Page} page Puppeteer 페이지 객체
@@ -184,51 +247,8 @@ async extractLinks(page, allowedDomains) {
   console.log(`링크 추출 중... 기준 URL: ${pageUrl}, 허용 도메인: ${allowedDomains.join(', ')}`);
 
   // 페이지 내 모든 링크 추출 (절대 경로와 상대 경로 모두)
-  const links = await page.evaluate((baseUrl, currentPath) => {
+  const links = await page.evaluate(() => {
     // 상대 경로를 절대 경로로 변환하는 함수
-    function resolveUrl(base, relative) {
-      try {
-        // 이미 절대 URL인 경우
-        if (relative.startsWith('http://') || relative.startsWith('https://')) {
-          return relative;
-        }
-
-        // 빈 링크, 자바스크립트 링크, 앵커 링크, 메일 링크 건너뛰기
-        if (!relative || relative === '#' ||
-            relative.startsWith('javascript:') ||
-            relative.startsWith('mailto:') ||
-            relative.startsWith('tel:')) {
-          return null;
-        }
-
-        // 루트 경로인 경우
-        if (relative.startsWith('/')) {
-          return new URL(relative, base).href;
-        }
-
-        // 프로토콜 상대 URL인 경우
-        if (relative.startsWith('//')) {
-          return new URL(`https:${relative}`).href;
-        }
-
-        // 상대 경로인 경우
-        // 현재 경로의 마지막 부분 제거 (파일명이나 마지막 디렉토리)
-        const pathParts = currentPath.split('/');
-        // 파일 확장자가 있거나 마지막 요소가 비어있지 않은 경우 마지막 부분 제거
-        if (pathParts[pathParts.length - 1].includes('.') || pathParts[pathParts.length - 1] !== '') {
-          pathParts.pop();
-        }
-        let basePath = pathParts.join('/');
-        if (!basePath.endsWith('/')) {
-          basePath += '/';
-        }
-
-        return new URL(basePath + relative, base).href;
-      } catch (e) {
-        console.warn(`URL 변환 실패: ${relative}`, e);
-        return null;
-      }
-    }
 
     // 모든 앵커 요소 찾기
     const anchors = Array.from(document.querySelectorAll('a[href]'));
@@ -236,13 +256,12 @@ async extractLinks(page, allowedDomains) {
 
     anchors.forEach(anchor => {
       const href = anchor.getAttribute('href');
-
       // href 속성이 있는지 확인
-      if (!href) return;
-
-      const resolvedUrl = resolveUrl(baseUrl, href);
-      if (resolvedUrl) {
-        extractedUrls.push(resolvedUrl);
+      if (href) {
+        const resolvedUrl = this.resolveUrl(pageUrl, href);
+        if (resolvedUrl) {
+          extractedUrls.push(resolvedUrl);
+        }
       }
     });
 
@@ -255,6 +274,7 @@ async extractLinks(page, allowedDomains) {
   // 허용된 도메인 필터링
   const allowedLinks = uniqueLinks.filter(url => {
     try {
+      console.log('url :', url, allowedDomains, this.isUrlAllowed(url, allowedDomains));
       return this.isUrlAllowed(url, allowedDomains);
     } catch (e) {
       console.warn(`URL 필터링 실패: ${url}`, e);
@@ -276,7 +296,7 @@ async extractLinks(page, allowedDomains) {
 async getNextUrl() {
   // 클래스 멤버 변수로 도메인 인덱스 추적 (생성자에 추가 필요)
   if (!this.currentDomainIndex) {
-    this.currentDomainIndex = 1;
+    this.currentDomainIndex = 0;
   }
 
   // 허용된 도메인 목록 가져오기
@@ -297,7 +317,7 @@ async getNextUrl() {
   switch (this.strategy) {
     case 'specific':
       // 특정 도메인만 탐색
-      if (!specificDomain) {
+      if (!this.specificDomain) {
         console.warn('specific 전략에 도메인이 지정되지 않았습니다. 기본 도메인을 사용합니다.');
         targetDomain = this.baseDomain;
       } else {
@@ -329,6 +349,7 @@ async getNextUrl() {
 
     if (urls && urls.length > 0) {
       console.log(`도메인 ${targetDomain}에서 방문할 URL을 찾았습니다: ${urls[0]}`);
+      this._recursionCount = 0;
       return { url: urls[0], domain: targetDomain };
     } else {
       console.log(`도메인 ${targetDomain}에 방문하지 않은 URL이 없습니다.`);
@@ -529,25 +550,30 @@ async getNextUrl() {
 
       // URL을 하나씩 가져와 처리
       let nextUrlInfo;
-      while ((nextUrlInfo = await this.getNextUrl()) && visitCount < this.maxUrls) {
-        visitCount++;
-        console.log(`URL ${visitCount}/${this.maxUrls} 처리 중...`);
+      while (visitCount < this.maxUrls &&(nextUrlInfo = await this.getNextUrl())) {
+        try {
+          visitCount++;
+          console.log(`URL ${visitCount}/${this.maxUrls} 처리 중...`);
 
-        await this.visitUrl(nextUrlInfo.url, nextUrlInfo.domain);
+          await this.visitUrl(nextUrlInfo.url, nextUrlInfo.domain);
 
-        // 전체 통계 출력
-        let totalStats = { total: 0, visited: 0, pending: 0 };
-        const stats = await db.getDomainStats(nextUrlInfo.domain);
-        totalStats.total += stats.total;
-        totalStats.visited += stats.visited;
-        totalStats.pending += stats.pending;
+          // 전체 통계 출력
+          let totalStats = { total: 0, visited: 0, pending: 0 };
+          const stats = await db.getDomainStats(nextUrlInfo.domain);
+          totalStats.total += stats.total;
+          totalStats.visited += stats.visited;
+          totalStats.pending += stats.pending;
 
-        console.log(`전체 통계: 총 ${totalStats.total}개 URL, 방문 ${totalStats.visited}개, 대기 ${totalStats.pending}개`);
+          console.log(`전체 통계: 총 ${totalStats.total}개 URL, 방문 ${totalStats.visited}개, 대기 ${totalStats.pending}개`);
 
-        // 요청 사이 지연 추가
-        if (totalStats.pending > 0 && visitCount < this.maxUrls) {
-          console.log(`다음 URL 처리 전 ${this.delayBetweenRequests}ms 대기...`);
-          await new Promise(resolve => setTimeout(resolve, this.delayBetweenRequests));
+          // 요청 사이 지연 추가
+          if (totalStats.pending > 0 && visitCount < this.maxUrls) {
+            console.log(`다음 URL 처리 전 ${this.delayBetweenRequests}ms 대기...`);
+            await new Promise(resolve => setTimeout(resolve, this.delayBetweenRequests));
+          }
+        }
+        catch(error) {
+            console.error(`총 ${visitCount}개 URL 방문  중 ${error}`);
         }
       }
 
@@ -557,6 +583,7 @@ async getNextUrl() {
     } finally {
       this.isRunning = false;
     }
+    return;
   }
 
   /**
@@ -614,8 +641,8 @@ manager.run().then(async () => {
   console.log(`- 남은 방문 예정 URL: ${totalStats.pending}개`);
   console.log(`- 저장된 결과 항목 수: ${manager.results.length}개`);
   console.log('모든 작업이 완료되었습니다.');
-  process.exit(0);
 }).catch(error => {
-  console.error('실행 중 오류가 발생했습니다:', error);
-  process.exit(1);
+  console.error(`실행 중 오류가 발생했습니다: ${error}`);
 });
+
+module.exports = { BaseWorkerManager };
