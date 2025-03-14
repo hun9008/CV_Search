@@ -6,7 +6,7 @@ const fs = require('fs');
 // config.js 파일 가져오기
 let CONFIG;
 try {
-  CONFIG = require('../crawl/config');
+  CONFIG = require('../../crawl/config');
 } catch (error) {
   console.warn('config.js 파일을 찾을 수 없습니다. 기본 설정을 사용합니다.', error.message);
   // 기본 설정 사용
