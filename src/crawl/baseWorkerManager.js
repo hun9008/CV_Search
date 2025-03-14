@@ -1,9 +1,10 @@
+require('module-alias/register');
 const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
-const {MongoDBService} = require('../database/mongodb-service');
-const { infiniteScroll, extractAndExecuteScripts } = require('./baseWorker');
-const CONFIG = require('./config');
+const {MongoDBService} = require('@database/mongodb-service');
+const { infiniteScroll, extractAndExecuteScripts } = require('@crawl/baseWorker');
+const CONFIG = require('@config/config');
 db = new MongoDBService();
 
 // 설정 초기화 (필요한 디렉토리 생성 등)

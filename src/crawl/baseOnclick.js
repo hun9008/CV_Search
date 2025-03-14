@@ -1,4 +1,4 @@
-const { WorkerPool } = require('./worker-task');
+const { WorkerPool } = require('@crawl/worker-task');
 
 /**
  * 페이지에서 onclick 속성을 가진 요소들을 찾아 이벤트를 실행

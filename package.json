@@ -1,0 +1,26 @@
+{
+  "name": "cv_search",
+  "version": "1.0.0",
+  "description": "스크립트 분석 및 URL 추출 웹 크롤러",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/crawl/baseWorkerManager",
+    "test": "jest --config=test/__tests__/jest.config.cjs --detectOpenHandles"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@src": "src",
+    "@database": "src/database",
+    "@crawl": "src/crawl",
+    "@test": "test",
+    "@config": "config"
+  },
+  "dependencies": {
+    "module-alias": "^2.2.3",
+    "puppeteer": "^20.8.0"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "jest-html-reporters": "^3.1.7"
+  }
+}

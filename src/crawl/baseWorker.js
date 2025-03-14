@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-const { extractAndProcessOnClicks } = require('./baseOnclick');
+const { extractAndProcessOnClicks } = require('@crawl/baseOnclick');
 /**
  * 페이지를 아래로 스크롤하는 함수
  * @param {Page} page Puppeteer 페이지 객체
