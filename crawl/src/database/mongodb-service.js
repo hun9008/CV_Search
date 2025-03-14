@@ -105,7 +105,7 @@ async getDomainsByUrlCount(options = {}) {
     // 결과를 콘솔에 표 형식으로 출력 (선택적)
     if (result.length > 0) {
       console.table(result.map(item => ({
-        domain: item.domain,
+        domain: 'https:\\www.'+item.domain,
         total: item.stats.total,
         visited: item.stats.visited,
         pending: item.stats.pending,

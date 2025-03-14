@@ -1,5 +1,5 @@
 const { BaseWorkerManager } = require('@crawl/baseWorkerManager');
-
+const { extractDomain } = require('@crawl/urlManager');
 // BaseWorkerManager를 직접 import할 수 없으므로 모킹
 jest.mock('@database/mongodb-service', () => {
   return {
@@ -93,7 +93,7 @@ describe('BaseWorkerManager - extractDomain', () => {
     ];
 
     urls.forEach((url, index) => {
-      const domain = manager.extractDomain(url);
+      const domain = extractDomain(url);
       expect(domain).toBe(expectedDomains[index]);
     });
   });
@@ -108,7 +108,7 @@ describe('BaseWorkerManager - extractDomain', () => {
 
     // 모든 잘못된 URL에 대해 함수가 오류를 던지지 않고 기본값을 반환하는지 확인
     invalidUrls.forEach(url => {
-      expect(() => manager.extractDomain(url)).not.toThrow();
+      expect(() => extractDomain(url)).not.toThrow();
     });
   });
 });

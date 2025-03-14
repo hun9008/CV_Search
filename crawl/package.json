@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/crawl/baseWorkerManager",
-    "test": "jest --config=test/__tests__/jest.config.cjs --detectOpenHandles"
+    "test": "jest --config=test/__tests__/jest.config.cjs --detectOpenHandles",
+    "stats" :"node src/database/domain-url-stats ",
+    "visited-reset": "node src/database/reset-visits"
   },
   "_moduleAliases": {
     "@root": ".",

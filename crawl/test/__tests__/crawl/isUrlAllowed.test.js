@@ -1,4 +1,5 @@
 const { BaseWorkerManager } = require('@crawl/baseWorkerManager');
+const { extractDomain ,isUrlAllowed } = require('@crawl/urlManager');
 
 // 모킹 설정
 jest.mock('@database/mongodb-service');
@@ -37,7 +38,7 @@ describe('BaseWorkerManager - isUrlAllowed', () => {
     ];
 
     allowedUrls.forEach(url => {
-      expect(manager.isUrlAllowed(url, allowedDomains)).toBe(true);
+      expect(isUrlAllowed(url, allowedDomains)).toBe(true);
     });
   });
 
@@ -53,7 +54,7 @@ describe('BaseWorkerManager - isUrlAllowed', () => {
     ];
 
     disallowedUrls.forEach(url => {
-      expect(manager.isUrlAllowed(url, allowedDomains)).toBe(false);
+      expect(isUrlAllowed(url, allowedDomains)).toBe(false);
     });
   });
 
@@ -68,7 +69,7 @@ describe('BaseWorkerManager - isUrlAllowed', () => {
     ];
 
     invalidUrls.forEach(url => {
-      expect(manager.isUrlAllowed(url, allowedDomains)).toBe(false);
+      expect(isUrlAllowed(url, allowedDomains)).toBe(false);
     });
   });
 });
