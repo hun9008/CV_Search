@@ -1,5 +1,5 @@
 const { MongoClient } = require('mongodb');
-const CONFIG = require('../crawl/config');
+const CONFIG = require('../../crawl/config');
 const { startMongoDBService, checkMongoDBStatus } = require('./init-mongodb');
 
 class MongoDBService {
