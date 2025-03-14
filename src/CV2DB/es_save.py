@@ -4,6 +4,8 @@ from sentence_transformers import SentenceTransformer
 from elasticsearch import Elasticsearch
 import numpy as np
 
+from sqlQuery import fetch_job_data
+
 CV_DATA_DIR = "../../data/cv"
 JOBS_DATA_DIR = "../../data/naver" 
 ES_HOST = "http://127.0.0.1:9200"
@@ -76,6 +78,34 @@ def process_and_store_documents(DATA_DIR, INDEX_NAME):
         response = es.index(index=INDEX_NAME, body=doc)
         print(f"{filename} Saved. Document ID: {response['_id']}")
 
+def process_and_store_jobs(INDEX_NAME):
+    texts = []
+    vectors = []
+
+    jobs = fetch_job_data()
+
+    for job in jobs:
+        texts.append(job)
+        print(f"Processing job: {len(job)} characters")
+
+        vector = encode_long_text(job)
+        vectors.append(vector)
+
+    all_equal = all(v == vectors[0] for v in vectors)
+    print("All vectors are the same:", all_equal)
+    
+    if all_equal:
+        for i, vector in enumerate(vectors):
+            print(f"Vector {i} first 3 values: {vector[:3]}")
+    
+    for text, vector in zip(texts, vectors):
+        doc = {
+            "text": text,
+            "vector": vector
+        }
+
+        response = es.index(index=INDEX_NAME, body=doc)
+        print(f"Saved. Document ID: {response['_id']}")
 
 def create_index(INDEX_NAME):
     if es.indices.exists(index=INDEX_NAME):
@@ -117,6 +147,7 @@ if __name__ == "__main__":
     create_index(CV_INDEX_NAME)
     create_index(JOBS_INDEX_NAME)
     process_and_store_documents(CV_DATA_DIR, CV_INDEX_NAME)
-    process_and_store_documents(JOBS_DATA_DIR, JOBS_INDEX_NAME)
+    # process_and_store_documents(JOBS_DATA_DIR, JOBS_INDEX_NAME)
+    process_and_store_jobs(JOBS_INDEX_NAME)
     valid_check(CV_INDEX_NAME)
     valid_check(JOBS_INDEX_NAME)

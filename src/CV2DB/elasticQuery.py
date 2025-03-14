@@ -132,7 +132,7 @@ def search_combined_jobs(cv_vector, cv_text, top_k=3, cosine_weight=0.5, bm25_we
     
     top_jobs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]
     
-    return [(job_id, score) for job_id, score in top_jobs]
+    return [(job_id, score, cosine_scores.get(job_id, 0), bm25_scores.get(job_id, 0)) for job_id, score in top_jobs]
 
 
 if __name__ == "__main__":
@@ -154,12 +154,12 @@ if __name__ == "__main__":
 
         print("Combined Similar 10 Job Posting:")
         for job in combine_jobs:
-            print(f"Job ID: {job[0]}, Score: {job[1]}")
-            text = es.get(index=JOBS_INDEX_NAME, id=job[0])["_source"]["text"]
-            lines = text.split('\n')
-            for line in lines:
-                if line.startswith('[') and len(line) < 100:
-                    print(f"Text: {line}\n")
+                job_id, combined_score, cosine_score, bm25_score = job
+                src = es.get(index=JOBS_INDEX_NAME, id=job_id)["_source"]
+                company_name = src["text"].split('\n')[0].split(': ')[1].strip('"')
+                department = src["text"].split('\n')[1].split(': ')[1].strip('"')
+
+                print(f"[{company_name}] {department} | Combined Score: {combined_score:.2f} | Cosine: {cosine_score:.2f} | BM25: {bm25_score:.2f}\n")
 
         # cosine_similar_jobs = search_cosine_similar_jobs(cv_vector, top_k=3)
 
