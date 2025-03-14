@@ -1,39 +1,73 @@
 
-# CV Search
-
-service intro...
+# CV_search
 
 ## Team Member
 
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Part</th>
-<th>What I do</th>
-</tr>
-</thead>
-<tfoot>
-<tbody>
-<tr>
-<td>[팀장] 정용훈</td>
-<td>BE, AI</td>
-<td></td>
-</tr>
-<tr>
-<td>[팀원] 육세현</td>
-<td>BE,DM</td>
-<td>모든 직무 데이터를 크롤링합니다.</td>
-</tr>
-<tr>
-<td>...</td>
-<td>blk</td>
-<td>blk</td>
-</tr>
-<tr>
-<td>...</td>
-<td>blk</td>
-<td>blk</td>
-</tr>
-</tbody>
-</table>
+Team Member
+| Name | Part | What I do |
+|------|------|-----------|
+| [팀장] 정용훈 | BE, AI | |
+| [팀원] 육세현 | BE, DM | 모든 직무 데이터를 크롤링합니다. |
+| ... | blk | blk |
+| ... | blk | blk |
+
+
+## Crwal 프로젝트 구조
+```
+crwal/
+├── LICENSE
+├── config
+├── node_modules
+├── package-lock.json
+├── package.json
+├── requirements.txt
+├── src
+└── test
+
+```
+
+
+
+## 설치 및 실행 방법
+
+### 의존성 설치
+
+```bash
+npm install
+
+```
+
+
+### 애플리케이션 실행
+이 명령은 `src/crawl/baseWorkerManager`를 실행하여 크롤링 프로세스를 시작합니다.
+
+```bash
+npm start
+
+```
+
+### 테스트 실행
+
+```bash
+npm test
+
+```
+이 명령은 Jest를 사용하여 모든 테스트를 실행합니다. 테스트 결과는 콘솔에 표시되며, HTML 리포트는 test/__tests__/html-report/report.html에 생성됩니다
+
+
+## 환경설정
+
+프로젝트는 module-alias를 사용하여 경로 별칭을 지원합니다. 다음과 같은 별칭이 정의되어 있습니다:
+
+- @src - src 디렉토리
+- @crawl - src/crawl 디렉토리
+- @database - src/database/MongoDB 디렉토리
+- @test - test 디렉토리
+- @config - config 디렉토리
+
+이를 통해 다음과 같이 모듈을 가져올 수 있습니다:
+
+```js
+const { BaseWorkerManager } = require('@crawl/baseWorkerManager');
+const { checkMongoDBStatus } = require('@database/init-mongodb');
+```
