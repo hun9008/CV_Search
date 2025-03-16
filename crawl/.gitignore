@@ -1,5 +1,6 @@
 .env
 **/node_modules
+**/package-lock.json
 /src/CV2DB/vila
 __pycache__
 .pytest_cache
