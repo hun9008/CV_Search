@@ -643,7 +643,7 @@ async saveVisitResult(visitResult) {
       await db.connect();
 
       // 브라우저 초기화
-      await this.initBrowser();
+
 
       // 방문 URL 카운터
       let visitCount = 0;
@@ -653,6 +653,7 @@ async saveVisitResult(visitResult) {
       while (visitCount < this.maxUrls &&(nextUrlInfo = await this.getNextUrl())) {
         try {
           visitCount++;
+           await this.initBrowser();
           logger.info(`URL ${visitCount}/${this.maxUrls} 처리 중...`);
           this.currentUrl = nextUrlInfo;
                 // URL 방문 및 처리
@@ -677,6 +678,8 @@ async saveVisitResult(visitResult) {
         }
         catch(error) {
             logger.error(`총 ${visitCount}개 URL 방문  중 ${error}`);
+        } finally {
+            await this.closeBrowser();
         }
       }
 
