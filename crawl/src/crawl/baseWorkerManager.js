@@ -91,19 +91,10 @@ async initBrowser() {
         this.killChromeProcesses();
       }
 
-      // 다른 정리 작업이 필요한 경우 여기에 추가
-      // 정상 종료
       process.exit(0);
     };
 
-    // 종료 신호 캐치
-    process.on('SIGINT', processExit);
-    process.on('SIGTERM', processExit);
-    process.on('SIGHUP', processExit);
-    process.on('uncaughtException', (err) => {
-      logger.error('처리되지 않은 예외:', err);
-      processExit();
-    });
+
   }
 
   return this.browser;
@@ -687,10 +678,7 @@ async saveVisitResult(visitResult) {
     } catch (error) {
       logger.error('큐 처리 중 오류:', error);
     } finally {
-      if (this.browser) {
-        await this.browser.close();
-      }
-      this.isRunning = false;
+        await this.closeBrowser();
     }
     return;
   }
@@ -738,14 +726,6 @@ async closeBrowser() {
   }
 }
 
-// 명령줄 인수에서 시작 URL 가져오기
-
-// 관리자 인스턴스 생성
-const manager = new BaseWorkerManager({
-  delayBetweenRequests: CONFIG.CRAWLER.DELAY_BETWEEN_REQUESTS,
-  headless: CONFIG.BROWSER.HEADLESS,
-  maxUrls: CONFIG.CRAWLER.MAX_URLS
-});
 
 // 이 파일이 직접 실행될 때만 아래 코드 실행
 if (require.main === module) {

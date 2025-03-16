@@ -37,7 +37,7 @@ const PATHS = {
 // 브라우저 설정
 const BROWSER = {
   // 헤드리스 모드 (UI 없이 실행)
-  HEADLESS: process.env.HEADLESS !== 'false',
+  HEADLESS: 'new',
 
   // 브라우저 실행 인수
   LAUNCH_ARGS: [
