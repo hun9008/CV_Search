@@ -1,11 +1,11 @@
 require('module-alias/register');
-const fs = require('fs');
-const path = require('path');
 const puppeteer = require('puppeteer');
 const {MongoDBService} = require('@database/mongodb-service');
-const { infiniteScroll, extractAndExecuteScripts } = require('@crawl/baseWorker');
+const {extractAndExecuteScripts , extractAndExecuteScriptsPromise } = require('@crawl/baseWorker');
 const { isUrlAllowed, extractDomain } = require('@crawl/urlManager');
 const CONFIG = require('@config/config');
+const { defaultLogger: logger } = require('@utils/logger');
+const { VisitResult } = require('@models/visitResult');
 db = new MongoDBService();
 
 // 설정 초기화 (필요한 디렉토리 생성 등)
@@ -37,19 +37,11 @@ class BaseWorkerManager {
     if (this.strategy == "specific") {
       this.specificDomain = CONFIG.CRAWLER.BASE_DOMAIN;
     }
-    // 결과 저장 배열
-    this.results = [];
 
     // 실행 상태
     this.isRunning = false;
-
     // 브라우저 인스턴스
     this.browser = null;
-
-    console.log(`BaseWorkerManager 초기화 완료.`);
-    console.log(`- 시작 URL: ${this.startUrl}`);
-    console.log(`- 기본 도메인: ${this.baseDomain}`);
-    console.log(`- 헤드리스 모드: ${this.headless ? '활성화' : '비활성화'}`);
   }
 
 /**
@@ -57,22 +49,27 @@ class BaseWorkerManager {
  */
 async initBrowser() {
   if (!this.browser) {
-    console.log('브라우저 초기화 중...');
+    logger.info(`BaseWorkerManager 초기화 완료.`);
     this.browser = await puppeteer.launch({
-      headless: this.headless,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-      defaultViewport: { width: 1920, height: 1080 }
+      headless: 'new',
+      ignoreHTTPSErrors: true,
+      defaultViewport: null,
+      ignoreDefaultArgs: ['--enable-automation'],
+      args: CONFIG.CRAWLER.LAUNCH_ARGS,
+      defaultViewport: { width: 1920, height: 1080 },
+      timeout: 10_000, // 10 seconds
+      protocolTimeout: 20_000, // 20 seconds
     });
 
     // 브라우저 PID 저장
     this.browserPID = this.browser.process() ? this.browser.process().pid : null;
     if (this.browserPID) {
-      console.log(`브라우저 프로세스 ID: ${this.browserPID}`);
+      logger.info(`브라우저 프로세스 ID: ${this.browserPID}`);
     }
 
     // 프로세스 종료 신호 처리
     const processExit = async () => {
-      console.log('프로세스 종료 감지, 브라우저 정리 중...');
+      logger.info('프로세스 종료 감지, 브라우저 정리 중...');
 
       try {
         if (this.browser) {
@@ -85,10 +82,10 @@ async initBrowser() {
 
           // 브라우저 닫기
           await this.browser.close();
-          console.log('브라우저가 안전하게 종료되었습니다.');
+          logger.info('브라우저가 안전하게 종료되었습니다.');
         }
       } catch (err) {
-        console.error('브라우저 종료 중 오류:', err);
+        logger.error('브라우저 종료 중 오류:', err);
       } finally {
         // 추가: Google Chrome for Testing 프로세스 강제 종료
         this.killChromeProcesses();
@@ -104,7 +101,7 @@ async initBrowser() {
     process.on('SIGTERM', processExit);
     process.on('SIGHUP', processExit);
     process.on('uncaughtException', (err) => {
-      console.error('처리되지 않은 예외:', err);
+      logger.error('처리되지 않은 예외:', err);
       processExit();
     });
   }
@@ -202,7 +199,7 @@ async extractLinks(page, allowedDomains) {
   const baseUrl = new URL(pageUrl).origin;
   const currentPath = new URL(pageUrl).pathname;
 
-  console.log(`링크 추출 중... 기준 URL: ${pageUrl}, 허용 도메인: ${allowedDomains.join(', ')}`);
+  logger.info(`링크 추출 중... 기준 URL: ${pageUrl}, 허용 도메인: ${allowedDomains.join(', ')}`);
 
   // 페이지 내 모든 링크 추출 (절대 경로와 상대 경로 모두)
   const links = await page.evaluate((baseUrl, currentPath) => {
@@ -246,7 +243,7 @@ async extractLinks(page, allowedDomains) {
 
         return new URL(basePath + relative, base).href;
       } catch (e) {
-        console.warn(`URL 변환 실패: ${relative}`, e);
+        logger.warn(`URL 변환 실패: ${relative}`, e);
         return null;
       }
     }
@@ -275,16 +272,12 @@ async extractLinks(page, allowedDomains) {
   // 허용된 도메인 필터링
   const allowedLinks = uniqueLinks.filter(url => {
     try {
-      console.log('url :', url, allowedDomains, isUrlAllowed(url, allowedDomains));
       return isUrlAllowed(url, allowedDomains);
     } catch (e) {
-      console.warn(`URL 필터링 실패: ${url}`, e);
+    logger.warn(`URL 필터링 실패: ${url}`, e);
       return false;
     }
   });
-
-  console.log(`총 ${links.length}개 링크 발견, ${uniqueLinks.length}개 고유 링크, ${allowedLinks.length}개 허용된 링크`);
-
   return allowedLinks;
 }
 
@@ -302,13 +295,11 @@ async getNextUrl() {
 
   // 허용된 도메인 목록 가져오기
   if (!this.availableDomains) {
-    console.log('사용 가능한 도메인 목록 가져오는 중...');
+    logger.info('사용 가능한 도메인 목록 가져오는 중...');
     this.availableDomains = await db.getDomains();
-    console.log(`총 ${this.availableDomains.length}개 도메인 발견됨`);
   }
 
   if (!this.availableDomains || this.availableDomains.length === 0) {
-    console.warn('사용 가능한 도메인이 없습니다.');
     return null;
   }
 
@@ -319,7 +310,7 @@ async getNextUrl() {
     case 'specific':
       // 특정 도메인만 탐색
       if (!this.specificDomain) {
-        console.warn('specific 전략에 도메인이 지정되지 않았습니다. 기본 도메인을 사용합니다.');
+        logger.warn('specific 전략에 도메인이 지정되지 않았습니다. 기본 도메인을 사용합니다.');
         targetDomain = this.baseDomain;
       } else {
         targetDomain = specificDomain;
@@ -330,14 +321,14 @@ async getNextUrl() {
       // 랜덤 도메인 탐색
       const randomIndex = Math.floor(Math.random() * this.availableDomains.length);
       targetDomain = this.availableDomains[randomIndex].domain;
-      console.log(`랜덤 도메인 선택: ${targetDomain} (인덱스: ${randomIndex}/${this.availableDomains.length})`);
+      logger.info(`랜덤 도메인 선택: ${targetDomain} (인덱스: ${randomIndex}/${this.availableDomains.length})`);
       break;
 
     case 'sequential':
     default:
       // 순차적 도메인 탐색
       targetDomain = this.availableDomains[this.currentDomainIndex].domain;
-      console.log(`순차적 도메인 선택: ${targetDomain} (인덱스: ${this.currentDomainIndex}/${this.availableDomains.length})`);
+      logger.info(`순차적 도메인 선택: ${targetDomain} (인덱스: ${this.currentDomainIndex}/${this.availableDomains.length})`);
 
       // 다음 도메인으로 인덱스 이동
       this.currentDomainIndex = (this.currentDomainIndex + 1) % this.availableDomains.length;
@@ -349,15 +340,15 @@ async getNextUrl() {
     const urls = await db.getUnvisitedUrls(targetDomain, 1);
 
     if (urls && urls.length > 0) {
-      console.log(`도메인 ${targetDomain}에서 방문할 URL을 찾았습니다: ${urls[0]}`);
+      logger.info(`도메인 ${targetDomain}에서 방문할 URL을 찾았습니다: ${urls[0]}`);
       this._recursionCount = 0;
       return { url: urls[0], domain: targetDomain };
     } else {
-      console.log(`도메인 ${targetDomain}에 방문하지 않은 URL이 없습니다.`);
+      logger.warn(`도메인 ${targetDomain}에 방문하지 않은 URL이 없습니다.`);
 
       // 특정 도메인 전략일 때는 null 반환
       if (this.strategy === 'specific') {
-        console.log('특정 도메인에 더 이상 방문할 URL이 없습니다.');
+        logger.warn('특정 도메인에 더 이상 방문할 URL이 없습니다.');
         return null;
       }
 
@@ -367,7 +358,7 @@ async getNextUrl() {
       this._recursionCount++;
 
       if (this._recursionCount > this.availableDomains.length) {
-        console.log('모든 도메인에 방문할 URL이 없습니다.');
+        logger.warn('모든 도메인에 방문할 URL이 없습니다.');
         this._recursionCount = 0;
         return null;
       }
@@ -376,16 +367,16 @@ async getNextUrl() {
       return this.getNextUrl();
     }
   } catch (error) {
-    console.error(`도메인 ${targetDomain}에서 URL 가져오기 실패:`, error);
+    logger.error(`도메인 ${targetDomain}에서 URL 가져오기 실패:`, error);
 
     // 오류 발생 시 다른 도메인 시도
     if (strategy !== 'specific') {
-      console.log('다른 도메인에서 URL 가져오기 시도...');
+      logger.warn('다른 도메인에서 URL 가져오기 시도...');
       if (!this._errorCount) this._errorCount = 0;
       this._errorCount++;
 
       if (this._errorCount > 3) {
-        console.error('너무 많은 오류가 발생했습니다.');
+        logger.error('너무 많은 오류가 발생했습니다.');
         this._errorCount = 0;
         return null;
       }
@@ -401,13 +392,13 @@ async getNextUrl() {
     try {
       const { execSync } = require('child_process');
 
-      console.log('남은 Chrome 프로세스 정리 중...');
+      logger.warn('남은 Chrome 프로세스 정리 중...');
 
       // OS별로 다른 명령어 실행
       if (process.platform === 'darwin') {
         // macOS
         execSync('pkill -f "Google Chrome for Testing"');
-        console.log('Google Chrome for Testing 프로세스가 정리되었습니다.');
+        logger.warn('Google Chrome for Testing 프로세스가 정리되었습니다.');
 
         // 일반 Chrome 프로세스도 확인 (필요한 경우)
         // execSync('pkill -f "Google Chrome Helper"');
@@ -421,7 +412,7 @@ async getNextUrl() {
       }
     } catch (error) {
       // 이미 죽어있거나 다른 이유로 실패할 수 있음 - 무시
-      console.log('Chrome 프로세스 종료 완료 또는 종료할 프로세스가 없음');
+      logger.warn('Chrome 프로세스 종료 완료 또는 종료할 프로세스가 없음');
     }
   }
 
@@ -434,7 +425,11 @@ async getNextUrl() {
  */
 async visitUrl(urlInfo) {
   const { url, domain } = urlInfo;
-  console.log(`=== URL 방문 시작: ${url} ===`);
+  logger.info(`=== URL 방문 시작: ${url} ===`);
+  const visitResult = new VisitResult({
+    url,
+    domain
+  });
 
   try {
     // 브라우저가 초기화되어 있는지 확인
@@ -445,7 +440,6 @@ async visitUrl(urlInfo) {
 
     // 자바스크립트 대화상자 처리
     page.on('dialog', async dialog => {
-      console.log(`대화상자 감지: ${dialog.type()}, 메시지: ${dialog.message()}`);
       await dialog.dismiss();
     });
 
@@ -456,87 +450,83 @@ async visitUrl(urlInfo) {
     });
 
     // 현재 URL 가져오기 (리다이렉트 가능성)
-    const finalUrl = page.url();
-    console.log(`최종 URL: ${finalUrl}`);
-
+     visitResult.finalUrl = page.url();
     // 최종 URL의 도메인 확인
-    const finalDomain = extractDomain(finalUrl);
+    visitResult.finalDomain = extractDomain( visitResult.finalUrl);
 
-    // 스크롤하여 더 많은 콘텐츠 로드
-    await infiniteScroll(page, CONFIG.CRAWLER.MAX_SCROLLS);
+    try {
+        // 페이지 내용 추출
+        visitResult.pageContent = await this.extractPageContent(page);
+    } catch (error) {
+     logger.error('Error extracting page content:', error.message);
+      visitResult.errors.push({
+        type: 'content_extraction',
+        message: error.message,
+        stack: error.stack
+    });
+    }
 
-    // 페이지 내용 추출
-    const pageContent = await this.extractPageContent(page);
+    try {
+        // 기본 링크 추출 (a 태그)
+        visitResult.herfUrls = await this.extractLinks(page, [domain]);
+    } catch (error) {
+       logger.error('Error extracting links:', error.message);
+        visitResult.errors.push({
+        type: 'link_extraction',
+        message: error.message,
+        stack: error.stack
+    });
+    }
 
-    // 기본 링크 추출 (a 태그)
-    const baseLinks = await this.extractLinks(page, [domain]);
-    console.log(`기본 링크 ${baseLinks.length}개 추출됨`);
-
-    // extractAndExecuteScripts 함수를 사용하여 자바스크립트 실행 및 추가 URL 추출
-    const scriptResult = await extractAndExecuteScripts(finalUrl,[domain] ,this.browser);
-
+    try {
+        // extractAndExecuteScripts 함수를 사용하여 자바스크립트 실행 및 추가 URL 추출
+        visitResult.onclickUrls = await extractAndExecuteScripts(visitResult.finalUrl, [domain], this.browser);
+    } catch (error) {
+       logger.error('Error extracting and executing scripts:', error.message);
+        visitResult.errors.push({
+        type: 'script_extraction',
+        message: error.message,
+        stack: error.stack,
+        url: visitResult.finalUrl
+    });
+    }
+    visitResult.success = true;
     // 모든 발견된 URL 병합
-    const allDiscoveredUrls = Array.from(new Set([
-      ...baseLinks,
-      ...(scriptResult.success ? scriptResult.discoveredUrls : [])
+     visitResult.crawledUrls = Array.from(new Set([
+      ...visitResult.herfUrls,
+      ...visitResult.onclickUrls
     ]));
-
-    console.log(`총 ${allDiscoveredUrls.length}개의 고유 URL이 발견되었습니다.`);
-
     // URL 정보를 도메인별로 그룹화
-    const urlsByDomain = this.groupUrlsByDomain(allDiscoveredUrls);
-
-    // 페이지 닫기
-    await page.close();
-
-    // 방문 결과 객체 생성하여 반환
-    const visitResult = {
-      success: true,
-      url: url,
-      finalUrl: finalUrl,
-      domain: domain,
-      finalDomain: finalDomain,
-      pageContent: pageContent,
-      crawledUrls: allDiscoveredUrls,
-      urlsByDomain: urlsByDomain,
-      visitedAt: new Date().toISOString()
-    };
-
-    console.log(`=== URL 방문 완료: ${url} ===`);
-
+    visitResult.logSummary(logger);
     return visitResult;
   } catch (error) {
-    console.error(`URL ${url} 방문 중 오류:`, error);
+     logger.error(`URL ${url} 방문 중 오류:`, error);
+    // 오류 정보를 결과 객체에 추가
+    visitResult.error = error.toString();
+    // 결과 로깅
+    visitResult.logSummary(logger);
 
-    // 오류 정보를 포함한 결과 객체 반환
-    return {
-      success: false,
-      url: url,
-      domain: domain,
-      error: error.toString(),
-      visitedAt: new Date().toISOString()
-    };
+    return visitResult;
   }
   finally {
-        // 추가: 남아있는 페이지 확인 및 정리
     try {
       if (this.browser) {
         const pages = await this.browser.pages();
         if (pages.length > 0) {
-          console.log(`방문 후 ${pages.length}개의 미닫힘 페이지 발견, 정리 중...`);
+          logger.info(`방문 후 ${pages.length}개의 미닫힘 페이지 발견, 정리 중...`);
           await Promise.all(pages.map(page => {
             try {
               return page.close();
             } catch (e) {
-              console.warn('페이지 닫기 실패:', e.message);
+              logger.info('페이지 닫기 실패:', e.message);
               return Promise.resolve();
             }
           }));
-          console.log('모든 페이지가 정리되었습니다.');
+          logger.info('모든 페이지가 정리되었습니다.');
         }
       }
     } catch (pageCloseError) {
-      console.error('페이지 정리 중 오류:', pageCloseError);
+      logger.error('페이지 정리 중 오류:', pageCloseError);
     }
 
   }
@@ -563,7 +553,7 @@ groupUrlsByDomain(urls) {
         });
       }
     } catch (e) {
-      console.warn(`URL 그룹화 실패: ${url}`, e);
+      logger.warn(`URL 그룹화 실패: ${url}`, e);
     }
   });
 
@@ -575,57 +565,66 @@ groupUrlsByDomain(urls) {
  * @param {Object} visitResult - visitUrl 함수의 반환 결과
  * @returns {Promise<boolean>} 성공 여부
  */
-async persistVisitResult(visitResult) {
-  if (!visitResult.success) {
-    // 오류 정보 저장
-    this.results.push({
-      url: visitResult.url,
-      domain: visitResult.domain,
-      error: visitResult.error,
-      visitedAt: visitResult.visitedAt
-    });
-
-    // 오류가 있어도 URL을 방문한 것으로 표시 (중복 시도 방지)
-    await db.markUrlVisited(visitResult.domain, visitResult.url, `오류: ${visitResult.error}`);
-    return false;
-  }
-
+async saveVisitResult(visitResult) {
   try {
+    const domain = visitResult.domain;
+
+    // 추가 전 도메인의 하위 URL 개수 확인
+    const beforeStats = await db.getDomainStats(domain);
+    logger.info(`도메인 ${domain}의 현재 URL 개수: ${beforeStats.total}개 (방문: ${beforeStats.visited}개, 대기: ${beforeStats.pending}개)`);
+
+    // 추가할 URL 수 로깅
+    const urlsToAdd = visitResult.crawledUrls || [];
+    logger.info(`도메인 ${domain}에 추가할 새 URL: ${urlsToAdd.length}개`);
+
     // 각 도메인 그룹별로 URL 추가
-    for (const [groupDomain, urls] of Object.entries(visitResult.urlsByDomain)) {
-      await db.bulkAddSubUrls(groupDomain, urls);
-    }
+    const addResult = await db.bulkAddSubUrls(domain, urlsToAdd);
 
-    // URL을 방문 완료로 표시
-    await db.markUrlVisited(visitResult.domain, visitResult.url, visitResult.pageContent.text);
+    // 방문 결과 저장
+    await db.addVisitedResult(visitResult);
 
-    // 리다이렉트된 URL도 방문 완료로 표시 (도메인이 다를 수 있음)
-    if (visitResult.finalUrl !== visitResult.url) {
-      await db.markUrlVisited(visitResult.finalDomain, visitResult.finalUrl, visitResult.pageContent.text);
-    }
+    // 추가 후 도메인의 하위 URL 개수 확인
+    const afterStats = await db.getDomainStats(domain);
 
-    // 페이지 정보 저장
-    const pageInfo = {
-      url: visitResult.finalUrl,
-      originalUrl: visitResult.finalUrl !== visitResult.url ? visitResult.url : undefined,
-      domain: visitResult.finalDomain,
-      title: visitResult.pageContent.title,
-      meta: visitResult.pageContent.meta,
-      text: visitResult.pageContent.text,
-      extractedUrls: visitResult.crawledUrls.length,
-      visitedAt: visitResult.visitedAt
+    // 실제로 추가된 URL 수 계산
+    const actuallyAdded = afterStats.total - beforeStats.total;
+
+    // 테이블 형식으로 통계 출력
+    const statsTable = {
+      '도메인': domain,
+      '총 URL 수': {
+        '이전': beforeStats.total,
+        '이후': afterStats.total,
+        '증가': actuallyAdded
+      },
+      '방문한 URL 수': {
+        '이전': beforeStats.visited,
+        '이후': afterStats.visited,
+        '증가': afterStats.visited - beforeStats.visited
+      },
+      '대기 중인 URL 수': {
+        '이전': beforeStats.pending,
+        '이후': afterStats.pending,
+        '증가': afterStats.pending - beforeStats.pending
+      },
+      '추가 시도한 URL 수': urlsToAdd.length,
+      '실제 추가된 URL 수': actuallyAdded
     };
 
-    // 결과 배열에 추가(필요 시)
-    // this.results.push(pageInfo);
+    // 콘솔에 테이블 형식으로 출력
+    console.table(statsTable);
 
-    // 도메인 통계 출력
-    const stats = await db.getDomainStats(visitResult.domain);
-    console.log(`도메인 ${visitResult.domain} 통계: 총 ${stats.total}개 URL, 방문 ${stats.visited}개, 대기 ${stats.pending}개`);
+    // 추가 정보 로그
+    logger.info(`URL 처리 완료: ${visitResult.url}`);
+    logger.info(`성공 여부: ${visitResult.success ? '성공' : '실패'}`);
+
+    if (urlsToAdd.length > 0 && actuallyAdded === 0) {
+      logger.info('모든 URL이 이미 데이터베이스에 존재합니다.');
+    }
 
     return true;
   } catch (error) {
-    console.error(`방문 결과 저장 중 오류:`, error);
+    logger.error(`방문 결과 저장 중 오류:`, error);
     return false;
   }
 }
@@ -634,16 +633,15 @@ async persistVisitResult(visitResult) {
    */
   async processQueue() {
     if (this.isRunning) {
-      console.log('이미 실행 중입니다.');
       return;
     }
 
     this.isRunning = true;
-    console.log('URL 큐 처리 시작...');
 
     try {
       // MongoDB 연결 확인
       await db.connect();
+
       // 브라우저 초기화
       await this.initBrowser();
 
@@ -655,13 +653,13 @@ async persistVisitResult(visitResult) {
       while (visitCount < this.maxUrls &&(nextUrlInfo = await this.getNextUrl())) {
         try {
           visitCount++;
-          console.log(`URL ${visitCount}/${this.maxUrls} 처리 중...`);
+          logger.info(`URL ${visitCount}/${this.maxUrls} 처리 중...`);
           this.currentUrl = nextUrlInfo;
                 // URL 방문 및 처리
           const visitResult = await this.visitUrl(nextUrlInfo);
 
           // 결과를 데이터베이스에 저장
-          await this.persistVisitResult(visitResult);
+          await this.saveVisitResult(visitResult);
 
 
           // 전체 통계 출력
@@ -671,22 +669,20 @@ async persistVisitResult(visitResult) {
           totalStats.visited += stats.visited;
           totalStats.pending += stats.pending;
 
-          console.log(`전체 통계: 총 ${totalStats.total}개 URL, 방문 ${totalStats.visited}개, 대기 ${totalStats.pending}개`);
-
           // 요청 사이 지연 추가
           if (totalStats.pending > 0 && visitCount < this.maxUrls) {
-            console.log(`다음 URL 처리 전 ${this.delayBetweenRequests}ms 대기...`);
+            logger.info(`다음 URL 처리 전 ${this.delayBetweenRequests}ms 대기...`);
             await new Promise(resolve => setTimeout(resolve, this.delayBetweenRequests));
           }
         }
         catch(error) {
-            console.error(`총 ${visitCount}개 URL 방문  중 ${error}`);
+            logger.error(`총 ${visitCount}개 URL 방문  중 ${error}`);
         }
       }
 
-      console.log(`큐 처리 완료. 총 ${visitCount}개 URL 방문`);
+      logger.info(`큐 처리 완료. 총 ${visitCount}개 URL 방문`);
     } catch (error) {
-      console.error('큐 처리 중 오류:', error);
+      logger.error('큐 처리 중 오류:', error);
     } finally {
       if (this.browser) {
         await this.browser.close();
@@ -701,7 +697,7 @@ async persistVisitResult(visitResult) {
    */
 async closeBrowser() {
   if (this.browser) {
-    console.log('브라우저 정리 중...');
+    logger.info('브라우저 정리 중...');
     try {
       // 모든 페이지 닫기 시도
       const pages = await this.browser.pages();
@@ -713,9 +709,9 @@ async closeBrowser() {
       // 브라우저 닫기
       await this.browser.close();
       this.browser = null;
-      console.log('브라우저가 정상적으로 종료되었습니다.');
+      logger.info('브라우저가 정상적으로 종료되었습니다.');
     } catch (err) {
-      console.error('브라우저 종료 중 오류:', err);
+      logger.error('브라우저 종료 중 오류:', err);
     } finally {
       // Google Chrome for Testing 프로세스 강제 종료
       this.killChromeProcesses();
@@ -727,7 +723,7 @@ async closeBrowser() {
    * 관리자 실행
    */
   async run() {
-    console.log(`BaseWorkerManager 실행`);
+    logger.info(`BaseWorkerManager 실행`);
     try {
       await this.processQueue();
     } finally {
@@ -735,7 +731,7 @@ async closeBrowser() {
       // MongoDB 연결 종료
       await db.disconnect();
     }
-    console.log('BaseWorkerManager 실행 완료');
+    logger.info('BaseWorkerManager 실행 완료');
   }
 }
 
@@ -759,7 +755,7 @@ if (require.main === module) {
 
   // 관리자 실행
   manager.run().then(async () => {
-    console.log('===== 크롤링 요약 =====');
+    logger.info('===== 크롤링 요약 =====');
 
     // 전체 통계 계산
     let totalStats = { total: 0, visited: 0, pending: 0 };
@@ -770,13 +766,13 @@ if (require.main === module) {
       totalStats.pending += stats.pending;
     }
 
-    console.log(`- 총 URL: ${totalStats.total}개`);
-    console.log(`- 방문한 URL: ${totalStats.visited}개`);
-    console.log(`- 남은 방문 예정 URL: ${totalStats.pending}개`);
-    console.log(`- 저장된 결과 항목 수: ${manager.results.length}개`);
-    console.log('모든 작업이 완료되었습니다.');
+    logger.info(`- 총 URL: ${totalStats.total}개`);
+    logger.info(`- 방문한 URL: ${totalStats.visited}개`);
+    logger.info(`- 남은 방문 예정 URL: ${totalStats.pending}개`);
+    logger.info(`- 저장된 결과 항목 수: ${manager.results.length}개`);
+    logger.info('모든 작업이 완료되었습니다.');
   }).catch(error => {
-    console.error(`실행 중 오류가 발생했습니다: ${error}`);
+    logger.error(`실행 중 오류가 발생했습니다: ${error}`);
   });
 }
 module.exports = { BaseWorkerManager };

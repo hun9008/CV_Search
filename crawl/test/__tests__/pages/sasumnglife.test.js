@@ -1,13 +1,12 @@
-
 const puppeteer = require('puppeteer');
 const { BaseWorkerManager } = require('@crawl/baseWorkerManager');
 const { infiniteScroll, extractAndExecuteScripts } = require('@crawl/baseWorker');
 
-describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
+describe('삼성 생명 커리어 채용 페이지 크롤링 테스트', () => {
   let manager;
   let page;
-  const targetUrl = 'https://www.skshieldusapply.com';
-  const allowedDomains = ['skshieldusapply.com'];
+  const targetUrl = 'https://samsunglifeservice.recruiter.co.kr/';
+  const allowedDomains = ['samsunglifeservice.recruiter.co.kr'];
 
   // 테스트 실행 시간 늘리기 (웹 크롤링은 시간이 소요될 수 있음)
   jest.setTimeout(60000);
@@ -18,37 +17,43 @@ describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
     manager = new BaseWorkerManager();
     await manager.initBrowser();
     manager.maxUrl = 1;
+
   });
+
   beforeEach(async () => {
     // 각 테스트 전에 새 페이지 생성
     page = await manager.browser.newPage();
   });
 
-  afterEach(async () => {
-    // 각 테스트 후에 페이지 닫기
-    if (page) {
-      await page.close().catch(err => console.warn('페이지 닫기 오류:', err));
-      page = null;
+afterEach(async () => {
+
+  // 브라우저에 남아있는 모든 페이지 확인 및 닫기
+  if (manager && manager.browser) {
+    const pages = await manager.browser.pages().catch(err => {
+      console.warn('브라우저 페이지 가져오기 오류:', err);
+      return [];
+    });
+
+    if (pages.length > 0) {
+      console.log(`남아있는 ${pages.length}개 페이지 정리 중...`);
+
+      // 각 페이지 닫기 시도
+      await Promise.all(pages.map(browserPage =>
+        browserPage.close().catch(err =>
+          console.warn('브라우저 페이지 닫기 오류:', err)
+        )
+      ));
+
+      console.log('모든 페이지 정리 완료');
     }
-  });
+  }
+});
+
   afterAll(async () => {
     // 테스트 후 브라우저 종료
     await manager.browser.close();
   });
 
-  test('페이지 접속 및 기본 정보 확인', async () => {
-    // 페이지 로드
-    await page.goto(targetUrl, { waitUntil: 'networkidle2' });
-
-    // 페이지 제목 확인
-    const title = await page.title();
-    console.log(`페이지 제목: ${title}`);
-    expect(title).toContain('SK쉴더스 채용');
-
-    // 현재 URL 확인
-    const currentUrl = page.url();
-    expect(currentUrl).toContain(allowedDomains[0]);
-  });
 
 
 
@@ -76,6 +81,8 @@ describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
 
   test('extractLinks 함수 테스트', async () => {
     // 페이지 로드
+        // 페이지 로드
+
     await page.goto(targetUrl, { waitUntil: 'networkidle2' });
 
     // 링크 추출
@@ -100,7 +107,7 @@ describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
 
   test('extractAndExecuteScripts 함수 테스트', async () => {
     // 스크립트 추출 및 실행
-    const discoveredUrls = await extractAndExecuteScripts(targetUrl, allowedDomains,manager.browser);
+    const discoveredUrls = await extractAndExecuteScripts(targetUrl,allowedDomains, manager.browser);
 
     // 발견된 URL이 있는지 확인
     expect(discoveredUrls).toBeDefined();

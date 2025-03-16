@@ -1,6 +1,10 @@
+require('module-alias/register');
 const { MongoClient } = require('mongodb');
-const CONFIG = require('../../config/config');
-const { startMongoDBService, checkMongoDBStatus } = require('./init-mongodb');
+const CONFIG = require('@config/config');
+const { startMongoDBService, checkMongoDBStatus } = require('@database/init-mongodb');
+const { defaultLogger: logger } = require('@utils/logger');
+const { VisitResult } = require('@models/visitResult');
+
 
 class MongoDBService {
   constructor() {
@@ -8,7 +12,7 @@ class MongoDBService {
     this.db = null;
     this.domainsCollection = null;
     // config 또는 환경변수에서 연결 정보 가져오기
-    this.uri = process.env.MONGODB_URI || CONFIG.DATABASE.MONGODB_URI
+    this.uri = process.env.MONGODB_ADMIN_URI || CONFIG.DATABASE.MONGODB_URI
     this.dbName = process.env.MONGODB_DB_NAME || CONFIG.DATABASE.MONGODB_DB_NAME;
   }
 
@@ -105,7 +109,7 @@ async getDomainsByUrlCount(options = {}) {
     // 결과를 콘솔에 표 형식으로 출력 (선택적)
     if (result.length > 0) {
       console.table(result.map(item => ({
-        domain: 'https:\\www.'+item.domain,
+        domain: item.domain,
         total: item.stats.total,
         visited: item.stats.visited,
         pending: item.stats.pending,
@@ -230,11 +234,11 @@ async getUrlStats(options = {}) {
       const isRunning = await checkMongoDBStatus(this.uri).catch(() => false);
 
       if (!isRunning) {
-        console.log('MongoDB 서비스가 실행 중이지 않습니다. 시작을 시도합니다...');
+        logger.warn('MongoDB 서비스가 실행 중이지 않습니다. 시작을 시도합니다...');
         await startMongoDBService();
 
         // 서비스가 완전히 시작할 때까지 잠시 대기
-        console.log('MongoDB 서비스가 준비되는 동안 기다리는 중...');
+        logger.warn('MongoDB 서비스가 준비되는 동안 기다리는 중...');
         await new Promise(resolve => setTimeout(resolve, 5000));
       }
 
@@ -247,7 +251,7 @@ async getUrlStats(options = {}) {
 
       // 연결
       await this.client.connect();
-      console.log('MongoDB 연결 성공');
+      logger.warn('MongoDB 연결 성공');
 
       // 데이터베이스 및 컬렉션 설정
       this.db = this.client.db(this.dbName);
@@ -255,10 +259,10 @@ async getUrlStats(options = {}) {
 
       // 필요한 인덱스가 없으면 생성
       await this._ensureIndexes();
-
-      console.log('MongoDB 연결 및 컬렉션 설정 완료');
+      logger.info(this.uri);
+      logger.warn('MongoDB 연결 및 컬렉션 설정 완료');
     } catch (error) {
-      console.error('MongoDB 연결 오류:', error);
+      logger.error('MongoDB 연결 오류:', error);
       throw error;
     }
   }
@@ -564,48 +568,118 @@ async getDomains(options = {}) {
     }
   }
 
-  /**
-   * URL을 방문 완료로 표시하고 텍스트를 저장합니다.
-   * @param {string} domain 도메인 이름
-   * @param {string} url URL 주소
-   * @param {string|null} text 페이지 텍스트 내용
-   * @returns {Promise<boolean>} 성공 여부
-   */
-  async markUrlVisited(domain, url, text = null) {
-    await this.connect();
+/**
+ * 방문 결과 데이터를 추가하거나 업데이트합니다.
+ * @param {VisitResult|Object} visitResult 방문 결과 객체
+ * @returns {Promise<Object>} 저장 결과 ({success: boolean, operation: string, message: string})
+ */
+async addVisitedResult(visitResult) {
+  await this.connect();
 
-    try {
-      const updateData = {
-        'suburl_list.$.visited': true,
-        'suburl_list.$.updated_at': new Date(),
-        'updated_at': new Date()
+  try {
+    // visitResult가 VisitResult 클래스의 인스턴스가 아니면 변환
+    if (!(visitResult instanceof VisitResult)) {
+      visitResult = new VisitResult(visitResult);
+    }
+
+    const domain = visitResult.domain;
+    const url = visitResult.url;
+
+    if (!domain || !url) {
+      return {
+        success: false,
+        message: '도메인과 URL은 필수입니다'
+      };
+    }
+
+    // VisitResult 객체의 toDbUpdateFormat 메서드 활용
+    const updateData = visitResult.toDbUpdateFormat();
+    const now = new Date();
+
+    // 도메인 존재 여부 확인
+    const domainExists = await this.domainsCollection.findOne({ domain });
+
+    if (!domainExists) {
+      // 도메인이 존재하지 않으면 도메인과 함께 하위 URL 추가
+      const subUrlData = {
+        url,
+        ...visitResult.toDbFormat(),
+        created_at: now
       };
 
-      if (text !== null) {
-        updateData['suburl_list.$.text'] = text;
-      }
+      await this.domainsCollection.insertOne({
+        domain,
+        url: `http://${domain}`,
+        created_at: now,
+        updated_at: now,
+        suburl_list: [subUrlData]
+      });
 
+      logger.info(`새 도메인 ${domain}과 함께 URL ${url} 방문 데이터 저장 완료`);
+
+      return {
+        success: true,
+        operation: 'insert_domain',
+        message: `새 도메인 ${domain}과 URL ${url} 추가 완료`
+      };
+    }
+
+    // URL 존재 여부 확인
+    const urlExists = await this.domainsCollection.findOne({
+      domain,
+      'suburl_list.url': url
+    });
+
+    if (urlExists) {
+      // 기존 URL 업데이트
       const result = await this.domainsCollection.updateOne(
         { domain, 'suburl_list.url': url },
         { $set: updateData }
       );
 
-      if (result.matchedCount === 0) {
-        // URL이 없으면 방문된 URL로 추가
-        await this.addOrUpdateSubUrl(domain, {
-          url,
-          visited: true,
-          text
-        });
-      }
+      logger.info(`URL ${url} 방문 정보 업데이트 완료 (${visitResult.success ? '성공' : '실패'})`);
 
-      console.log(`URL ${url}을(를) 방문 완료로 표시`);
-      return true;
-    } catch (error) {
-      console.error(`URL ${url} 방문 표시 중 오류:`, error);
-      throw error;
+      return {
+        success: true,
+        operation: 'update',
+        message: `URL ${url} 방문 정보 업데이트 완료`,
+        modified: result.modifiedCount > 0
+      };
+    } else {
+      // 새 URL 추가
+      const subUrlData = {
+        url,
+        ...visitResult.toDbFormat(),
+        created_at: now
+      };
+
+      const result = await this.domainsCollection.updateOne(
+        { domain },
+        {
+          $push: { suburl_list: subUrlData },
+          $set: { updated_at: now }
+        }
+      );
+
+      logger.info(`URL ${url} 추가 및 방문 정보 저장 완료 (${visitResult.success ? '성공' : '실패'})`);
+
+      return {
+        success: true,
+        operation: 'insert_url',
+        message: `URL ${url} 추가 완료`,
+        modified: result.modifiedCount > 0
+      };
     }
+  } catch (error) {
+    logger.error(`URL ${visitResult?.url || 'unknown'} 방문 데이터 저장 중 오류:`, error);
+
+    return {
+      success: false,
+      error: error.message,
+      message: `방문 데이터 저장 중 오류: ${error.message}`
+    };
   }
+}
 
   /**
    * 도메인에 대한 통계 정보를 가져옵니다.
@@ -649,73 +723,104 @@ async getDomains(options = {}) {
       throw error;
     }
   }
+/**
+ * 다수의 하위 URL을 한 번에 추가합니다. 각 URL은 VisitResult 형식으로 변환됩니다.
+ * @param {string} domain 도메인 이름
+ * @param {Array<string|object>} subUrls 하위 URL 배열 (문자열 또는 객체 형태)
+ * @returns {Promise<number>} 추가된 URL 수
+ */
+async bulkAddSubUrls(domain, subUrls) {
+  await this.connect();
 
-  /**
-   * 다수의 하위 URL을 한 번에 추가합니다.
-   * @param {string} domain 도메인 이름
-   * @param {Array<object>} subUrls 하위 URL 배열 [{url, visited, text}, ...]
-   * @returns {Promise<number>} 추가된 URL 수
-   */
-  async bulkAddSubUrls(domain, subUrls) {
-    await this.connect();
+  if (!subUrls || subUrls.length === 0) return 0;
 
-    if (!subUrls || subUrls.length === 0) return 0;
+  try {
+    const now = new Date();
 
-    try {
-      const now = new Date();
-
-      // 도메인이 존재하는지 확인
-      const domainDoc = await this.domainsCollection.findOne({ domain });
-      if (!domainDoc) {
-        // 도메인이 없으면 생성
-        await this.addOrUpdateDomain(domain, `http://${domain}`);
-      }
-
-      // 기존 URL 목록 추출
-      const existingUrls = new Set();
-
-      if (domainDoc && domainDoc.suburl_list) {
-        domainDoc.suburl_list.forEach(item => {
-          if (item.url) existingUrls.add(item.url);
-        });
-      }
-
-      // 새 URL만 필터링
-      const newSubUrls = subUrls.filter(item =>
-        !existingUrls.has(item.url) &&
-        item.url &&
-        item.url.startsWith('http')
-      );
-
-      if (newSubUrls.length === 0) {
-        console.log(`도메인 ${domain}에 추가할 새 URL이 없음`);
-        return 0;
-      }
-
-      // URL 추가 작업 생성
-      const formattedSubUrls = newSubUrls.map(item => ({
-        url: item.url,
-        visited: item.visited || false,
-        text: item.text || null,
-        created_at: now,
-        updated_at: now
-      }));
-
-      await this.domainsCollection.updateOne(
-        { domain },
-        {
-          $push: { suburl_list: { $each: formattedSubUrls } },
-          $set: { updated_at: now }
-        }
-      );
-
-      console.log(`${formattedSubUrls.length}개의 URL이 도메인 ${domain}에 추가됨`);
-      return formattedSubUrls.length;
-    } catch (error) {
-      console.error(`도메인 ${domain}에 대량 URL 추가 중 오류:`, error);
-      throw error;
+    // 도메인이 존재하는지 확인
+    const domainDoc = await this.domainsCollection.findOne({ domain });
+    if (!domainDoc) {
+      // 도메인이 없으면 생성
+      await this.addOrUpdateDomain(domain, `http://${domain}`);
     }
+
+    // 기존 URL 목록 추출
+    const existingUrls = new Set();
+
+    if (domainDoc && domainDoc.suburl_list) {
+      domainDoc.suburl_list.forEach(item => {
+        if (item.url) existingUrls.add(item.url);
+      });
+    }
+
+    // 입력된 URL 항목 정규화 및 VisitResult 객체로 변환
+    const normalizedUrls = subUrls.map(item => {
+      let urlString;
+
+      // 문자열 또는 객체 형태의 URL 처리
+      if (typeof item === 'string') {
+        urlString = item;
+      } else if (item && typeof item === 'object' && item.url) {
+        urlString = item.url;
+      } else {
+        return null; // 유효하지 않은 입력은 null 반환
+      }
+
+      // URL 유효성 검사
+      if (!urlString || typeof urlString !== 'string' || !urlString.startsWith('http')) {
+        return null;
+      }
+
+      // 이미 존재하는 URL 필터링
+      if (existingUrls.has(urlString)) {
+        return null;
+      }
+
+      // 각 URL에 대한 VisitResult 객체 생성 (방문 안 함으로 표시)
+      const visitResult = new VisitResult({
+        url: urlString,
+        domain: domain,
+        success: false, // 아직 방문하지 않았으므로 false
+        visitedAt: null, // 방문 시간 없음
+        pageContent: {}, // 빈 콘텐츠
+        crawledUrls: [] // 수집된 URL 없음
+      });
+
+      return visitResult;
+    }).filter(item => item !== null); // null 항목 제거
+
+    if (normalizedUrls.length === 0) {
+      logger.info(`도메인 ${domain}에 추가할 새 URL이 없음`);
+      return 0;
+    }
+
+    // VisitResult 객체를 DB 형식으로 변환
+    const formattedSubUrls = normalizedUrls.map(visitResult => ({
+      ...visitResult.toDbFormat(), // 나머지 필드는 기본 DB 형식 사용
+      url: visitResult.url,
+      domain: visitResult.domain,
+      visited: false, // 항상 false로 설정
+      success: false, // 아직 방문하지 않았으므로 false
+      created_at: now,
+      updated_at: now,
+    }));
+
+    // DB에 일괄 추가
+    await this.domainsCollection.updateOne(
+      { domain },
+      {
+        $push: { suburl_list: { $each: formattedSubUrls } },
+        $set: { updated_at: now }
+      }
+    );
+
+    logger.info(`${formattedSubUrls.length}개의 URL이 도메인 ${domain}에 추가됨`);
+    return formattedSubUrls.length;
+  } catch (error) {
+    logger.error(`도메인 ${domain}에 대량 URL 추가 중 오류:`, error);
+    throw error;
   }
+}
 
 
   /**

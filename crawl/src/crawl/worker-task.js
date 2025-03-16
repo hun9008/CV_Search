@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const { defaultLogger: logger } = require('@utils/logger');
 
 /**
  * Onclick 스크립트를 실행하는 작업자 클래스
@@ -38,7 +39,7 @@ class OnClickWorker {
    */
   async execute() {
     // 작업 시작 로그
-    console.log(`[Worker ${this.id}] onclick 스크립트 ${this.index}/${this.total} 실행 시작...`);
+    logger.info(`[Worker ${this.id}] onclick 스크립트 ${this.index}/${this.total} 실행 시작...`);
 
     try {
       // 브라우저 및 페이지 초기화
@@ -62,11 +63,11 @@ class OnClickWorker {
       // 자원 정리
       await this.cleanup();
 
-      console.log(`[Worker ${this.id}] onclick ${this.index} 실행 완료: ${result.success ? (result.urlChanged ? '페이지 이동 감지' : '정상 실행') : '실패'}`);
+      logger.info(`[Worker ${this.id}] onclick ${this.index} 실행 완료: ${result.success ? (result.urlChanged ? '페이지 이동 감지' : '정상 실행') : '실패'}`);
 
       return result;
     } catch (error) {
-      console.error(`[Worker ${this.id}] onclick 실행 중 오류:`, error);
+      logger.error(`[Worker ${this.id}] onclick 실행 중 오류:`, error);
 
       // 브라우저가 열려있으면 닫기
       await this.cleanup();
@@ -111,7 +112,7 @@ class OnClickWorker {
   async setupPage() {
     // 자바스크립트 대화상자 처리
     this.page.on('dialog', async dialog => {
-      console.log(`[Worker ${this.id}] onclick ${this.index} 대화상자 감지: ${dialog.type()}, 메시지: ${dialog.message()}`);
+      logger.info(`[Worker ${this.id}] onclick ${this.index} 대화상자 감지: ${dialog.type()}, 메시지: ${dialog.message()}`);
       await dialog.dismiss();
     });
 
@@ -121,7 +122,7 @@ class OnClickWorker {
     }, this.index, this.id);
 
     // 콘솔 로그를 가로채서 출력
-    this.page.on('console', msg => console.log(`[Worker ${this.id}] onclick ${this.index} 콘솔:`, msg.text()));
+    this.page.on('console', msg => logger.info(`[Worker ${this.id}] onclick ${this.index} 콘솔:`, msg.text()));
 
     // 페이지 로드
     await this.page.goto(this.currentUrl, {
@@ -148,22 +149,19 @@ class OnClickWorker {
         try {
           // 대화상자 함수 오버라이드
           window.alert = function(message) {
-            console.log('alert 호출됨:', message);
             return undefined;
           };
 
           window.confirm = function(message) {
-            console.log('confirm 호출됨:', message);
             return true; // 항상 확인 버튼 클릭으로 처리
           };
 
           window.prompt = function(message, defaultValue) {
-            console.log('prompt 호출됨:', message);
             return defaultValue || ''; // 기본값이나 빈 문자열 반환
           };
 
           // 실행될 onclick 코드에 대한 정보 출력
-          console.log(`${elementInfo.tagName} 요소의 onclick 실행: ${onclickCode}`);
+          logger.info(`${elementInfo.tagName} 요소의 onclick 실행: ${onclickCode}`);
 
           // URL 변경 감지를 위한 기존 함수 백업
           const originalAssign = window.location.assign;
@@ -174,7 +172,6 @@ class OnClickWorker {
 
           // location 함수 오버라이드
           window.location.assign = function(url) {
-            console.log('location.assign 호출됨:', url);
             detectedUrl = url;
             urlChanged = true;
             clearTimeout(timeoutId);
@@ -188,7 +185,6 @@ class OnClickWorker {
           };
 
           window.location.replace = function(url) {
-            console.log('location.replace 호출됨:', url);
             detectedUrl = url;
             urlChanged = true;
             clearTimeout(timeoutId);
@@ -196,7 +192,6 @@ class OnClickWorker {
               success: true,
               detectedUrl: url,
               urlChanged: true,
-              message: 'location.replace 호출됨'
             });
             return originalReplace.call(window.location, url);
           };
@@ -205,7 +200,6 @@ class OnClickWorker {
           try {
             Object.defineProperty(window.location, 'href', {
               set: function(url) {
-                console.log('location.href 설정됨:', url);
                 detectedUrl = url;
                 urlChanged = true;
                 clearTimeout(timeoutId);
@@ -222,12 +216,11 @@ class OnClickWorker {
               }
             });
           } catch (e) {
-            console.log('location.href 속성 재정의 실패:', e);
+            console.error('location.href 속성 재정의 실패:', e);
           }
 
           // window.open 오버라이드
           window.open = function(url) {
-            console.log('window.open 호출됨:', url);
             detectedUrl = url;
             urlChanged = true;
             clearTimeout(timeoutId);
@@ -242,7 +235,6 @@ class OnClickWorker {
 
           // onclick 코드 실행
           eval(onclickCode);
-          console.log('onclick 실행 완료');
 
           // URL이 변경되지 않았다면 바로 결과 반환
           if (!urlChanged) {
@@ -283,7 +275,7 @@ class OnClickWorker {
 
     // 실행 후 URL 확인
     const afterUrl = await this.page.url();
-    console.log(`[Worker ${this.id}] afterUrl: ${afterUrl}`);
+    logger.info(`[Worker ${this.id}] afterUrl: ${afterUrl}`);
 
     // URL 변경 확인
     if (afterUrl !== beforeUrl) {
@@ -325,7 +317,7 @@ class OnClickWorker {
         await this.page.close();
         this.page = null;
       } catch (error) {
-        console.error(`[Worker ${this.id}] 페이지 종료 중 오류:`, error);
+        logger.error(`[Worker ${this.id}] 페이지 종료 중 오류:`, error);
       }
     }
 
@@ -334,7 +326,7 @@ class OnClickWorker {
       try {
         await this.browser.close();
       } catch (error) {
-        console.error(`[Worker ${this.id}] 브라우저 종료 중 오류:`, error);
+        logger.error(`[Worker ${this.id}] 브라우저 종료 중 오류:`, error);
       }
       this.browser = null;
     }
@@ -370,7 +362,7 @@ class WorkerPool {
             const result = await worker.execute();
             resolve(result);
           } catch (error) {
-            console.error(`[WorkerPool] 작업 실행 오류:`, error);
+            logger.error(`[WorkerPool] 작업 실행 오류:`, error);
             resolve({
               success: false,
               error: error.toString(),

@@ -1,4 +1,6 @@
 const { WorkerPool } = require('@crawl/worker-task');
+const baseWorker = require('@crawl/baseWorker');
+const { defaultLogger: logger } = require('@utils/logger');
 
 /**
  * 페이지에서 onclick 속성을 가진 요소들을 찾아 이벤트를 실행
@@ -31,11 +33,11 @@ async function processOnClickEvents(options) {
     results: []
   };
 
-  console.log(`=== onclick 이벤트 처리 시작 (${onclickElements.length}개) ===`);
+ logger.info(`=== onclick 이벤트 처리 시작 (${onclickElements.length}개) ===`);
 
   // onclick 요소가 없으면 바로 반환
   if (!onclickElements || onclickElements.length === 0) {
-    console.log("유효한 onclick 이벤트가 없습니다.");
+   logger.info("유효한 onclick 이벤트가 없습니다.");
     return result;
   }
 
@@ -56,7 +58,7 @@ async function processOnClickEvents(options) {
       browser: browser // 브라우저 인스턴스 재사용 (worker-task에서 이를 지원해야 함)
     }));
 
-    console.log(`${tasks.length}개의 onclick 작업을 병렬로 처리합니다... (동시 실행: ${maxConcurrency})`);
+   logger.info(`${tasks.length}개의 onclick 작업을 병렬로 처리합니다... (동시 실행: ${maxConcurrency})`);
 
     // 모든 작업 병렬 실행
     const onclickResults = await workerPool.processTasks(tasks);
@@ -76,7 +78,7 @@ async function processOnClickEvents(options) {
           const detectedUrl = onclickResult.detectedUrl;
           if (detectedUrl && typeof detectedUrl === 'string' && detectedUrl.startsWith('http')) {
             result.discoveredUrls.add(detectedUrl);
-            console.log(`[OnClick ${onclickResult.index}] 새 URL 발견: ${detectedUrl}`);
+           logger.info(`[OnClick ${onclickResult.index}] 새 URL 발견: ${detectedUrl}`);
           }
         }
       } else {
@@ -84,11 +86,11 @@ async function processOnClickEvents(options) {
       }
     });
 
-    console.log(`=== onclick 이벤트 처리 완료 ===`);
-    console.log(`- 처리된 이벤트: ${result.processed}/${result.totalElements}개`);
-    console.log(`- 성공: ${result.successful}개`);
-    console.log(`- 실패: ${result.failed}개`);
-    console.log(`- 발견된 URL: ${result.discoveredUrls.size}개`);
+   logger.info(`=== onclick 이벤트 처리 완료 ===`);
+   logger.info(`- 처리된 이벤트: ${result.processed}/${result.totalElements}개`);
+   logger.info(`- 성공: ${result.successful}개`);
+   logger.info(`- 실패: ${result.failed}개`);
+   logger.info(`- 발견된 URL: ${result.discoveredUrls.size}개`);
 
     return result;
   } catch (error) {
@@ -111,32 +113,27 @@ async function processOnClickEvents(options) {
 async function extractAndProcessOnClicks(options) {
   const {
     browser,
+    page,
     url,
     headless = true,
     maxConcurrency = 3,
     timeout = 5000
   } = options;
 
-  console.log(`[OnClick 모듈] URL ${url} 처리 시작...`);
+ logger.info(`[OnClick 모듈] URL ${url} 처리 시작...`);
 
   try {
-    // 새 페이지 열기
-    const page = await browser.newPage();
 
     // 페이지 설정
     page.on('dialog', async dialog => {
-      console.log(`[OnClick 모듈] 대화상자 감지: ${dialog.type()}, 메시지: ${dialog.message()}`);
+     logger.info(`[OnClick 모듈] 대화상자 감지: ${dialog.type()}, 메시지: ${dialog.message()}`);
       await dialog.dismiss();
     });
+      // 페이지 스크롤
+   logger.info('페이지 스크롤 시작...');
+    // await baseWorker.infiniteScroll(page, 5); // 스크롤 5번만 수행
+   logger.info('페이지 스크롤 완료');
 
-    // 페이지 로드
-    await page.goto(url, {
-      waitUntil: 'networkidle2',
-      timeout: 60000
-    });
-
-    // 현재 URL 확인 (리다이렉트 가능성)
-    const currentUrl = page.url();
 
     // onclick 요소 추출
     const onclickElements = await page.evaluate(() => {
@@ -153,16 +150,13 @@ async function extractAndProcessOnClicks(options) {
       });
     });
 
-    console.log(`[OnClick 모듈] ${onclickElements.length}개의 onclick 요소를 발견했습니다.`);
-
-    // 페이지 닫기 (리소스 해제)
-    await page.close();
+   logger.info(`[OnClick 모듈] ${onclickElements.length}개의 onclick 요소를 발견했습니다.`);
 
     // 발견한 onclick 요소들 처리
     if (onclickElements.length > 0) {
       const result = await processOnClickEvents({
         browser,
-        url: currentUrl,
+        url: url,
         onclickElements,
         headless,
         maxConcurrency,
@@ -172,7 +166,7 @@ async function extractAndProcessOnClicks(options) {
       return {
         success: true,
         url: url,
-        currentUrl: currentUrl,
+        currentUrl: url,
         discoveredUrls: Array.from(result.discoveredUrls),
         totalElements: result.totalElements,
         processed: result.processed,
@@ -184,7 +178,7 @@ async function extractAndProcessOnClicks(options) {
       return {
         success: true,
         url: url,
-        currentUrl: currentUrl,
+        currentUrl: url,
         discoveredUrls: [],
         message: 'onclick 요소가 없습니다.'
       };

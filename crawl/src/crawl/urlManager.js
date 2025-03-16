@@ -17,7 +17,6 @@
 
         // 도메인 추출
         const domain = parsedUrl.host;
-        console.log('domain :', domain);
         // 허용된 도메인인지 확인
         return allowedDomains.some(allowedDomain =>
           domain === allowedDomain ||
@@ -40,7 +39,7 @@
       const urlObj = new URL(url);
       return urlObj.hostname;
     } catch (error) {
-      console.log(`URL에서 도메인 추출 중 오류: ${url}`, error);
+      logger.error(`URL에서 도메인 추출 중 오류: ${url}`, error);
       return null;
     }
   }

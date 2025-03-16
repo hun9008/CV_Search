@@ -17,8 +17,20 @@ describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
     manager = new BaseWorkerManager();
     await manager.initBrowser();
     manager.maxUrl = 1;
-    page = await manager.browser.newPage();
 
+  });
+
+  beforeEach(async () => {
+    // 각 테스트 전에 새 페이지 생성
+    page = await manager.browser.newPage();
+  });
+
+  afterEach(async () => {
+    // 각 테스트 후에 페이지 닫기
+    if (page) {
+      await page.close().catch(err => console.warn('페이지 닫기 오류:', err));
+      page = null;
+    }
   });
 
   afterAll(async () => {
@@ -90,7 +102,7 @@ describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
 
   test('extractAndExecuteScripts 함수 테스트', async () => {
     // 스크립트 추출 및 실행
-    const discoveredUrls = await extractAndExecuteScripts(targetUrl, manager.browser);
+    const discoveredUrls = await extractAndExecuteScripts(targetUrl,allowedDomains, manager.browser);
 
     // 발견된 URL이 있는지 확인
     expect(discoveredUrls).toBeDefined();

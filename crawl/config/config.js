@@ -5,6 +5,8 @@
 
 const path = require('path');
 const os = require('os');
+require('dotenv').config();
+
 
 // 기본 도메인 설정 - 크롤링 범위를 제한하기 위한 도메인 목록
 const DOMAINS = {
@@ -46,6 +48,7 @@ const BROWSER = {
     '--disable-extensions',     // 확장 기능 비활성화
     '--disable-notifications',  // 알림 비활성화
     '--disable-popup-blocking'  // 팝업 차단 비활성화
+
   ],
 
   // 브라우저 타임아웃 설정 (밀리초)
@@ -109,6 +112,10 @@ const TEST_DATABASE = {
   MONGODB_USER: process.env.MONGODB_USER || 'crawler_user',
   MONGODB_PASSWORD: process.env.MONGODB_PASSWORD || 'crawler_password'
 }
+
+
+
+
 // 설정 값 중 환경 변수에 의해 재정의된 값 로그
 function logEnvironmentOverrides() {
   const overrides = [];

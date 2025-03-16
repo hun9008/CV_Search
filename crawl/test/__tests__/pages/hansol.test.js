@@ -1,4 +1,3 @@
-
 const puppeteer = require('puppeteer');
 const { BaseWorkerManager } = require('@crawl/baseWorkerManager');
 const { infiniteScroll, extractAndExecuteScripts } = require('@crawl/baseWorker');
@@ -6,8 +5,8 @@ const { infiniteScroll, extractAndExecuteScripts } = require('@crawl/baseWorker'
 describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
   let manager;
   let page;
-  const targetUrl = 'https://www.skshieldusapply.com';
-  const allowedDomains = ['skshieldusapply.com'];
+  const targetUrl = 'https:\\hansol.recruiter.co.kr';
+  const allowedDomains = ['hansol.recruiter.co.kr'];
 
   // 테스트 실행 시간 늘리기 (웹 크롤링은 시간이 소요될 수 있음)
   jest.setTimeout(60000);
@@ -18,7 +17,9 @@ describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
     manager = new BaseWorkerManager();
     await manager.initBrowser();
     manager.maxUrl = 1;
+
   });
+
   beforeEach(async () => {
     // 각 테스트 전에 새 페이지 생성
     page = await manager.browser.newPage();
@@ -31,6 +32,7 @@ describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
       page = null;
     }
   });
+
   afterAll(async () => {
     // 테스트 후 브라우저 종료
     await manager.browser.close();
@@ -43,7 +45,7 @@ describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
     // 페이지 제목 확인
     const title = await page.title();
     console.log(`페이지 제목: ${title}`);
-    expect(title).toContain('SK쉴더스 채용');
+    expect(title).toContain('한솔그룹 채용');
 
     // 현재 URL 확인
     const currentUrl = page.url();
@@ -63,7 +65,7 @@ describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
     expect(visitResult.success).toBe(true);
 
     // 방문 결과에 새 URL이 포함되어 있는지 확인 (최소 1개 이상)
-    expect(visitResult.crawledUrls.length).toBeGreaterThanOrEqual(1);
+    expect(visitResult.crawledUrls.length).toBeGreaterThanOrEqual(20);
 
     console.log(`발견된 URL 개수: ${visitResult.crawledUrls.length}`);
 
@@ -100,7 +102,7 @@ describe('삼성 커리어 채용 페이지 크롤링 테스트', () => {
 
   test('extractAndExecuteScripts 함수 테스트', async () => {
     // 스크립트 추출 및 실행
-    const discoveredUrls = await extractAndExecuteScripts(targetUrl, allowedDomains,manager.browser);
+    const discoveredUrls = await extractAndExecuteScripts(targetUrl,allowedDomains, manager.browser);
 
     // 발견된 URL이 있는지 확인
     expect(discoveredUrls).toBeDefined();

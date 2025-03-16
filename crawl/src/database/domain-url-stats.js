@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { MongoDBService } = require('./mongodb-service');
 
 /**
@@ -6,7 +7,6 @@ const { MongoDBService } = require('./mongodb-service');
  */
 async function printDomainUrlStats(options = {}) {
   const db = new MongoDBService();
-
   try {
     // 모든 도메인의 URL 통계 가져오기
     console.log('도메인별 URL 통계 가져오는 중...');

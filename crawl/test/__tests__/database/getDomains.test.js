@@ -1,5 +1,6 @@
 const { MongoClient } = require('mongodb');
 const { MongoDBService } = require('@database/mongodb-service');
+const { VisitResult } = require('@models/visitResult');
 const fs = require('fs').promises;
 const path = require('path');
 const { TEST_DATABASE } = require('@config/config');
@@ -49,28 +50,70 @@ const TEST_DATA_FILE = path.join(TEST_DATA_DIR, 'domain-test-results.json');
       mongodbService = new MongoDBService();
       mongodbService.setUri(TEST_DATABASE.MONGODB_ADMIN_URI);
       mongodbService.setDbName(TEST_DATABASE.MONGODB_DB_NAME);
+
       // MongoDB에 연결
       await mongodbService.connect();
-      console.log('MongoDB 연결 성공');      // 테스트 도메인 생성
+      console.log('MongoDB 연결 성공');
+
+      // 테스트 도메인 생성
       for (const domain of TEST_DOMAINS) {
         console.log(`도메인 생성 중: ${domain}`);
         await mongodbService.addOrUpdateDomain(domain, `https://${domain}`);
       }
 
-      // 첫 번째 도메인에 URL 추가 (2개의 방문된 URL, 1개의 미방문 URL)
+      // 첫 번째 도메인에 URL 추가 (모두 미방문 URL로 추가)
       await mongodbService.bulkAddSubUrls(TEST_DOMAINS[0], [
-        { url: `https://${TEST_DOMAINS[0]}/page1`, visited: true, text: 'First page content' },
-        { url: `https://${TEST_DOMAINS[0]}/page2`, visited: true, text: 'Second page content' },
-        { url: `https://${TEST_DOMAINS[0]}/page3`, visited: false, text: null }
+        `https://${TEST_DOMAINS[0]}/page1`,
+        `https://${TEST_DOMAINS[0]}/page2`,
+        `https://${TEST_DOMAINS[0]}/page3`
       ]);
 
-      // 두 번째 도메인에 URL 추가 (1개의 방문된 URL, 3개의 미방문 URL)
+      // 두 번째 도메인에 URL 추가 (모두 미방문 URL로 추가)
       await mongodbService.bulkAddSubUrls(TEST_DOMAINS[1], [
-        { url: `https://${TEST_DOMAINS[1]}/page1`, visited: true, text: 'Test page content' },
-        { url: `https://${TEST_DOMAINS[1]}/page2`, visited: false, text: null },
-        { url: `https://${TEST_DOMAINS[1]}/page3`, visited: false, text: null },
-        { url: `https://${TEST_DOMAINS[1]}/page4`, visited: false, text: null }
+        `https://${TEST_DOMAINS[1]}/page1`,
+        `https://${TEST_DOMAINS[1]}/page2`,
+        `https://${TEST_DOMAINS[1]}/page3`,
+        `https://${TEST_DOMAINS[1]}/page4`
       ]);
+
+      // 이제 일부 URL을 방문한 것으로 수동 마킹 (MongoDB를 직접 사용)
+      // 첫 번째 도메인의 2개 URL을 방문 완료로 표시
+      await mongodbService.db.collection('domains').updateOne(
+        { domain: TEST_DOMAINS[0], 'suburl_list.url': `https://${TEST_DOMAINS[0]}/page1` },
+        {
+          $set: {
+            'suburl_list.$.visited': true,
+            'suburl_list.$.success': true,
+            'suburl_list.$.text': 'Test page 1 content',
+            'suburl_list.$.updated_at': new Date()
+          }
+        }
+      );
+
+      await mongodbService.db.collection('domains').updateOne(
+        { domain: TEST_DOMAINS[0], 'suburl_list.url': `https://${TEST_DOMAINS[0]}/page2` },
+        {
+          $set: {
+            'suburl_list.$.visited': true,
+            'suburl_list.$.success': true,
+            'suburl_list.$.text': 'Test page 2 content',
+            'suburl_list.$.updated_at': new Date()
+          }
+        }
+      );
+
+      // 두 번째 도메인의 1개 URL을 방문 완료로 표시
+      await mongodbService.db.collection('domains').updateOne(
+        { domain: TEST_DOMAINS[1], 'suburl_list.url': `https://${TEST_DOMAINS[1]}/page1` },
+        {
+          $set: {
+            'suburl_list.$.visited': true,
+            'suburl_list.$.success': true,
+            'suburl_list.$.text': 'Test page content',
+            'suburl_list.$.updated_at': new Date()
+          }
+        }
+      );
 
       // 세 번째 도메인은 서브 URL 없음
 
