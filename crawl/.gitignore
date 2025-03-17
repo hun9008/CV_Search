@@ -5,3 +5,5 @@
 /src/CV2DB/vila
 __pycache__
 .pytest_cache
+**/data
+**/screenshot

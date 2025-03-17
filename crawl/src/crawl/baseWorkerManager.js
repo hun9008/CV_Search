@@ -101,7 +101,58 @@ async initBrowser() {
 }
 
 
+  /**
+   * 에러 발생 시 페이지 스크린샷을 저장하는 함수
+   * @param {Page} page - Puppeteer 페이지 객체
+   * @param {string} url - 스크린샷을 찍을 URL
+   * @param {Object} visitResult - 방문 결과 객체 (스크린샷 경로를 저장할 객체)
+   * @returns {Promise<string|null>} 저장된 스크린샷 경로 또는 실패 시 null
+   */
+  async saveErrorScreenshot(page, url, visitResult = null) {
+    if (!page) {
+      logger.warn('페이지 객체가 없어 스크린샷을 저장할 수 없습니다.');
+      return null;
+    }
 
+    try {
+      // 스크린샷 저장 경로 생성
+      const fs = require('fs').promises;
+      const path = require('path');
+      const screenshotsDir = path.join(CONFIG.PATHS.ERROR_SCREENSHOTS_DIR);
+
+      // 디렉토리가 없으면 생성
+      await fs.mkdir(screenshotsDir, { recursive: true });
+
+      // 파일명에 사용할 수 있는 URL 문자열 생성 (잘못된 문자 제거)
+      const sanitizedUrl = url
+        .replace(/^https?:\/\//, '')
+        .replace(/[^a-zA-Z0-9]/g, '_')
+        .substring(0, 100); // URL이 너무 길지 않도록 제한
+
+      // 타임스탬프 추가
+      const timestamp = new Date().toISOString().replace(/:/g, '-');
+      const fileName = `${sanitizedUrl}_${timestamp}.png`;
+      const filePath = path.join(screenshotsDir, fileName);
+
+      // 스크린샷 저장
+      await page.screenshot({
+        path: filePath,
+        fullPage: true // 전체 페이지 캡처
+      });
+
+      logger.info(`에러 스크린샷 저장됨: ${filePath}`);
+
+      // 방문 결과 객체가 제공되면 스크린샷 경로 추가
+      if (visitResult) {
+        visitResult.screenshotPath = filePath;
+      }
+
+      return filePath;
+    } catch (screenshotError) {
+      logger.error('스크린샷 저장 중 오류:', screenshotError);
+      return null;
+    }
+  }
   /**
    * 페이지의 내용을 추출
    * @param {Page} page Puppeteer 페이지 객체
@@ -422,12 +473,13 @@ async visitUrl(urlInfo) {
     domain
   });
 
+  let page;
   try {
     // 브라우저가 초기화되어 있는지 확인
     const browser = await this.initBrowser();
 
     // 새 페이지 열기
-    const page = await browser.newPage();
+    page = await browser.newPage();
 
     // 자바스크립트 대화상자 처리
     page.on('dialog', async dialog => {
@@ -496,6 +548,8 @@ async visitUrl(urlInfo) {
     visitResult.error = error.toString();
     // 결과 로깅
     visitResult.logSummary(logger);
+          // 클래스 메서드로 호출
+    await this.saveErrorScreenshot(page, url);
 
     return visitResult;
   }

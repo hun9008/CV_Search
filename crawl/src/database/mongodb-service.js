@@ -919,6 +919,125 @@ async resetAllVisitedStatus(specificDomain = null) {
     throw error;
   }
 }
+
+  /**
+ * 방문에 실패한(success=false) URL들의 방문 상태를 초기화합니다.
+ * @param {string} [specificDomain=null] 특정 도메인만 초기화하려면 해당 도메인명 지정, null이면 모든 도메인
+ * @returns {Promise<object>} 초기화 결과 ({totalDomains, totalUrls, updatedUrls})
+ */
+async resetFailedVisitedStatus(specificDomain = null) {
+  await this.connect();
+
+  try {
+    console.log(`${specificDomain ? `도메인 ${specificDomain}의` : '모든 도메인의'} 방문 실패 URL 초기화 중...`);
+
+    // 초기화에 사용할 쿼리 필터 설정
+    const filter = specificDomain ? { domain: specificDomain } : {};
+
+    // 초기화 전 상태 확인 (통계용)
+    const beforeStats = await this.domainsCollection.aggregate([
+      { $match: filter },
+      { $project: {
+          domain: 1,
+          totalUrls: { $size: { $ifNull: ['$suburl_list', []] } },
+          visitedUrls: {
+            $size: {
+              $filter: {
+                input: { $ifNull: ['$suburl_list', []] },
+                as: 'url',
+                cond: '$$url.visited'
+              }
+            }
+          },
+          failedUrls: {
+            $size: {
+              $filter: {
+                input: { $ifNull: ['$suburl_list', []] },
+                as: 'url',
+                cond: { $and: ['$$url.visited', { $eq: ['$$url.success', false] }] }
+              }
+            }
+          }
+        }
+      }
+    ]).toArray();
+
+    // 초기 통계 데이터 계산
+    const totalDomains = beforeStats.length;
+    const totalUrls = beforeStats.reduce((sum, domain) => sum + domain.totalUrls, 0);
+    const visitedUrls = beforeStats.reduce((sum, domain) => sum + domain.visitedUrls, 0);
+    const failedUrls = beforeStats.reduce((sum, domain) => sum + domain.failedUrls, 0);
+
+    console.log(`초기화 전 통계:`);
+    console.log(`- 도메인 수: ${totalDomains}`);
+    console.log(`- 총 URL 수: ${totalUrls}`);
+    console.log(`- 방문된 URL 수: ${visitedUrls}`);
+    console.log(`- 방문 실패 URL 수: ${failedUrls}`);
+
+    if (failedUrls === 0) {
+      console.log('초기화할 방문 실패 URL이 없습니다.');
+      return {
+        totalDomains,
+        totalUrls,
+        updatedUrls: 0
+      };
+    }
+
+    // 현재 시간 (업데이트 시간 기록용)
+    const now = new Date();
+
+    // suburl_list 배열 내에서 visited=true, success=false인 URL만 visited 상태를 false로 설정
+    const result = await this.domainsCollection.updateMany(
+      filter,
+      [
+        {
+          $set: {
+            suburl_list: {
+              $map: {
+                input: '$suburl_list',
+                as: 'suburl',
+                in: {
+                  $cond: [
+                    // 조건: visited가 true이고 success가 false인 경우만 업데이트
+                    { $and: ['$$suburl.visited', { $eq: ['$$suburl.success', false] }] },
+                    // true인 경우: visited를 false로 설정, 나머지는 유지
+                    {
+                      url: '$$suburl.url',
+                      visited: false,  // visited 상태 변경
+                      success: false,  // success 유지
+                      text: '$$suburl.text',
+                      error: '$$suburl.error',
+                      created_at: '$$suburl.created_at',
+                      updated_at: now
+                    },
+                    // false인 경우: 원래 값 그대로 유지
+                    '$$suburl'
+                  ]
+                }
+              }
+            },
+            updated_at: now
+          }
+        }
+      ]
+    );
+
+    console.log(`초기화 완료:`);
+    console.log(`- 업데이트된 도메인: ${result.matchedCount}`);
+    console.log(`- 수정된 도메인: ${result.modifiedCount}`);
+    console.log(`- 초기화된 URL: ${failedUrls}`);
+
+    return {
+      totalDomains,
+      totalUrls,
+      updatedUrls: failedUrls
+    };
+
+  } catch (error) {
+    console.error('방문 실패 URL 초기화 중 오류:', error);
+    throw error;
+  }
+}
   /**
    * 모든 도메인 목록을 가져옵니다.
    * @returns {Promise<Array<object>>} 도메인 객체 배열

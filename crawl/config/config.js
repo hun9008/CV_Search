@@ -26,7 +26,7 @@ const DOMAINS = {
 const PATHS = {
   // 기본 데이터 디렉토리
   DATA_DIR: path.resolve(process.env.DATA_DIR || 'data'),
-
+  ERROR_SCREENSHOTS_DIR : './screenshot',
   // 결과 파일
   RESULT_FILES: {
     // 로그 파일
@@ -106,11 +106,11 @@ const DATABASE = {
 
 const TEST_DATABASE = {
 
-  MONGODB_ADMIN_URI: process.env.MONGODB_ADMIN_URI || 'mongodb://admin:password123@localhost:27017/admin',
-  MONGODB_URI: process.env.MONGODB_URI || 'mongodb://crawler_user:crawler_password@localhost:27017/crawler_db?authSource=crawler_db',
-  MONGODB_DB_NAME: process.env.MONGODB_DB_NAME || 'test',
-  MONGODB_USER: process.env.MONGODB_USER || 'crawler_user',
-  MONGODB_PASSWORD: process.env.MONGODB_PASSWORD || 'crawler_password'
+  MONGODB_ADMIN_URI: 'mongodb://admin:password123@localhost:27017/admin',
+  MONGODB_URI:  'mongodb://crawler_user:crawler_password@localhost:27017/crawler_db?authSource=crawler_db',
+  MONGODB_DB_NAME:  'test',
+  MONGODB_USER: 'crawler_user',
+  MONGODB_PASSWORD:'crawler_password'
 }
 
 

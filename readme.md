@@ -72,9 +72,12 @@ const { BaseWorkerManager } = require('@crawl/baseWorkerManager');
 const { checkMongoDBStatus } = require('@database/init-mongodb');
 ```
 
-## To Do list
+## ISSUE
 
-- logger 개발 및 테스트
-- 도메인 직접 입력 및 테스트 (도메인 하나당 얼마나오는지 테스트)
-- 서버메모리 사용량 테스트 및 메모리 누수 체크
-- Page 닫아지는 닫아지는지 체크 및 테스트
+- logger 개발 및 테스트 ✅ (d)
+- 도메인 직접 입력 및 테스트 (도메인 하나당 얼마나오는지 테스트)❌
+- 서버메모리 사용량 테스트 및 메모리 누수 체크 ✅
+- Page 닫아지는 닫아지는지 체크 및 테스트 ✅
+- 오래실행되면 visitUrl이 오래 걸리면서 protocolError 발생 ❌
+- url .pdf 등 제거 ❌
+
