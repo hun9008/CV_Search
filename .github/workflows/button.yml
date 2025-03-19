@@ -11,41 +11,44 @@ jobs:
         with:
           ref: dev_crawl
 
+      - name: Debug directory structure
+        run: ls -R  # 디렉토리 구조 확인용
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: crwal/package-lock.json  # 캐시 경로 지정
+          cache-dependency-path: crawl/package-lock.json  # crwal -> crawl 수정
 
       - name: Install dependencies
         run: npm install
-        working-directory: crawl  # crwal 디렉토리에서 실행
+        working-directory: crawl  # crwal -> crawl 수정
 
       - name: Build application
         run: npm run build
-        working-directory: crawl  # crwal 디렉토리에서 실행
+        working-directory: crawl  # crwal -> crawl 수정
 
       - name: Setting secret
         run: |
           mkdir -p src/config
           echo "${{ secrets.SECRET_JSON }}" | base64 --decode > src/config/secret.json
           find src/config
-        working-directory: crawl  # crwal 디렉토리에서 실행
+        working-directory: crawl  # crwal -> crawl 수정
         shell: bash
 
       - name: Create .env file
         run: |
           echo "MONGODB_ADMIN_URI=${{ secrets.MONGO_DB_ADMIN_URI }}" >> .env
           echo "MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }}" >> .env
-        working-directory: crawl  # crwal 디렉토리에서 실행
+        working-directory: crawl  # crwal -> crawl 수정
 
       - name: Docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build --build-arg MONGODB_ADMIN_URI=${{ secrets.MONGO_DB_ADMIN_URI }} --build-arg MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }} -t ${{ secrets.DOCKER_REPO }}/cv_search .
           docker push ${{ secrets.DOCKER_REPO }}/cv_search
-        working-directory: crawl  # crwal 디렉토리에서 실행
+        working-directory: crawl  # crwal -> crawl 수정
 
   deploy:
     needs: build
@@ -64,4 +67,4 @@ jobs:
             sudo docker rm -f $(sudo docker ps -a -q)
             sudo docker pull ${{ secrets.DOCKER_REPO }}/cv_search
             sudo docker run -d -p 3000:3000 --env-file .env ${{ secrets.DOCKER_REPO }}/cv_search
-            sudo docker image prune -ff
+            sudo docker image prune -f
