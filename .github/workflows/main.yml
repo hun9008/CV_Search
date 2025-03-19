@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - dev_crawl
-workflow_dispatch:  # ✅ 수동 실행 활성화
+  # ✅ 수동 실행 활성화
 
 jobs:
   build:
