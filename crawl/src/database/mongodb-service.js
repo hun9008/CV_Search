@@ -395,6 +395,116 @@ async getDomains(options = {}) {
 }
 
 
+async countResults(keywords = []) {
+    await this.connect();
+
+    // Validate that the domains collection is available
+    if (!this.domainsCollection) {
+      throw new Error('domains collection not initialized');
+    }
+
+    // Base pipeline for aggregation
+    const pipeline = [
+      // Unwind the suburl_list array
+      { $unwind: '$suburl_list' },
+
+      // Only include URLs that have been visited and have text content
+      { $match: {
+        'suburl_list.visited': true,
+        'suburl_list.text': { $exists: true, $ne: null }
+      }}
+    ];
+
+    // If keywords provided, add keyword filtering
+    if (keywords && keywords.length > 0) {
+      // Add conditions to match all keywords in the text
+      const keywordConditions = keywords.map(keyword => ({
+        'suburl_list.text': {
+          $regex: keyword,
+          $options: 'i' // Case insensitive
+        }
+      }));
+
+      pipeline.push({ $match: { $and: keywordConditions } });
+    }
+
+    // Count the results
+    pipeline.push({ $count: 'total' });
+
+    try {
+      const result = await this.domainsCollection.aggregate(pipeline).toArray();
+      return result.length > 0 ? result[0].total : 0;
+    } catch (error) {
+      console.error('Error counting results:', error);
+      throw error;
+    }
+  }
+   /**
+   * Search for URLs containing all specified keywords in their text content
+   * @param {string[]} keywords - Array of keywords to search for
+   * @param {number} limit - Maximum number of results to return
+   * @param {number} skip - Number of results to skip (for pagination)
+   */
+  async searchByKeywords(keywords = [], limit = 50, skip = 0) {
+    await this.connect();
+
+    // Validate that the domains collection is available
+    if (!this.domainsCollection) {
+      throw new Error('domains collection not initialized');
+    }
+
+    // Base pipeline for aggregation
+    const pipeline = [
+      // Unwind the suburl_list array to work with individual URLs
+      { $unwind: '$suburl_list' },
+
+      // Only include URLs that have been visited and have text content
+      { $match: {
+        'suburl_list.visited': true,
+        'suburl_list.text': { $exists: true, $ne: null }
+      }}
+    ];
+
+    // If keywords provided, add keyword filtering
+    if (keywords && keywords.length > 0) {
+      // Add conditions to match all keywords in the text
+      const keywordConditions = keywords.map(keyword => ({
+        'suburl_list.text': {
+          $regex: keyword,
+          $options: 'i' // Case insensitive
+        }
+      }));
+
+      pipeline.push({ $match: { $and: keywordConditions } });
+    }
+
+    // Complete the pipeline with projection, sorting, skip and limit
+    pipeline.push(
+      // Project only the fields we need
+      {
+        $project: {
+          _id: 0,
+          domain: 1,
+          url: '$suburl_list.url',
+          text: '$suburl_list.text',
+          createdAt: '$suburl_list.created_at'
+        }
+      },
+      // Sort by creation date (most recent first)
+      { $sort: { 'createdAt': -1 } },
+      // Apply pagination
+      { $skip: skip },
+      { $limit: limit }
+    );
+
+    try {
+      return await this.domainsCollection.aggregate(pipeline).toArray();
+    } catch (error) {
+      console.error('Error searching by keywords:', error);
+      throw error;
+    }
+  }
+
   /**
    * 도메인을 추가하거나 업데이트합니다.
    * @param {string} domain 도메인 이름
