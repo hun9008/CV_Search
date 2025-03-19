@@ -20,32 +20,32 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: crwal  # crwal 디렉토리에서 실행
+        working-directory: crawl  # crwal 디렉토리에서 실행
 
       - name: Build application
         run: npm run build
-        working-directory: crwal  # crwal 디렉토리에서 실행
+        working-directory: crawl  # crwal 디렉토리에서 실행
 
       - name: Setting secret
         run: |
           mkdir -p src/config
           echo "${{ secrets.SECRET_JSON }}" | base64 --decode > src/config/secret.json
           find src/config
-        working-directory: crwal  # crwal 디렉토리에서 실행
+        working-directory: crawl  # crwal 디렉토리에서 실행
         shell: bash
 
       - name: Create .env file
         run: |
           echo "MONGODB_ADMIN_URI=${{ secrets.MONGO_DB_ADMIN_URI }}" >> .env
           echo "MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }}" >> .env
-        working-directory: crwal  # crwal 디렉토리에서 실행
+        working-directory: crawl  # crwal 디렉토리에서 실행
 
       - name: Docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build --build-arg MONGODB_ADMIN_URI=${{ secrets.MONGO_DB_ADMIN_URI }} --build-arg MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }} -t ${{ secrets.DOCKER_REPO }}/cv_search .
           docker push ${{ secrets.DOCKER_REPO }}/cv_search
-        working-directory: crwal  # crwal 디렉토리에서 실행
+        working-directory: crawl  # crwal 디렉토리에서 실행
 
   deploy:
     needs: build
