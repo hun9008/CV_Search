@@ -10,7 +10,7 @@ NC='\033[0m' # No Color
 # 설정
 DOCKER_USERNAME="sehyunsix"
 IMAGE_NAME="crawl-client"
-TAG="1.0.0"
+TAG="latest"
 CONTAINER_NAME="frontend-test"
 PORT=3000  # 호스트 포트 (원하는 포트로 변경할 수 있습니다)
 
