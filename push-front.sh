@@ -7,9 +7,11 @@ TAG="latest"
 
 # 이미지 빌드
 echo "Building Docker image ${IMAGE_NAME}:${TAG}..."
-docker build -t ${IMAGE_NAME}:${TAG} public/
+docker build --no-cache -t ${IMAGE_NAME}:${TAG} public/
 
-# 태그 추가
+docker rmi ${DOCKER_USERNAME}/${IMAGE_NAME}:${TAG}
+
+
 echo "Tagging image as ${DOCKER_USERNAME}/${IMAGE_NAME}:${TAG}..."
 docker tag ${IMAGE_NAME}:${TAG} ${DOCKER_USERNAME}/${IMAGE_NAME}:${TAG}
 
