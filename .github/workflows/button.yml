@@ -38,7 +38,6 @@ jobs:
           
       - name: 백엔드 Docker 이미지 빌드 및 푸시
         run: |
-          cd crawl
           docker build \
             --build-arg MONGODB_ADMIN_URI=${{ secrets.MONGO_DB_ADMIN_URI }} \
             --build-arg MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }} \
