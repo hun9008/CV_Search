@@ -145,3 +145,86 @@ input, button, select {
     text-align: center;
     padding: 20px;
 }
+
+.parse-container {
+    display: flex;
+    margin-top: 15px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.parse-btn {
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    margin-right: 15px;
+    min-width: 140px;
+}
+
+.parse-btn:hover {
+    background-color: #1a252f;
+}
+
+.parse-btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.parse-result {
+    flex: 1;
+    min-width: 300px;
+    border-left: 2px solid #eee;
+    padding-left: 15px;
+    margin-left: 10px;
+}
+
+.parsed-cv-data {
+    background-color: #f8f9fa;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+}
+
+.cv-field {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.cv-field:last-child {
+    margin-bottom: 0;
+}
+
+.loading-small {
+    font-style: italic;
+    color: #666;
+    padding: 5px 0;
+}
+
+.error {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .parse-container {
+        flex-direction: column;
+    }
+
+    .parse-btn {
+        margin-right: 0;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .parse-result {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+        width: 100%;
+    }
+}

@@ -113,8 +113,9 @@ const TEST_DATABASE = {
   MONGODB_PASSWORD:'crawler_password'
 }
 
-
-
+const SERVER = {
+  PORT: process.env.PORT || '8080',
+}
 
 // 설정 값 중 환경 변수에 의해 재정의된 값 로그
 function logEnvironmentOverrides() {
@@ -165,6 +166,7 @@ const CONFIG = {
   PATHS,
   BROWSER,
   CRAWLER,
+  SERVER,
   initialize: initializeConfig
 };
 
