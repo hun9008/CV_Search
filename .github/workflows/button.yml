@@ -51,12 +51,12 @@ jobs:
           
   deploy:
     name: NCP 서버 배포
-    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v3
-        
+        with:
+           ref: dev_crawl 
       - name: 현재 디렉토리 파일 목록 확인
         run: ls -la
         
