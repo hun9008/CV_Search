@@ -4,8 +4,9 @@ FROM node:20-slim
 # 작업 디렉토리 설정
 WORKDIR /app
 
+COPY . .
 # 패키지 파일 복사
-COPY ./crawl/package*.json .
+WORKDIR /app/crawl
 
 # 의존성 설치
 RUN npm install
@@ -14,7 +15,7 @@ RUN npm install
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
-COPY . .
+
 
 # 환경 변수 설정
 ENV NODE_ENV=production
