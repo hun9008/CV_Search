@@ -31,7 +31,7 @@ jobs:
           
       - name: 프론트엔드 Docker 이미지 빌드 및 푸시
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/crawl-client:latest public/.
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/crawl-client:latest public/
           docker push ${{ secrets.DOCKER_USERNAME }}/crawl-client:latest
           
       - name: 백엔드 Docker 이미지 빌드 및 푸시
