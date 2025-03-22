@@ -38,6 +38,7 @@ CREATE TABLE cv (
 CREATE TABLE jobs (
     id INT PRIMARY KEY AUTO_INCREMENT,       -- 공고 ID (자동 증가)
     company_name VARCHAR(255) NOT NULL,      -- 회사명
+    job_title VARCHAR(255) NOT NULL,         -- 직무 제목
     department VARCHAR(255) NOT NULL,        -- 모집 부서
     experience VARCHAR(20) NOT NULL,         -- 모집 경력 (신입, 중급, 고급, 인턴)
     description TEXT NOT NULL,               -- 업무 내용 (상세 직무 설명)
