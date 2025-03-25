@@ -43,8 +43,7 @@ services:
       - "8080:8080"
     container_name: myweb-api
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
+    env_file: ".env"
     networks:
       - cv-network
     healthcheck:
