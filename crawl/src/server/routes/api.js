@@ -1,8 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const dataController = require('../controllers/dataController');
-const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, SchemaType } = require('@google/generative-ai');
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const jobsController = require('../controllers/jobsController');
+const statsController = require('../controllers/statsController');
+const { GeminiService } = require('@parse/geminiService');
+const { defaultLogger: logger } = require('@utils/logger');
+
+// GeminiService 인스턴스 생성
+const geminiService = new GeminiService();
 
 /**
  * @route   GET /api/search
@@ -13,127 +18,61 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
  * @access  Public
  */
 router.get('/search', dataController.getResults);
+
+/**
+ * @route   POST /api/parse-cv
+ * @desc    텍스트를 분석하여 채용공고인지 판별하고 정보 추출
+ * @body    {string} content - 분석할 텍스트 내용
+ * @returns {Object} 분석 결과 및 추출된 채용 정보
+ * @access  Public
+ */
 router.post('/parse-cv', async (req, res) => {
-    try {
-        const { content } = req.body;
+  try {
+    const { content } = req.body;
 
-        if (!content) {
-            return res.status(400).json({ success: false, error: '내용이 제공되지 않았습니다' });
-        }
-
-        // 스키마 정의
-        const schema = {
-            type: SchemaType.OBJECT,
-            properties: {
-                success: {
-                    type: SchemaType.BOOLEAN,
-                    description: "채용공고인지 여부",
-                },
-                reason: {
-                    type: SchemaType.STRING,
-                    description: "채용공고가 아닌 경우 이유",
-                },
-                company_name: {
-                    type: SchemaType.STRING,
-                    description: "회사명",
-                },
-                department: {
-                    type: SchemaType.STRING,
-                    description: "부서",
-                },
-                experience: {
-                    type: SchemaType.STRING,
-                    description: "경력 요구사항",
-                },
-                description: {
-                    type: SchemaType.STRING,
-                    description: "직무 설명",
-                },
-                job_type: {
-                    type: SchemaType.STRING,
-                    description: "고용 형태",
-                },
-                posted_period: {
-                    type: SchemaType.STRING,
-                    description: "게시 기간",
-                },
-                requirements: {
-                    type: SchemaType.STRING,
-                    description: "필수 요건",
-                },
-                preferred_qualifications: {
-                    type: SchemaType.STRING,
-                    description: "우대 사항",
-                },
-                ideal_candidate: {
-                    type: SchemaType.STRING,
-                    description: "이상적인 후보자",
-                }
-            },
-            required: ["success"]
-        };
-
-        // Configure the model
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-2.0-flash-lite',
-          generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: schema,
-        },
-        });
-
-        const promptText = `
-당신은 채용공고 분석 전문가입니다. 다음 텍스트를 분석하여 채용공고인지 판단하세요.
-
-만약 채용공고라면, 다음 정보를 추출하세요:
-- company_name: 회사명
-- department: 부서
-- experience: 경력 요구사항
-- description: 직무 설명
-- job_type: 고용 형태 (정규직, 계약직 등)
-- posted_period: 게시 기간
-- requirements: 필수 요건
-- preferred_qualifications: 우대 사항
-- ideal_candidate: 이상적인 후보자
-
-채용공고가 맞으면 success를 true로, 아니면 false로 설정하고 이유를 reason 필드에 제공하세요.
-텍스트는 다음과 같습니다:
-
-${content}
-`;
-
-      const genAIResult = await model.generateContent(promptText);
-
-        // 응답 텍스트를 가져옴
-        const responseText = genAIResult.response.text();
-
-        // 디버깅용 로그 추가
-        console.log('Gemini API 응답 텍스트:', responseText);
-
-        try {
-            // 텍스트를 JSON 객체로 파싱
-            const parsedResponse = JSON.parse(responseText);
-
-            // 파싱된 JSON 객체를 응답으로 전송
-            return res.status(200).json(parsedResponse);
-        } catch (parseError) {
-            console.error('JSON 파싱 오류:', parseError);
-
-            // JSON 파싱에 실패한 경우, 원본 텍스트를 그대로 전송
-            return res.status(500).json({
-                success: false,
-                error: 'JSON 파싱 오류',
-                rawResponse: responseText
-            });
-        }
-
-    } catch (error) {
-        console.error('텍스트 처리 중 오류 발생:', error);
-        res.status(500).json({
-            success: false,
-            error: error.message || '텍스트를 파싱하는 중 오류가 발생했습니다'
-        });
+    if (!content) {
+      logger.warn('내용이 제공되지 않은 요청');
+      return res.status(400).json({ success: false, error: '내용이 제공되지 않았습니다' });
     }
+
+    logger.info('채용공고 분석 요청', { contentLength: content.length });
+
+    // GeminiService를 사용하여 채용공고 분석
+    const result = await geminiService.parseRecruitment(content);
+
+    // 결과 반환
+    return res.status(200).json(result);
+
+  } catch (error) {
+    logger.error('텍스트 처리 중 오류 발생:', error);
+
+    // JSON 파싱 오류인 경우
+    if (error.message.includes('JSON')) {
+      return res.status(500).json({
+        success: false,
+        error: 'JSON 파싱 오류',
+        message: error.message
+      });
+    }
+
+    // 일반 오류
+    return res.status(500).json({
+      success: false,
+      error: error.message || '텍스트를 파싱하는 중 오류가 발생했습니다'
+    });
+  }
 });
+
+
+// 통계 라우트
+router.get('/stats', statsController.getStats);
+router.get('/stats/job-types', statsController.getJobTypeStats);
+router.get('/stats/experience', statsController.getExperienceStats);
+router.get('/stats/domains', statsController.getDomainStats);
+router.get('/stats/urls', statsController.getUrlStats);
+
+router.get('/jobs', jobsController.getJobs);
+router.get('/jobs/:id', jobsController.getJobById);
+
 
 module.exports = router;

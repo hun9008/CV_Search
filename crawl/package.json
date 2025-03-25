@@ -5,11 +5,12 @@
   "main": "src/index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node src/crawl/baseWorkerManager",
+    "crawl": "node src/crawl/baseWorkerManager",
     "test": "jest --config=test/__tests__/jest.config.cjs --detectOpenHandles",
     "stats": "node --env-file=.env src/database/domain-url-stats ",
     "server": "node src/server/index",
-    "visited-reset": "node src/database/reset-visits"
+    "visited-reset": "node src/database/reset-visits",
+    "parse": "node src/parse/parseManager"
   },
   "_moduleAliases": {
     "@root": ".",
@@ -20,6 +21,7 @@
     "@models": "src/models",
     "@server": "src/server",
     "@test": "test",
+    "@parse": "src/parse",
     "@config": "config"
   },
   "dependencies": {
@@ -27,11 +29,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "faker": "^6.6.6",
     "module-alias": "^2.2.3",
     "morgan": "^1.10.0",
     "puppeteer": "^24.4.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.6.0",
     "jest": "^29.5.0",
     "jest-html-reporters": "^3.1.7",
     "mongodb-memory-server": "^10.1.4"

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Search - Statistics</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/stats.css">
+    <!-- Chart.js 라이브러리 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>CV Search</h1>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html">URL Search</a></li>
+                <li><a href="jobs.html">Recruitment Info</a></li>
+                <li><a href="stats.html" class="active">Statistics</a></li>
+            </ul>
+        </nav>
+
+        <div class="stats-header">
+            <h2>Crawling and Recruitment Statistics</h2>
+            <button id="refresh-stats-btn">Refresh Data</button>
+        </div>
+
+        <div class="stats-container">
+            <div class="stats-card">
+                <h3>URL Classification</h3>
+                <div class="chart-container">
+                    <canvas id="url-classification-chart"></canvas>
+                </div>
+                <div class="stats-summary" id="url-stats-summary">
+                    <div class="stat-item">
+                        <span class="stat-label">Total URLs:</span>
+                        <span class="stat-value" id="total-urls">Loading...</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Recruitment URLs:</span>
+                        <span class="stat-value" id="recruit-urls">Loading...</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Non-Recruitment URLs:</span>
+                        <span class="stat-value" id="non-recruit-urls">Loading...</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Unclassified URLs:</span>
+                        <span class="stat-value" id="unclassified-urls">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <h3>Job Types Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="job-types-chart"></canvas>
+                </div>
+                <div class="stats-summary" id="job-types-summary">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <h3>Timeline - URLs Processed Per Day</h3>
+            <div class="chart-container wide-chart">
+                <canvas id="timeline-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="last-updated">
+            Last updated: <span id="last-updated-time">Loading...</span>
+        </div>
+         <div class="stats-card">
+        <h3>URL 분석 통계</h3>
+        <div class="chart-container">
+            <canvas id="url-analysis-chart"></canvas>
+        </div>
+        <div class="stats-summary" id="visit-url-stats-summary">
+            <div class="stat-item">
+                <span class="stat-label">총 방문 URL 수:</span>
+                <span class="stat-value" id="total-visits">Loading...</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">총 서브 URL 수:</span>
+                <span class="stat-value" id="total-sub-urls">Loading...</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">분석된 URL 수:</span>
+                <span class="stat-value" id="analyzed-urls">Loading...</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">채용공고 URL 수:</span>
+                <span class="stat-value" id="recruit-sub-urls">Loading...</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">비채용공고 URL 수:</span>
+                <span class="stat-value" id="non-recruit-sub-urls">Loading...</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">분석 비율:</span>
+                <span class="stat-value" id="analysis-ratio">Loading...</span>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script src="js/stats.js"></script>
+</body>
+</html>

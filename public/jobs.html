@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Search</title>
+    <title>CV Search - Recruitment Info</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/jobs.css">
 </head>
 <body>
     <div class="container">
@@ -19,36 +20,34 @@
 
         <div class="search-form">
             <div class="form-group">
-                <label for="keywords">Keywords (comma-separated):</label>
-                <input type="text" id="keywords" placeholder="Enter keywords...">
+                <label for="job-keywords">Keywords (comma-separated):</label>
+                <input type="text" id="job-keywords" placeholder="e.g. developer, python, senior">
             </div>
 
             <div class="form-group">
-                <label for="limit">Results per page:</label>
-                <select id="limit">
-                    <option value="10">10</option>
+                <label for="job-limit">Results per page:</label>
+                <select id="job-limit">
                     <option value="25">25</option>
                     <option value="50" selected>50</option>
                     <option value="100">100</option>
                 </select>
             </div>
 
-            <button id="search-btn">Search</button>
+            <button id="job-search-btn">Search</button>
 
-            <div class="keywords-list" id="active-keywords"></div>
+            <div class="keywords-list" id="job-active-keywords"></div>
         </div>
 
-        <div id="results-count"></div>
-        <div id="results" class="results"></div>
+        <div id="job-results-count"></div>
+        <div id="job-results" class="job-results"></div>
 
         <div class="pagination">
-            <button id="prev-page" disabled>Previous</button>
-            <span id="page-info">Page 1</span>
-            <button id="next-page">Next</button>
+            <button id="job-prev-page" disabled>Previous</button>
+            <span id="job-page-info">Page 1</span>
+            <button id="job-next-page">Next</button>
         </div>
     </div>
 
-    <!-- Load JavaScript files -->
-    <script src="js/search.js"></script>
+    <script src="js/jobs.js"></script>
 </body>
 </html>
