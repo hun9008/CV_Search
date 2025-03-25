@@ -17,9 +17,6 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 
 
-# 환경 변수 설정
-ENV NODE_ENV=production
-
 # 작업 디렉토리를 crawl 폴더로 이동
 WORKDIR /app/crawl
 
