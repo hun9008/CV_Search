@@ -56,7 +56,7 @@ CREATE TABLE jobs (
     posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 공고 등록 날짜
     expires_at DATE,                                 -- 공고 만료 날짜
     raw_jobs_text TEXT NOT NULL,                    -- 모집공고 전체 원본 텍스트 (크롤링 데이터 원본)
-    jobs_url VARCHAR(255) NOT NULL,                 -- 공고 URL
+    jobs_url VARCHAR(255) NOT NULL                 -- 공고 URL
 );
 
 
