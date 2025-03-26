@@ -13,12 +13,12 @@ CREATE TABLE users (
     oauth_id VARCHAR(255) UNIQUE,            -- OAuth 고유 ID (OAuth 로그인 시 사용)
     oauth_access_token TEXT DEFAULT NULL,  
     oauth_refresh_token TEXT DEFAULT NULL,  
-    token_expiry TIMESTAMP DEFAULT NULL      -- Access Token 만료 시간
+    token_expiry TIMESTAMP DEFAULT NULL,      -- Access Token 만료 시간
     name VARCHAR(255) NOT NULL,              -- 사용자 이름
     address VARCHAR(255) NOT NULL,           -- 주소 (경기 수원과 같은 카테고리)
     role VARCHAR(10) DEFAULT 'user',         -- 역할 (일반 사용자, 관리자)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 계정 생성일
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP  -- 마지막 수정일
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 마지막 수정일
     UNIQUE(oauth_provider, oauth_id)         -- OAuth 고유 ID 중복 방지
 );
 
@@ -54,7 +54,7 @@ CREATE TABLE jobs (
     preferred_qualifications TEXT,                  -- 우대 사항 (선택, 선호 역량)
     ideal_candidate TEXT,                           -- 인재상 (선택, 원하는 인재상)
     posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 공고 등록 날짜
-    expires_at DATE                                 -- 공고 만료 날짜
+    expires_at DATE,                                 -- 공고 만료 날짜
     raw_jobs_text TEXT NOT NULL,                    -- 모집공고 전체 원본 텍스트 (크롤링 데이터 원본)
     jobs_url VARCHAR(255) NOT NULL,                 -- 공고 URL
 );
