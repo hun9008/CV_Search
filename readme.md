@@ -72,7 +72,7 @@ const { BaseWorkerManager } = require('@crawl/baseWorkerManager');
 const { checkMongoDBStatus } = require('@database/init-mongodb');
 ```
 
-## ISSUE
+## DEVLOG
 
 - logger 개발 및 테스트 ✅ (d)
 - 도메인 직접 입력 및 테스트 (도메인 하나당 얼마나오는지 테스트)❌
@@ -80,4 +80,7 @@ const { checkMongoDBStatus } = require('@database/init-mongodb');
 - Page 닫아지는 닫아지는지 체크 및 테스트 ✅
 - 오래실행되면 visitUrl이 오래 걸리면서 protocolError 발생 ❌
 - url .pdf 등 제거 ❌
+- LLM 연동 채용공고 데이터 1차 파싱 ✅
+- LLM 연동 채용공고 데이터 2차 파싱 ✅
+  
 
