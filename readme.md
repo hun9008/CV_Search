@@ -1,15 +1,6 @@
 
 # CV_search
 
-## Team Member
-
-Team Member
-| Name | Part | What I do |
-|------|------|-----------|
-| [팀장] 정용훈 | BE, AI | |
-| [팀원] 육세현 | BE, DM | 모든 직무 데이터를 크롤링합니다. |
-| ... | blk | blk |
-| ... | blk | blk |
 
 
 ## Crwal 프로젝트 구조
