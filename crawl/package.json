@@ -7,10 +7,13 @@
   "scripts": {
     "crawl": "node src/crawl/baseWorkerManager",
     "test": "jest --config=test/__tests__/jest.config.cjs --detectOpenHandles",
+    "seed": "node src/seed/seedGenerator",
     "stats": "node --env-file=.env src/database/domain-url-stats ",
     "server": "node src/server/index",
     "visited-reset": "node src/database/reset-visits",
-    "parse": "node src/parse/parseManager"
+    "gemini-parse": "node src/parse/parseToGemini",
+    "claude-parse":"node src/parse/parseToClaude"
+
   },
   "_moduleAliases": {
     "@root": ".",
@@ -25,6 +28,7 @@
     "@config": "config"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "@google/generative-ai": "^0.24.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

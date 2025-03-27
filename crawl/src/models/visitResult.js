@@ -22,6 +22,7 @@ const SubUrlSchema = new Schema({
     default: Date.now
   },
   isRecruit: Boolean,
+  isClaude: Boolean,
   success: Boolean,
   error: String,
   errors:{ type: [String], default: [] } ,

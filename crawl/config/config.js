@@ -158,6 +158,7 @@ function initializeConfig() {
   console.log(`크롤링 설정 초기화 완료. 데이터 디렉토리: ${PATHS.DATA_DIR}`);
 }
 
+const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY;
 // 구성 객체
 const CONFIG = {
   TEST_DATABASE,
@@ -167,6 +168,7 @@ const CONFIG = {
   BROWSER,
   CRAWLER,
   SERVER,
+  CLAUDE_API_KEY,
   initialize: initializeConfig
 };
 

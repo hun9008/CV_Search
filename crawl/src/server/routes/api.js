@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const claudeJobsController = require('../controllers/claudeJobsController'); // Added Claude controller
 const dataController = require('../controllers/dataController');
 const jobsController = require('../controllers/jobsController');
 const statsController = require('../controllers/statsController');
@@ -73,6 +74,13 @@ router.get('/stats/urls', statsController.getUrlStats);
 
 router.get('/jobs', jobsController.getJobs);
 router.get('/jobs/:id', jobsController.getJobById);
+
+// Claude 채용 정보 라우트
+router.get('/recruitinfos-claude', claudeJobsController.getClaudeJobs);
+router.get('/recruitinfos-claude/filters', claudeJobsController.getClaudeJobFilters);
+router.get('/recruitinfos-claude/:id', claudeJobsController.getClaudeJobById);
+router.get('/stats/claude', claudeJobsController.getClaudeJobStats);
+
 
 
 module.exports = router;
