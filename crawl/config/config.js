@@ -98,7 +98,7 @@ const CRAWLER = {
 const DATABASE = {
   // MongoDB 연결 정보
   MONGODB_ADMIN_URI: process.env.MONGODB_ADMIN_URI || 'mongodb://admin:password123@localhost:27017/admin',
-  MONGODB_URI: process.env.MONGODB_URI || 'mongodb://crawler_user:crawler_password@localhost:27017/crawler_db?authSource=crawler_db',
+  MONGODB_URI: process.env.MONGODB_URI,
   MONGODB_DB_NAME: process.env.MONGODB_DB_NAME || 'crawler_db',
   MONGODB_USER: process.env.MONGODB_USER || 'crawler_user',
   MONGODB_PASSWORD: process.env.MONGODB_PASSWORD || 'crawler_password'
