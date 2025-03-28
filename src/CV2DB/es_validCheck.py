@@ -4,9 +4,14 @@ from sentence_transformers import SentenceTransformer
 from elasticsearch import Elasticsearch
 import numpy as np
 
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path="../../.env")
+host_ip = os.getenv("ELASTIC_HOST")
+
 CV_DATA_DIR = "../../data/cv"
 JOBS_DATA_DIR = "../../data/naver" 
-ES_HOST = "http://127.0.0.1:9200"
+ES_HOST = host_ip
 CV_INDEX_NAME = "cv_index"
 JOBS_INDEX_NAME = "job_index"  
 
