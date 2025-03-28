@@ -1,6 +1,8 @@
 package com.www.goodjob.config;
 
+import com.www.goodjob.service.AuthService;
 import com.www.goodjob.service.JwtTokenProvider;
+import com.www.goodjob.service.OAuthUserInfo;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,18 +19,27 @@ import java.io.IOException;
 public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final AuthService authService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        String email = oAuth2User.getAttribute("email");
 
-        // JWT 발급
-        String jwtToken = jwtTokenProvider.createToken(email);
+        OAuthUserInfo userInfo = OAuthUserInfo.builder()
+                .email(oAuth2User.getAttribute("email"))
+                .name(oAuth2User.getAttribute("name"))
+                .provider("google")
+                .oauthId(oAuth2User.getName())
+                .accessToken("token-sample")
+                .refreshToken("refresh-sample")
+                .tokenExpiry(null)
+                .build();
 
-        // 프론트 리디렉션
+        authService.saveOrGetUser(userInfo);
+
+        String jwtToken = jwtTokenProvider.createToken(userInfo.getEmail());
         response.sendRedirect("http://localhost:3000/oauth/redirect?token=" + jwtToken);
     }
 }
