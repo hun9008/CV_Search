@@ -1,4 +1,10 @@
 package com.www.goodjob.repository;
 
-public class UserOAuthRepository {
+import com.www.goodjob.domain.UserOAuth;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserOAuthRepository extends JpaRepository<UserOAuth, Long> {
+    Optional<UserOAuth> findByProviderAndOauthId(String provider, String oauthId);
 }
