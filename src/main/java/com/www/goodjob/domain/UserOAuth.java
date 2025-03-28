@@ -1,6 +1,7 @@
 // UserOAuth.java
 package com.www.goodjob.domain;
 
+import com.www.goodjob.enums.OAuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -22,7 +23,8 @@ public class UserOAuth {
     private User user;
 
     @Column(nullable = false)
-    private String provider; // e.g., google, kakao
+    @Enumerated(EnumType.STRING)
+    private OAuthProvider provider;
 
     @Column(nullable = false)
     private String oauthId;  // 소셜 플랫폼에서의 사용자 ID

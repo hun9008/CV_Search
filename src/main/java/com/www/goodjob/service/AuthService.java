@@ -2,7 +2,8 @@ package com.www.goodjob.service;
 
 import com.www.goodjob.domain.User;
 import com.www.goodjob.domain.UserOAuth;
-import com.www.goodjob.domain.UserRole;
+import com.www.goodjob.enums.OAuthProvider;
+import com.www.goodjob.enums.UserRole;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class AuthService {
 
                     UserOAuth oauth = UserOAuth.builder()
                             .user(savedUser)
-                            .provider(userInfo.getProvider())
+                            .provider(OAuthProvider.valueOf(userInfo.getProvider().toUpperCase()))
                             .oauthId(userInfo.getOauthId())
                             .accessToken(userInfo.getAccessToken())
                             .refreshToken(userInfo.getRefreshToken())

@@ -1,6 +1,7 @@
 // User.java
 package com.www.goodjob.domain;
 
+import com.www.goodjob.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
