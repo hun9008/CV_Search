@@ -1,0 +1,44 @@
+name: Deploy to EC2 (Amazon Linux, dev_wei)
+
+on:
+    push:
+        branches:
+            - dev_wei
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Set up SSH
+              uses: webfactory/ssh-agent@v0.5.3
+              with:
+                  ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+
+            - name: Deploy to EC2
+              run: |
+                  ssh -o StrictHostKeyChecking=no ec2-user@3.34.97.5 << 'EOF'
+
+                    cd ~/git/CV_Search
+                    git checkout dev_wei
+                    git pull origin dev_wei  
+
+
+                    if ! command -v node &> /dev/null; then
+                      curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+                      sudo yum install -y nodejs
+                    fi
+
+
+                    npm install
+                    npm run build
+
+
+                    sudo rm -rf /var/www/goodJob_client
+                    sudo cp -r dist /var/www/goodJob_client
+
+                    sudo systemctl restart nginx
+                  EOF
