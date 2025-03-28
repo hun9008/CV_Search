@@ -84,6 +84,7 @@ async initBrowser() {
   if (!this.browser) {
     logger.info(`BaseWorkerManager 초기화 완료.`);
     this.browser = await puppeteer.launch({
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
       headless: 'new',
       ignoreHTTPSErrors: true,
       defaultViewport: null,

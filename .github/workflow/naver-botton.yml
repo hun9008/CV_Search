@@ -22,8 +22,6 @@ jobs:
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v3
-        with:
-          ref: dev_crawl_ref
 
       - name: Docker Hub 로그인
         uses: docker/login-action@v2
@@ -56,8 +54,6 @@ jobs:
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v3
-        with:
-           ref: dev_crawl_ref
       - name: 현재 디렉토리 파일 목록 확인
         run: ls -la
 
