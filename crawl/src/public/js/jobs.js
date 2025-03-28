@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextPageButton = document.getElementById('job-next-page');
     const pageInfoSpan = document.getElementById('job-page-info');
 
-    const API_JOBS = 'http://175.45.201.225/api/jobs';
+    const API_JOBS = 'http://localhost/api/jobs';
     // State variables
     let currentPage = 1;
     let totalPages = 1;

@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let urlClassificationChart = null;
     let jobTypesChart = null;
     let timelineChart = null;
-    const API_STATS = 'http://175.45.201.225/api/stats';
+    const API_STATS = 'http://localhost/api/stats';
 
     // Initialize
     fetchStats();
