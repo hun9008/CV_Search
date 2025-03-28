@@ -8,9 +8,7 @@
     "crawl": "node src/crawl/baseWorkerManager",
     "test": "jest --config=test/__tests__/jest.config.cjs --detectOpenHandles",
     "seed": "node src/seed/seedGenerator",
-    "stats": "node --env-file=.env src/database/domain-url-stats ",
     "server": "node src/server/index",
-    "visited-reset": "node src/database/reset-visits",
     "gemini-parse": "node src/parse/parseToGemini",
     "claude-parse":"node src/parse/parseToClaude"
 
