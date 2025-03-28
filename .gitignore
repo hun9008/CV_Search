@@ -1,0 +1,5 @@
+crawl
+.env
+test
+cv_env
+src/CV2DB
