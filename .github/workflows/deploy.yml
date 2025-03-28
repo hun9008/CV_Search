@@ -20,7 +20,7 @@ jobs:
 
             - name: Deploy to EC2
               run: |
-                  ssh -o StrictHostKeyChecking=no ec2-user@3.34.97.5 << 'EOF'
+                  ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
 
                     cd ~/git/CV_Search
                     git checkout dev_wei
