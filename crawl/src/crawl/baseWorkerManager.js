@@ -89,7 +89,7 @@ async initBrowser() {
       ignoreHTTPSErrors: true,
       defaultViewport: null,
       ignoreDefaultArgs: ['--enable-automation'],
-      args: CONFIG.CRAWLER.LAUNCH_ARGS,
+      args: CONFIG.BROWSER.LAUNCH_ARGS,
       defaultViewport: { width: 1920, height: 1080 },
       timeout: 10_000, // 10 seconds
       protocolTimeout: 20_000, // 20 seconds
