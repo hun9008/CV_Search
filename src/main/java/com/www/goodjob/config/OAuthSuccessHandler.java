@@ -1,5 +1,6 @@
 package com.www.goodjob.config;
 
+import com.www.goodjob.service.JwtTokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,22 +16,19 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
 
+    private final JwtTokenProvider jwtTokenProvider;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-
         String email = oAuth2User.getAttribute("email");
-        String name = oAuth2User.getAttribute("name");
-        String oauthId = oAuth2User.getName();
-        String provider = authentication.getAuthorities().stream()
-                .findFirst().orElseThrow().getAuthority();
 
-        // 여기서 DB 저장 로직 or JWT 발급 로직 호출 가능
+        // JWT 발급
+        String jwtToken = jwtTokenProvider.createToken(email);
 
-        // 예시: 토큰 생성 후 리디렉션
-        String jwtToken = "mock-jwt-token"; // JWT 생성 로직 필요
+        // 프론트 리디렉션
         response.sendRedirect("http://localhost:3000/oauth/redirect?token=" + jwtToken);
     }
 }
