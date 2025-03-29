@@ -321,27 +321,27 @@ exports.getCompleteClaudeJobs = async (req, res) => {
       company_name: {
         $exists: true,
         $ne: null,
-        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '']
+        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음','']
       },
 
       // 직무 유형이 있고 비어있지 않음
       job_type: {
         $exists: true,
         $ne: null,
-        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '']
+        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음','']
       },
       // 경력이 있고 비어있지 않음
       experience: {
         $exists: true,
         $ne: null,
-        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '']
+        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음','']
       },
       // 설명이 있고 No description이 아님
       description: {
         $exists: true,
         $ne: null,
         $ne: 'No description available.',
-        $nin:  ['Unknown Company', '알 수 없음', '명시되지 않음', '']
+        $nin:  ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음','']
       }
       ,
       // 우대 사항 (선택, 선호 역량)
@@ -349,14 +349,14 @@ exports.getCompleteClaudeJobs = async (req, res) => {
         $exists: true,
         $ne: null,
         $ne: 'No description available.',
-        $nin:  ['Unknown Company', '알 수 없음', '명시되지 않음', '']
+        $nin:  ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음','']
       },
       // 인재상 (선택, 원하는 인재상)
       ideal_candidate: {
          $exists: true,
         $ne: null,
         $ne: 'No description available.',
-        $nin:  ['Unknown Company', '알 수 없음', '명시되지 않음', '']
+        $nin:  ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음','']
       },
     };
 

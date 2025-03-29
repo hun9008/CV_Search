@@ -2,6 +2,13 @@ name: Docker Compose Deploy to NCP
 run-name: Deploying to NCP
 
 on:
+  push:
+    branches:
+      - main  # 메인 브랜치에 푸시될 때 실행
+    paths:
+      - 'crawl/**'  # crawl 디렉토리 내의 파일이 변경된 경우만 실행
+      - 'proxy/**'  # proxy 디렉토리 내의 파일이 변경된 경우만 실행
+      - 'docker-compose.yml'  # docker-compose.yml 파일이 변경된 경우만 실행
   workflow_dispatch:
     inputs:
       action:
