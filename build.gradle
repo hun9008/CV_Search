@@ -24,23 +24,61 @@ repositories {
 }
 
 dependencies {
+	// -------------------------------------------------
+	// Spring Boot Starters
+	// -------------------------------------------------
+	// Spring Data JPA for ORM and database operations
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	// OAuth2 Client for OAuth login features
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	// Spring Security for authentication and authorization
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	// Spring Web for building REST APIs
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// Validation starter for bean validation support
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+	// -------------------------------------------------
+	// Lombok for reducing boilerplate code
+	// -------------------------------------------------
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// -------------------------------------------------
+	// Development Tools
+	// -------------------------------------------------
+	// Spring Boot DevTools for hot reloading during development
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// -------------------------------------------------
+	// Database Driver
+	// -------------------------------------------------
+	// MySQL Connector/J for connecting to MySQL databases
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// -------------------------------------------------
+	// JWT (JSON Web Token) Dependencies
+	// -------------------------------------------------
+	// JJWT API for JWT operations
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	// JJWT implementation and Jackson integration (runtime)
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+	// -------------------------------------------------
+	// OpenAPI / Swagger for API Documentation
+	// -------------------------------------------------
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+
+	// -------------------------------------------------
+	// Testing Dependencies
+	// -------------------------------------------------
+	// Spring Boot Test Starter for unit and integration tests
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// Spring Security Test utilities
+	testImplementation 'org.springframework.security:spring-security-test'
+	// JUnit Platform Launcher for test runtime
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {

@@ -9,6 +9,7 @@ import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.service.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -28,23 +29,36 @@ public class AuthController {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final String GOOGLE_CLIENT_ID = "your_google_client_id";
-    private final String GOOGLE_CLIENT_SECRET = "your_google_client_secret";
-    private final String GOOGLE_REDIRECT_URI = "https://yourapp.com/auth/callback";
+    // OAuth2 configuration values for Google
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String googleClientId;
 
-    private final String KAKAO_CLIENT_ID = "your_kakao_rest_api_key";
-    private final String KAKAO_REDIRECT_URI = "https://yourapp.com/auth/callback";
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String googleClientSecret;
+
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    private String googleRedirectUri;
+
+    // OAuth2 configuration values for Kakao
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String kakaoClientId;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+    private String kakaoClientSecret;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+    private String kakaoRedirectUri;
 
     @GetMapping("/login")
     public ResponseEntity<Map<String, String>> getLoginUrl(@RequestParam String provider) {
         String redirectUrl;
         if (provider.equalsIgnoreCase("google")) {
-            redirectUrl = "https://accounts.google.com/o/oauth2/auth?client_id=" + GOOGLE_CLIENT_ID
-                    + "&redirect_uri=" + GOOGLE_REDIRECT_URI
+            redirectUrl = "https://accounts.google.com/o/oauth2/auth?client_id=" + googleClientId
+                    + "&redirect_uri=" + googleRedirectUri
                     + "&response_type=code&scope=email profile";
         } else if (provider.equalsIgnoreCase("kakao")) {
-            redirectUrl = "https://kauth.kakao.com/oauth/authorize?client_id=" + KAKAO_CLIENT_ID
-                    + "&redirect_uri=" + KAKAO_REDIRECT_URI
+            redirectUrl = "https://kauth.kakao.com/oauth/authorize?client_id=" + kakaoClientId
+                    + "&redirect_uri=" + kakaoRedirectUri
                     + "&response_type=code&scope=account_email profile";
         } else {
             return ResponseEntity.badRequest().body(Map.of("error", "Unsupported provider"));
@@ -82,15 +96,15 @@ public class AuthController {
             if (provider.equalsIgnoreCase("google")) {
                 accessTokenUrl = "https://oauth2.googleapis.com/token";
                 params.add("code", code);
-                params.add("client_id", GOOGLE_CLIENT_ID);
-                params.add("client_secret", GOOGLE_CLIENT_SECRET);
-                params.add("redirect_uri", GOOGLE_REDIRECT_URI);
+                params.add("client_id", googleClientId);
+                params.add("client_secret", googleClientSecret);
+                params.add("redirect_uri", googleRedirectUri);
                 params.add("grant_type", "authorization_code");
             } else if (provider.equalsIgnoreCase("kakao")) {
                 accessTokenUrl = "https://kauth.kakao.com/oauth/token";
                 params.add("code", code);
-                params.add("client_id", KAKAO_CLIENT_ID);
-                params.add("redirect_uri", KAKAO_REDIRECT_URI);
+                params.add("client_id", kakaoClientId);
+                params.add("redirect_uri", kakaoRedirectUri);
                 params.add("grant_type", "authorization_code");
             } else {
                 return ResponseEntity.badRequest().body(Map.of("error", "Unsupported provider"));
@@ -141,7 +155,6 @@ public class AuthController {
                                     .accessToken(accessToken)
                                     .build()
                     ));
-
 
             // JWT 발급
             String jwt = jwtTokenProvider.createToken(email);
