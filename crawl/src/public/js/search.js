@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentKeywords = [];
 
     // API base URL - change if needed
-    const API_BASE_URL = 'http://localhost/api';
-    const GEMINI_API_URL = 'http://localhost/api/parse-cv';
+    const API_BASE_URL = '/api';
+    const GEMINI_API_URL = '/parse-cv';
 
     /**
      * Performs the search request to the API

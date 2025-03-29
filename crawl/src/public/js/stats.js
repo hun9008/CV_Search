@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let urlClassificationChart = null;
     let jobTypesChart = null;
     let timelineChart = null;
-    const API_STATS = 'http://localhost/api/stats';
 
     // Initialize
     fetchStats();
@@ -45,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchStats() {
         try {
             // API 호출하여 통계 데이터 가져오기
-            const response = await fetch(API_STATS);
+            const response = await fetch('/api/stats');
             if (!response.ok) {
                 throw new Error('통계 데이터를 가져오는데 실패했습니다.');
             }
