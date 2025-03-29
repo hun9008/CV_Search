@@ -82,5 +82,10 @@ router.get('/recruitinfos-claude/:id', claudeJobsController.getClaudeJobById);
 router.get('/stats/claude', claudeJobsController.getClaudeJobStats);
 
 
+// 완전한 데이터를 가진 Claude 채용공고 조회 API
+router.get('/recruitinfos-claude-complete', claudeJobsController.getCompleteClaudeJobs);
+
+// Claude 채용정보 데이터 완성도 통계 API
+router.get('/recruitinfos-claude/completion-stats', claudeJobsController.getCompletionStats);
 
 module.exports = router;

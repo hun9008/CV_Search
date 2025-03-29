@@ -384,3 +384,53 @@ input, button, select {
     position: relative;
     bottom: -1px;
 }
+
+
+
+/* 통계 모달 스타일 */
+.wider-modal {
+  width: 80%;
+  max-width: 900px;
+}
+
+.stats-summary {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.stats-table th,
+.stats-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.stats-table th {
+  background-color: #7b68ee;
+  color: white;
+}
+
+.stats-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.stats-actions {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.results-stats {
+  background-color: #f0f8ff;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  border-left: 4px solid #7b68ee;
+}

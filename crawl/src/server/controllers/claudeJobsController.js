@@ -295,4 +295,176 @@ exports.getClaudeJobStats = async (req, res) => {
   }
 };
 
+
+/**
+ * 완전한 데이터가 있는 Claude 채용정보 조회
+ * @param {Object} req - 요청 객체
+ * @param {Object} res - 응답 객체
+ */
+exports.getCompleteClaudeJobs = async (req, res) => {
+  try {
+    await mongoService.connect();
+    const {
+      sortBy = 'updated_at',
+      limit = 50,
+      page = 1
+    } = req.query;
+
+    // 유효한 숫자로 변환
+    const limitNum = parseInt(limit) || 50;
+    const pageNum = parseInt(page) || 1;
+    const skip = (pageNum - 1) * limitNum;
+
+    // 완전한 데이터를 가진 채용공고를 찾기 위한 쿼리
+    const completeDataQuery = {
+      // 회사명이 있고 Unknown/알 수 없음/명시되지 않음이 아님
+      company_name: {
+        $exists: true,
+        $ne: null,
+        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '']
+      },
+
+      // 직무 유형이 있고 비어있지 않음
+      job_type: {
+        $exists: true,
+        $ne: null,
+        $ne: ''
+      },
+      // 경력이 있고 비어있지 않음
+      experience: {
+        $exists: true,
+        $ne: null,
+        $ne: ''
+      },
+      // 설명이 있고 No description이 아님
+      description: {
+        $exists: true,
+        $ne: null,
+        $ne: 'No description available.',
+        $ne: ''
+      }
+    };
+
+    // 정렬 기준 설정
+    let sortOptions = {};
+    if (sortBy === 'company_name' || sortBy === 'job_type') {
+      sortOptions[sortBy] = 1; // 텍스트 필드는 오름차순
+    } else {
+      sortOptions[sortBy] = -1; // 날짜 필드는 내림차순
+    }
+
+    // 총 결과 수 카운트 쿼리 실행
+    const total = await RecruitInfoClaude.countDocuments(completeDataQuery);
+
+    // 완전한 데이터 통계 - 모든 문서 중 완전한 데이터의 비율
+    const totalAll = await RecruitInfoClaude.countDocuments({});
+    const completeRatio = totalAll > 0 ? (total / totalAll * 100).toFixed(2) : 0;
+
+    // 검색 쿼리 실행 (페이지네이션 적용)
+    const jobs = await RecruitInfoClaude.find(completeDataQuery)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limitNum);
+
+    // 응답 전송
+    res.status(200).json({
+      success: true,
+      total,
+      totalAll,
+      completeRatio,
+      page: pageNum,
+      limit: limitNum,
+      pages: Math.ceil(total / limitNum),
+      jobs
+    });
+
+  } catch (error) {
+    logger.error('완전한 Claude 채용정보 조회 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: '완전한 Claude 채용정보를 조회하는 중 오류가 발생했습니다.'
+    });
+  }
+};
+
+/**
+ * 데이터 완성도 통계 조회
+ * @param {Object} req - 요청 객체
+ * @param {Object} res - 응답 객체
+ */
+exports.getCompletionStats = async (req, res) => {
+  try {
+    await mongoService.connect();
+
+    // 총 문서 수
+    const totalDocs = await RecruitInfoClaude.countDocuments({});
+
+    // 각 필드별 완성도 통계
+    const fieldStats = [
+      { field: 'company_name', display: '회사명' },
+      { field: 'job_type', display: '직무타입' },
+      { field: 'experience', display: '경력' },
+      { field: 'description', display: '설명' },
+      { field: 'requirements', display: '요구사항' },
+      { field: 'preferred_qualifications', display: '우대사항' }
+    ];
+
+    // 각 필드별 통계 수집
+    const stats = await Promise.all(fieldStats.map(async (item) => {
+      // 해당 필드가 존재하고 비어있지 않은 문서 수
+      const filledCount = await RecruitInfoClaude.countDocuments({
+        [item.field]: { $exists: true, $ne: null, $ne: '' }
+      });
+
+      // 알 수 없음 값을 가진 문서 수
+      const unknownValues = ['Unknown', '알 수 없음', '명시되지 않음'];
+      const unknownCount = await RecruitInfoClaude.countDocuments({
+        [item.field]: { $in: unknownValues }
+      });
+
+      return {
+        field: item.field,
+        display: item.display,
+        filled: filledCount,
+        unknown: unknownCount,
+        empty: totalDocs - filledCount,
+        filledPercentage: ((filledCount / totalDocs) * 100).toFixed(2),
+        unknownPercentage: ((unknownCount / totalDocs) * 100).toFixed(2),
+        emptyPercentage: (((totalDocs - filledCount) / totalDocs) * 100).toFixed(2)
+      };
+    }));
+
+    // 완전한 데이터를 가진 문서 수 (모든 필수 필드가 채워진 문서)
+    const completeDataCount = await RecruitInfoClaude.countDocuments({
+      company_name: {
+        $exists: true, $ne: null, $ne: '',
+        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음']
+      },
+      title: { $exists: true, $ne: null, $ne: '' },
+      job_type: { $exists: true, $ne: null, $ne: '' },
+      experience: { $exists: true, $ne: null, $ne: '' },
+      description: {
+        $exists: true, $ne: null, $ne: '',
+        $ne: 'No description available.'
+      }
+    });
+
+    // 응답 전송
+    res.status(200).json({
+      success: true,
+      totalDocuments: totalDocs,
+      completeDocuments: completeDataCount,
+      completePercentage: ((completeDataCount / totalDocs) * 100).toFixed(2),
+      fieldStats: stats
+    });
+
+  } catch (error) {
+    logger.error('Claude 채용정보 완성도 통계 조회 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: '채용정보 완성도 통계를 조회하는 중 오류가 발생했습니다.'
+    });
+  }
+};
+
 module.exports = exports;

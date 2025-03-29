@@ -1,4 +1,3 @@
-// Global variables to track current state
 let currentPage = 1;
 let totalPages = 1;
 let jobsPerPage = 10;
@@ -7,7 +6,8 @@ let filters = {
     jobType: '',
     experience: '',
     searchText: '',
-    sortBy: 'updated_at'
+    sortBy: 'updated_at',
+    completeDataOnly: false
 };
 
 // Initialize when the DOM content is loaded
@@ -21,6 +21,171 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load filter options
     loadFilterOptions();
 });
+// "완성도 통계 보기" 버튼을 추가하고 통계 표시 기능 구현
+function setupCompletionStats() {
+  // HTML 요소 추가 (적절한 위치에 삽입)
+  const statsButton = document.createElement('button');
+  statsButton.id = 'show-completion-stats';
+  statsButton.className = 'filter-btn';
+  statsButton.textContent = '데이터 완성도 통계 보기';
+
+  // 버튼을 페이지에 삽입 (필터 섹션 다음에)
+  const filterSection = document.querySelector('.filter-section');
+  filterSection.after(statsButton);
+
+  // 통계 표시 모달 생성
+  const statsModal = document.createElement('div');
+  statsModal.id = 'stats-modal';
+  statsModal.className = 'modal';
+  statsModal.innerHTML = `
+    <div class="modal-content wider-modal">
+      <div class="modal-header">
+        <h2>채용공고 데이터 완성도 통계</h2>
+        <span class="close-stats">&times;</span>
+      </div>
+      <div id="stats-content">
+        <div class="loading">통계 데이터를 불러오는 중...</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(statsModal);
+
+  // 이벤트 리스너 설정
+  statsButton.addEventListener('click', async () => {
+    statsModal.style.display = 'block';
+    await loadCompletionStats();
+  });
+
+  document.querySelector('.close-stats').addEventListener('click', () => {
+    statsModal.style.display = 'none';
+  });
+
+  window.addEventListener('click', (event) => {
+    if (event.target === statsModal) {
+      statsModal.style.display = 'none';
+    }
+  });
+}
+
+// 완성도 통계 데이터 로드 함수
+async function loadCompletionStats() {
+  try {
+    const statsContent = document.getElementById('stats-content');
+    statsContent.innerHTML = '<div class="loading">통계 데이터를 불러오는 중...</div>';
+
+    const response = await fetch('/api/recruitinfos-claude/completion-stats');
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.error || '통계 데이터를 불러오지 못했습니다.');
+    }
+
+    // 통계 데이터 표시
+    statsContent.innerHTML = `
+      <div class="stats-summary">
+        <h3>요약</h3>
+        <p>전체 채용공고: <strong>${data.totalDocuments}</strong>개</p>
+        <p>완전한 데이터를 가진 채용공고: <strong>${data.completeDocuments}</strong>개 (${data.completePercentage}%)</p>
+      </div>
+
+      <h3>필드별 완성도</h3>
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th>필드명</th>
+            <th>채워진 데이터</th>
+            <th>알 수 없음 데이터</th>
+            <th>비어있는 데이터</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.fieldStats.map(stat => `
+            <tr>
+              <td>${stat.display}</td>
+              <td>${stat.filled}개 (${stat.filledPercentage}%)</td>
+              <td>${stat.unknown}개 (${stat.unknownPercentage}%)</td>
+              <td>${stat.empty}개 (${stat.emptyPercentage}%)</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <div class="stats-actions">
+        <button id="load-complete-data" class="primary-btn">완전한 데이터의 채용공고만 보기</button>
+      </div>
+    `;
+
+    // 완전한 데이터만 보기 버튼 이벤트 리스너
+    document.getElementById('load-complete-data').addEventListener('click', () => {
+      document.getElementById('complete-data-only').checked = true;
+      filters.completeDataOnly = true;
+      loadCompletedJobsFromServer();
+      statsModal.style.display = 'none';
+    });
+
+  } catch (error) {
+    console.error('데이터 완성도 통계 로드 오류:', error);
+    document.getElementById('stats-content').innerHTML = `
+      <div class="error">
+        <p>데이터 완성도 통계를 불러오지 못했습니다.</p>
+        <p>자세한 내용: ${error.message}</p>
+      </div>
+    `;
+  }
+}
+
+// 서버에서 완전한 데이터 채용공고만 가져오기
+async function loadCompletedJobsFromServer() {
+  try {
+    const jobsContainer = document.getElementById('jobs-container');
+    jobsContainer.innerHTML = '<div class="loading">완전한 데이터의 채용공고를 불러오는 중...</div>';
+
+    // API URL 구성 (완전한 데이터 전용 API 사용)
+    let apiUrl = `/api/recruitinfos-claude-complete?page=${currentPage}&limit=${jobsPerPage}`;
+
+    if (filters.sortBy) {
+      apiUrl += `&sortBy=${encodeURIComponent(filters.sortBy)}`;
+    }
+
+    // 서버에서 데이터 가져오기
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    currentJobs = data.jobs;
+    totalPages = Math.ceil(data.total / jobsPerPage);
+
+    // 결과 수 업데이트
+    document.getElementById('results-count').innerHTML = `
+      <div class="results-stats">
+        <p>완전한 데이터의 채용공고: <strong>${data.total}</strong>개 (전체 ${data.totalAll}개 중 ${data.completeRatio}%)</p>
+      </div>
+    `;
+
+    // 채용공고 표시
+    displayJobs(currentJobs);
+
+    // 페이지네이션 업데이트
+    updatePagination();
+
+  } catch (error) {
+    console.error('완전한 데이터의 채용공고 로드 오류:', error);
+    document.getElementById('jobs-container').innerHTML = `
+      <div class="error">
+        <p>완전한 데이터의 채용공고를 불러오지 못했습니다.</p>
+        <p>자세한 내용: ${error.message}</p>
+      </div>
+    `;
+  }
+}
 
 // Function to set up all event listeners
 function setupEventListeners() {
@@ -46,6 +211,7 @@ function setupEventListeners() {
         filters.experience = document.getElementById('experience').value;
         filters.searchText = document.getElementById('search-text').value;
         filters.sortBy = document.getElementById('sort-by').value;
+        filters.completeDataOnly = document.getElementById('complete-data-only').checked;
         loadJobListings();
     });
 
@@ -55,12 +221,14 @@ function setupEventListeners() {
         document.getElementById('experience').value = '';
         document.getElementById('search-text').value = '';
         document.getElementById('sort-by').value = 'updated_at';
+        document.getElementById('complete-data-only').checked = false;
 
         filters = {
             jobType: '',
             experience: '',
             searchText: '',
-            sortBy: 'updated_at'
+            sortBy: 'updated_at',
+            completeDataOnly: false
         };
 
         loadJobListings();
@@ -82,6 +250,11 @@ function setupEventListeners() {
 // Function to load the job listings from the server
 async function loadJobListings() {
     try {
+
+    if (filters.completeDataOnly) {
+      await loadCompletedJobsFromServer();
+      return;
+    }
         const jobsContainer = document.getElementById('jobs-container');
         jobsContainer.innerHTML = '<div class="loading">Loading job listings...</div>';
 
@@ -104,6 +277,8 @@ async function loadJobListings() {
             apiUrl += `&sortBy=${encodeURIComponent(filters.sortBy)}`;
         }
 
+
+
         // Fetch the data from the server
         const response = await fetch(apiUrl);
 
@@ -112,7 +287,27 @@ async function loadJobListings() {
         }
 
         const data = await response.json();
-        currentJobs = data.jobs;
+
+        // If complete data only filter is enabled, filter out jobs with empty fields client-side as well
+        let jobs = data.jobs;
+        if (filters.completeDataOnly) {
+            jobs = jobs.filter(job =>
+                job.company_name &&
+                job.company_name !== 'Unknown Company' &&
+                job.company_name !== '알 수 없음' &&
+                job.company_name !== '명시되지 않음' &&
+                job.title &&
+                job.title !== 'Untitled Position' &&
+                job.description &&
+                job.description !== 'No description available.' &&
+                job.job_type &&
+                job.job_type !== '' &&
+                job.experience &&
+                job.experience !== ''
+            );
+        }
+
+        currentJobs = jobs;
         totalPages = Math.ceil(data.total / jobsPerPage);
 
         // Update the results count
@@ -134,6 +329,7 @@ async function loadJobListings() {
         `;
     }
 }
+
 
 // Function to load filter options dynamically from available data
 async function loadFilterOptions() {
@@ -196,18 +392,34 @@ function displayJobs(jobs) {
         const postedDate = job.posted_at ? new Date(job.posted_at).toLocaleDateString() : 'Unknown';
         const expiryDate = job.end_date ? new Date(job.end_date).toLocaleDateString() : 'Unknown';
 
+        // Check if data is complete
+        const isComplete = job.company_name &&
+                           job.company_name !== 'Unknown Company' &&
+                           job.company_name !== '알 수 없음' &&
+                           job.company_name !== '명시되지 않음' &&
+                           job.description &&
+                           job.description !== 'No description available.' &&
+                           job.job_type &&
+                           job.job_type !== '' &&
+                           job.experience &&
+                           job.experience !== '';
+
         // Create the job card HTML
         const jobCard = document.createElement('div');
         jobCard.className = 'job-card';
         jobCard.innerHTML = `
             <span class="parser-info">Parsed by Claude</span>
-            <h3 class="job-title">${escapeHtml(job.title || 'Untitled Position')}</h3>
+            <h3 class="job-title">${escapeHtml(job.title || 'Untitled Position')}
+                <span class="${isComplete ? 'complete-data-indicator' : 'complete-data-indicator incomplete-data-indicator'}">
+                    ${isComplete ? 'Complete Data' : 'Incomplete Data'}
+                </span>
+            </h3>
             <h4 class="company-name">${escapeHtml(job.company_name || 'Unknown Company')}</h4>
 
             <div class="job-meta">
                 ${job.department ? `<span class="department">${escapeHtml(job.department)}</span>` : ''}
-                ${job.job_type ? `<span class="job-type">${escapeHtml(job.job_type)}</span>` : ''}
-                ${job.experience ? `<span class="experience">${escapeHtml(job.experience)}</span>` : ''}
+                ${job.job_type ? `<span class="job-type">${escapeHtml(job.job_type)}</span>` : '<span class="job-type missing">No Job Type</span>'}
+                ${job.experience ? `<span class="experience">${escapeHtml(job.experience)}</span>` : '<span class="experience missing">No Experience Level</span>'}
             </div>
 
             <div class="job-dates">

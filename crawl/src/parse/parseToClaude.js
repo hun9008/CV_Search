@@ -50,47 +50,56 @@ class ClaudeParser {
     }
   }
 
-  /**
-   * isRecruit=true인 URL 가져오기
-   */
-  async fetchRecruitUrls(limit = this.batchSize) {
-    try {
-      await this.connect();
+/**
+ * isRecruit=true이고 isRecruit_claude=null인 URL 가져오기
+ */
+async fetchRecruitUrls(limit = this.batchSize) {
+  try {
+    await this.connect();
 
-      // isRecruit=true인 URL 추출 집계 파이프라인
-      const pipeline = [
-        { $match: { 'suburl_list.visited': true, 'suburl_list.success': true, 'suburl_list.isRecruit': true } },
-        { $unwind: '$suburl_list' },
-        {
-          $match: {
-            'suburl_list.visited': true,
-            'suburl_list.success': true,
-            'suburl_list.isRecruit': true
-          }
-        },
-        { $limit: limit },
-        {
-          $project: {
-            _id: 0,
-            domain: 1,
-            url: '$suburl_list.url',
-            text: '$suburl_list.text',
-            title: '$suburl_list.title',
-            meta: '$suburl_list.meta',
-            visitedAt: '$suburl_list.visitedAt'
-          }
+    // isRecruit=true이고 isRecruit_claude=null인 URL 추출 집계 파이프라인
+    const pipeline = [
+      {
+        $match: {
+          'suburl_list.visited': true,
+          'suburl_list.success': true,
+          'suburl_list.isRecruit': true
         }
-      ];
+      },
+      { $unwind: '$suburl_list' },
+      {
+        $match: {
+          'suburl_list.visited': true,
+          'suburl_list.success': true,
+          'suburl_list.isRecruit': true,
+            $or: [
+            { 'suburl_list.isRecruit_claude': { $exists: false } },
+            { 'suburl_list.isRecruit_claude': null }
+          ]
+        }
+      },
+      { $limit: limit },
+      {
+        $project: {
+          _id: 0,
+          domain: 1,
+          url: '$suburl_list.url',
+          text: '$suburl_list.text',
+          title: '$suburl_list.title',
+          meta: '$suburl_list.meta',
+          visitedAt: '$suburl_list.visitedAt'
+        }
+      }
+    ];
 
-      const urls = await VisitResult.aggregate(pipeline);
-      logger.info(`${urls.length}개의 채용공고 URL 추출 완료`);
-      return urls;
-    } catch (error) {
-      logger.error('채용공고 URL 추출 오류:', error);
-      throw error;
-    }
+    const urls = await VisitResult.aggregate(pipeline);
+    logger.info(`${urls.length}개의 Claude 분석 대상 채용공고 URL 추출 완료`);
+    return urls;
+  } catch (error) {
+    logger.error('채용공고 URL 추출 오류:', error);
+    throw error;
   }
-
+}
   /**
    * URL이 채용공고인지 Claude API로 파싱
    */
@@ -241,29 +250,48 @@ class ClaudeParser {
     }
   }
 
-  /**
-   * 채용공고 정보를 RecruitInfoClaude 컬렉션에 저장
-   */
-  async saveRecruitInfo(recruitData) {
-    try {
-      const result = await RecruitInfoClaude.findOneAndUpdate(
-        { url: recruitData.url },
-        recruitData,
-        {
-          upsert: true,
-          new: true,
-          setDefaultsOnInsert: true
-        }
-      );
+/**
+ * 채용공고 정보를 RecruitInfoClaude 컬렉션에 저장하고
+ * VisitResult 컬렉션의 isRecruit_claude 필드 업데이트
+ */
+async saveRecruitInfo(recruitData) {
+  try {
+    // 1. RecruitInfoClaude 컬렉션에 저장
+    const result = await RecruitInfoClaude.findOneAndUpdate(
+      { url: recruitData.url },
+      recruitData,
+      {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true
+      }
+    );
 
-      logger.info(`URL ${recruitData.url} 채용정보 저장 완료 (recruitinfos_claude 컬렉션)`);
-      return result;
-    } catch (error) {
-      logger.error(`채용정보 저장 오류 (${recruitData.url}):`, error);
-      throw error;
-    }
+    logger.info(`URL ${recruitData.url} Claude 분석 결과:`, {
+      success: recruitData.success,
+      company_name: recruitData.company_name || 'N/A',
+      is_recruitment: recruitData.success ? '채용공고 맞음' : '채용공고 아님'
+    });
+
+    // 2. VisitResult 모델의 해당 URL에 대한 isRecruit_claude 필드 업데이트
+    // Claude 분석 결과에 따라 isRecruit_claude 값을 설정
+    const isRecruitClaude = recruitData.success === true ? true : false;
+
+    // URL로 VisitResult에서 해당 document 찾아서 업데이트
+    await VisitResult.updateOne(
+      { 'suburl_list.url': recruitData.url },
+      { $set: { 'suburl_list.$.isRecruit_claude': isRecruitClaude } }
+    );
+
+    logger.info(`URL ${recruitData.url} 채용정보 저장 완료 (recruitinfos_claude 컬렉션)`);
+    logger.info(`URL ${recruitData.url} VisitResult isRecruit_claude=${isRecruitClaude} 업데이트 완료`);
+
+    return result;
+  } catch (error) {
+    logger.error(`채용정보 저장 오류 (${recruitData.url}):`, error);
+    throw error;
   }
-
+}
   /**
    * 단일 URL 처리 (파싱 및 저장)
    */
@@ -296,6 +324,8 @@ class ClaudeParser {
       const recruitInfoData = this.convertToRecruitInfoSchema(response, urlData);
 
       if (recruitInfoData) {
+
+        // recruitInfoData
         // 3. RecruitInfoClaude 컬렉션에 저장
         await this.saveRecruitInfo(recruitInfoData);
         this.stats.success++;

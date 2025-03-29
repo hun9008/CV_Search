@@ -65,37 +65,44 @@
         </div>
 
         <div class="filter-section">
-            <h3>Filters</h3>
-            <div class="filter-options">
-                <div class="filter-group">
-                    <label for="job-type">Job Type:</label>
-                    <select id="job-type">
-                        <option value="">All Types</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="experience">Experience Level:</label>
-                    <select id="experience">
-                        <option value="">All Levels</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="search-text">Search:</label>
-                    <input type="text" id="search-text" placeholder="Search in titles, company...">
-                </div>
-                <div class="filter-group">
-                    <label for="sort-by">Sort By:</label>
-                    <select id="sort-by">
-                        <option value="updated_at">Latest Updates</option>
-                        <option value="posted_at">Post Date</option>
-                        <option value="company_name">Company Name</option>
-                        <option value="job_type">Job Type</option>
-                    </select>
-                </div>
-            </div>
-            <button id="apply-filters" class="filter-btn">Apply Filters</button>
-            <button id="reset-filters" class="filter-btn reset">Reset</button>
+    <h3>Filters</h3>
+    <div class="filter-options">
+        <div class="filter-group">
+            <label for="job-type">Job Type:</label>
+            <select id="job-type">
+                <option value="">All Types</option>
+            </select>
         </div>
+        <div class="filter-group">
+            <label for="experience">Experience Level:</label>
+            <select id="experience">
+                <option value="">All Levels</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="search-text">Search:</label>
+            <input type="text" id="search-text" placeholder="Search in titles, company...">
+        </div>
+        <div class="filter-group">
+            <label for="sort-by">Sort By:</label>
+            <select id="sort-by">
+                <option value="updated_at">Latest Updates</option>
+                <option value="posted_at">Post Date</option>
+                <option value="company_name">Company Name</option>
+                <option value="job_type">Job Type</option>
+            </select>
+        </div>
+    </div>
+    <div class="additional-filters">
+        <label class="checkbox-container">
+            <input type="checkbox" id="complete-data-only">
+            <span class="checkmark"></span>
+            Show only complete job listings (no empty fields)
+        </label>
+    </div>
+    <button id="apply-filters" class="filter-btn">Apply Filters</button>
+    <button id="reset-filters" class="filter-btn reset">Reset</button>
+</div>
 
         <div id="results-count"></div>
         <div id="jobs-container" class="jobs-container">

@@ -467,3 +467,73 @@
 .loading {
     animation: pulse 1.5s infinite ease-in-out;
 }
+
+  .comparison-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        margin-left: 5px;
+        font-size: 0.75rem;
+        border-radius: 3px;
+        background-color: #7b68ee;
+        color: white;
+    }
+
+    .job-card .parser-info {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.75rem;
+        padding: 3px 6px;
+        background-color: #673ab7;
+        color: white;
+        border-radius: 3px;
+    }
+
+    .filter-section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+    }
+
+    .filter-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .additional-filters {
+        margin: 10px 0;
+    }
+
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 14px;
+        user-select: none;
+    }
+
+    .checkbox-container input {
+        margin-right: 8px;
+    }
+
+    .complete-data-indicator {
+        display: inline-block;
+        padding: 3px 6px;
+        font-size: 0.75rem;
+        border-radius: 3px;
+        background-color: #4caf50;
+        color: white;
+        margin-left: 5px;
+    }
+
+    .incomplete-data-indicator {
+        background-color: #ff9800;
+    }

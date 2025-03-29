@@ -23,12 +23,12 @@ services:
 
   api:
     image: sehyunsix/crawl-server:latest
-    command: npm run crawl
+    command: npm run server
     ports:
       - "8080:8080"
     container_name: myweb-api
     restart: unless-stopped
-    env_file: ".env"
+    env_file: "crawl/.env"
     networks:
       - cv-network
     healthcheck:
