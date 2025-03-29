@@ -10,8 +10,7 @@
     "seed": "node src/seed/seedGenerator",
     "server": "node src/server/index",
     "gemini-parse": "node src/parse/parseToGemini",
-    "claude-parse":"node src/parse/parseToClaude"
-
+    "claude-parse": "node src/parse/parseToClaude"
   },
   "_moduleAliases": {
     "@root": ".",
@@ -35,7 +34,8 @@
     "module-alias": "^2.2.3",
     "mongoose": "^8.13.0",
     "morgan": "^1.10.0",
-    "puppeteer": "^24.4.0"
+    "puppeteer": "^24.4.0",
+    "robots-parser": "^3.0.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.6.0",

@@ -2,7 +2,7 @@ require('module-alias/register');
 const puppeteer = require('puppeteer');
 const mongoose = require('mongoose');
 const {extractAndExecuteScripts , extractAndExecuteScriptsPromise } = require('@crawl/baseWorker');
-const { isUrlAllowed, extractDomain } = require('@crawl/urlManager');
+const { isUrlAllowed, extractDomain ,isUrlAllowedWithRobots, parseRobotsTxt} = require('@crawl/urlManager');
 const CONFIG = require('@config/config');
 const { defaultLogger: logger } = require('@utils/logger');
 const { VisitResult, SubUrl } = require('@models/visitResult');
@@ -14,6 +14,8 @@ logger.info(MONGODB_URI);
  * URL 탐색 관리자 클래스
  * 여러 URL을 큐에 넣고 순차적으로 탐색합니다.
  */
+
+
 class BaseWorkerManager {
   /**
    * 생성자
@@ -24,7 +26,7 @@ class BaseWorkerManager {
    * @param {boolean} options.headless 헤드리스 모드 사용 여부
    */
   constructor(options = {}) {
-    this.startUrl = options.startUrl || CONFIG.DOMAINS.DEFAULT_URL;
+    this.startUrl = options.startUrl || CONFIG.CRAWLER.START_URL;
     this.delayBetweenRequests = options.delayBetweenRequests || CONFIG.CRAWLER.DELAY_BETWEEN_REQUESTS;
     this.headless = options.headless !== undefined ? options.headless : CONFIG.BROWSER.HEADLESS;
     this.maxUrls = CONFIG.CRAWLER.MAX_URLS;
@@ -84,7 +86,6 @@ async initBrowser() {
   if (!this.browser) {
     logger.info(`BaseWorkerManager 초기화 완료.`);
     this.browser = await puppeteer.launch({
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
       headless: 'new',
       ignoreHTTPSErrors: true,
       defaultViewport: null,
@@ -357,142 +358,191 @@ async extractLinks(page, allowedDomains) {
  * 다음에 방문할 URL 가져오기
  * @returns {Promise<{url: string, domain: string}|null>} 다음 URL 또는 없으면 null
  */
-  async getNextUrl() {
-    // MongoDB가 연결되어 있는지 확인
-    if (!this.isConnected) {
-      await this.connect();
-    }
+async getNextUrl() {
+  // MongoDB가 연결되어 있는지 확인
+  if (!this.isConnected) {
+    await this.connect();
+  }
 
-    // 클래스 멤버 변수로 도메인 인덱스 추적
-    if (!this.currentDomainIndex) {
-      this.currentDomainIndex = 0;
-    }
-
-    // 허용된 도메인 목록 가져오기
-    if (!this.availableDomains) {
-      logger.info('사용 가능한 도메인 목록 가져오는 중...');
-
-      // Mongoose로 도메인 목록 조회 (문자열 배열로 반환됨)
-      const domains = await VisitResult.distinct('domain');
-
-      // 도메인 객체 배열로 변환 (각 도메인을 객체로 구성)
-      this.availableDomains = domains.map(domain => ({ domain }));
-
-      logger.info(`${this.availableDomains.length}개의 도메인 찾음: ${domains.join(', ')}`);
-    }
-
-    if (!this.availableDomains || this.availableDomains.length === 0) {
-      return null;
-    }
-
-    // 도메인 선택 전략에 따라 처리
-    let targetDomain;
-
-    switch (this.strategy) {
-      case 'specific':
-        // 특정 도메인만 탐색
-        if (!this.specificDomain) {
-          logger.warn('specific 전략에 도메인이 지정되지 않았습니다. 기본 도메인을 사용합니다.');
-          targetDomain = this.baseDomain || extractDomain(this.startUrl);
-        } else {
-          targetDomain = this.specificDomain;
-        }
-        break;
-
-      case 'random':
-        // 랜덤 도메인 탐색
-        const randomIndex = Math.floor(Math.random() * this.availableDomains.length);
-        targetDomain = this.availableDomains[randomIndex].domain;
-        logger.info(`랜덤 도메인 선택: ${targetDomain} (인덱스: ${randomIndex}/${this.availableDomains.length})`);
-        break;
-
-      case 'sequential':
-      default:
-        // 순차적 도메인 탐색
-        targetDomain = this.availableDomains[this.currentDomainIndex].domain;
-        logger.info(`순차적 도메인 선택: ${targetDomain} (인덱스: ${this.currentDomainIndex}/${this.availableDomains.length})`);
-
-        // 다음 도메인으로 인덱스 이동
-        this.currentDomainIndex = (this.currentDomainIndex + 1) % this.availableDomains.length;
-        break;
-    }
-
-    // 선택된 도메인에서 방문하지 않은 URL 찾기
+  if (!this.availableDomains) {
+    logger.info('사용 가능한 도메인 목록을 데이터베이스에서 로드 중...');
     try {
-      // 도메인 문서 가져오기
-      const domainDoc = await VisitResult.findOne({ domain: targetDomain });
+      logger.info('사용 가능한 도메인 목록을 데이터베이스에서 로드 중...');
 
-      if (!domainDoc || !domainDoc.suburl_list) {
-        // 도메인 문서나 URL 목록이 없으면 기본 URL 사용
-        if (targetDomain === extractDomain(this.startUrl)) {
-          logger.info(`도메인 ${targetDomain}에 대한 문서가 없습니다. 시작 URL 사용: ${this.startUrl}`);
+      // 데이터베이스에서 모든 도메인 문서 가져오기
+      const domains = await VisitResult.find({}, { domain: 1, _id: 0 }).lean();
 
-          // 시작 URL 추가
-          const newVisitResult = new VisitResult({
-            domain: targetDomain,
-            suburl_list: [{
-              url: this.startUrl,
-              visited: false,
-              discoveredAt: new Date(),
-              created_at: new Date(),
-              domain: targetDomain
-            }],
-            created_at: new Date(),
-            updated_at: new Date()
-          });
+      if (domains && domains.length > 0) {
+        // 중복 없는 도메인 목록 생성
+        this.availableDomains = domains.map(doc => ({ domain: doc.domain }));
+        logger.info(`${this.availableDomains.length}개의 도메인을 불러왔습니다.`);
 
-          await newVisitResult.save();
-          return { url: this.startUrl, domain: targetDomain };
+        // 도메인 목록 로깅 (최대 5개)
+        if (this.availableDomains.length > 0) {
+          const domainSample = this.availableDomains.slice(0, 5).map(d => d.domain);
+          logger.info(`도메인 샘플: ${domainSample.join(', ')}${this.availableDomains.length > 5 ? ` 외 ${this.availableDomains.length - 5}개` : ''}`);
         }
+      }
+    }
+    catch (error) {
+    logger.error('도메인 목록 로드 중 오류:', error);
+    // 오류 시 기본 시작 URL의 도메인 사용
+    const startDomain = extractDomain(this.startUrl);
+    this.availableDomains = [{ domain: startDomain }];
+    logger.info(`오류로 인해 시작 도메인 ${startDomain}으로 초기화합니다.`);
+  }
+  }
 
+  // 클래스 멤버 변수로 도메인 인덱스 추적
+  if (!this.currentDomainIndex) {
+    this.currentDomainIndex = 0;
+  }
+
+  // robots.txt 캐시 초기화 (없는 경우)
+  if (!this.robotsCache) {
+    this.robotsCache = {};
+  }
+
+
+  // 도메인 선택 전략에 따라 처리
+  let targetDomain;
+
+  switch (this.strategy) {
+    case 'specific':
+      // 특정 도메인만 탐색
+      if (!this.specificDomain) {
+        logger.warn('specific 전략에 도메인이 지정되지 않았습니다. 기본 도메인을 사용합니다.');
+        targetDomain = this.baseDomain || extractDomain(this.startUrl);
+      } else {
+        targetDomain = this.specificDomain;
+      }
+      break;
+
+    case 'random':
+      // 랜덤 도메인 탐색
+      const randomIndex = Math.floor(Math.random() * this.availableDomains.length);
+      targetDomain = this.availableDomains[randomIndex].domain;
+      logger.info(`랜덤 도메인 선택: ${targetDomain} (인덱스: ${randomIndex}/${this.availableDomains.length})`);
+      break;
+
+    case 'sequential':
+    default:
+      // 순차적 도메인 탐색
+      targetDomain = this.availableDomains[this.currentDomainIndex].domain;
+      logger.info(`순차적 도메인 선택: ${targetDomain} (인덱스: ${this.currentDomainIndex}/${this.availableDomains.length})`);
+
+      // 다음 도메인으로 인덱스 이동
+      this.currentDomainIndex = (this.currentDomainIndex + 1) % this.availableDomains.length;
+      break;
+  }
+
+  // targetDomain의 robots.txt 파싱
+  if (!this.robotsCache[targetDomain]) {
+    this.robotsCache[targetDomain] = await parseRobotsTxt(targetDomain);
+  }
+
+  // 선택된 도메인에서 방문하지 않은 URL 찾기
+  try {
+    // 도메인 문서 가져오기
+    const domainDoc = await VisitResult.findOne({ domain: targetDomain });
+
+    if (!domainDoc || !domainDoc.suburl_list) {
+      // 도메인 문서나 URL 목록이 없으면 기본 URL 사용
+        logger.info(`도메인 ${targetDomain}에 대한 문서가 없습니다. 시작 URL 사용: ${this.startUrl}`);
+
+      // 시작 URL이 robots.txt에 의해 차단되는지 확인
+      const isAllowed = await isUrlAllowedWithRobots(this.startUrl, [targetDomain], this.robotsCache);
+      if (!isAllowed) {
+        logger.warn(`시작 URL ${targetDomain}이 robots.txt에 의해 차단되었습니다. 다른 URL을 찾습니다.`);
+        // 다른 도메인 시도
+        if (this.strategy !== 'specific') {
+          return this.getNextUrl();
+        }
         return null;
       }
 
-      // 방문하지 않은 URL 찾기
-      const unvisitedUrl = domainDoc.suburl_list.find(item => !item.visited);
+      // 시작 URL 추가
+      const newVisitResult = new VisitResult({
+        domain: targetDomain,
+        suburl_list: [{
+          url: this.startUrl,
+          visited: false,
+          discoveredAt: new Date(),
+          created_at: new Date(),
+          domain: targetDomain
+        }],
+        created_at: new Date(),
+        updated_at: new Date()
+      });
 
-      if (unvisitedUrl) {
-        logger.info(`도메인 ${targetDomain}에서 방문할 URL을 찾았습니다: ${unvisitedUrl.url}`);
-        this._recursionCount = 0;
-        return { url: unvisitedUrl.url, domain: targetDomain };
-      } else {
-        logger.warn(`도메인 ${targetDomain}에 방문하지 않은 URL이 없습니다.`);
+      await newVisitResult.save();
+      return { url: this.startUrl, domain: targetDomain };
 
-        if (this.strategy === 'specific') {
-          logger.warn('특정 도메인에 더 이상 방문할 URL이 없습니다.');
-          return null;
-        }
-
-        // 다른 전략일 경우 재귀적으로 다시 시도
-        if (!this._recursionCount) this._recursionCount = 0;
-        this._recursionCount++;
-
-        if (this._recursionCount > this.availableDomains.length) {
-          logger.warn('모든 도메인에 방문할 URL이 없습니다.');
-          this._recursionCount = 0;
-          return null;
-        }
-
-        return this.getNextUrl();
-      }
-    } catch (error) {
-      logger.error(`도메인 ${targetDomain}에서 URL 가져오기 실패:`, error);
-
-      if (this.strategy !== 'specific') {
-        logger.warn('다른 도메인에서 URL 가져오기 시도...');
-        if (!this._errorCount) this._errorCount = 0;
-        this._errorCount++;
-
-        if (this._errorCount > 3) {
-          logger.error('너무 많은 오류가 발생했습니다.');
-          this._errorCount = 0;
-          return null;
-        }
-      }
-
-      return null;
     }
+
+    // robots.txt 규칙에 따라 허용된 URL만 필터링
+    const robotsData = this.robotsCache[targetDomain];
+
+    // 비동기 필터링 함수
+    async function filterAllowedUrls(urls) {
+      const results = [];
+      for (const item of urls) {
+        if (!item.visited) {
+          const isAllowed = await isUrlAllowedWithRobots(item.url, [targetDomain], this.robotsCache);
+          if (isAllowed) {
+            results.push(item);
+          }
+        }
+      }
+      return results;
+    }
+
+    // 방문하지 않은 URL 중 robots.txt에 의해 허용되는 URL 찾기
+    const allowedUnvisitedUrls = await filterAllowedUrls.call(this, domainDoc.suburl_list);
+
+    if (allowedUnvisitedUrls.length > 0) {
+      const unvisitedUrl = allowedUnvisitedUrls[0];
+      logger.info(`도메인 ${targetDomain}에서 방문할 URL을 찾았습니다: ${unvisitedUrl.url}`);
+      this._recursionCount = 0;
+      return { url: unvisitedUrl.url, domain: targetDomain };
+    } else {
+      logger.warn(`도메인 ${targetDomain}에 방문 가능한 URL이 없습니다.`);
+
+      if (this.strategy === 'specific') {
+        logger.warn('특정 도메인에 더 이상 방문할 URL이 없습니다.');
+        return null;
+      }
+
+      // 다른 전략일 경우 재귀적으로 다시 시도
+      if (!this._recursionCount) this._recursionCount = 0;
+      this._recursionCount++;
+
+      if (this._recursionCount > this.availableDomains.length) {
+        logger.warn('모든 도메인에 방문할 URL이 없습니다.');
+        this._recursionCount = 0;
+        return null;
+      }
+
+      return this.getNextUrl();
+    }
+  } catch (error) {
+    logger.error(`도메인 ${targetDomain}에서 URL 가져오기 실패:`, error);
+
+    if (this.strategy !== 'specific') {
+      logger.warn('다른 도메인에서 URL 가져오기 시도...');
+      if (!this._errorCount) this._errorCount = 0;
+      this._errorCount++;
+
+      if (this._errorCount > 3) {
+        logger.error('너무 많은 오류가 발생했습니다.');
+        this._errorCount = 0;
+        return null;
+      }
+    }
+
+    return null;
   }
+}
 
   killChromeProcesses() {
     try {
@@ -606,13 +656,53 @@ async visitUrl(urlInfo) {
       ...subUrlResult.herfUrls,
       ...subUrlResult.onclickUrls
      ]));
+// robots.txt 규칙에 따라 차단된 URL 필터링
+if (this.robotsCache && this.robotsCache[domain] && this.robotsCache[domain].parser) {
+  const robotsParser = this.robotsCache[domain].parser;
+  const filteredUrls = [];
+  const blockedUrls = [];
 
-        // 통계 정보 업데이트
-      subUrlResult.crawlStats = {
-        total: subUrlResult.crawledUrls.length,
-        href: subUrlResult.herfUrls.length,
-        onclick: subUrlResult.onclickUrls.length
-      };
+  // 각 URL이 robots.txt에 의해 허용되는지 확인
+  for (const url of subUrlResult.crawledUrls) {
+    try {
+      const isAllowed = robotsParser.isAllowed(url, 'puppeteer');
+      if (isAllowed) {
+        filteredUrls.push(url);
+      } else {
+        blockedUrls.push(url);
+      }
+    } catch (error) {
+      logger.warn(`robots.txt 규칙 적용 중 오류 (${url}):`, error.message);
+      // 오류 발생 시 URL 포함 (보수적 접근)
+      filteredUrls.push(url);
+    }
+  }
+
+        // 필터링 결과 로깅
+        if (blockedUrls.length > 0) {
+          logger.info(`robots.txt에 의해 차단된 URL ${blockedUrls.length}개 제외됨`);
+          if (blockedUrls.length <= 5) {
+            logger.debug(`차단된 URL: ${blockedUrls.join(', ')}`);
+          } else {
+            logger.debug(`차단된 URL 샘플: ${blockedUrls.slice(0, 5).join(', ')} 외 ${blockedUrls.length - 5}개`);
+          }
+        }
+
+        // 필터링된 URL로 업데이트
+        subUrlResult.crawledUrls = filteredUrls;
+
+        // 통계 정보에 robots.txt 필터링 정보 추가
+        subUrlResult.crawlStats.blocked_by_robots = blockedUrls.length;
+        subUrlResult.crawlStats.allowed_after_robots = filteredUrls.length;
+      }
+
+     // 통계 정보 업데이트
+    subUrlResult.crawlStats = {
+      ...subUrlResult.crawlStats,
+      total: subUrlResult.crawledUrls.length,
+      href: subUrlResult.herfUrls.length,
+      onclick: subUrlResult.onclickUrls.length
+    };
     // URL 정보를 도메인별로 그룹화
     subUrlResult.logSummary(logger);
     return subUrlResult;

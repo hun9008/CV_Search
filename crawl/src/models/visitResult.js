@@ -31,6 +31,8 @@ const SubUrlSchema = new Schema({
   title: String,
   meta: Schema.Types.Mixed,
   crawlStats: {
+    blocked_by_robots: Number,
+    allowed_after_robots:Number,
     total: Number,
     href: Number,
     onclick: Number

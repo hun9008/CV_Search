@@ -71,7 +71,8 @@ const CRAWLER = {
     PAGES: parseInt(process.env.CONCURRENCY_PAGES || '3'),    // 동시에 열 수 있는 페이지 수
     SCRIPTS: parseInt(process.env.CONCURRENCY_SCRIPTS || '5') // 동시에 실행할 스크립트 수
   },
-  BASE_DOMAIN:'career.naver.com',
+  BASE_DOMAIN: 'toss.im',
+  START_URL:'https://toss.im/career/jobs',
 
   // 요청 사이 지연 시간 (밀리초)
   DELAY_BETWEEN_REQUESTS: parseInt(process.env.DELAY || '3000'),
