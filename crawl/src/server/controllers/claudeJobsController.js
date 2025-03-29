@@ -83,11 +83,8 @@ exports.getClaudeJobs = async (req, res) => {
 
     // 정렬 기준 설정
     let sortOptions = {};
-    if (sortBy === 'company_name' || sortBy === 'job_type') {
-      sortOptions[sortBy] = 1; // 텍스트 필드는 오름차순
-    } else {
-      sortOptions[sortBy] = -1; // 날짜 필드는 내림차순
-    }
+    sortOptions['_id'] = 1; // 텍스트 필드는 오름차순
+
 
     // 총 결과 수 카운트 쿼리 실행
     const total = await RecruitInfoClaude.countDocuments(searchQuery);
@@ -362,11 +359,8 @@ exports.getCompleteClaudeJobs = async (req, res) => {
 
     // 정렬 기준 설정
     let sortOptions = {};
-    if (sortBy === 'company_name' || sortBy === 'job_type') {
-      sortOptions[sortBy] = 1; // 텍스트 필드는 오름차순
-    } else {
-      sortOptions[sortBy] = -1; // 날짜 필드는 내림차순
-    }
+    sortOptions['_id'] = 1; // 텍스트 필드는 오름차순
+
 
     // 총 결과 수 카운트 쿼리 실행
     const total = await RecruitInfoClaude.countDocuments(completeDataQuery);
@@ -380,7 +374,7 @@ exports.getCompleteClaudeJobs = async (req, res) => {
       .sort(sortOptions)
       .skip(skip)
       .limit(limitNum);
-
+    logger.info(jobs)
     // 응답 전송
     res.status(200).json({
       success: true,
@@ -473,7 +467,6 @@ exports.getCompletionStats = async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Claude 채용정보 완성도 통계 조회 오류:', error);
     res.status(500).json({
       success: false,
       error: '채용정보 완성도 통계를 조회하는 중 오류가 발생했습니다.'
