@@ -1,1 +1,52 @@
-spring.application.name=goodjob
+spring:
+  application:
+    name: goodjob
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/goodjob?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: user
+    password: ajoucapstone
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  jackson:
+    time-zone: Asia/Seoul
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: your-google-client-id
+            client-secret: your-google-client-secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/auth/callback?provider=google"
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: your-kakao-client-id
+            client-secret: your-kakao-client-secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/auth/callback?provider=kakao"
+            scope:
+              - account_email
+              - profile
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
+            user-name-attribute: id
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
