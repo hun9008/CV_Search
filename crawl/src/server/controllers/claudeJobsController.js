@@ -328,21 +328,36 @@ exports.getCompleteClaudeJobs = async (req, res) => {
       job_type: {
         $exists: true,
         $ne: null,
-        $ne: ''
+        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '']
       },
       // 경력이 있고 비어있지 않음
       experience: {
         $exists: true,
         $ne: null,
-        $ne: ''
+        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '']
       },
       // 설명이 있고 No description이 아님
       description: {
         $exists: true,
         $ne: null,
         $ne: 'No description available.',
-        $ne: ''
+        $nin:  ['Unknown Company', '알 수 없음', '명시되지 않음', '']
       }
+      ,
+      // 우대 사항 (선택, 선호 역량)
+      preferred_qualifications: {
+        $exists: true,
+        $ne: null,
+        $ne: 'No description available.',
+        $nin:  ['Unknown Company', '알 수 없음', '명시되지 않음', '']
+      },
+      // 인재상 (선택, 원하는 인재상)
+      ideal_candidate: {
+         $exists: true,
+        $ne: null,
+        $ne: 'No description available.',
+        $nin:  ['Unknown Company', '알 수 없음', '명시되지 않음', '']
+      },
     };
 
     // 정렬 기준 설정
@@ -440,12 +455,11 @@ exports.getCompletionStats = async (req, res) => {
         $exists: true, $ne: null, $ne: '',
         $nin: ['Unknown Company', '알 수 없음', '명시되지 않음']
       },
-      title: { $exists: true, $ne: null, $ne: '' },
-      job_type: { $exists: true, $ne: null, $ne: '' },
-      experience: { $exists: true, $ne: null, $ne: '' },
+      job_type: { $exists: true, $ne: null,  $nin: ['Unknown Company', '알 수 없음', '명시되지 않음']},
+      experience: { $exists: true, $ne: null,  $nin: ['Unknown Company', '알 수 없음', '명시되지 않음']},
       description: {
         $exists: true, $ne: null, $ne: '',
-        $ne: 'No description available.'
+        $nin: ['Unknown Company', '알 수 없음', '명시되지 않음']
       }
     });
 
