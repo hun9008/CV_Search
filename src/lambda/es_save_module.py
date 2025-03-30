@@ -22,7 +22,8 @@ from dotenv import load_dotenv
 
 import mysql.connector
 
-load_dotenv(dotenv_path="../../.env")
+load_dotenv(dotenv_path="./.env.lambda")
+# load_dotenv(dotenv_path="../../.env")
 es_host_ip = os.getenv("ELASTIC_HOST")
 RDB_host_ip = os.getenv("DB_HOST_IP")
 AWS_ACCESS_KEY_ID=os.getenv("AWS_ACCESS_KEY_ID")
@@ -33,6 +34,9 @@ ES_HOST = es_host_ip
 RDB_HOST = RDB_host_ip
 CV_INDEX_NAME = "cv_index"
 JOBS_INDEX_NAME = "job_index"  
+
+# print("ES_HOST:", ES_HOST)
+# print("RDB_HOST:", RDB_HOST)
 
 es = Elasticsearch(ES_HOST)
 
@@ -377,4 +381,4 @@ def es_save_jobs(u_id):
         print(f"Saved. Document ID: {response['_id']}")
 
 # es_save_cv("https://goodjobucket.s3.ap-northeast-2.amazonaws.com/cv/cv_example.pdf", 1)
-es_save_jobs(1)
+# es_save_jobs(1)
