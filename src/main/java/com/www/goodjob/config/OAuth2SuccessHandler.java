@@ -66,6 +66,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = jwtTokenProvider.generateAccessToken(email);
         String refreshToken = jwtTokenProvider.generateRefreshToken(email);
 
+        // 토큰을 DB에 저장 (UserOAuth 엔티티 업데이트)
+        userOAuth.setAccessToken(accessToken);
+        userOAuth.setRefreshToken(refreshToken);
+        userOAuthRepository.save(userOAuth);
+
         log.info("OAuth2 로그인 성공: email={}, accessToken={}, refreshToken={}", email, accessToken, refreshToken);
 
         // 프론트엔드(혹은 테스트용 백엔드 페이지)로 리다이렉트 (예: /auth/redirect)
