@@ -3,47 +3,28 @@ package com.www.goodjob.service;
 import com.www.goodjob.domain.User;
 import com.www.goodjob.domain.UserOAuth;
 import com.www.goodjob.enums.OAuthProvider;
-import com.www.goodjob.enums.UserRole;
 import com.www.goodjob.repository.UserOAuthRepository;
-import com.www.goodjob.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
     private final UserOAuthRepository userOAuthRepository;
 
-    @Transactional
-    public User saveOrGetUser(OAuthUserInfo userInfo) {
-        return userRepository.findByEmail(userInfo.getEmail())
-                .orElseGet(() -> {
-                    User newUser = User.builder()
-                            .email(userInfo.getEmail())
-                            .name(userInfo.getName())
-                            .role(UserRole.USER)
-                            .createdAt(LocalDateTime.now())
-                            .updatedAt(LocalDateTime.now())
-                            .build();
-
-                    User savedUser = userRepository.save(newUser);
-
-                    UserOAuth oauth = UserOAuth.builder()
-                            .user(savedUser)
-                            .provider(OAuthProvider.valueOf(userInfo.getProvider().toUpperCase()))
-                            .oauthId(userInfo.getOauthId())
-                            .accessToken(userInfo.getAccessToken())
-                            .refreshToken(userInfo.getRefreshToken())
-                            .tokenExpiry(userInfo.getTokenExpiry())
-                            .build();
-
-                    userOAuthRepository.save(oauth);
-                    return savedUser;
-                });
+    /**
+     * 소셜 로그인 후 추가 회원가입 처리 예시 (User 객체를 이미 가지고 있다고 가정)
+     */
+    public UserOAuth registerSocialUser(User user, String oauthId, OAuthProvider provider, String accessToken, String refreshToken) {
+        UserOAuth userOAuth = UserOAuth.builder()
+                .user(user)
+                .oauthId(oauthId)
+                .provider(provider)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenExpiry(null) // 만료 시간 세팅 필요 시
+                .build();
+        return userOAuthRepository.save(userOAuth);
     }
 }

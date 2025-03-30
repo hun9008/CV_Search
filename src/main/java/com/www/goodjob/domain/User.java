@@ -1,4 +1,3 @@
-// User.java
 package com.www.goodjob.domain;
 
 import com.www.goodjob.enums.UserRole;
@@ -8,12 +7,15 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)

@@ -22,7 +22,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserOAuthRepository userOAuthRepository;

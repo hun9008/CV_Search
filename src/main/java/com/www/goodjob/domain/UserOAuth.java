@@ -1,4 +1,3 @@
-// UserOAuth.java
 package com.www.goodjob.domain;
 
 import com.www.goodjob.enums.OAuthProvider;
@@ -10,14 +9,18 @@ import java.time.LocalDateTime;
 @Table(name = "user_oauth", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"provider", "oauthId"})
 })
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UserOAuth {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 소셜 로그인만 사용하는 환경에서는 User와 1:1 매핑합니다.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -27,7 +30,7 @@ public class UserOAuth {
     private OAuthProvider provider;
 
     @Column(nullable = false)
-    private String oauthId;  // 소셜 플랫폼에서의 사용자 ID
+    private String oauthId;  // 외부 제공자에서 받은 사용자 ID
 
     @Lob
     private String accessToken;

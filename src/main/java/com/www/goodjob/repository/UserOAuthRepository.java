@@ -1,11 +1,10 @@
 package com.www.goodjob.repository;
 
 import com.www.goodjob.domain.UserOAuth;
-import com.www.goodjob.enums.OAuthProvider;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
 
 public interface UserOAuthRepository extends JpaRepository<UserOAuth, Long> {
-    Optional<UserOAuth> findByProviderAndOauthId(OAuthProvider provider, String oauthId);
+    // User 엔티티의 email 필드를 기준으로 조회
+    Optional<UserOAuth> findByUser_Email(String email);
 }
