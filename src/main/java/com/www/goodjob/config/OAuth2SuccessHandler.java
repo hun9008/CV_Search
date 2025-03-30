@@ -41,35 +41,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String email = customUser.getEmail();
 
-        // 기존 User가 있으면 조회, 없으면 신규 생성 (소셜 로그인만 사용하는 환경)
-        User user = userRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    User newUser = User.builder()
-                            .email(email)
-                            .name(customUser.getName())
-                            .build();
-                    return userRepository.save(newUser);
-                });
-
-        // UserOAuth 처리: 기존 소셜 정보가 있으면 업데이트, 없으면 생성
-        UserOAuth userOAuth = userOAuthRepository.findByUser_Email(email)
-                .orElseGet(() -> {
-                    UserOAuth newUserOAuth = UserOAuth.builder()
-                            .user(user)
-                            .oauthId(String.valueOf(oAuth2User.getAttributes().get("id")))
-                            .provider(jwtTokenProvider.extractProvider(oAuth2User))
-                            .build();
-                    return userOAuthRepository.save(newUserOAuth);
-                });
-
         // JWT 토큰 생성 (Access & Refresh)
         String accessToken = jwtTokenProvider.generateAccessToken(email);
         String refreshToken = jwtTokenProvider.generateRefreshToken(email);
-
-        // 토큰을 DB에 저장 (UserOAuth 엔티티 업데이트)
-        userOAuth.setAccessToken(accessToken);
-        userOAuth.setRefreshToken(refreshToken);
-        userOAuthRepository.save(userOAuth);
 
         log.info("OAuth2 로그인 성공: email={}, accessToken={}, refreshToken={}", email, accessToken, refreshToken);
 

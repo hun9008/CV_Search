@@ -1,16 +1,10 @@
 package com.www.goodjob.service;
 
-import com.www.goodjob.security.OAuth2Attribute;
-import com.www.goodjob.enums.OAuthProvider;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
@@ -78,31 +72,6 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
-    }
-
-    /**
-     * OAuth2User의 정보를 분기 처리하여 OAuthUserInfo 객체 생성 (구글, 카카오)
-     */
-    public OAuthUserInfo extractUserInfo(OAuth2User oAuth2User) {
-        Map<String, Object> attributes = oAuth2User.getAttributes();
-        String provider = attributes.containsKey("kakao_account") ? "kakao" : "google";
-        OAuth2Attribute oAuth2Attribute = OAuth2Attribute.of(provider, attributes);
-
-        return OAuthUserInfo.builder()
-                .email(oAuth2Attribute.getEmail())
-                .name(oAuth2Attribute.getName())
-                .picture(oAuth2Attribute.getPicture())
-                .build();
-    }
-
-    /**
-     * OAuth2User에서 제공자 판별
-     */
-    public OAuthProvider extractProvider(OAuth2User oAuth2User) {
-        if (oAuth2User.getAttributes().containsKey("kakao_account")) {
-            return OAuthProvider.KAKAO;
-        }
-        return OAuthProvider.GOOGLE;
     }
 
     /**
