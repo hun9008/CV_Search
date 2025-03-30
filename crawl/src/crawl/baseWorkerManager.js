@@ -1,5 +1,6 @@
 require('module-alias/register');
-const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer');
+const chromium = require('chrome-aws-lambda');
 const mongoose = require('mongoose');
 const {extractAndExecuteScripts , extractAndExecuteScriptsPromise } = require('@crawl/baseWorker');
 const { isUrlAllowed, extractDomain ,isUrlAllowedWithRobots, parseRobotsTxt} = require('@crawl/urlManager');
@@ -85,7 +86,8 @@ class BaseWorkerManager {
 async initBrowser() {
   if (!this.browser) {
     logger.info(`BaseWorkerManager 초기화 완료.`);
-    this.browser = await puppeteer.launch({
+    this.browser = await chromium.puppeteer.launch({
+      executablePath: await chromium.executablePath,
       headless: 'new',
       ignoreHTTPSErrors: true,
       defaultViewport: null,

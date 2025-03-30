@@ -27,6 +27,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@google/generative-ai": "^0.24.0",
+    "chrome-aws-lambda": "^10.1.0",
     "cli-table3": "^0.6.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
