@@ -47,8 +47,8 @@ const BROWSER = {
     '--disable-gpu',            // GPU 가속 비활성화
     '--disable-extensions',     // 확장 기능 비활성화
     '--disable-notifications',  // 알림 비활성화
-    '--disable-popup-blocking'  // 팝업 차단 비활성화
-
+    '--disable-popup-blocking',  // 팝업 차단 비활성화
+    '--disable-features=site-per-process'
   ],
 
   // 브라우저 타임아웃 설정 (밀리초)
@@ -65,14 +65,14 @@ const CRAWLER = {
   // 최대 방문 URL 수
   MAX_URLS: parseInt(process.env.MAX_URLS || '100000000'),
 
-  STRATEGY:'random',
+  STRATEGY:'specific',
   // 병렬 처리 수
   CONCURRENCY: {
     PAGES: parseInt(process.env.CONCURRENCY_PAGES || '3'),    // 동시에 열 수 있는 페이지 수
     SCRIPTS: parseInt(process.env.CONCURRENCY_SCRIPTS || '5') // 동시에 실행할 스크립트 수
   },
   BASE_DOMAIN: 'toss.im',
-  START_URL:'https://toss.im/career/jobs',
+  START_URL:'https://toss.im/shopping-seller?utm_source=homepage&utm_medium',
 
   // 요청 사이 지연 시간 (밀리초)
   DELAY_BETWEEN_REQUESTS: parseInt(process.env.DELAY || '3000'),

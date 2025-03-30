@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Table = require('cli-table3');
 const Schema = mongoose.Schema;
 
 // URL 항목 서브스키마 (suburl_list 배열의 항목)
@@ -25,7 +26,12 @@ const SubUrlSchema = new Schema({
   isRecruit_claude : Boolean,
   success: Boolean,
   error: String,
-  errors:{ type: [String], default: [] } ,
+  errors:[{
+    type: { type: String },
+    message: String,
+    stack: String,
+    url: String
+  }],
   finalUrl: String,
   text: String,
   title: String,
@@ -59,20 +65,55 @@ SubUrlSchema.methods.logSummary = function(logger) {
     // URL 기본 정보
     logger.info(`\nURL 항목 요약 정보:`);
 
-    const basicInfo = {
-      URL: this.url,
-      도메인: this.domain || extractDomain(this.url),
-      제목: this.title || '제목 없음',
-      방문여부: this.visited ? '방문함' : '방문하지 않음',
-      성공여부: this.success ? '성공' : this.visited ? '실패' : '미방문',
-      리다이렉트: this.redirected ? `${this.url} → ${this.finalUrl}` : '없음',
-      방문시간: this.visitedAt ? new Date(this.visitedAt).toLocaleString() : '없음',
-      발견시간: this.discoveredAt ? new Date(this.discoveredAt).toLocaleString() : new Date(this.created_at).toLocaleString(),
-      생성시간: new Date(this.created_at).toLocaleString(),
-      수정시간: new Date(this.updated_at).toLocaleString()
-    };
+    // const basicInfo = {
+    //   URL: this.url,
+    //   도메인: this.domain || extractDomain(this.url),
+    //   제목: this.title || '제목 없음',
+    //   내용: this.text || '내용 없음',
+    //   방문여부: this.visited ? '방문함' : '방문하지 않음',
+    //   성공여부: this.success ? '성공' : this.visited ? '실패' : '미방문',
+    //   리다이렉트: this.redirected ? `${this.url} → ${this.finalUrl}` : '없음',
+    //   방문시간: this.visitedAt ? new Date(this.visitedAt).toLocaleString() : '없음',
+    //   발견시간: this.discoveredAt ? new Date(this.discoveredAt).toLocaleString() : new Date(this.created_at).toLocaleString(),
+    //   생성시간: new Date(this.created_at).toLocaleString(),
+    //   수정시간: new Date(this.updated_at).toLocaleString()
+    // };
 
-    console.table(basicInfo);
+    // console.table(basicInfo);
+    // 커스텀 테이블 생성
+const table = new Table({
+  head: ['항목', '값'],
+  colWidths: [15, 65], // 열 너비 고정
+  wordWrap: true       // 긴 텍스트 자동 줄바꿈
+});
+
+    // 데이터 추가
+    table.push(
+      ['URL', this.url],
+      ['도메인', this.domain || extractDomain(this.url)],
+      ['제목', this.title || '제목 없음'],
+      ['방문여부', this.visited ? '방문함' : '방문하지 않음'],
+      ['성공여부', this.success ? '성공' : this.visited ? '실패' : '미방문'],
+      ['리다이렉트', this.redirected ? `${this.url} → ${this.finalUrl}` : '없음'],
+      ['방문시간', this.visitedAt ? new Date(this.visitedAt).toLocaleString() : '없음'],
+      ['발견시간', this.discoveredAt ? new Date(this.discoveredAt).toLocaleString() : new Date(this.created_at).toLocaleString()],
+      ['생성시간', new Date(this.created_at).toLocaleString()],
+      ['수정시간', new Date(this.updated_at).toLocaleString()]
+    );
+
+    // 내용은 별도 테이블로 처리
+    if (this.text) {
+      const contentPreview = this.text.length > 200
+        ? this.text.substring(0, 197) + '...'
+        : this.text;
+
+      table.push(['내용 미리보기', contentPreview]);
+      table.push(['내용 길이', `${this.text.length}자`]);
+    }
+
+    // 테이블 출력
+    logger.info(`\nURL 항목 요약 정보:`);
+    logger.info('\n'+table.toString());
 
     // 크롤링 통계가 있으면 표시
     if (this.crawlStats) {

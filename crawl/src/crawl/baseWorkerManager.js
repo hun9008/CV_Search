@@ -29,11 +29,11 @@ class BaseWorkerManager {
     this.startUrl = options.startUrl || CONFIG.CRAWLER.START_URL;
     this.delayBetweenRequests = options.delayBetweenRequests || CONFIG.CRAWLER.DELAY_BETWEEN_REQUESTS;
     this.headless = options.headless !== undefined ? options.headless : CONFIG.BROWSER.HEADLESS;
-    this.maxUrls = CONFIG.CRAWLER.MAX_URLS;
-    this.strategy = CONFIG.CRAWLER.STRATEGY;
+    this.maxUrls =CONFIG.CRAWLER.MAX_URLS;
+    this.strategy = options.strategy || CONFIG.CRAWLER.STRATEGY;
     this.currentUrl;
     if (this.strategy == "specific") {
-      this.specificDomain = CONFIG.CRAWLER.BASE_DOMAIN;
+      this.specificDomain = options.specificDomain || CONFIG.CRAWLER.BASE_DOMAIN;
     }
 
     // 실행 상태
@@ -285,7 +285,7 @@ async extractLinks(page, allowedDomains) {
         }
 
         // 빈 링크, 자바스크립트 링크, 앵커 링크, 메일 링크 건너뛰기
-        if (!relative || relative === '#' ||
+        if (!relative || relative.startsWith('#') ||
           relative.startsWith('javascript:') ||
           relative.startsWith('mailto:') ||
           relative.startsWith('tel:')) {
@@ -617,6 +617,7 @@ async visitUrl(urlInfo) {
         // 페이지 내용 추출
       subUrlResult.pageContent = await this.extractPageContent(page);
       subUrlResult.title = subUrlResult.pageContent.title;
+      subUrlResult.text = subUrlResult.pageContent.text;
     } catch (error) {
      logger.error('Error extracting page content:', error.message);
       subUrlResult.errors.push({
@@ -964,7 +965,10 @@ if (require.main === module) {
   const manager = new BaseWorkerManager({
     delayBetweenRequests: CONFIG.CRAWLER.DELAY_BETWEEN_REQUESTS,
     headless: CONFIG.BROWSER.HEADLESS,
-    maxUrls: CONFIG.CRAWLER.MAX_URLS
+    maxUrls: CONFIG.CRAWLER.MAX_URLS,
+    strategy: process.argv[2],
+    specificDomain : process.argv[3],
+    startUrl : process.argv[4],
   });
 
   // 관리자 실행
