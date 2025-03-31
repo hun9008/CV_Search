@@ -1,11 +1,8 @@
-FROM mysql:8.0
+FROM openjdk:21-jdk-slim
 
-ENV MYSQL_ROOT_PASSWORD=root
-ENV MYSQL_DATABASE=goodjob
-ENV MYSQL_USER=user
-ENV MYSQL_PASSWORD=ajoucapstone
+WORKDIR /app
+COPY build/libs/*.jar app.jar
 
-COPY my.cnf /etc/mysql/conf.d/my.cnf
-COPY schema.sql /docker-entrypoint-initdb.d/schema.sql
+EXPOSE 8080
 
-EXPOSE 3306
+ENTRYPOINT ["java", "-jar", "app.jar"]
