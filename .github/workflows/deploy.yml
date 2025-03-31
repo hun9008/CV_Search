@@ -1,0 +1,37 @@
+name: Deploy to EC2 with Password
+
+on:
+  push:
+    branches:
+      - dev_spring
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Deploy to EC2
+        env:
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_PASSWORD: ${{ secrets.EC2_PASSWORD }}
+          RDB_URL: ${{ secrets.RDB_URL }}
+          RDB_USERNAME: ${{ secrets.RDB_USERNAME }}
+          RDB_PASSWORD: ${{ secrets.RDB_PASSWORD }}
+        run: |
+          sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
+            cd CV_Search
+          
+            echo "RDB_URL=$RDB_URL" > .env
+            echo "RDB_USERNAME=$RDB_USERNAME" >> .env
+            echo "RDB_PASSWORD=$RDB_PASSWORD" >> .env
+          
+            docker compose down || true
+            docker compose up -d --build
+          EOF
