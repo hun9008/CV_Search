@@ -32,6 +32,10 @@ jobs:
             echo "RDB_USERNAME=$RDB_USERNAME" >> .env
             echo "RDB_PASSWORD=$RDB_PASSWORD" >> .env
           
+            ./gradlew clean build
+
+            cp build/libs/*.jar app.jar
+          
             docker compose down || true
             docker compose up -d --build
           EOF
