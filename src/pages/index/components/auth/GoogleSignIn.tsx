@@ -5,6 +5,7 @@ import axios from 'axios';
 function SignIn() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const SPRING_IP = process.env.SPRING_IP;
 
     useEffect(() => {
         const token = searchParams.get('token');
@@ -21,12 +22,13 @@ function SignIn() {
 
     const handleGoogleLogin = () => {
         axios
-            .get(`http://15.164.164.32:8080/auth/login`)
+            .get(`http://${{ SPRING_IP }}/auth/login`)
             .then((response) => {
                 if (response.status === 200) {
                     console.log('moved');
-                    window.location.href =
-                        'http://15.164.164.32:8080/auth/login?provider=google';
+                    window.location.href = `http://${{
+                        SPRING_IP,
+                    }}/auth/login?provider=google`;
                 }
             })
             .catch((error) => console.log(error)); // 에러 페이지 만들기
