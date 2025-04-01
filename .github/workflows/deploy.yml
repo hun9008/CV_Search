@@ -37,6 +37,6 @@ jobs:
         
             cp build/libs/*.jar ./app.jar
           
-            docker compose down || true
-            docker compose up -d --build
+            docker-compose down || true
+            docker-compose up -d --build
           EOF
