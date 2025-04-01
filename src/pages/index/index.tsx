@@ -1,12 +1,10 @@
-import SignIn from './components/signIn';
-import SignUp from './components/signUp';
+import LandingPage from '../../pages/landing/index';
+import SignIn from '../signIn/SignIn';
 
 function index() {
     return (
-        <ol>
-            <SignIn />
-            <SignUp />
-        </ol>
+        // <LandingPage />
+        <SignIn />
     );
 }
 

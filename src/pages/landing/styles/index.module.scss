@@ -1,0 +1,113 @@
+.page {
+    padding: 0;
+    margin: 0;
+    background: linear-gradient(to right, #eef2ff, #cfd9ff);
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: #3478f6;
+    }
+
+    .nav_links {
+        display: flex;
+        gap: 10px;
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .signup_btn {
+            background-color: #f3f4f6;
+        }
+
+        .login_btn {
+            background-color: black;
+            color: white;
+        }
+    }
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // width: 80%;
+    // max-width: 1200px;
+    margin: 50px auto;
+    gap: 50px;
+
+    .text_section {
+        flex: 1;
+        h1 {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        p {
+            font-size: 18px;
+            color: gray;
+        }
+        .get_started_btn {
+            background-color: #3478f6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    }
+
+    .upload_box {
+        flex: 1;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
+
+footer {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 14px;
+    color: gray;
+}
+
+// @media (max-width: 1024px) {
+//     .container {
+//         flex-direction: column;
+//         text-align: center;
+//     }
+// }
+
+// @media (max-width: 768px) {
+//     .navbar {
+//         flex-direction: column;
+//         align-items: center;
+//         .nav_links {
+//             margin-top: 10px;
+//         }
+//     }
+// }
