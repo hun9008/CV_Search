@@ -1,4 +1,4 @@
-import LandingPage from '../../pages/landing/index';
+// import LandingPage from '../../pages/landing/index';
 import SignIn from '../signIn/SignIn';
 
 function index() {

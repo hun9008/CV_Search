@@ -1,7 +1,7 @@
 import style from './styles/SignIn.module.scss';
-import KakaoSignIn from '@pages/index/components/auth/KakaoSignIn';
-import GoogleSignIn from '@pages/index/components/auth/GoogleSignIn';
-import LandingPage from '../../pages/landing/index';
+import KakaoSignIn from '../../pages/index/components/auth/KakaoSignIn';
+import GoogleSignIn from '../../pages/index/components/auth/GoogleSignIn';
+// import LandingPage from '../../pages/landing/index';
 
 function SignIn() {
     return (
