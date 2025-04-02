@@ -1,0 +1,228 @@
+[H[J[1;1H[H[J[1;1H  Booting `Amazon Linux (6.1.130-139.222.amzn2023.x86_64) 2023'
+
+
+[    0.085076] Cannot get hvm parameter CONSOLE_EVTCHN (18): -22!
+[    0.275978] Cannot get hvm parameter CONSOLE_EVTCHN (18): -22!
+[    3.325128] device-mapper: ioctl: 4.47.0-ioctl (2022-07-28) initialised: dm-devel@redhat.com
+[    3.334287] fuse: init (API version 7.38)
+[    3.338686] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+[    3.343285] systemd[1]: modprobe@configfs.service: Deactivated successfully.
+[    3.371611] loop: module loaded
+[    3.387555] systemd[1]: Finished modprobe@configfs.service - Load Kernel Module configfs.
+[    3.390768] systemd[1]: Started systemd-journald.service - Journal Service.
+[    3.891084] systemd-journald[1144]: Received client request to flush runtime journal.
+[    4.276938] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+[    4.281162] vif vif-0 enX0: renamed from eth0
+[    4.302500] i8042: PNP: PS/2 Controller [PNP0303:PS2K,PNP0f13:PS2M] at 0x60,0x64 irq 1,12
+[    4.305149] i8042: Warning: Keylock active
+[    4.316926] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    4.319943] serio: i8042 AUX port at 0x60,0x64 irq 12
+[    4.370912] ACPI: button: Power Button [PWRF]
+[    4.372745] input: Sleep Button as /devices/LNXSYSTM:00/LNXSLPBN:00/input/input1
+[    4.375189] ACPI: button: Sleep Button [SLPF]
+[    4.504692] RPC: Registered named UNIX socket transport module.
+[    4.506568] RPC: Registered udp transport module.
+[    4.507977] RPC: Registered tcp transport module.
+[    4.509467] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    4.561385] SCSI subsystem initialized
+[    4.632610] zram_generator::config[2002]: zram0: system has too much memory (3904MB), limit is 800MB, ignoring.
+[    4.667697] libata version 3.00 loaded.
+[    4.682519] ata_piix 0000:00:01.1: version 2.13
+[    4.685280] scsi host0: ata_piix
+[    4.686930] scsi host1: ata_piix
+[    4.688671] ata1: PATA max MWDMA2 cmd 0x1f0 ctl 0x3f6 bmdma 0xc000 irq 14
+[    4.690455] ata2: PATA max MWDMA2 cmd 0x170 ctl 0x376 bmdma 0xc008 irq 15
+[    7.111307] cloud-init[2204]: Cloud-init v. 22.2.2 running 'init' at Tue, 01 Apr 2025 03:15:16 +0000. Up 7.05 seconds.
+[    7.230963] cloud-init[2204]: ci-info: ++++++++++++++++++++++++++++++++++++++Net device info++++++++++++++++++++++++++++++++++++++
+[    7.232573] cloud-init[2204]: ci-info: +--------+------+----------------------------+---------------+--------+-------------------+
+[    7.234026] cloud-init[2204]: ci-info: | Device |  Up  |          Address           |      Mask     | Scope  |     Hw-Address    |
+[    7.235485] cloud-init[2204]: ci-info: +--------+------+----------------------------+---------------+--------+-------------------+
+[    7.236924] cloud-init[2204]: ci-info: |  enX0  | True |       172.31.33.111        | 255.255.240.0 | global | 0a:0b:ed:5c:09:e7 |
+[    7.238375] cloud-init[2204]: ci-info: |  enX0  | True | fe80::80b:edff:fe5c:9e7/64 |       .       |  link  | 0a:0b:ed:5c:09:e7 |
+[    7.240079] cloud-init[2204]: ci-info: |   lo   | True |         127.0.0.1          |   255.0.0.0   |  host  |         .         |
+[    7.241523] cloud-init[2204]: ci-info: |   lo   | True |          ::1/128           |       .       |  host  |         .         |
+[    7.243093] cloud-init[2204]: ci-info: +--------+------+----------------------------+---------------+--------+-------------------+
+[    7.244543] cloud-init[2204]: ci-info: ++++++++++++++++++++++++++++++Route IPv4 info++++++++++++++++++++++++++++++
+[    7.245822] cloud-init[2204]: ci-info: +-------+-------------+-------------+-----------------+-----------+-------+
+[    7.247957] cloud-init[2204]: ci-info: | Route | Destination |   Gateway   |     Genmask     | Interface | Flags |
+[    7.249295] cloud-init[2204]: ci-info: +-------+-------------+-------------+-----------------+-----------+-------+
+[    7.250640] cloud-init[2204]: ci-info: |   0   |   0.0.0.0   | 172.31.32.1 |     0.0.0.0     |    enX0   |   UG  |
+[    7.251929] cloud-init[2204]: ci-info: |   1   |  172.31.0.2 | 172.31.32.1 | 255.255.255.255 |    enX0   |  UGH  |
+[    7.253205] cloud-init[2204]: ci-info: |   2   | 172.31.32.0 |   0.0.0.0   |  255.255.240.0  |    enX0   |   U   |
+[    7.260047] cloud-init[2204]: ci-info: |   3   | 172.31.32.1 |   0.0.0.0   | 255.255.255.255 |    enX0   |   UH  |
+[    7.262295] cloud-init[2204]: ci-info: +-------+-------------+-------------+-----------------+-----------+-------+
+[    7.265115] cloud-init[2204]: ci-info: +++++++++++++++++++Route IPv6 info+++++++++++++++++++
+[    7.266208] cloud-init[2204]: ci-info: +-------+-------------+---------+-----------+-------+
+[    7.267402] cloud-init[2204]: ci-info: | Route | Destination | Gateway | Interface | Flags |
+[    7.268483] cloud-init[2204]: ci-info: +-------+-------------+---------+-----------+-------+
+[    7.269549] cloud-init[2204]: ci-info: |   0   |  fe80::/64  |    ::   |    enX0   |   U   |
+[    7.270632] cloud-init[2204]: ci-info: |   2   |    local    |    ::   |    enX0   |   U   |
+[    7.271727] cloud-init[2204]: ci-info: |   3   |  multicast  |    ::   |    enX0   |   U   |
+[    7.272802] cloud-init[2204]: ci-info: +-------+-------------+---------+-----------+-------+
+[    8.659901] cloud-init[2204]: Generating public/private ed25519 key pair.
+[    8.661099] cloud-init[2204]: Your identification has been saved in /etc/ssh/ssh_host_ed25519_key
+[    8.662469] cloud-init[2204]: Your public key has been saved in /etc/ssh/ssh_host_ed25519_key.pub
+[    8.663805] cloud-init[2204]: The key fingerprint is:
+[    8.664631] cloud-init[2204]: SHA256:U3pDz4j7ZGBukMjtrl+ynVVOUUQ41uLZUOr7zkWH6mk root@ip-172-31-33-111.ap-northeast-2.compute.internal
+[    8.666423] cloud-init[2204]: The key's randomart image is:
+[    8.670063] cloud-init[2204]: +--[ED25519 256]--+
+[    8.670842] cloud-init[2204]: |             *=  |
+[    8.680080] cloud-init[2204]: |            *o.  |
+[    8.681108] cloud-init[2204]: |          ooo*   |
+[    8.681865] cloud-init[2204]: |   . o . = =o... |
+[    8.682708] cloud-init[2204]: |    o + S + * . o|
+[    8.683406] cloud-init[2204]: |     . + = = o ..|
+[    8.684159] cloud-init[2204]: |      o = + +   .|
+[    8.684937] cloud-init[2204]: |     . * * .E+ . |
+[    8.685695] cloud-init[2204]: |    .o+ o ..o.+  |
+[    8.686451] cloud-init[2204]: +----[SHA256]-----+
+[    8.687208] cloud-init[2204]: Generating public/private ecdsa key pair.
+[    8.688230] cloud-init[2204]: Your identification has been saved in /etc/ssh/ssh_host_ecdsa_key
+[    8.689556] cloud-init[2204]: Your public key has been saved in /etc/ssh/ssh_host_ecdsa_key.pub
+[    8.690879] cloud-init[2204]: The key fingerprint is:
+[    8.691681] cloud-init[2204]: SHA256:gVYW7g7eZLUe78KR5PRHx/Cx7fFnCNmoF1Lpuk2YSGI root@ip-172-31-33-111.ap-northeast-2.compute.internal
+[    8.693459] cloud-init[2204]: The key's randomart image is:
+[    8.694326] cloud-init[2204]: +---[ECDSA 256]---+
+[    8.695095] cloud-init[2204]: |        +.   .   |
+[    8.695858] cloud-init[2204]: |       =    o .. |
+[    8.696625] cloud-init[2204]: |      o o .o + ++|
+[    8.697380] cloud-init[2204]: |     .E..o+.* oo=|
+[    8.698137] cloud-init[2204]: |     ..oS=oO + +o|
+[    8.698900] cloud-init[2204]: |     . *..Oo+ o =|
+[    8.700098] cloud-init[2204]: |      . o..*.. ..|
+[    8.701149] cloud-init[2204]: |          +..    |
+[    8.702799] cloud-init[2204]: |           ..    |
+[    8.703523] cloud-init[2204]: +----[SHA256]-----+
+[    9.333783] cloud-init[2293]: Cloud-init v. 22.2.2 running 'modules:config' at Tue, 01 Apr 2025 03:15:18 +0000. Up 9.22 seconds.
+[   10.110187] cloud-init[2303]: Cloud-init v. 22.2.2 running 'modules:final' at Tue, 01 Apr 2025 03:15:19 +0000. Up 10.02 seconds.
+ci-info: ++++++++++++++++++++++++++++++++Authorized keys from /home/ec2-user/.ssh/authorized_keys for user ec2-user++++++++++++++++++++++++++++++++
+ci-info: +---------+-------------------------------------------------------------------------------------------------+---------+------------------+
+ci-info: | Keytype |                                       Fingerprint (sha256)                                      | Options |     Comment      |
+ci-info: +---------+-------------------------------------------------------------------------------------------------+---------+------------------+
+ci-info: | ssh-rsa | b3:07:22:f6:94:66:63:f1:9a:9c:98:07:b1:e7:df:fd:09:2a:99:07:8a:bc:06:00:5f:f8:b0:df:e8:4f:56:99 |    -    | goodjob-2025-key |
+ci-info: +---------+-------------------------------------------------------------------------------------------------+---------+------------------+
+<14>Apr  1 03:15:19 cloud-init: #############################################################
+<14>Apr  1 03:15:19 cloud-init: -----BEGIN SSH HOST KEY FINGERPRINTS-----
+<14>Apr  1 03:15:19 cloud-init: 256 SHA256:gVYW7g7eZLUe78KR5PRHx/Cx7fFnCNmoF1Lpuk2YSGI root@ip-172-31-33-111.ap-northeast-2.compute.internal (ECDSA)
+<14>Apr  1 03:15:19 cloud-init: 256 SHA256:U3pDz4j7ZGBukMjtrl+ynVVOUUQ41uLZUOr7zkWH6mk root@ip-172-31-33-111.ap-northeast-2.compute.internal (ED25519)
+<14>Apr  1 03:15:19 cloud-init: -----END SSH HOST KEY FINGERPRINTS-----
+<14>Apr  1 03:15:19 cloud-init: #############################################################
+-----BEGIN SSH HOST KEY KEYS-----
+ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBINRrZYbKAp/BQvwj5CGQlkMdf34NHoYUJa6CHQASWo6/VFg4gJrtPpweUgrmBI7SLOv+5906OXv9CUq9XUygp8= root@ip-172-31-33-111.ap-northeast-2.compute.internal
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKQ0quIxB984z3QtuZGmeVj+GkQ/MIc+BcuZ4caUXAHm root@ip-172-31-33-111.ap-northeast-2.compute.internal
+-----END SSH HOST KEY KEYS-----
+[   10.344259] cloud-init[2303]: Cloud-init v. 22.2.2 finished at Tue, 01 Apr 2025 03:15:19 +0000. Datasource DataSourceEc2.  Up 10.32 seconds
+
+
+Amazon Linux 2023.6.20250317
+Kernel 6.1.130-139.222.amzn2023.x86_64 on an x86_64 (-)
+
+ip-172-31-33-111 login: [  704.861690] kauditd_printk_skb: 116 callbacks suppressed
+[  704.861692] audit: type=1305 audit(1743478014.927:443): op=set audit_pid=0 old=1875 auid=4294967295 ses=4294967295 subj=system_u:system_r:auditd_t:s0 res=1
+[  704.895253] audit: type=1131 audit(1743478014.967:444): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=auditd comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  704.898154] audit: type=1131 audit(1743478014.967:445): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  705.165027] audit: type=1131 audit(1743478015.237:446): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-fsck@dev-disk-by\x2duuid-3E53\x2d275F comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  705.205011] audit: type=1131 audit(1743478015.277:447): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-remount-fs comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  705.208022] audit: type=1131 audit(1743478015.277:448): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-fsck-root comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  705.210971] audit: type=1131 audit(1743478015.277:449): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-tmpfiles-setup-dev comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  705.214903] audit: type=1130 audit(1743478015.277:450): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-reboot comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  705.219372] audit: type=1131 audit(1743478015.277:451): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:init_t:s0 msg='unit=systemd-reboot comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+[  705.223860] audit: type=1334 audit(1743478015.277:452): prog-id=39 op=UNLOAD
+[  705.444898] systemd-shutdown[1]: Syncing filesystems and block devices.
+[  705.455477] systemd-shutdown[1]: Sending SIGTERM to remaining processes...
+[  705.459956] systemd-journald[1144]: Received SIGTERM from PID 1 (systemd-shutdow).
+[  705.469705] systemd-shutdown[1]: Sending SIGKILL to remaining processes...
+[  705.472331] systemd-shutdown[1]: Unmounting file systems.
+[  705.474132] (sd-remount)[3090]: Remounting '/' read-only with options 'seclabel,attr2,inode64,logbufs=8,logbsize=32k,sunit=1024,swidth=1024,noquota'.
+[  705.487862] systemd-shutdown[1]: All filesystems unmounted.
+[  705.489129] systemd-shutdown[1]: Deactivating swaps.
+[  705.490327] systemd-shutdown[1]: All swaps deactivated.
+[  705.491502] systemd-shutdown[1]: Detaching loop devices.
+[  705.493072] systemd-shutdown[1]: All loop devices detached.
+[  705.494301] systemd-shutdown[1]: Stopping MD devices.
+[  705.495937] systemd-shutdown[1]: All MD devices stopped.
+[  705.497124] systemd-shutdown[1]: Detaching DM devices.
+[  705.498321] systemd-shutdown[1]: All DM devices detached.
+[  705.499520] systemd-shutdown[1]: All filesystems, swaps, loop devices, MD devices and DM devices detached.
+[  705.502584] systemd-shutdown[1]: Syncing filesystems and block devices.
+[  705.503978] systemd-shutdown[1]: Rebooting.
+[  705.508371] ACPI: PM: Preparing to enter system sleep state S5
+[  705.509684] reboot: Restarting system
+[  705.510686] reboot: machine restart
+[H[J[1;1H[H[J[1;1H  Booting `Amazon Linux (6.1.130-139.222.amzn2023.x86_64) 2023'
+
+
+[    0.084398] Cannot get hvm parameter CONSOLE_EVTCHN (18): -22!
+[    0.263212] Cannot get hvm parameter CONSOLE_EVTCHN (18): -22!
+[    4.126113] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+[    4.128442] systemd[1]: modprobe@drm.service: Deactivated successfully.
+[    4.136044] device-mapper: core: CONFIG_IMA_DISABLE_HTABLE is disabled. Duplicate IMA measurements will not be recorded in the IMA log.
+[    4.137793] device-mapper: uevent: version 1.0.3
+[    4.138716] device-mapper: ioctl: 4.47.0-ioctl (2022-07-28) initialised: dm-devel@redhat.com
+[    4.146567] fuse: init (API version 7.38)
+[    4.147981] loop: module loaded
+[    4.165840] systemd[1]: Finished modprobe@drm.service - Load Kernel Module drm.
+[    4.168126] systemd[1]: Started systemd-journald.service - Journal Service.
+[    4.678687] systemd-journald[1144]: Received client request to flush runtime journal.
+[    5.056336] vif vif-0 enX0: renamed from eth0
+[    5.134946] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+[    5.195180] i8042: PNP: PS/2 Controller [PNP0303:PS2K,PNP0f13:PS2M] at 0x60,0x64 irq 1,12
+[    5.198226] i8042: Warning: Keylock active
+[    5.201529] RPC: Registered named UNIX socket transport module.
+[    5.202683] SCSI subsystem initialized
+[    5.203065] RPC: Registered udp transport module.
+[    5.205471] RPC: Registered tcp transport module.
+[    5.207090] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    5.220278] ACPI: button: Power Button [PWRF]
+[    5.221615] input: Sleep Button as /devices/LNXSYSTM:00/LNXSLPBN:00/input/input1
+[    5.224149] ACPI: button: Sleep Button [SLPF]
+[    5.250141] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    5.251672] serio: i8042 AUX port at 0x60,0x64 irq 12
+[    5.333335] libata version 3.00 loaded.
+[    5.378843] ata_piix 0000:00:01.1: version 2.13
+[    5.394595] scsi host0: ata_piix
+[    5.410273] scsi host1: ata_piix
+[    5.411518] ata1: PATA max MWDMA2 cmd 0x1f0 ctl 0x3f6 bmdma 0xc000 irq 14
+[    5.413343] ata2: PATA max MWDMA2 cmd 0x170 ctl 0x376 bmdma 0xc008 irq 15
+[    5.424750] zram_generator::config[2020]: zram0: system has too much memory (3904MB), limit is 800MB, ignoring.
+[    5.788184] rm[2040]: removed '/var/lib/cloud/instance/boot-finished'
+[    5.789698] rm[2040]: removed '/var/lib/cloud/instance'
+[    7.491755] cloud-init[2198]: Cloud-init v. 22.2.2 running 'init' at Tue, 01 Apr 2025 03:27:07 +0000. Up 7.45 seconds.
+[    7.541628] cloud-init[2198]: ci-info: ++++++++++++++++++++++++++++++++++++++Net device info++++++++++++++++++++++++++++++++++++++
+[    7.544084] cloud-init[2198]: ci-info: +--------+------+----------------------------+---------------+--------+-------------------+
+[    7.545706] cloud-init[2198]: ci-info: | Device |  Up  |          Address           |      Mask     | Scope  |     Hw-Address    |
+[    7.547380] cloud-init[2198]: ci-info: +--------+------+----------------------------+---------------+--------+-------------------+
+[    7.550103] cloud-init[2198]: ci-info: |  enX0  | True |       172.31.33.111        | 255.255.240.0 | global | 0a:0b:ed:5c:09:e7 |
+[    7.560086] cloud-init[2198]: ci-info: |  enX0  | True | fe80::80b:edff:fe5c:9e7/64 |       .       |  link  | 0a:0b:ed:5c:09:e7 |
+[    7.561642] cloud-init[2198]: ci-info: |   lo   | True |         127.0.0.1          |   255.0.0.0   |  host  |         .         |
+[    7.563755] cloud-init[2198]: ci-info: |   lo   | True |          ::1/128           |       .       |  host  |         .         |
+[    7.565494] cloud-init[2198]: ci-info: +--------+------+----------------------------+---------------+--------+-------------------+
+[    7.567140] cloud-init[2198]: ci-info: ++++++++++++++++++++++++++++++Route IPv4 info++++++++++++++++++++++++++++++
+[    7.568924] cloud-init[2198]: ci-info: +-------+-------------+-------------+-----------------+-----------+-------+
+[    7.570727] cloud-init[2198]: ci-info: | Route | Destination |   Gateway   |     Genmask     | Interface | Flags |
+[    7.572444] cloud-init[2198]: ci-info: +-------+-------------+-------------+-----------------+-----------+-------+
+[    7.574488] cloud-init[2198]: ci-info: |   0   |   0.0.0.0   | 172.31.32.1 |     0.0.0.0     |    enX0   |   UG  |
+[    7.577174] cloud-init[2198]: ci-info: |   1   |  172.31.0.2 | 172.31.32.1 | 255.255.255.255 |    enX0   |  UGH  |
+[    7.579141] cloud-init[2198]: ci-info: |   2   | 172.31.32.0 |   0.0.0.0   |  255.255.240.0  |    enX0   |   U   |
+[    7.580579] cloud-init[2198]: ci-info: |   3   | 172.31.32.1 |   0.0.0.0   | 255.255.255.255 |    enX0   |   UH  |
+[    7.583450] cloud-init[2198]: ci-info: +-------+-------------+-------------+-----------------+-----------+-------+
+[    7.584936] cloud-init[2198]: ci-info: +++++++++++++++++++Route IPv6 info+++++++++++++++++++
+[    7.586129] cloud-init[2198]: ci-info: +-------+-------------+---------+-----------+-------+
+[    7.587407] cloud-init[2198]: ci-info: | Route | Destination | Gateway | Interface | Flags |
+[    7.588642] cloud-init[2198]: ci-info: +-------+-------------+---------+-----------+-------+
+[    7.589934] cloud-init[2198]: ci-info: |   0   |  fe80::/64  |    ::   |    enX0   |   U   |
+[    7.591268] cloud-init[2198]: ci-info: |   2   |    local    |    ::   |    enX0   |   U   |
+[    7.592573] cloud-init[2198]: ci-info: |   3   |  multicast  |    ::   |    enX0   |   U   |
+[    7.593810] cloud-init[2198]: ci-info: +-------+-------------+---------+-----------+-------+
+[    9.110515] cloud-init[2270]: Cloud-init v. 22.2.2 running 'modules:config' at Tue, 01 Apr 2025 03:27:09 +0000. Up 9.00 seconds.
+[    9.829066] cloud-init[2279]: Cloud-init v. 22.2.2 running 'modules:final' at Tue, 01 Apr 2025 03:27:09 +0000. Up 9.72 seconds.
+[    9.934865] cloud-init[2279]: Cloud-init v. 22.2.2 finished at Tue, 01 Apr 2025 03:27:10 +0000. Datasource DataSourceEc2.  Up 9.92 seconds
+
+
+Amazon Linux 2023.6.20250317
+Kernel 6.1.130-139.222.amzn2023.x86_64 on an x86_64 (-)
+
+ip-172-31-33-111 login: [  241.451644] zram_generator::config[2738]: zram0: system has too much memory (3904MB), limit is 800MB, ignoring.
+[  326.794890] bridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.
+[  326.801952] Bridge firewalling registered
+[  327.052190] Initializing XFRM netlink socket
