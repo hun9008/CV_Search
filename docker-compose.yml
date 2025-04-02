@@ -10,11 +10,11 @@ services:
       - "8080:8080"
     env_file:
       - .env
-#    environment:
-#      - SPRING_DATASOURCE_URL=${RDB_URL}
-#      - SPRING_DATASOURCE_USERNAME=${RDB_USERNAME}
-#      - SPRING_DATASOURCE_PASSWORD=${RDB_PASSWORD}
-#      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+    environment:
+      - SPRING_DATASOURCE_URL=${RDB_URL}
+      - SPRING_DATASOURCE_USERNAME=${RDB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${RDB_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
     networks:
       - goodjob-net
 
