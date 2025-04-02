@@ -13,8 +13,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -30,6 +35,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
         http
+                // CORS 설정은 별도의 CorsConfigurationSource 빈이 자동으로 사용됩니다.
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -55,5 +61,24 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    // 새로운 방식의 전역 CORS 설정: CorsConfigurationSource 빈 등록
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // 모든 도메인 허용
+        configuration.setAllowedOrigins(List.of("*"));
+        // 허용할 HTTP 메서드 설정
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // 허용할 HTTP 헤더 설정
+        configuration.setAllowedHeaders(List.of("*"));
+        // 필요한 경우, 자격 증명 허용 여부 설정 (보통 JWT 기반 stateless API에서는 false)
+        configuration.setAllowCredentials(false);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // 모든 엔드포인트에 대해 위 CORS 설정을 적용
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
