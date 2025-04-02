@@ -47,7 +47,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         log.info("OAuth2 로그인 성공: email={}, accessToken={}, refreshToken={}", email, accessToken, refreshToken);
 
-        String frontEndUrl = "http://goodjob.ai.kr/auth/redirect";
+        // "SignIn" 컴포넌트에서 tokens를 받도록 리다이렉트
+        String frontEndUrl = "http://localhost:5173/auth/callback";
+
+        // 프론트 대신, 백엔드의 /auth/redirect 로 리다이렉트해서 테스트
+        // String frontEndUrl = "http://localhost:8080/auth/redirect";
+
         String redirectUrl = UriComponentsBuilder.fromUriString(frontEndUrl)
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
