@@ -20,7 +20,8 @@ services:
       - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
       - KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
       - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+      - JWT_SECRET_KEY=your-secret-key
     networks:
       - goodjob-net
 
