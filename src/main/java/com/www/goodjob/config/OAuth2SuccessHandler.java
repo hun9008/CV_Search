@@ -47,12 +47,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         log.info("OAuth2 로그인 성공: email={}, accessToken={}, refreshToken={}", email, accessToken, refreshToken);
 
-        // 프론트엔드(혹은 테스트용 백엔드 페이지)로 리다이렉트 (예: /auth/redirect)
-        String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:8080/auth/redirect")
+        String frontEndUrl = "http://goodjob.ai.kr/auth/redirect";
+        String redirectUrl = UriComponentsBuilder.fromUriString(frontEndUrl)
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
                 .build().toUriString();
 
+        // 리다이렉트: 프론트엔드에서는 이 페이지에서 토큰을 받아 검증한 후 메인 페이지로 이동
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 }

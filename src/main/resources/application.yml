@@ -3,18 +3,18 @@ spring:
     name: goodjob
 
   datasource:
-    url: jdbc:mysql://15.164.169.79:3306/goodjob?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: user
-    password: ajoucapstone
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+    show-sql: ${SPRING_JPA_SHOW_SQL}
     properties:
       hibernate:
-        format_sql: true
+        format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL}
 
   jackson:
     time-zone: Asia/Seoul
@@ -24,17 +24,17 @@ spring:
       client:
         registration:
           google:
-            client-id: YOUR_GOOGLE_CLIENT_ID
-            client-secret: YOUR_GOOGLE_CLIENT_SECRET
-            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
             scope:
               - email
               - profile
           kakao:
-            client-id: YOUR_KAKAO_CLIENT_ID
-            client-secret: YOUR_KAKAO_CLIENT_SECRET
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
             client-authentication-method: client_secret_post
-            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
+            redirect-uri: ${KAKAO_REDIRECT_URI}
             client-name: Kakao
             authorization-grant-type: authorization_code
             scope:
@@ -53,7 +53,7 @@ spring:
             user-name-attribute: id
 
 jwt:
-  secretKey: "my-super-secret-key-my-super-secret-key-1234"
+  secretKey: ${JWT_SECRET_KEY}
 
 logging:
   level:
