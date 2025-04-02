@@ -38,4 +38,6 @@ jobs:
           
             docker-compose down || true
             docker-compose up -d --build
+          
+            docker image prune -f
           EOF
