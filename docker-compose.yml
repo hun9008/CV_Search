@@ -15,6 +15,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=${RDB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${RDB_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+      - JWT_SECRET_KEY=your-secret-key
     networks:
       - goodjob-net
 
