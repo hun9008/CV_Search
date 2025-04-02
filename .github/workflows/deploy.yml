@@ -30,7 +30,7 @@ jobs:
           
             git pull origin dev_spring
           
-            ./gradlew build
+            ./gradlew clean build
           
             echo "RDB_URL=$RDB_URL" > .env
             echo "RDB_USERNAME=$RDB_USERNAME" >> .env
