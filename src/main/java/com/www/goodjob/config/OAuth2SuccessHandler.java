@@ -53,7 +53,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .queryParam("refreshToken", refreshToken)
                 .build().toUriString();
 
-        // 리다이렉트: 프론트엔드에서는 이 페이지에서 토큰을 받아 검증한 후 메인 페이지로 이동
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 }
