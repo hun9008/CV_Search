@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   spring-app:
     build:
@@ -19,3 +21,7 @@ services:
       - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
     networks:
       - goodjob-net
+
+networks:
+  goodjob-net:
+    driver: bridge
