@@ -52,6 +52,7 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(jwtTokenProvider.jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/auth/login")
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler((HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) -> {
                             logger.error("OAuth2 로그인 실패: {}", exception.getMessage(), exception);
