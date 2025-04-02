@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+// import axios from 'axios';
 
 function SignIn() {
     const navigate = useNavigate();
@@ -8,11 +8,13 @@ function SignIn() {
     const SPRING_IP = process.env.SPRING_IP;
 
     useEffect(() => {
-        const token = searchParams.get('token');
+        const accessToken = searchParams.get('accessToken');
+        const refreshToken = searchParams.get('refreshToken');
 
-        if (token) {
-            console.log('Received JWT Token:', token);
-            localStorage.setItem('jwt-token', token);
+        if (accessToken && refreshToken) {
+            console.log('Received JWT Token:', accessToken, refreshToken);
+            localStorage.setItem('jwt-token:access', accessToken);
+            localStorage.setItem('jwt-token:refresh', refreshToken);
             navigate('/tempPage');
         } else {
             console.log('No token received');
@@ -21,17 +23,7 @@ function SignIn() {
     }, [searchParams, navigate]);
 
     const handleGoogleLogin = () => {
-        axios
-            .get(`http://${{ SPRING_IP }}/auth/login`)
-            .then((response) => {
-                if (response.status === 200) {
-                    console.log('moved');
-                    window.location.href = `http://${{
-                        SPRING_IP,
-                    }}/auth/login?provider=google`;
-                }
-            })
-            .catch((error) => console.log(error)); // 에러 페이지 만들기
+        window.location.href = `http://${SPRING_IP}/auth/login?provider=google`;
     };
 
     return <button onClick={handleGoogleLogin}>Google로 로그인</button>;
