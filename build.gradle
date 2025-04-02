@@ -79,6 +79,8 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	// JUnit Platform Launcher for test runtime
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
 }
 
 tasks.named('test') {
