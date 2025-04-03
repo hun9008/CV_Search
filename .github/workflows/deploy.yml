@@ -27,6 +27,7 @@ jobs:
           
             git pull origin dev_RDB
           
+            docker rm -f mysql-goodjob || true
             docker-compose down || true
             docker-compose up -d --build
           
