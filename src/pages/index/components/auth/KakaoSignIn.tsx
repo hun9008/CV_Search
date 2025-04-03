@@ -1,9 +1,19 @@
+import { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
 function KakaoSignIn() {
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const SPRING_IP = import.meta.env.VITE_SPRING_IP;
+
+    useEffect(() => {
+        const accessToken = searchParams.get('accessToken');
+        const refreshToken = searchParams.get('refreshToken');
+        console.log('Received JWT Token:', accessToken, refreshToken);
+    }, [searchParams, navigate]);
+
     const handleKakaoLogin = () => {
-        const REDIRECT_URI = 'http://localhost:5173/auth/callback';
-        const REST_API_KEY = `4a013aec886221e5c3c457d8cd170162`; // 보안 처리할 것
-        const authUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
-        window.location.href = authUrl;
+        window.location.href = `http://${SPRING_IP}/auth/login?provider=kakao`;
     };
 
     return <button onClick={handleKakaoLogin}>카카오 로그인</button>;

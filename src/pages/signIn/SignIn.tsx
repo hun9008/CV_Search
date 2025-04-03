@@ -1,9 +1,13 @@
 import style from './styles/SignIn.module.scss';
 import KakaoSignIn from '../../pages/index/components/auth/KakaoSignIn';
 import GoogleSignIn from '../../pages/index/components/auth/GoogleSignIn';
-// import LandingPage from '../../pages/landing/index';
+import { useNavigate } from 'react-router-dom';
 
 function SignIn() {
+    const navigate = useNavigate();
+    const navigateToSignUp = () => {
+        navigate('/signUp');
+    };
     return (
         <div className={style.page}>
             <h1 className={style.page__title}>goodJob</h1>
@@ -16,7 +20,7 @@ function SignIn() {
             <KakaoSignIn />
             <br />
             <p>또는</p>
-            <button>회원가입</button>
+            <button onClick={navigateToSignUp}>회원가입</button>
         </div>
     );
 }

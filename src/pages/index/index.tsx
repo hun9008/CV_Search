@@ -1,11 +1,7 @@
-// import LandingPage from '../../pages/landing/index';
-import SignIn from '../signIn/SignIn';
+import LandingPage from '../../pages/landing/index';
 
 function index() {
-    return (
-        // <LandingPage />
-        <SignIn />
-    );
+    return <LandingPage />;
 }
 
 export default index;

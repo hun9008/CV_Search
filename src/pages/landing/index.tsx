@@ -1,13 +1,32 @@
 import style from './styles/index.module.scss';
+import { useNavigate } from 'react-router-dom';
 
 function index() {
+    const navigate = useNavigate(); // 나중에 상단바 컴포넌트로 뺄 것
+
+    const navigateToSignIn = () => {
+        navigate('/signIn');
+    };
+    const navigateToSignUp = () => {
+        navigate('/signUp');
+    };
     return (
         <div className={style.page}>
             <nav className={style.navbar}>
                 <div className={style.logo}>goodJob</div>
                 <div className={style.nav_links}>
-                    <button className={style.signup_btn}>회원가입</button>
-                    <button className={style.login_btn}>로그인</button>
+                    <button
+                        className={style.signup_btn}
+                        onClick={navigateToSignUp}
+                    >
+                        회원가입
+                    </button>
+                    <button
+                        className={style.login_btn}
+                        onClick={navigateToSignIn}
+                    >
+                        로그인
+                    </button>
                 </div>
             </nav>
 
