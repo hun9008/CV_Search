@@ -6,3 +6,4 @@ cv_env
 __pycache__
 .pytest_cache
 .env.lambda
+
