@@ -14,7 +14,9 @@ rootDir: rootDir,
     "^@test/(.*)$": path.join(rootDir, "test/$1"),
     "^@config/(.*)$": path.join(rootDir, "config/$1"),
     "^@utils/(.*)$": path.join(rootDir, "src/utils/$1"),
-    "^@models/(.*)$": path.join(rootDir, "src/models/$1")
+    "^@models/(.*)$": path.join(rootDir, "src/models/$1"),
+    "^@parse/(.*)$": "<rootDir>/src/parse/$1",
+
   },
 
   // 루트 디렉토리와 node_modules를 모듈 검색 경로에 포함

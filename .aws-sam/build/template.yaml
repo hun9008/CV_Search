@@ -1,0 +1,105 @@
+service: cv-search-crawler
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-northeast-2
+  memorySize: 2048
+  timeout: 900
+  environment:
+    NODE_ENV: ${opt:stage, 'dev'}
+    MAX_EXECUTION_TIME: 840000
+    TIME_PER_URL: 10000
+    LOG_LEVEL: info
+    MONGODB_ADMIN_URI: ${ssm:/cv-search/mongodb-uri~true}
+  iam:
+    role:
+      statements:
+      - Effect: Allow
+        Action:
+        - ssm:GetParameter
+        Resource:
+        - arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/cv-search/*
+      - Effect: Allow
+        Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+        Resource: arn:aws:logs:#{AWS::Region}:#{AWS::AccountId}:*
+functions:
+  crawl:
+    handler: src/index.handler
+    description: "\uC6F9 \uD06C\uB864\uB9C1\uC744 \uC218\uD589\uD558\uB294 Lambda\
+      \ \uD568\uC218"
+    layers:
+    - Ref: ChromiumLambdaLayer
+    events:
+    - http:
+        path: /crawl
+        method: post
+        cors: true
+        authorizer:
+          type: COGNITO_USER_POOLS
+          authorizerId:
+            Ref: ApiGatewayAuthorizer
+    - schedule:
+        rate: rate(1 hour)
+        enabled: true
+        input:
+          ping: true
+    vpc:
+      securityGroupIds:
+      - ${ssm:/cv-search/security-group-id}
+      subnetIds:
+      - ${ssm:/cv-search/subnet-id-1}
+      - ${ssm:/cv-search/subnet-id-2}
+  warmup:
+    handler: src/index.handler
+    description: "\uD06C\uB864\uB7EC \uC6DC\uC5C5 Lambda \uD568\uC218"
+    memorySize: 128
+    timeout: 30
+    layers:
+    - Ref: ChromiumLambdaLayer
+    events:
+    - schedule:
+        rate: rate(10 minutes)
+        enabled: true
+        input:
+          ping: true
+layers:
+  chromium:
+    name: ${self:service}-chromium
+    description: "Chromium \uBE0C\uB77C\uC6B0\uC800\uB97C \uC704\uD55C Lambda \uB808\
+      \uC774\uC5B4"
+    compatibleRuntimes:
+    - nodejs20.x
+    path: layers/chrome-aws-lambda
+Resources:
+  ApiGatewayAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CrawlerCognitoAuthorizer
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      RestApiId:
+        Ref: ApiGatewayRestApi
+      ProviderARNs:
+      - ${ssm:/cv-search/cognito-user-pool-arn}
+  CrawlerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/${self:service}-${opt:stage, 'dev'}-crawl
+      RetentionInDays: 30
+plugins:
+- serverless-webpack
+- serverless-offline
+- serverless-dotenv-plugin
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+    packager: npm
+    excludeFiles: src/**/*.test.js
+  serverless-offline:
+    httpPort: 3000
+    lambdaPort: 3002

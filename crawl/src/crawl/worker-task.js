@@ -32,6 +32,79 @@ class OnClickWorker {
     this.useSharedBrowser = !!this.sharedBrowser;
   }
 
+/**
+ * 페이지를 스크롤합니다.
+ * @param {Object} options 스크롤 옵션
+ * @param {number} options.distance 스크롤 거리 (픽셀)
+ * @param {number} options.delay 스크롤 사이의 지연 시간 (ms)
+ * @param {number} options.steps 스크롤 단계 수
+ * @returns {Promise<void>}
+ */
+async scrollPage(options = {}) {
+  const {
+    distance = 500,       // 기본 스크롤 거리
+    delay = 100,          // 기본 지연 시간
+    steps = 5,            // 기본 스크롤 단계 수
+    fullPage = false      // 전체 페이지 스크롤 여부
+  } = options;
+
+  logger.info(`[Worker ${this.id}] 페이지 스크롤 시작...`);
+
+  try {
+    if (fullPage) {
+      // 전체 페이지 스크롤 (페이지 끝까지)
+      await this.scrollFullPage(delay);
+    } else {
+      // 지정된 거리만큼 단계별 스크롤
+      for (let i = 0; i < steps; i++) {
+        await this.page.evaluate((scrollDistance) => {
+          window.scrollBy(0, scrollDistance);
+        }, distance);
+
+        logger.info(`[Worker ${this.id}] 스크롤 ${i + 1}/${steps} 완료 (${distance}px)`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+
+    logger.info(`[Worker ${this.id}] 페이지 스크롤 완료`);
+  } catch (error) {
+    logger.error(`[Worker ${this.id}] 페이지 스크롤 중 오류:`, error);
+  }
+}
+
+/**
+ * 페이지 끝까지 자동 스크롤합니다.
+ * @param {number} delay 스크롤 사이의 지연 시간 (ms)
+ * @returns {Promise<void>}
+ */
+async scrollFullPage(delay = 100) {
+  logger.info(`[Worker ${this.id}] 전체 페이지 스크롤 시작...`);
+
+  try {
+    await this.page.evaluate(async (scrollDelay) => {
+      await new Promise((resolve) => {
+        let totalHeight = 0;
+        const distance = 300;
+
+        const timer = setInterval(() => {
+          const scrollHeight = document.body.scrollHeight;
+          window.scrollBy(0, distance);
+          totalHeight += distance;
+
+          // 페이지 끝에 도달하거나 더 이상 스크롤되지 않으면 중지
+          if (totalHeight >= scrollHeight) {
+            clearInterval(timer);
+            resolve();
+          }
+        }, scrollDelay);
+      });
+    }, delay);
+
+    logger.info(`[Worker ${this.id}] 전체 페이지 스크롤 완료`);
+  } catch (error) {
+    logger.error(`[Worker ${this.id}] 전체 페이지 스크롤 중 오류:`, error);
+  }
+}
 
   /**
    * onclick 스크립트를 실행합니다.
@@ -47,6 +120,8 @@ class OnClickWorker {
 
       // 페이지 설정
       await this.setupPage();
+
+      await this.scrollPage();
 
       // 실행 전 URL 기록
       const beforeUrl = await this.page.url();
@@ -131,139 +206,139 @@ class OnClickWorker {
     });
   }
 
-  /**
-   * onclick 스크립트를 실행합니다.
-   * @returns {Promise<Object>} 실행 결과
-   */
   async executeOnclick() {
-    return this.page.evaluate(async (onclickCode, elementInfo, timeout) => {
-      return new Promise(resolve => {
-        // 타임아웃 설정
-        const timeoutId = setTimeout(() => {
+  return this.page.evaluate(async (onclickCode, elementInfo, timeout) => {
+    return new Promise(resolve => {
+      // 타임아웃 설정
+      const timeoutId = setTimeout(() => {
+        resolve({
+          success: true,
+          message: '실행 완료 (타임아웃)'
+        });
+      }, timeout);
+
+      try {
+        // 대화상자 함수 오버라이드
+        window.alert = function(message) {
+          console.log(`Alert 대화상자: ${message}`);
+          return undefined;
+        };
+
+        window.confirm = function(message) {
+          console.log(`Confirm 대화상자: ${message}`);
+          return true; // 항상 확인 버튼 클릭으로 처리
+        };
+
+        window.prompt = function(message, defaultValue) {
+          console.log(`Prompt 대화상자: ${message}`);
+          return defaultValue || ''; // 기본값이나 빈 문자열 반환
+        };
+
+        // 실행될 onclick 코드에 대한 정보 출력
+        console.log(`${elementInfo.tagName} 요소의 onclick 실행: ${onclickCode}`);
+
+        // URL 변경 감지를 위한 기존 함수 백업
+        const originalAssign = window.location.assign;
+        const originalReplace = window.location.replace;
+        const originalOpen = window.open;
+        let detectedUrl = null;
+        let urlChanged = false;
+
+        // location 함수 오버라이드 (주석 해제)
+        window.location.assign = function(url) {
+          detectedUrl = url;
+          urlChanged = true;
+          clearTimeout(timeoutId);
           resolve({
             success: true,
-            message: '실행 완료 (타임아웃)'
+            detectedUrl: url,
+            urlChanged: true,
+            message: 'location.assign 호출됨'
           });
-        }, timeout);
+          return originalAssign.call(window.location, url);
+        };
 
-        try {
-          // 대화상자 함수 오버라이드
-          window.alert = function(message) {
-            return undefined;
-          };
-
-          window.confirm = function(message) {
-            return true; // 항상 확인 버튼 클릭으로 처리
-          };
-
-          window.prompt = function(message, defaultValue) {
-            return defaultValue || ''; // 기본값이나 빈 문자열 반환
-          };
-
-          // 실행될 onclick 코드에 대한 정보 출력
-          logger.info(`${elementInfo.tagName} 요소의 onclick 실행: ${onclickCode}`);
-
-          // URL 변경 감지를 위한 기존 함수 백업
-          const originalAssign = window.location.assign;
-          const originalReplace = window.location.replace;
-          const originalOpen = window.open;
-          let detectedUrl = null;
-          let urlChanged = false;
-
-          // location 함수 오버라이드
-          window.location.assign = function(url) {
-            detectedUrl = url;
-            urlChanged = true;
-            clearTimeout(timeoutId);
-            resolve({
-              success: true,
-              detectedUrl: url,
-              urlChanged: true,
-              message: 'location.assign 호출됨'
-            });
-            return originalAssign.call(window.location, url);
-          };
-
-          window.location.replace = function(url) {
-            detectedUrl = url;
-            urlChanged = true;
-            clearTimeout(timeoutId);
-            resolve({
-              success: true,
-              detectedUrl: url,
-              urlChanged: true,
-            });
-            return originalReplace.call(window.location, url);
-          };
-
-          // location.href 속성 재정의
-          try {
-            Object.defineProperty(window.location, 'href', {
-              set: function(url) {
-                detectedUrl = url;
-                urlChanged = true;
-                clearTimeout(timeoutId);
-                resolve({
-                  success: true,
-                  detectedUrl: url,
-                  urlChanged: true,
-                  message: 'location.href 설정됨'
-                });
-                return url;
-              },
-              get: function() {
-                return window.location.toString();
-              }
-            });
-          } catch (e) {
-            console.error('location.href 속성 재정의 실패:', e);
-          }
-
-          // window.open 오버라이드
-          window.open = function(url) {
-            detectedUrl = url;
-            urlChanged = true;
-            clearTimeout(timeoutId);
-            resolve({
-              success: true,
-              detectedUrl: url,
-              urlChanged: true,
-              message: 'window.open 호출됨'
-            });
-            return originalOpen ? originalOpen.call(window, url) : null;
-          };
-
-          // onclick 코드 실행
-          eval(onclickCode);
-
-          // URL이 변경되지 않았다면 바로 결과 반환
-          if (!urlChanged) {
-            clearTimeout(timeoutId);
-            resolve({
-              success: true,
-              detectedUrl: null,
-              urlChanged: false,
-              message: '실행 완료 (URL 변경 없음)'
-            });
-          }
-        } catch (error) {
+        window.location.replace = function(url) {
+          detectedUrl = url;
+          urlChanged = true;
           clearTimeout(timeoutId);
-          console.error('onclick 실행 오류:', error);
           resolve({
-            success: false,
-            error: error.toString(),
-            message: 'onclick 실행 중 오류 발생'
+            success: true,
+            detectedUrl: url,
+            urlChanged: true,
+            message: 'location.replace 호출됨'
+          });
+          return originalReplace.call(window.location, url);
+        };
+
+        // location.href 속성 재정의
+        try {
+          Object.defineProperty(window.location, 'href', {
+            set: function(url) {
+              detectedUrl = url;
+              urlChanged = true;
+              clearTimeout(timeoutId);
+              resolve({
+                success: true,
+                detectedUrl: url,
+                urlChanged: true,
+                message: 'location.href 설정됨'
+              });
+              return url;
+            },
+            get: function() {
+              return window.location.toString();
+            }
+          });
+        } catch (e) {
+          console.error('location.href 속성 재정의 실패:', e);
+        }
+
+        // window.open 오버라이드
+        window.open = function(url) {
+          detectedUrl = url;
+          urlChanged = true;
+          clearTimeout(timeoutId);
+          resolve({
+            success: true,
+            detectedUrl: url,
+            urlChanged: true,
+            message: 'window.open 호출됨'
+          });
+          return originalOpen ? originalOpen.call(window, url) : null;
+        };
+
+        console.warn(`onclick 코드 실행: ${onclickCode}`);
+        // onclick 코드 실행
+        eval(onclickCode);
+
+        // URL이 변경되지 않았다면 바로 결과 반환
+        if (!urlChanged) {
+          clearTimeout(timeoutId);
+          resolve({
+            success: true,
+            detectedUrl: null,
+            urlChanged: false,
+            message: '실행 완료 (URL 변경 없음)'
           });
         }
-      });
-    }, this.onclickItem.onclick, {
-      tagName: this.onclickItem.tagName,
-      id: this.onclickItem.id,
-      className: this.onclickItem.className,
-      text: this.onclickItem.text
-    }, this.timeout);
-  }
-
+      } catch (error) {
+        clearTimeout(timeoutId);
+        console.error('onclick 실행 오류:', error.toString());
+        resolve({
+          success: false,
+          error: error.toString(),
+          message: 'onclick 실행 중 오류 발생'
+        });
+      }
+    });
+  }, this.onclickItem.onclick, {
+    tagName: this.onclickItem.tagName,
+    id: this.onclickItem.id,
+    className: this.onclickItem.className,
+    text: this.onclickItem.text
+  }, this.timeout);
+}
   /**
    * URL 변경을 확인하고 결과에 반영합니다.
    * @param {Object} result 결과 객체

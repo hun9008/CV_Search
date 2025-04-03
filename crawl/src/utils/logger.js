@@ -1,3 +1,4 @@
+require('dotenv')
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
@@ -62,6 +63,7 @@ class Logger {
    * 로그 파일 설정
    */
   setupLogFiles() {
+    console.log("SET logifle");
     try {
       if (!fs.existsSync(this.options.logDir)) {
         fs.mkdirSync(this.options.logDir, { recursive: true });
@@ -162,7 +164,7 @@ class Logger {
 }
 
 // 기본 로거 인스턴스 생성 (싱글톤)
-const defaultLogger = new Logger();
+const defaultLogger = new Logger({logDir:'./logs'});
 
 module.exports = {
   Logger,

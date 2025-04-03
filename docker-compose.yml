@@ -1,4 +1,4 @@
-version: '3.8'
+name: "crawl"
 
 services:
   nginx:
@@ -11,7 +11,6 @@ services:
     container_name: myweb-proxy
     restart: unless-stopped
     depends_on:
-      - web
       - api
     networks:
       - cv-network
@@ -22,29 +21,14 @@ services:
       retries: 3
       start_period: 10s
 
-  web:
-    image: sehyunsix/crawl-client:latest
-    ports:
-      - "3000:80"
-    container_name: myweb-web
-    restart: unless-stopped
-    networks:
-      - cv-network
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-
   api:
     image: sehyunsix/crawl-server:latest
+    command: npm run server
     ports:
       - "8080:8080"
     container_name: myweb-api
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
+    env_file: ".env"
     networks:
       - cv-network
     healthcheck:
