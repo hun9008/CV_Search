@@ -3,9 +3,9 @@ spring:
     name: goodjob
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://15.164.169.79:3306/goodjob?serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
-    username: ${SPRING_DATASOURCE_USERNAME:user}
-    password: ${SPRING_DATASOURCE_PASSWORD:ajoucapstone}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
