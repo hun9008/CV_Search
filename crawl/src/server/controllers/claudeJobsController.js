@@ -9,7 +9,6 @@ const RecruitInfoClaude = mongoose.model(
   RecruitInfo.schema,
   'recruitinfos_claude'
 );
-
 /**
  * Claude로 파싱된 채용 정보 검색 및 조회
  * @param {Object} req - 요청 객체
@@ -25,7 +24,9 @@ exports.getClaudeJobs = async (req, res) => {
       search = '',
       sortBy = 'updated_at',
       limit = 50,
-      page = 1
+      page = 1,
+      complete = 'false',
+      itOnly = 'false'
     } = req.query;
 
     // 유효한 숫자로 변환
@@ -35,6 +36,86 @@ exports.getClaudeJobs = async (req, res) => {
 
     // 검색 쿼리 구성
     const searchQuery = {};
+
+    // 완전한 데이터 필터링 옵션
+    if (complete === 'true') {
+      // 완전한 데이터를 가진 채용공고를 찾기 위한 쿼리
+      Object.assign(searchQuery, {
+        // 회사명이 있고 Unknown/알 수 없음/명시되지 않음이 아님
+        company_name: {
+          $exists: true,
+          $ne: null,
+          $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음', '']
+        },
+        // 직무 유형이 있고 비어있지 않음
+        job_type: {
+          $exists: true,
+          $ne: null,
+          $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음', '']
+        },
+        // 경력이 있고 비어있지 않음
+        experience: {
+          $exists: true,
+          $ne: null,
+          $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음', '']
+        },
+        // 설명이 있고 No description이 아님
+        description: {
+          $exists: true,
+          $ne: null,
+          $ne: 'No description available.',
+          $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음', '']
+        },
+        // 우대 사항 (선택, 선호 역량)
+        preferred_qualifications: {
+          $exists: true,
+          $ne: null,
+          $ne: 'No description available.',
+          $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음', '']
+        },
+        // 인재상 (선택, 원하는 인재상)
+        ideal_candidate: {
+          $exists: true,
+          $ne: null,
+          $ne: 'No description available.',
+          $nin: ['Unknown Company', '알 수 없음', '명시되지 않음', '명시되지 언급되지 않음', '']
+        },
+      });
+    }
+
+    // IT 관련 채용공고만 필터링
+    if (itOnly === 'true') {
+      const itKeywords = [
+        'IT', '개발', '소프트웨어', '프로그래머', '프로그래밍', '개발자', '엔지니어',
+        'SW', 'software', 'developer', 'programmer', 'engineer', 'frontend', 'backend',
+        '프론트엔드', '백엔드', 'fullstack', '풀스택', 'devops', '데브옵스', 'cloud', '클라우드',
+        'javascript', 'java', 'python', 'react', '리액트', 'node', '노드', 'angular', 'vue', 'django',
+        'spring', '스프링', 'AI', '인공지능', 'machine learning', '머신러닝', 'deep learning', '딥러닝',
+        'data', '데이터', 'blockchain', '블록체인', 'mobile', '모바일', 'app', '앱', 'web', '웹',
+        'system', '시스템', 'network', '네트워크', 'security', '보안', 'database', 'DB', '데이터베이스',
+        'DevOps', 'QA', '테스트', 'test', 'UX', 'UI', 'product', '서버', 'server', 'infrastructure', '인프라'
+      ];
+
+      const itRegexPatterns = itKeywords.map(keyword => new RegExp(keyword, 'i'));
+
+      const itSearchQuery = {
+        $or: [
+          { job_type: { $in: itRegexPatterns } },
+          { description: { $in: itRegexPatterns } },
+          { requirements: { $in: itRegexPatterns } },
+          { preferred_qualifications: { $in: itRegexPatterns } },
+          { department: { $in: itRegexPatterns } },
+          { title: { $in: itRegexPatterns } }
+        ]
+      };
+
+      // 기존 검색 쿼리에 IT 관련 필터 추가
+      if (searchQuery.$and) {
+        searchQuery.$and.push(itSearchQuery);
+      } else {
+        searchQuery.$and = [itSearchQuery];
+      }
+    }
 
     // 키워드 검색 처리
     if (keywords) {
@@ -58,7 +139,11 @@ exports.getClaudeJobs = async (req, res) => {
           };
         });
 
-        searchQuery.$and = keywordQueries;
+        if (searchQuery.$and) {
+          searchQuery.$and = [...searchQuery.$and, ...keywordQueries];
+        } else {
+          searchQuery.$and = keywordQueries;
+        }
       }
     }
 
@@ -74,20 +159,39 @@ exports.getClaudeJobs = async (req, res) => {
 
     // 텍스트 검색 (제목, 회사명, 설명 등)
     if (search) {
-      searchQuery.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { company_name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+      const searchRegex = { $regex: search, $options: 'i' };
+      const searchOrQuery = [
+        { title: searchRegex },
+        { company_name: searchRegex },
+        { description: searchRegex }
       ];
+
+      if (searchQuery.$or) {
+        // 이미 $or이 있는 경우 $and로 결합
+        if (!searchQuery.$and) {
+          searchQuery.$and = [];
+        }
+        searchQuery.$and.push({ $or: searchOrQuery });
+      } else {
+        searchQuery.$or = searchOrQuery;
+      }
     }
 
     // 정렬 기준 설정
     let sortOptions = {};
     sortOptions['_id'] = 1; // 텍스트 필드는 오름차순
 
-
     // 총 결과 수 카운트 쿼리 실행
     const total = await RecruitInfoClaude.countDocuments(searchQuery);
+
+    // 완전한 데이터 통계 - 모든 문서 중 완전한 데이터의 비율 (complete=true일 경우만)
+    let totalAll = null;
+    let completeRatio = null;
+
+    if (complete === 'true') {
+      totalAll = await RecruitInfoClaude.countDocuments({});
+      completeRatio = totalAll > 0 ? (total / totalAll * 100).toFixed(2) : 0;
+    }
 
     // 검색 쿼리 실행 (페이지네이션 적용)
     const jobs = await RecruitInfoClaude.find(searchQuery)
@@ -95,15 +199,24 @@ exports.getClaudeJobs = async (req, res) => {
       .skip(skip)
       .limit(limitNum);
 
-    // 응답 전송
-    res.status(200).json({
+    // 응답 데이터 준비
+    const response = {
       success: true,
       total,
       page: pageNum,
       limit: limitNum,
       pages: Math.ceil(total / limitNum),
       jobs
-    });
+    };
+
+    // complete=true인 경우 추가 통계 정보 포함
+    if (complete === 'true') {
+      response.totalAll = totalAll;
+      response.completeRatio = completeRatio;
+    }
+
+    // 응답 전송
+    res.status(200).json(response);
 
   } catch (error) {
     logger.error('Claude 채용정보 조회 오류:', error);
@@ -169,7 +282,7 @@ exports.getClaudeJobFilters = async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Claude 채용정보 필터 옵션 조회 오류:', error);
+    logger.error('Claude 채용정보 필터 옵션  오류:', error);
     res.status(500).json({
       success: false,
       error: 'Claude 채용정보 필터 옵션을 조회하는 중 오류가 발생했습니다.'

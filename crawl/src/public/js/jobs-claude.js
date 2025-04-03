@@ -7,7 +7,9 @@ let filters = {
     experience: '',
     searchText: '',
     sortBy: 'updated_at',
-    completeDataOnly: false
+    completeDataOnly: false,
+    itOnly: false
+
 };
 
 // Initialize when the DOM content is loaded
@@ -124,7 +126,7 @@ async function loadCompletionStats() {
     document.getElementById('load-complete-data').addEventListener('click', () => {
       document.getElementById('complete-data-only').checked = true;
       filters.completeDataOnly = true;
-      loadCompletedJobsFromServer();
+      loadJobListings();
       statsModal.style.display = 'none';
     });
 
@@ -139,53 +141,6 @@ async function loadCompletionStats() {
   }
 }
 
-// 서버에서 완전한 데이터 채용공고만 가져오기
-async function loadCompletedJobsFromServer() {
-  try {
-    const jobsContainer = document.getElementById('jobs-container');
-    jobsContainer.innerHTML = '<div class="loading">완전한 데이터의 채용공고를 불러오는 중...</div>';
-
-    // API URL 구성 (완전한 데이터 전용 API 사용)
-    let apiUrl = `/api/recruitinfos-claude-complete?page=${currentPage}&limit=${jobsPerPage}`;
-
-    if (filters.sortBy) {
-      apiUrl += `&sortBy=${encodeURIComponent(filters.sortBy)}`;
-    }
-
-    // 서버에서 데이터 가져오기
-    const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    currentJobs = data.jobs;
-    totalPages = Math.ceil(data.total / jobsPerPage);
-
-    // 결과 수 업데이트
-    document.getElementById('results-count').innerHTML = `
-      <div class="results-stats">
-        <p>완전한 데이터의 채용공고: <strong>${data.total}</strong>개 (전체 ${data.totalAll}개 중 ${data.completeRatio}%)</p>
-      </div>
-    `;
-
-    // 채용공고 표시
-    displayJobs(currentJobs);
-
-    // 페이지네이션 업데이트
-    updatePagination();
-
-  } catch (error) {
-    console.error('완전한 데이터의 채용공고 로드 오류:', error);
-    document.getElementById('jobs-container').innerHTML = `
-      <div class="error">
-        <p>완전한 데이터의 채용공고를 불러오지 못했습니다.</p>
-        <p>자세한 내용: ${error.message}</p>
-      </div>
-    `;
-  }
-}
 
 // Function to set up all event listeners
 function setupEventListeners() {
@@ -212,6 +167,7 @@ function setupEventListeners() {
         filters.searchText = document.getElementById('search-text').value;
         filters.sortBy = document.getElementById('sort-by').value;
         filters.completeDataOnly = document.getElementById('complete-data-only').checked;
+        filters.itOnly = document.getElementById('it-only').checked; // Add this line
         loadJobListings();
     });
 
@@ -222,17 +178,20 @@ function setupEventListeners() {
         document.getElementById('search-text').value = '';
         document.getElementById('sort-by').value = 'updated_at';
         document.getElementById('complete-data-only').checked = false;
+        document.getElementById('it-only').checked = false; // Add this line
 
         filters = {
             jobType: '',
             experience: '',
             searchText: '',
             sortBy: 'updated_at',
-            completeDataOnly: false
+            completeDataOnly: false,
+            itOnly: false // Add this property
         };
 
         loadJobListings();
     });
+
 
     // Modal close button
     document.querySelector('.close').addEventListener('click', () => {
@@ -250,11 +209,6 @@ function setupEventListeners() {
 // Function to load the job listings from the server
 async function loadJobListings() {
     try {
-
-    if (filters.completeDataOnly) {
-      await loadCompletedJobsFromServer();
-      return;
-    }
         const jobsContainer = document.getElementById('jobs-container');
         jobsContainer.innerHTML = '<div class="loading">Loading job listings...</div>';
 
@@ -277,7 +231,15 @@ async function loadJobListings() {
             apiUrl += `&sortBy=${encodeURIComponent(filters.sortBy)}`;
         }
 
+        // Add complete data filter parameter
+        if (filters.completeDataOnly) {
+            apiUrl += `&complete=true`;
+        }
 
+        // Add IT jobs only filter if the checkbox is checked
+        if (filters.itOnly) {
+            apiUrl += `&itOnly=true`;
+        }
 
         // Fetch the data from the server
         const response = await fetch(apiUrl);
@@ -288,30 +250,21 @@ async function loadJobListings() {
 
         const data = await response.json();
 
-        // If complete data only filter is enabled, filter out jobs with empty fields client-side as well
-        let jobs = data.jobs;
-        if (filters.completeDataOnly) {
-            jobs = jobs.filter(job =>
-                job.company_name &&
-                job.company_name !== 'Unknown Company' &&
-                job.company_name !== '알 수 없음' &&
-                job.company_name !== '명시되지 않음' &&
-                job.title &&
-                job.title !== 'Untitled Position' &&
-                job.description &&
-                job.description !== 'No description available.' &&
-                job.job_type &&
-                job.job_type !== '' &&
-                job.experience &&
-                job.experience !== ''
-            );
-        }
-
-        currentJobs = jobs;
+        currentJobs = data.jobs;
         totalPages = Math.ceil(data.total / jobsPerPage);
 
-        // Update the results count
-        document.getElementById('results-count').textContent = `Showing ${currentJobs.length} of ${data.total} job listings`;
+        // Update the results count with additional information when complete filter is active
+        if (filters.completeDataOnly) {
+            document.getElementById('results-count').innerHTML = `
+                <div class="results-stats">
+                    <p>완전한 데이터의 채용공고: <strong>${data.total}</strong>개
+                    ${data.totalAll ? `(전체 ${data.totalAll}개 중 ${data.completeRatio}%)` : ''}
+                    </p>
+                </div>
+            `;
+        } else {
+            document.getElementById('results-count').textContent = `Showing ${currentJobs.length} of ${data.total} job listings`;
+        }
 
         // Display the jobs
         displayJobs(currentJobs);
