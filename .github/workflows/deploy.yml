@@ -24,6 +24,10 @@ jobs:
           RDB_URL: ${{ secrets.RDB_URL }}
           RDB_USERNAME: ${{ secrets.RDB_USERNAME }}
           RDB_PASSWORD: ${{ secrets.RDB_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
         run: |
           sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
             cd CV_Search
@@ -35,6 +39,10 @@ jobs:
             echo "RDB_URL=$RDB_URL" > .env
             echo "RDB_USERNAME=$RDB_USERNAME" >> .env
             echo "RDB_PASSWORD=$RDB_PASSWORD" >> .env
+            echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> .env
+            echo "KAKAO_CLIENT_ID=$KAKAO_CLIENT_ID" >> .env
+            echo "KAKAO_CLIENT_SECRET=$KAKAO_CLIENT_SECRET" >> .env
+            echo "KAKAO_REDIRECT_URI=$KAKAO_REDIRECT_URI" >> .env
           
             docker-compose down || true
             docker-compose up -d --build
