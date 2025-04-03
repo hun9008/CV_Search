@@ -47,6 +47,9 @@ jobs:
             echo "KAKAO_CLIENT_ID=$KAKAO_CLIENT_ID" >> .env
             echo "KAKAO_CLIENT_SECRET=$KAKAO_CLIENT_SECRET" >> .env
             echo "KAKAO_REDIRECT_URI=$KAKAO_REDIRECT_URI" >> .env
+            echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .env
+            echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .env
+            echo "GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI" >> .env
           
             docker-compose down || true
             docker-compose up -d --build
