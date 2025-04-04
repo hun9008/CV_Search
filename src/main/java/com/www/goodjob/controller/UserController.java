@@ -31,14 +31,6 @@ public class UserController {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
 
-        // 추가 회원가입 정보로 User 업데이트 (예: region, name)
-        user.setRegion(request.getRegion());
-        if (request.getName() != null) {
-            user.setName(request.getName());
-        }
-        userRepository.save(user);
-
-        // UserOAuth 정보 업데이트: 로그인 시 토큰은 저장하지 않았으므로, 회원가입 시점에서 DB에 저장
         UserOAuth userOAuth = userOAuthRepository.findByUser_Email(email)
                 .orElseThrow(() -> new IllegalStateException("UserOAuth not found"));
         userOAuth.setAccessToken(request.getAccessToken());

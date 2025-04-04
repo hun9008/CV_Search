@@ -1,6 +1,7 @@
 package com.www.goodjob.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -24,17 +25,13 @@ public class AuthController {
         }
     }
 
-    // OAuthSuccessHandler에서 리다이렉트 후, 토큰을 확인하는 엔드포인트
-    @GetMapping("/redirect")
-    public String redirectAfterLogin(@RequestParam String accessToken,
-                                     @RequestParam String refreshToken) {
-        return "Login Success! AccessToken=" + accessToken + ", RefreshToken=" + refreshToken;
-    }
-
-    // 추가 회원가입(추가 정보 입력)이 필요한 경우 (예시)
-    @PostMapping("/signup")
-    public String signup(@RequestHeader("Authorization") String token,
-                         @RequestParam String region) {
-        return "Sign Up Success (region = " + region + ")";
+    @GetMapping("/callback")
+    public ResponseEntity<String> callback(@RequestParam(required = false) String accessToken) {
+        if (accessToken == null) {
+            System.out.println("❌ accessToken is missing!");
+            return ResponseEntity.badRequest().body("AccessToken is missing!");
+        }
+        System.out.println("✅ accessToken = " + accessToken);
+        return ResponseEntity.ok("Access Token: " + accessToken);
     }
 }

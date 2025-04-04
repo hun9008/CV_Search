@@ -1,9 +1,5 @@
 package com.www.goodjob.config;
 
-import com.www.goodjob.domain.User;
-import com.www.goodjob.domain.UserOAuth;
-import com.www.goodjob.repository.UserOAuthRepository;
-import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.CustomOAuth2User;
 import com.www.goodjob.service.JwtTokenProvider;
 import jakarta.servlet.ServletException;
@@ -11,13 +7,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.time.Duration;
 
 @Slf4j
 @Component
@@ -25,14 +26,20 @@ import java.io.IOException;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserOAuthRepository userOAuthRepository;
-    private final UserRepository userRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        Authentication authentication)
-            throws IOException, ServletException {
+                                        Authentication authentication) throws IOException, ServletException {
+
+        // SecurityContext 수동 설정
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        // 세션에도 저장 (필요 시)
+        HttpSessionSecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+        securityContextRepository.saveContext(context, request, response);
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         CustomOAuth2User customUser = (oAuth2User instanceof CustomOAuth2User)
@@ -41,22 +48,23 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String email = customUser.getEmail();
 
-        // JWT 토큰 생성 (Access & Refresh)
+        // JWT 생성
         String accessToken = jwtTokenProvider.generateAccessToken(email);
         String refreshToken = jwtTokenProvider.generateRefreshToken(email);
 
-        log.info("OAuth2 로그인 성공: email={}, accessToken={}, refreshToken={}", email, accessToken, refreshToken);
+        // HttpOnly 쿠키에 refreshToken 저장
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofDays(14))
+                .sameSite("Strict")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-        // "SignIn" 컴포넌트에서 tokens를 받도록 리다이렉트
-        String frontEndUrl = "http://localhost:5173/auth/callback";
-
-        // 프론트 대신, 백엔드의 /auth/redirect 로 리다이렉트해서 테스트
-        // String frontEndUrl = "http://localhost:8080/auth/redirect";
-
-        String redirectUrl = UriComponentsBuilder.fromUriString(frontEndUrl)
-                .queryParam("accessToken", accessToken)
-                .queryParam("refreshToken", refreshToken)
-                .build().toUriString();
+        // 프론트로 accessToken 전달 (프론트용 or 테스트용 중 선택)
+        // String redirectUrl = "http://localhost:5173/auth/callback?accessToken=" + accessToken;
+        String redirectUrl = "http://localhost:8080/auth/callback?accessToken=" + accessToken;
 
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
