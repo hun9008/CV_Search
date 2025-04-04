@@ -26,6 +26,7 @@ public class User {
 
     private String region;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
 
