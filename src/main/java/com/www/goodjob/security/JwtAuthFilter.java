@@ -26,17 +26,23 @@ public class JwtAuthFilter extends GenericFilterBean {
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String token = httpRequest.getHeader("Authorization"); // "Bearer xxx" 형식
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            String email = jwtTokenProvider.getEmail(token);
-            Authentication auth = new UsernamePasswordAuthenticationToken(
-                    email,
-                    null,
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-            );
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        // JWT 인증 처리
+        String token = httpRequest.getHeader("Authorization"); // "Bearer xxx"
+
+        if (token != null && token.startsWith("Bearer ")) {
+            String jwt = token.substring(7);
+            if (jwtTokenProvider.validateToken(jwt)) {
+                String email = jwtTokenProvider.getEmail(jwt);
+                Authentication auth = new UsernamePasswordAuthenticationToken(
+                        email,
+                        null,
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                );
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
         }
+
         chain.doFilter(request, response);
     }
 }
