@@ -47,7 +47,7 @@ CREATE TABLE jobs (
                       company_name VARCHAR(255) NOT NULL,                -- 회사명
                       job_title VARCHAR(255) NOT NULL,                   -- 직무 제목
                       department VARCHAR(255),                           -- 부서명
-                      experience_level ENUM('신입', '중급', '고급', '인턴'), -- 요구 경력
+                      experience_level VARCHAR(255),                     -- 요구 경력
                       description TEXT,                                  -- 상세 업무 내용
                       job_type ENUM('정규직', '계약직', '인턴'),          -- 근무 유형
                       start_date DATE,                                   -- 공고 시작일
