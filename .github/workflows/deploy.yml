@@ -51,6 +51,11 @@ jobs:
             echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .env
             echo "GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI" >> .env
           
+            echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env
+            echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
+            echo "AWS_REGION=$AWS_REGION" >> .env
+            echo "AWS_S3_BUCKET=$AWS_S3_BUCKET" >> .env
+          
             docker-compose down || true
             docker-compose up -d --build
           
