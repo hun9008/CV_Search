@@ -10,7 +10,7 @@ CREATE TABLE users (
                        email VARCHAR(255) UNIQUE NOT NULL,                -- 사용자 이메일 (고유값)
                        name VARCHAR(100) NOT NULL,                        -- 사용자 이름
                        region VARCHAR(100),                               -- 사용자의 지역 정보 (예: 경기 수원)
-                       role ENUM('user', 'admin') DEFAULT 'user',         -- 사용자 권한: 일반 사용자 또는 관리자
+                       role ENUM('USER', 'ADMIN') DEFAULT 'USER',         -- 사용자 권한: 일반 사용자 또는 관리자
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    -- 계정 생성 시간
                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 시간
 );
