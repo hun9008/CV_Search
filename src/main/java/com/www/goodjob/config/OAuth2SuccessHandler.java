@@ -3,6 +3,7 @@ package com.www.goodjob.config;
 import com.www.goodjob.domain.User;
 import com.www.goodjob.domain.UserOAuth;
 import com.www.goodjob.enums.OAuthProvider;
+import com.www.goodjob.enums.UserRole;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.CustomOAuth2User;
@@ -42,7 +43,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String email = customUser.getEmail();
         String name = customUser.getName();
         OAuthProvider provider = extractProvider(customUser);
-        String oauthId = customUser.getName(); // provider별 고유 ID
+        String oauthId = customUser.getOauthId(provider);
 
         boolean isFirstLogin = false;
         User user = userRepository.findByEmail(email).orElse(null);
@@ -51,6 +52,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             user = userRepository.save(User.builder()
                     .email(email)
                     .name(name)
+                    .role(UserRole.USER)
                     .build());
 
             userOAuthRepository.save(UserOAuth.builder()

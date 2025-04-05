@@ -31,12 +31,4 @@ public class UserOAuth {
 
     @Column(nullable = false)
     private String oauthId;  // 외부 제공자에서 받은 사용자 ID
-
-    @Lob
-    private String accessToken;
-
-    @Lob
-    private String refreshToken;
-
-    private LocalDateTime tokenExpiry;
 }
