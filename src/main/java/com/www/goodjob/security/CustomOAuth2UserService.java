@@ -34,6 +34,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         attributes.put("name", oAuth2Attribute.getName());
         attributes.put("email", oAuth2Attribute.getEmail());
         attributes.put("picture", oAuth2Attribute.getPicture());
+        attributes.put("provider", provider);
 
         // "name" 속성을 기준으로 DefaultOAuth2User를 생성합니다.
         OAuth2User modifiedUser = new DefaultOAuth2User(

@@ -1,5 +1,6 @@
 package com.www.goodjob.security;
 
+import com.www.goodjob.enums.OAuthProvider;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -24,6 +25,16 @@ public class CustomOAuth2User implements OAuth2User {
             return (String) kakaoAccount.get("email");
         }
         return (String) oAuth2User.getAttributes().get("email");
+    }
+
+    public String getOauthId(OAuthProvider provider) {
+        if (provider == OAuthProvider.KAKAO) {
+            return oAuth2User.getAttributes().get("id").toString();
+        } else if (provider == OAuthProvider.GOOGLE) {
+            return oAuth2User.getAttributes().get("sub").toString();
+        } else {
+            throw new IllegalArgumentException("Unsupported provider: " + provider);
+        }
     }
 
     @Override
