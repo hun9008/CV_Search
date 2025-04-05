@@ -3,10 +3,7 @@ package com.www.goodjob.controller;
 import com.www.goodjob.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,5 +16,18 @@ public class S3Controller {
     public ResponseEntity<String> getPresignedUrl(@RequestParam String fileName) {
         String url = s3Service.generatePresignedUrl(fileName);
         return ResponseEntity.ok(url);
+    }
+
+    @PostMapping("/confirm-upload")
+    public ResponseEntity<String> confirmUpload(
+            @RequestParam Long userId,
+            @RequestParam String fileName
+    ) {
+        boolean saved = s3Service.saveCvIfUploaded(userId, fileName);
+        if (saved) {
+            return ResponseEntity.ok("CV 정보가 저장되었습니다.");
+        } else {
+            return ResponseEntity.badRequest().body("S3에 해당 파일이 존재하지 않습니다.");
+        }
     }
 }
