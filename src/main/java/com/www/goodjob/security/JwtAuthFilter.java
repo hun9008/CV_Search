@@ -1,17 +1,17 @@
 package com.www.goodjob.security;
 
 import com.www.goodjob.service.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.web.filter.GenericFilterBean;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -26,8 +26,14 @@ public class JwtAuthFilter extends GenericFilterBean {
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String path = httpRequest.getRequestURI();
 
-        // JWT 인증 처리
+        // "/auth/callback-endpoint"는 필터에서 제외
+        if (path.equals("/auth/callback-endpoint")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String token = httpRequest.getHeader("Authorization"); // "Bearer xxx"
 
         if (token != null && token.startsWith("Bearer ")) {
