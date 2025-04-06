@@ -44,12 +44,12 @@ CREATE TABLE cv (
 -- 채용 공고 테이블
 CREATE TABLE jobs (
                       id BIGINT PRIMARY KEY AUTO_INCREMENT,              -- 공고 고유 ID
-                      company_name VARCHAR(255) NOT NULL,                -- 회사명
-                      title VARCHAR(255) NOT NULL,                   -- 직무 제목
-                      department VARCHAR(255),                           -- 부서명
+                      company_name TEXT,                -- 회사명
+                      title TEXT,                   -- 직무 제목
+                      department TEXT,                           -- 부서명
                       experience TEXT, -- 요구 경력
                       description TEXT,                                  -- 상세 업무 내용
-                      job_type   VARCHAR(255)        -- 근무 유형
+                      job_type   TEXT        -- 근무 유형
                       start_date DATE,                                   -- 공고 시작일
                       end_date DATE,                                     -- 공고 마감일
                       requirements TEXT,                                 -- 필수 요구 조건
@@ -60,7 +60,7 @@ CREATE TABLE jobs (
                       posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- 공고 등록일
                       expires_at DATE,                                   -- 공고 만료일
                       raw_jobs_text TEXT NOT NULL,                       -- 전체 원문 텍스트 (크롤링 원본)
-                      jobs_url VARCHAR(255) NOT NULL                     -- 공고 상세보기 링크 (공식 페이지)
+                      jobs_url TEXT                    -- 공고 상세보기 링크 (공식 페이지)
 );
 
 -- 피드백 테이블 (CV와 채용공고의 1:1 매칭 피드백)
