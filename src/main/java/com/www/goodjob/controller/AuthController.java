@@ -11,12 +11,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     // 커스텀 로그인 페이지 (provider 파라미터 옵션 처리)
     @GetMapping("/login")
@@ -43,6 +48,21 @@ public class AuthController {
 
     @GetMapping("/callback-endpoint")
     public ResponseEntity<?> handleCallback(HttpServletRequest request) {
+
+        logger.info(">>> /auth/callback-endpoint 요청 수신");
+
+        var session = request.getSession(false);
+        if (session == null) {
+            logger.warn("세션이 존재하지 않음.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "세션이 존재하지 않습니다."));
+        }
+
+        logger.info("세션 ID: {}", session.getId());
+        session.getAttributeNames().asIterator().forEachRemaining(attr -> {
+            logger.info("세션 속성: {} = {}", attr, session.getAttribute(attr));
+        });
+
         String accessToken = (String) request.getSession().getAttribute("accessToken");
         Boolean firstLogin = (Boolean) request.getSession().getAttribute("firstLogin");
 
