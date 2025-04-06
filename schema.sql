@@ -45,7 +45,7 @@ CREATE TABLE cv (
 CREATE TABLE jobs (
                       id BIGINT PRIMARY KEY AUTO_INCREMENT,              -- 공고 고유 ID
                       company_name VARCHAR(255) NOT NULL,                -- 회사명
-                      job_title VARCHAR(255) NOT NULL,                   -- 직무 제목
+                      title VARCHAR(255) NOT NULL,                   -- 직무 제목
                       department VARCHAR(255),                           -- 부서명
                       experience TEXT, -- 요구 경력
                       description TEXT,                                  -- 상세 업무 내용
