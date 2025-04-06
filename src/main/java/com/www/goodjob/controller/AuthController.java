@@ -1,5 +1,6 @@
 package com.www.goodjob.controller;
 
+import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.service.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Map;
 public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     // 커스텀 로그인 페이지 (provider 파라미터 옵션 처리)
     @GetMapping("/login")
@@ -42,24 +44,23 @@ public class AuthController {
     }
 
     @GetMapping("/callback-endpoint")
-    public ResponseEntity<?> handleCallback(HttpServletRequest request) {
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
-        Boolean firstLogin = (Boolean) request.getSession().getAttribute("firstLogin");
-
-        // 세션에서 꺼낸 후 제거 (한 번만 사용)
-        request.getSession().removeAttribute("accessToken");
-        request.getSession().removeAttribute("firstLogin");
-
-        if (accessToken == null || firstLogin == null) {
+    public ResponseEntity<?> handleCallback(@CookieValue(value = "refresh_token", required = false) String refreshToken) {
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "인증 정보가 없습니다."));
+                    .body(Map.of("message", "유효하지 않은 refresh token"));
         }
 
+        String email = jwtTokenProvider.getEmail(refreshToken);
+        String newAccessToken = jwtTokenProvider.generateAccessToken(email);
+
+        boolean isFirstLogin = !userRepository.existsByEmail(email);
+
         return ResponseEntity.ok(Map.of(
-                "accessToken", accessToken,
-                "firstLogin", firstLogin
+                "accessToken", newAccessToken,
+                "firstLogin", isFirstLogin
         ));
     }
+
 
 
 //    @GetMapping("/callback")
