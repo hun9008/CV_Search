@@ -21,6 +21,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
