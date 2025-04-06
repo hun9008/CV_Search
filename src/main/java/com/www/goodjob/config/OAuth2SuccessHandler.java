@@ -78,12 +78,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-        // accessToken + firstLogin JSON 응답
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(
-                String.format("{\"accessToken\": \"%s\", \"firstLogin\": %s}", accessToken, isFirstLogin)
-        );
+        request.getSession().setAttribute("accessToken", accessToken);
+        request.getSession().setAttribute("firstLogin", isFirstLogin);
+
+        // 프론트 전용 redirect
+        response.sendRedirect("http://localhost:5173/auth/callback");
+
+        // 백에서 test
+        // response.sendRedirect("http://localhost:8080/auth/callback");
+
     }
 
     private OAuthProvider extractProvider(CustomOAuth2User user) {

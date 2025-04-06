@@ -1,6 +1,7 @@
 package com.www.goodjob.controller;
 
 import com.www.goodjob.service.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -38,4 +40,45 @@ public class AuthController {
 
         return ResponseEntity.ok(Collections.singletonMap("accessToken", newAccessToken));
     }
+
+    @GetMapping("/callback-endpoint")
+    public ResponseEntity<?> handleCallback(HttpServletRequest request) {
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        Boolean firstLogin = (Boolean) request.getSession().getAttribute("firstLogin");
+
+        // 세션에서 꺼낸 후 제거 (한 번만 사용)
+        request.getSession().removeAttribute("accessToken");
+        request.getSession().removeAttribute("firstLogin");
+
+        if (accessToken == null || firstLogin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "인증 정보가 없습니다."));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "accessToken", accessToken,
+                "firstLogin", firstLogin
+        ));
+    }
+
+
+//    @GetMapping("/callback")
+//    public String callbackPage() {
+//        return """
+//        <html>
+//          <body>
+//            <h1>✅ 리다이렉트 완료!</h1>
+//            <button onclick="fetchToken()">Get Token</button>
+//            <script>
+//              async function fetchToken() {
+//                const res = await fetch('/auth/callback-endpoint');
+//                const data = await res.json();
+//                alert(JSON.stringify(data));
+//              }
+//            </script>
+//          </body>
+//        </html>
+//        """;
+//    }
+
 }
