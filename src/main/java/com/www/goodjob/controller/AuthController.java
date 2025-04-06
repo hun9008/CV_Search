@@ -1,5 +1,6 @@
 package com.www.goodjob.controller;
 
+import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.service.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -47,39 +49,23 @@ public class AuthController {
     }
 
     @GetMapping("/callback-endpoint")
-    public ResponseEntity<?> handleCallback(HttpServletRequest request) {
-
-        logger.info(">>> /auth/callback-endpoint 요청 수신");
-
-        var session = request.getSession(false);
-        if (session == null) {
-            logger.warn("세션이 존재하지 않음.");
+    public ResponseEntity<?> handleCallback(@CookieValue(value = "refresh_token", required = false) String refreshToken) {
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "세션이 존재하지 않습니다."));
+                    .body(Map.of("message", "유효하지 않은 refresh token"));
         }
 
-        logger.info("세션 ID: {}", session.getId());
-        session.getAttributeNames().asIterator().forEachRemaining(attr -> {
-            logger.info("세션 속성: {} = {}", attr, session.getAttribute(attr));
-        });
+        String email = jwtTokenProvider.getEmail(refreshToken);
+        String newAccessToken = jwtTokenProvider.generateAccessToken(email);
 
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
-        Boolean firstLogin = (Boolean) request.getSession().getAttribute("firstLogin");
-
-        // 세션에서 꺼낸 후 제거 (한 번만 사용)
-        request.getSession().removeAttribute("accessToken");
-        request.getSession().removeAttribute("firstLogin");
-
-        if (accessToken == null || firstLogin == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "인증 정보가 없습니다."));
-        }
+        boolean isFirstLogin = !userRepository.existsByEmail(email);
 
         return ResponseEntity.ok(Map.of(
-                "accessToken", accessToken,
-                "firstLogin", firstLogin
+                "accessToken", newAccessToken,
+                "firstLogin", isFirstLogin
         ));
     }
+
 
 
 //    @GetMapping("/callback")

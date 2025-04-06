@@ -45,56 +45,40 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuthProvider provider = extractProvider(customUser);
         String oauthId = customUser.getOauthId(provider);
 
-        boolean isFirstLogin = false;
-        User user = userRepository.findByEmail(email).orElse(null);
-
-        if (user == null) {
-            user = userRepository.save(User.builder()
+        // 유저가 없으면 생성 = 첫 로그인
+        if (!userRepository.existsByEmail(email)) {
+            User newUser = userRepository.save(User.builder()
                     .email(email)
                     .name(name)
                     .role(UserRole.USER)
                     .build());
 
             userOAuthRepository.save(UserOAuth.builder()
-                    .user(user)
+                    .user(newUser)
                     .provider(provider)
                     .oauthId(oauthId)
                     .build());
-
-            isFirstLogin = true;
         }
 
         // JWT 발급
-        String accessToken = jwtTokenProvider.generateAccessToken(email);
         String refreshToken = jwtTokenProvider.generateRefreshToken(email);
-
-        // RefreshToken은 HttpOnly 쿠키로 저장
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
-                .secure(true) // HTTPS니까 true로
+                .secure(true)
                 .path("/")
                 .maxAge(Duration.ofDays(14))
-                .sameSite("None") // 크로스 도메인 + 쿠키 전달 허용
+                .sameSite("None")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-        request.getSession().setAttribute("accessToken", accessToken);
-        request.getSession().setAttribute("firstLogin", isFirstLogin);
-
-        // 프론트 전용 redirect
+        // 이제 accessToken과 firstLogin은 session에 저장하지 않고, callback-endpoint에서 처리
         response.sendRedirect("https://localhost:5173/auth/callback");
-
-        // 백에서 test
-        // response.sendRedirect("http://localhost:8080/auth/callback");
-
     }
 
     private OAuthProvider extractProvider(CustomOAuth2User user) {
-        // provider 정보는 attributes에서 직접 추출
         if (user.getAttributes().containsKey("provider")) {
             return OAuthProvider.valueOf(user.getAttributes().get("provider").toString().toUpperCase());
         }
         throw new IllegalStateException("OAuth provider not found in user attributes");
     }
 }
-
