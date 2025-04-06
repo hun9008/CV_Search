@@ -37,7 +37,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
         http
-                .cors(withDefaults()) // CORS 설정 추가
+                .cors(withDefaults())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -53,7 +53,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtTokenProvider.jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/auth/login")
                         .successHandler(oAuth2SuccessHandler)
@@ -67,21 +67,15 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 새로운 방식의 전역 CORS 설정: CorsConfigurationSource 빈 등록
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // 모든 도메인 허용
         configuration.setAllowedOrigins(List.of("https://localhost:5173"));
-        // 허용할 HTTP 메서드 설정
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // 허용할 HTTP 헤더 설정
         configuration.setAllowedHeaders(List.of("*"));
-        // 필요한 경우, 자격 증명 허용 여부 설정 (보통 JWT 기반 stateless API에서는 false)
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // 모든 엔드포인트에 대해 위 CORS 설정을 적용
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
