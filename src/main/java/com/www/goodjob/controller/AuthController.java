@@ -12,6 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -19,6 +22,8 @@ public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     // 커스텀 로그인 페이지 (provider 파라미터 옵션 처리)
     @GetMapping("/login")
