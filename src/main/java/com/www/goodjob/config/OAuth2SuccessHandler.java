@@ -82,7 +82,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         request.getSession().setAttribute("firstLogin", isFirstLogin);
 
         // 프론트 전용 redirect
-        response.sendRedirect("http://localhost:5173/auth/callback");
+        response.sendRedirect("https://localhost:5173/auth/callback");
 
         // 백에서 test
         // response.sendRedirect("http://localhost:8080/auth/callback");
