@@ -71,10 +71,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // RefreshToken은 HttpOnly 쿠키로 저장
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
-                .secure(true)
+                .secure(true) // HTTPS니까 true로
                 .path("/")
                 .maxAge(Duration.ofDays(14))
-                .sameSite("Strict")
+                .sameSite("None") // 크로스 도메인 + 쿠키 전달 허용
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
