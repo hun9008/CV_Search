@@ -7,6 +7,8 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+from src.fetch_RDB_query import fetch_job_data
+
 from collections import defaultdict
 
 import os
@@ -21,8 +23,10 @@ import numpy as np
 from dotenv import load_dotenv
 
 import mysql.connector
+from datetime import datetime
+from urllib.parse import urlparse
 
-load_dotenv(dotenv_path="./.env.lambda")
+load_dotenv(dotenv_path="./.env")
 # load_dotenv(dotenv_path="../../.env")
 es_host_ip = os.getenv("ELASTIC_HOST")
 RDB_host_ip = os.getenv("DB_HOST_IP")
@@ -225,6 +229,7 @@ def download_pdf_from_s3(s3_url, local_path):
     else:
         raise ValueError("지원되지 않는 S3 URL 형식입니다.")
 
+    print(f"Bucket : {bucket}", f"Key : {key}")
     s3.download_file(bucket, key, local_path)
     print(f"Downloaded {s3_url} to {local_path}")
 
@@ -269,6 +274,45 @@ def encode_long_text(text):
     avg_vector = np.mean(sentence_vectors, axis=0)  
     return avg_vector.tolist()
 
+def rdb_save_cv(s3_url, user_id):
+    with open("/tmp/temp_cv.txt", "r", encoding="utf-8") as f:
+        raw_text = f.read()
+
+    path = urlparse(s3_url).path 
+    file_name = os.path.basename(path)  
+
+    db_config = {
+        "host": RDB_HOST,
+        "port": 3306,
+        "user": "user",
+        "password": "ajoucapstone",
+        "database": "goodjob"
+    }
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+
+        query = """
+        INSERT INTO cv (user_id, file_name, file_url, raw_text, uploaded_at, last_updated)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+
+        now = datetime.now()
+        values = (user_id, file_name, s3_url, raw_text, now, now)
+
+        cursor.execute(query, values)
+        conn.commit()
+        print(f"[✓] CV 저장 완료: user_id={user_id}, file_name={file_name}")
+
+    except mysql.connector.Error as err:
+        print(f"[X] MySQL 오류: {err}")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 def es_save_cv(s3_url, u_id):
 
     run_vila(s3_url)
@@ -285,73 +329,24 @@ def es_save_cv(s3_url, u_id):
     response = es.index(index=CV_INDEX_NAME, body=doc)
     print(f"{u_id} CV Saved. Document ID: {response['_id']}")
 
+    try:
+        rdb_save_cv(s3_url, u_id)
+    except mysql.connector.Error as err:
+        print(f"[X] MySQL 오류: {err}")
+    except Exception as e:
+        print(f"[X] 오류 발생: {e}")
+    print(f"CV RDB 저장 완료: user_id={u_id}")
+
 ####################### ^ save cv function #######################
 
-def fetch_job_data():
-    db_config = {
-        "host": RDB_HOST,  
-        "port": 3306,            
-        "user": "user",           
-        "password": "ajoucapstone",  
-        "database": "goodjob"     
-    }
-
-    query = """
-    SELECT 
-        id, 
-        company_name, 
-        job_title,
-        department, 
-        experience, 
-        job_type, 
-        requirements, 
-        preferred_qualifications,
-        ideal_candidate,
-        description,
-        raw_jobs_text,
-        jobs_url
-    FROM jobs;
-    """
-
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute(query)
-        results = cursor.fetchall()
-
-        formatted_texts = []
-
-        for row in results:
-            formatted_text = f'''
-"company_name": "{row['company_name']}"
-"job_title": "{row['job_title']}"
-"department": "{row['department'] or ''}"
-"experience": "{row['experience'] or ''}"
-"job_type": "{row['job_type'] or ''}"
-"description": "{row['description'] or ''}"
-"requirements": "{row['requirements'] or ''}"
-"preferred_qualifications": "{row['preferred_qualifications'] or ''}"
-"ideal_candidate": "{row['ideal_candidate'] or ''}"
-"jobs_url": "{row['jobs_url']}"
-"raw_jobs_text": "{row['raw_jobs_text']}"
-            '''.strip()
-            formatted_texts.append(formatted_text)
-
-        return formatted_texts
-
-    except mysql.connector.Error as err:
-        print(f"MySQL 오류 발생: {err}")
-        return []
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
-def es_save_jobs(u_id):
+def es_save_jobs():
     
     jobs = fetch_job_data()
+
+    # jobs가 비어있을 경우 예외처리
+    if not jobs:
+        print("No jobs found.")
+        return
 
     texts = []
     vectors = []
@@ -363,18 +358,18 @@ def es_save_jobs(u_id):
         vector = encode_long_text(job)
         vectors.append(vector)
 
-    all_equal = all(v == vectors[0] for v in vectors)
-    print("All vectors are the same:", all_equal)
+    # all_equal = all(v == vectors[0] for v in vectors)
+    # print("All vectors are the same:", all_equal)
 
-    if all_equal:
-        for i, vector in enumerate(vectors):
-            print(f"Vector {i} first 3 values: {vector[:3]}")
+    # if all_equal:
+    #     for i, vector in enumerate(vectors):
+    #         print(f"Vector {i} first 3 values: {vector[:3]}")
 
     for text, vector in zip(texts, vectors):
         doc = {
             "text": text,
             "vector": vector,
-            "u_id": u_id,
+            # "u_id": u_id,
         }
 
         response = es.index(index=JOBS_INDEX_NAME, body=doc)

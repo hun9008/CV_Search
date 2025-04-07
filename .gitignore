@@ -5,5 +5,5 @@ cv_env
 /src/CV2DB/vila
 __pycache__
 .pytest_cache
-.env.lambda
+.env.es
 
