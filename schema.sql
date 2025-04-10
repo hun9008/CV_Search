@@ -9,7 +9,7 @@ CREATE TABLE users (
                        id BIGINT PRIMARY KEY AUTO_INCREMENT,              -- 사용자 고유 ID
                        email VARCHAR(255) UNIQUE NOT NULL,                -- 사용자 이메일 (고유값)
                        name VARCHAR(100) NOT NULL,                        -- 사용자 이름
-                       region VARCHAR(100),                               -- 사용자의 지역 정보 (예: 경기 수원)
+                       region VARCHAR(100),                               -- delete사용자의 지역 정보 (예: 경기 수원)
                        role ENUM('USER', 'ADMIN') DEFAULT 'USER',         -- 사용자 권한: 일반 사용자 또는 관리자
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    -- 계정 생성 시간
                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 시간
@@ -51,16 +51,17 @@ CREATE TABLE jobs (
                       description TEXT,                                  -- 상세 업무 내용
                       job_type   TEXT        -- 근무 유형
                       start_date DATE,                                   -- 공고 시작일
+                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- 공고 등록일
                       end_date DATE,                                     -- 공고 마감일
                       requirements TEXT,                                 -- 필수 요구 조건
                       preferred_qualifications TEXT,                     -- 우대 조건
                       ideal_candidate TEXT,                              -- 인재상
-                      is_public BOOLEAN DEFAULT TRUE,                    -- 사용자에게 노출 여부 (FALSE 시 숨김)
-                      archived_at TIMESTAMP DEFAULT NULL,                -- 관리자 또는 배치에 의해 숨겨진 날짜
+                      is_public BOOLEAN DEFAULT TRUE,                    -- ##사용자에게 노출 여부 (FALSE 시 숨김)
+                      archived_at TIMESTAMP DEFAULT NULL,                -- ##관리자 또는 배치에 의해 숨겨진 날짜
                       posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- 공고 등록일
-                      expires_at DATE,                                   -- 공고 만료일
+                      expires_at DATE,                                   -- ##공고 만료일
                       raw_jobs_text TEXT NOT NULL,                       -- 전체 원문 텍스트 (크롤링 원본)
-                      jobs_url TEXT                    -- 공고 상세보기 링크 (공식 페이지)
+                      url TEXT                    -- 공고 상세보기 링크 (공식 페이지)
 );
 
 -- 피드백 테이블 (CV와 채용공고의 1:1 매칭 피드백)
@@ -108,11 +109,11 @@ CREATE TABLE admin_logs (
                             FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 사용자 검색 히스토리 테이블
-CREATE TABLE search_history (
-                                id BIGINT PRIMARY KEY AUTO_INCREMENT,              -- 검색 기록 ID
-                                user_id BIGINT NOT NULL,                           -- 검색한 사용자
-                                keyword VARCHAR(255) NOT NULL,                     -- 검색어
-                                searched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 검색 시점
-                                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+-- -- 사용자 검색 히스토리 테이블
+-- CREATE TABLE search_history (
+--                                 id BIGINT PRIMARY KEY AUTO_INCREMENT,              -- 검색 기록 ID
+--                                 user_id BIGINT NOT NULL,                           -- 검색한 사용자
+--                                 keyword VARCHAR(255) NOT NULL,                     -- 검색어
+--                                 searched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 검색 시점
+--                                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+-- );
