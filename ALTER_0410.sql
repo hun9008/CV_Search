@@ -1,14 +1,3 @@
-ALTER TABLE jobs MODIFY COLUMN id BIGINT AUTO_INCREMENT;
-
-ALTER TABLE jobs
-ADD COLUMN is_public BOOLEAN DEFAULT TRUE AFTER ideal_candidate;
-
-ALTER TABLE jobs
-ADD COLUMN archived_at TIMESTAMP DEFAULT NULL AFTER is_public;
-
-ALTER TABLE jobs
-ADD COLUMN expires_at DATE AFTER posted_at;
-
 -- 피드백 테이블
 CREATE TABLE IF NOT EXISTS cv_feedback (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,               
