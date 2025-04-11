@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+JWT_SECRET_KEY: this_is_a_very_long_and_secure_key_1234567890
+AWS_ACCESS_KEY_ID: test-key
+AWS_SECRET_ACCESS_KEY: test-secret
+AWS_S3_BUCKET: test-bucket
+AWS_REGION: ap-northeast-2

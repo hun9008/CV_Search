@@ -7,6 +7,7 @@ import com.www.goodjob.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -15,6 +16,8 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.net.URL;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -24,9 +27,13 @@ public class S3Service {
     private final S3Client s3Client;
     private final UserRepository userRepository;
     private final CvRepository cvRepository;
+    private final RestTemplate restTemplate;
 
     @Value("${AWS_S3_BUCKET}")
     private String bucketName;
+
+    @Value("${FASTAPI_HOST}")
+    private String fastapiHost;
 
     public String generatePresignedUrl(String fileName) {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
@@ -80,6 +87,19 @@ public class S3Service {
                 .build();
 
         cvRepository.save(cv);
+
+        try {
+            String url = fastapiHost + "/save-es-cv";
+            Map<String, Object> request = new HashMap<>();
+            request.put("s3_url", fileUrl.toString());
+            request.put("u_id", userId);
+
+            restTemplate.postForEntity(url, request, String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("[FastAPI 호출 실패] " + e.getMessage());
+        }
+
         return true;
     }
 
