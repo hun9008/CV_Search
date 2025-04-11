@@ -35,6 +35,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          FASTAPI_HOST: ${{ secrets.FASTAPI_HOST }}
 
         run: |
           sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
@@ -59,6 +60,7 @@ jobs:
             echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
             echo "AWS_REGION=$AWS_REGION" >> .env
             echo "AWS_S3_BUCKET=$AWS_S3_BUCKET" >> .env
+            echo "FASTAPI_HOST=$FASTAPI_HOST" >> .env
           
             docker-compose down || true
             docker-compose up -d --build
