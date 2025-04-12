@@ -78,3 +78,11 @@ server:
 
 fastapi:
   host: http://43.201.113.240:8000
+
+#sgis:
+#  consumer-key: ${SGIS_CONSUMER_KEY}
+#  consumer-secret: ${SGIS_CONSUMER_SECRET}
+
+sgis:
+  consumer-key: f8f2cbf402244c83bdf9
+  consumer-secret: 9575e18080944e108eaf
