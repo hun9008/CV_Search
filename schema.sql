@@ -66,15 +66,19 @@ CREATE TABLE jobs (
 
 -- 피드백 테이블 (CV와 채용공고의 1:1 매칭 피드백)
 CREATE TABLE cv_feedback (
-                             id BIGINT PRIMARY KEY AUTO_INCREMENT,               -- 피드백 고유 ID
-                             cv_id BIGINT NOT NULL,                              -- 어떤 이력서에 대한 피드백인지
-                             job_id BIGINT NOT NULL,                             -- 어떤 공고와 비교한 피드백인지
-                             feedback TEXT NOT NULL,                             -- 부족한 점 등 피드백 내용
-                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- 피드백 생성 시간
-                             FOREIGN KEY (cv_id) REFERENCES cv(id) ON DELETE CASCADE,
-                             FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
-                             UNIQUE(cv_id, job_id)                               -- 한 CV와 한 공고의 피드백은 1개만
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,               -- 피드백 고유 ID
+    cv_id BIGINT NOT NULL,                              -- 어떤 이력서에 대한 피드백인지
+    job_id BIGINT NOT NULL,                             -- 어떤 공고와 비교한 피드백인지
+    feedback TEXT NOT NULL,                             -- 부족한 점 등 피드백 내용
+    score INT DEFAULT 0,                                -- 해당 CV와 공고 간 유사도 또는 매칭 점수
+    confirmed BOOLEAN DEFAULT FALSE,                    -- 사용자가 해당 피드백을 확인했는지 여부
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- 피드백 생성 시간
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 피드백 갱신 시간
+    FOREIGN KEY (cv_id) REFERENCES cv(id) ON DELETE CASCADE,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
+    UNIQUE(cv_id, job_id)                               -- 한 CV와 한 공고의 피드백은 1개만
 );
+
 
 -- 북마크 테이블
 CREATE TABLE bookmarks (
