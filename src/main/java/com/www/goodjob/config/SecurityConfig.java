@@ -51,8 +51,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/s3/**",
                                 "/job-update/**",
-                                "/recommend/**",
-                                "/error"
+                                "/recommend/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
