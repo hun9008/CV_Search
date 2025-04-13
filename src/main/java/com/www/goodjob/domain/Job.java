@@ -22,12 +22,12 @@ public class Job {
 
     private String department; // 부서명
 
-    private String experience; // 요구 경력
+    private String experience; // 요구 경력 (신입, 경력)
 
     @Column(columnDefinition = "TEXT")
     private String description; // 상세 업무
 
-    private String jobType; // 근무 유형
+    private String jobType; // 근무 유형 (정규직, 계약직)
 
     @Column(columnDefinition = "TEXT")
     private String preferredQualifications; // 우대 조건

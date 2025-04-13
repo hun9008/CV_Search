@@ -15,7 +15,7 @@ public class JobSearchResponse {
     private String title;
     private String description;
     private String jobType;
-    private String department;
+    private String experience;
     private String url;
     private LocalDateTime createdAt;
 }
