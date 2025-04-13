@@ -39,7 +39,6 @@ public class UserController {
                     .body(Map.of("message", "User not found"));
         }
 
-        user.setRegion(body.get("region"));
         userRepository.save(user);
 
         return ResponseEntity.ok(UserDto.from(user));
