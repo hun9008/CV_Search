@@ -3,12 +3,11 @@ set -e
 
 echo "Waiting for MySQL to be ready..."
 
-until mysqladmin ping -u root -p"$MYSQL_ROOT_PASSWORD" --silent; do
-    sleep 1
+until docker exec mysql-goodjob mysqladmin ping -uroot -p"$MYSQL_ROOT_PASSWORD" --silent; do
+  echo "Waiting for MySQL..."
+  sleep 2
 done
 
-echo "Running schema.sql..."
-mysql -u root -p"$MYSQL_ROOT_PASSWORD" < /schema.sql
-echo "schema.sql applied."
-
-exec docker-entrypoint.sh "$@"
+echo "Applying schema.sql..."
+docker exec -i mysql-goodjob mysql -uroot -p"$MYSQL_ROOT_PASSWORD" < schema.sql
+echo "Schema applied."
