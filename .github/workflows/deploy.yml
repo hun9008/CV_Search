@@ -40,7 +40,7 @@ jobs:
             docker-compose up -d --build
 
             chmod +x init.sh
-            ./init.sh
+            ./init.sh "$MYSQL_ROOT_PASSWORD"
 
             docker image prune -f
           EOF

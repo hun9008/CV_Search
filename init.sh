@@ -1,8 +1,11 @@
 #!/bin/bash
 set -e
 
-if [ -f .env ]; then
-  export $(grep -v '^#' .env | xargs)
+MYSQL_ROOT_PASSWORD="$1"
+
+if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
+  echo "MYSQL_ROOT_PASSWORD가 전달되지 않았습니다."
+  exit 1
 fi
 
 echo "Waiting for MySQL to be ready..."
@@ -14,4 +17,4 @@ done
 
 echo "Applying schema.sql..."
 docker exec -i mysql-goodjob mysql -uroot -p"$MYSQL_ROOT_PASSWORD" < schema.sql
-echo "Schema applied."
+echo "[Success] schema.sql applied."
