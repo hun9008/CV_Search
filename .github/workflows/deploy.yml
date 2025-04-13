@@ -21,18 +21,26 @@ jobs:
           EC2_USER: ${{ secrets.EC2_USER }}
           EC2_HOST: ${{ secrets.EC2_RDB_HOST }}
           EC2_PASSWORD: ${{ secrets.EC2_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         run: |
           sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
             cd CV_Search
           
             git pull origin dev_RDB
+
+            echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" > .env
+            echo "MYSQL_DATABASE=$MYSQL_DATABASE" >> .env
+            echo "MYSQL_USER=$MYSQL_USER" >> .env
+            echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> .env
           
-            docker rm -f mysql-goodjob || true
             docker-compose down || true
             docker-compose up -d --build
 
-            chmod +x db-migrate.sh
-            ./db-migrate.sh
+            chmod +x init.sh
+            ./init.sh
 
             docker image prune -f
           EOF
