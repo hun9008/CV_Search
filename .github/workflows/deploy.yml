@@ -33,6 +33,6 @@ jobs:
 
             chmod +x db-migrate.sh
             ./db-migrate.sh
-            
+
             docker image prune -f
           EOF

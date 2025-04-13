@@ -49,7 +49,7 @@ CREATE TABLE jobs (
                       department TEXT,                           -- 부서명
                       experience TEXT, -- 요구 경력
                       description TEXT,                                  -- 상세 업무 내용
-                      job_type   TEXT        -- 근무 유형
+                      job_type   TEXT,        -- 근무 유형
                       start_date DATE,                                   -- 공고 시작일
                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- 공고 등록일
                       end_date DATE,                                     -- 공고 마감일
