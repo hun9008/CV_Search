@@ -2,20 +2,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between; // 변경: 헤더와 컨텐츠 사이 공간 분배
-    width: 100%;
-    height: 100vh;
+    justify-content: center;
+    min-height: 100vh;
     background: linear-gradient(135deg, #e6f0ff 0%, #f5f9fd 100%);
+    padding: 2rem 1rem;
     position: relative;
-    overflow: hidden; // Added to contain the blur effect
 
-    // Blurred background circle
+    // 블러 배경 원
     &::before {
         content: '';
         position: absolute;
         width: 600px;
         height: 600px;
-        flex-shrink: 0;
         border-radius: 600px;
         background: rgba(24, 119, 242, 0.2);
         filter: blur(100px);
@@ -23,89 +21,40 @@
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 0;
-        pointer-events: none; // Ensures it doesn't interfere with clicks
-
-        @media (max-width: 1200px) {
-            width: 500px;
-            height: 500px;
-            border-radius: 500px;
-        }
+        pointer-events: none;
 
         @media (max-width: 992px) {
             width: 400px;
             height: 400px;
-            border-radius: 400px;
             filter: blur(80px);
-        }
-
-        @media (max-width: 768px) {
-            width: 300px;
-            height: 300px;
-            border-radius: 300px;
-            filter: blur(60px);
         }
 
         @media (max-width: 480px) {
             width: 250px;
             height: 250px;
-            border-radius: 250px;
             filter: blur(50px);
         }
     }
+}
 
-    &__main {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center; // 변경: 수직 중앙 정렬
-        flex: 1; // 추가: 남은 공간 모두 차지
-        width: 100%;
-        padding: 2rem 0; // 상하 패딩 추가
-        position: relative; // Added to ensure content stays above the blur
-        z-index: 1; // Added to ensure content stays above the blur
+.container {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    position: relative;
+}
 
-        @media (max-width: 768px) {
-            padding: 1.5rem;
-        }
-    }
-
-    &__content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 4rem;
-        width: 100%;
-        max-width: 1280px;
-        padding: 0 2rem; // 추가: 좌우 패딩
-        position: relative;
-        z-index: 1;
-
-        @media (max-width: 992px) {
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 0 1.5rem; // 모바일에서 패딩 조정
-        }
-
-        @media (max-width: 480px) {
-            padding: 0 1rem; // 작은 화면에서 패딩 더 줄임
-        }
-    }
+.title {
+    text-align: start;
+    margin-bottom: 1rem;
 
     &__text {
-        max-width: 500px;
-        position: relative; // Added to ensure content stays above the blur
-        z-index: 1; // Added to ensure content stays above the blur
-    }
-
-    &__title {
-        font-size: 2.5rem;
+        font-size: 1.5rem;
         font-weight: 700;
         color: #333;
-        margin-bottom: 1rem;
-
-        font-style: normal;
-
-        line-height: 160%;
+        margin-bottom: 0.5rem;
 
         @media (max-width: 768px) {
             font-size: 2rem;
@@ -116,68 +65,33 @@
         }
     }
 
-    &__subtitle {
-        font-size: 1.25rem;
+    &__subtext {
+        font-size: 1rem;
         color: #666;
-        margin-bottom: 2rem;
 
         @media (max-width: 768px) {
             font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-        }
-    }
-
-    &__landingButton {
-        background-color: #1877f2;
-        color: white;
-        border: none;
-        border-radius: 90px;
-        padding: 0.75rem 2rem;
-        font-size: 1.1rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background-color 0.2s;
-
-        &:hover {
-            background-color: #1464d8;
         }
 
         @media (max-width: 480px) {
-            padding: 0.6rem 1.5rem;
             font-size: 1rem;
         }
     }
 }
-.container {
-    width: 100%;
-    max-width: 700px; // 조정 필요
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: center;
-    z-index: 1;
-    position: relative;
-}
 
-.uploadPlaceholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
 .dragAndDropCard {
     width: 100%;
+    background-color: white;
+    border-radius: 24px;
+    border: 2px dashed #e0e0e0;
+    padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: white;
-
-    border-radius: 24px;
-    border: 2px dashed#e0e0e0;
-    padding: 3rem 2rem;
     margin-bottom: 2rem;
     transition: all 0.2s ease;
+
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 
     &.dragging {
@@ -189,6 +103,7 @@
         border-color: #e53935;
         background-color: rgba(229, 57, 53, 0.02);
     }
+
     &__text {
         font-size: 1.25rem;
         font-weight: 500;
@@ -243,13 +158,13 @@
         span {
             display: inline-block;
             padding: 0 10px;
-            // background-color: white;
             background-color: transparent;
             position: relative;
             color: #666;
             font-size: 0.9rem;
         }
     }
+
     &__button {
         background-color: #1877f2;
         color: white;
@@ -293,19 +208,16 @@
         padding: 1.5rem 1rem;
     }
 }
-.terms {
-    width: 100%;
+
+.hiddenInput {
+    display: none;
+}
+
+.uploadPlaceholder {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-content: center;
-    font-size: 12px;
-    text-align: center;
-
-    &__main {
-        font-weight: 600;
-        font-size: 16px;
-    }
+    align-items: center;
+    width: 100%;
 }
 
 .uploadIcon {
@@ -332,6 +244,7 @@
 .fileInfo {
     margin: 1rem 0;
 }
+
 .filePreview {
     width: 100%;
 
@@ -343,14 +256,17 @@
         padding: 1rem;
         margin-bottom: 1rem;
     }
+
     &__icon {
         color: #1877f2;
         margin-right: 1rem;
         flex-shrink: 0;
     }
+
     &__info {
         flex: 1;
     }
+
     &__name {
         font-weight: 500;
         color: #333;
@@ -374,6 +290,7 @@
         align-items: center;
         justify-content: center;
         transition: all 0.2s ease;
+
         &:hover {
             background-color: rgba(0, 0, 0, 0.05);
             color: #e53935;
@@ -385,8 +302,58 @@
         }
     }
 }
-.hiddenInput {
-    display: none;
+
+.uploadProgress {
+    margin: 1rem 0;
+
+    &__bar {
+        width: 100%;
+        height: 6px;
+        background-color: #f4f5f6;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    &__fill {
+        height: 100%;
+        background-color: #1877f2;
+        border-radius: 3px;
+        width: 0;
+        animation: progressAnimation 2s ease-in-out forwards;
+    }
+
+    &__text {
+        font-size: 0.9rem;
+        color: #666;
+        text-align: center;
+    }
+}
+
+.uploadSuccess {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #43a047;
+    margin: 1rem 0;
+    font-weight: 500;
+
+    svg {
+        margin-right: 0.5rem;
+    }
+}
+
+.errorMessage {
+    display: flex;
+    align-items: center;
+    color: #e53935;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+
+    svg {
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+    }
 }
 
 .continueButtons {
@@ -420,83 +387,6 @@
         }
     }
 }
-.uploadProgress {
-    margin: 1rem 0;
-
-    &__bar {
-        width: 100%;
-        height: 6px;
-        background-color: #f4f5f6;
-        border-radius: 3px;
-        overflow: hidden;
-        margin-bottom: 0.5rem;
-    }
-    &__fill {
-        height: 100%;
-        background-color: #1877f2;
-        border-radius: 3px;
-        width: 0;
-        animation: progressAnimation 2s ease-in-out forwards;
-    }
-    &__text {
-        font-size: 0.9rem;
-        color: #666;
-        text-align: center;
-    }
-}
-.uploadSuccess {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #43a047;
-    margin: 1rem 0;
-    font-weight: 500;
-
-    svg {
-        margin-right: 0.5rem;
-    }
-}
-.errorMessage {
-    display: flex;
-    align-items: center;
-    color: #e53935;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-
-    svg {
-        margin-right: 0.5rem;
-        flex-shrink: 0;
-    }
-}
-
-// Add specific styles for iOS devices to handle safe areas
-@supports (-webkit-touch-callout: none) {
-    .page {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-    }
-}
-
-// Add specific styles for landscape orientation on mobile
-@media (max-height: 480px) and (orientation: landscape) {
-    .page {
-        &__title {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        &__subtitle {
-            font-size: 0.85rem;
-            margin-bottom: 1.25rem;
-        }
-
-        &__uploadCard {
-            padding: 1.5rem 1rem;
-        }
-    }
-}
 
 @keyframes progressAnimation {
     0% {
@@ -506,6 +396,7 @@
         width: 100%;
     }
 }
+
 // iOS 안전 영역 처리
 @supports (-webkit-touch-callout: none) {
     .page {
