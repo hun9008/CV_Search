@@ -12,7 +12,6 @@ public class UserDto {
     private Long id;
     private String email;
     private String name;
-    private String region;
     private String role;
     private LocalDateTime createdAt;
 
@@ -21,7 +20,6 @@ public class UserDto {
                 .id(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
-                .region(user.getRegion())
                 .role(user.getRole() != null ? user.getRole().name() : "USER") // fallback
                 .createdAt(user.getCreatedAt())
                 .build();

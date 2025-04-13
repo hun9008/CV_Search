@@ -75,3 +75,10 @@ server:
       enabled: true
       force: true
   forward-headers-strategy: framework
+
+fastapi:
+  host: http://43.201.113.240:8000
+
+sgis:
+  consumer-key: ${SGIS_CONSUMER_KEY}
+  consumer-secret: ${SGIS_CONSUMER_SECRET}

@@ -52,7 +52,9 @@ public class SecurityConfig {
                                 "/s3/**",
                                 "/job-update/**",
                                 "/recommend/**",
-                                "/error"
+                                "/error",
+                                "/api/region/**",
+                                "/jobs/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
