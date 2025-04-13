@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
+
 echo "Waiting for MySQL to be ready..."
 
 until docker exec mysql-goodjob mysqladmin ping -uroot -p"$MYSQL_ROOT_PASSWORD" --silent; do
