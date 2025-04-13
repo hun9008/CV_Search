@@ -24,8 +24,6 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    private String region;
-
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
