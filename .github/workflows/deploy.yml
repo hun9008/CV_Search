@@ -29,7 +29,8 @@ jobs:
           sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
             cd CV_Search
           
-            git pull origin dev_RDB
+            git fetch origin dev_RDB
+            git reset --hard origin/dev_RDB
 
             echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" > .env
             echo "MYSQL_DATABASE=$MYSQL_DATABASE" >> .env
