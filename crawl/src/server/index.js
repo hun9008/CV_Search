@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(morgan('dev')); // Logging
 
 // Static files (for the frontend)
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../../public')));
 
 // API Routes
 app.use('/api', routes);

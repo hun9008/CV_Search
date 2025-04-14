@@ -9,7 +9,7 @@ import {
   // Potentially specific error types if the SDK exports them
 } from '@google/generative-ai';
 import { defaultLogger as logger } from '../utils/logger'; // Assuming logger is correctly
-import { IGeminiResponse ,IRecruitInfo} from 'src/models/recruitinfo-model';
+import { IGeminiResponse ,IRecruitInfo} from '../models/recruitinfo-model';
 
 
 

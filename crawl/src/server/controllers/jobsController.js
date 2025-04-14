@@ -10,10 +10,14 @@ const { mongoService } = require('@database/mongodb-service');
 exports.getJobs = async (req, res) => {
   try {
     await mongoService.connect();
+    // 더 명확한 로그 메시지 추가
+    console.log('getJobs 함수가 호출되었습니다');
+    console.log('Request Query:', req.query);  // 전체 req 객체가 아닌 query만 로깅
     const {
       keywords = '',
       limit = 50,
-      page = 1
+      page = 1,
+      complete=false
     } = req.query;
 
     // 유효한 숫자로 변환
@@ -22,7 +26,7 @@ exports.getJobs = async (req, res) => {
     const skip = (pageNum - 1) * limitNum;
 
     // 검색 쿼리 구성
-    const searchQuery = {};
+    const searchQuery = { }; // 성공한 채용공고만 표시
 
     // 키워드 검색 처리
     if (keywords) {
@@ -30,24 +34,31 @@ exports.getJobs = async (req, res) => {
 
       if (keywordArray.length > 0) {
         // 키워드 검색을 위한 $or 쿼리 구성
-        const keywordQueries = keywordArray.map(keyword => {
-          const regex = new RegExp(keyword, 'i');
-          return {
-            $or: [
-              { company_name: regex },
-              { department: regex },
-              { job_type: regex },
-              { experience: regex },
-              { description: regex },
-              { requirements: regex },
-              { preferred_qualifications: regex },
-              { ideal_candidate: regex }
-            ]
-          };
-        });
-
-        searchQuery.$and = keywordQueries;
+        searchQuery.$or = [
+          { title: { $regex: keywordArray.join('|'), $options: 'i' } },
+          { company_name: { $regex: keywordArray.join('|'), $options: 'i' } },
+          { department: { $regex: keywordArray.join('|'), $options: 'i' } },
+          { description: { $regex: keywordArray.join('|'), $options: 'i' } },
+          { requirements: { $regex: keywordArray.join('|'), $options: 'i' } },
+          { preferred_qualifications: { $regex: keywordArray.join('|'), $options: 'i' } },
+          { ideal_candidate: { $regex: keywordArray.join('|'), $options: 'i' } }
+        ];
       }
+    }
+
+    // 완전한 데이터만 필터링 (completeOnly 파라미터가 'true'인 경우)
+    if (complete === 'true') {
+      console.log('complete true query');
+      // 중요 필드들이 null이나 비어있지 않은 문서만 필터링
+      searchQuery.company_name = { $ne: null, $ne: "" };
+      searchQuery.department = { $ne: null, $ne: "" };
+      // searchQuery.location = { $ne: null, $ne: "" };
+      searchQuery.experience = { $ne: null, $ne: "" };
+      searchQuery.job_type = { $ne: null, $ne: "" };
+      searchQuery.description = { $ne: null, $ne: "" };
+      searchQuery.preferred_qualifications = { $ne: null, $ne: "" };
+      searchQuery.ideal_candidate = { $ne: null, $ne: "" };
+      searchQuery.requirements = { $ne: null, $ne: "" };
     }
 
     // 총 결과 수 카운트 쿼리 실행
@@ -110,3 +121,5 @@ exports.getJobById = async (req, res) => {
     });
   }
 };
+
+
