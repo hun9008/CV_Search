@@ -42,7 +42,17 @@ merge_service() {
     rm -rf "$TARGET_DIR"
   fi
 
+  echo "Merging $DEV_BRANCH into $TARGET_DIR..."
+
+  # 기존 디렉토리 제거
+  if [ -d "$TARGET_DIR" ]; then
+    echo "Cleaning up $TARGET_DIR before merging..."
+    git rm -r --cached "$TARGET_DIR" || true
+    rm -rf "$TARGET_DIR"
+  fi
+
   git read-tree --prefix="$TARGET_DIR" -u "$DEV_BRANCH"
+  git add "$TARGET_DIR"  # ✅ 이거 추가!
   git commit -m "merge ${DEV_BRANCH} into ${TARGET_DIR}" || echo "Nothing to commit for $1"
 }
 
