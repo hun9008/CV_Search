@@ -119,8 +119,6 @@ CREATE TABLE regions (
     cd VARCHAR(10) NOT NULL UNIQUE,           -- 행정구역 코드
     sido VARCHAR(50) NOT NULL,                -- 시/도 (예: 서울특별시)
     sigungu VARCHAR(100) NOT NULL,            -- 시/군/구 (예: 강남구)
-    x_coor VARCHAR(30),                       -- X 좌표 (UTM-K 기준)
-    y_coor VARCHAR(30)                        -- Y 좌표 (UTM-K 기준)
 );
 
 -- -- 사용자 검색 히스토리 테이블
