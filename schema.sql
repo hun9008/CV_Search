@@ -1,4 +1,3 @@
--- 데이터베이스 생성
 CREATE DATABASE IF NOT EXISTS goodjob DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- 데이터베이스 선택
@@ -9,7 +8,6 @@ CREATE TABLE users (
                        id BIGINT PRIMARY KEY AUTO_INCREMENT,              -- 사용자 고유 ID
                        email VARCHAR(255) UNIQUE NOT NULL,                -- 사용자 이메일 (고유값)
                        name VARCHAR(100) NOT NULL,                        -- 사용자 이름
-                       region VARCHAR(100),                               -- delete사용자의 지역 정보 (예: 경기 수원)
                        role ENUM('USER', 'ADMIN') DEFAULT 'USER',         -- 사용자 권한: 일반 사용자 또는 관리자
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    -- 계정 생성 시간
                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 시간
@@ -43,23 +41,23 @@ CREATE TABLE cv (
 
 -- 채용 공고 테이블
 CREATE TABLE jobs (
-                      id BIGINT PRIMARY KEY AUTO_INCREMENT,              -- 공고 고유 ID
-                      company_name TEXT,                -- 회사명
-                      title TEXT,                   -- 직무 제목
-                      department TEXT,                           -- 부서명
-                      experience TEXT, -- 요구 경력
-                      description TEXT,                                  -- 상세 업무 내용
-                      job_type   TEXT,        -- 근무 유형
-                      start_date DATE,                                   -- 공고 시작일
-                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- 공고 등록일
-                      end_date DATE,                                     -- 공고 마감일
-                      requirements TEXT,                                 -- 필수 요구 조건
-                      preferred_qualifications TEXT,                     -- 우대 조건
+                      id BIGINT PRIMARY KEY AUTO_INCREMENT,  -- 공고 고유 ID
+                      company_name TEXT,               -- 회사 이름
+                      title TEXT,                      -- 채용 공고 제목
+                      region_id, BIGINT,               -- 지역 아이디    
+                      department TEXT,                 -- 부서명
+                      require_experience TEXT,         -- ["경력무관", "신입", "경력"]
+                      job_description TEXT,            -- 직무 기술서. (이 직무는 뭐하는 )        
+                      job_type TEXT,                    -- 근무 유형 (정규직/계약직/...) ["정규직", "계약직", "인턴","아르바이트","프리랜서","파견직"]                       
+                      requirements TEXT,                                 -- 필수 요구 조건 -> filter skill
+                      preferred_qualifications TEXT,                     -- 우대 조건 -> filter skill
                       ideal_candidate TEXT,                              -- 인재상
+                      apply_start_date DATE,                             -- 채용 시작일
+                      apply_end_date DATE,                               -- 채용 마감일
                       is_public BOOLEAN DEFAULT TRUE,                    -- ##사용자에게 노출 여부 (FALSE 시 숨김)
+                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    -- 공고 등록된 날짜
+                      expired_at TIMESTAMP DEFAULT NULL,                 -- 공고 내려간 날짜 
                       archived_at TIMESTAMP DEFAULT NULL,                -- ##관리자 또는 배치에 의해 숨겨진 날짜
-                      posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     -- 공고 등록일
-                      expires_at DATE,                                   -- ##공고 만료일
                       raw_jobs_text TEXT NOT NULL,                       -- 전체 원문 텍스트 (크롤링 원본)
                       url TEXT                    -- 공고 상세보기 링크 (공식 페이지)
 );
@@ -119,15 +117,4 @@ CREATE TABLE regions (
     cd VARCHAR(10) NOT NULL UNIQUE,           -- 행정구역 코드
     sido VARCHAR(50) NOT NULL,                -- 시/도 (예: 서울특별시)
     sigungu VARCHAR(100) NOT NULL,            -- 시/군/구 (예: 강남구)
-    x_coor VARCHAR(30),                       -- X 좌표 (UTM-K 기준)
-    y_coor VARCHAR(30)                        -- Y 좌표 (UTM-K 기준)
 );
-
--- -- 사용자 검색 히스토리 테이블
--- CREATE TABLE search_history (
---                                 id BIGINT PRIMARY KEY AUTO_INCREMENT,              -- 검색 기록 ID
---                                 user_id BIGINT NOT NULL,                           -- 검색한 사용자
---                                 keyword VARCHAR(255) NOT NULL,                     -- 검색어
---                                 searched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 검색 시점
---                                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
--- );
