@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# ========================================
+# Merge dev_<service> into main/<service>/
+# 덮어쓰기 방식: 기존 디렉토리 삭제 → 브랜치 내용 복사
+# ========================================
+
 SERVICES=("spring" "crawl" "front" "RDB" "ES")
 
 print_usage() {
@@ -30,30 +35,28 @@ if [ "$CURRENT_BRANCH" != "main" ]; then
 fi
 
 merge_service() {
-  DEV_BRANCH="dev_$1"
-  TARGET_DIR="$1/"
+  SERVICE=$1
+  DEV_BRANCH="dev_${SERVICE}"
+  TARGET_DIR="${SERVICE}"
 
-  echo "Merging $DEV_BRANCH into $TARGET_DIR..."
+  echo ""
+  echo "=== Merging $DEV_BRANCH → $TARGET_DIR ==="
 
-  # 기존 파일 제거
-  if [ -d "$TARGET_DIR" ]; then
-    echo "Cleaning up $TARGET_DIR before merging..."
-    git rm -r --cached "$TARGET_DIR" || true
-    rm -rf "$TARGET_DIR"
-  fi
+  echo "Deleting old $TARGET_DIR..."
+  git rm -r --cached "$TARGET_DIR" 2>/dev/null || true
+  rm -rf "$TARGET_DIR"
 
-  echo "Merging $DEV_BRANCH into $TARGET_DIR..."
+  TMP_DIR="tmp_merge_${SERVICE}"
+  git worktree add "$TMP_DIR" "$DEV_BRANCH"
 
-  # 기존 디렉토리 제거
-  if [ -d "$TARGET_DIR" ]; then
-    echo "Cleaning up $TARGET_DIR before merging..."
-    git rm -r --cached "$TARGET_DIR" || true
-    rm -rf "$TARGET_DIR"
-  fi
+  echo "Copying files from $DEV_BRANCH to $TARGET_DIR..."
+  mkdir -p "$TARGET_DIR"
+  cp -r "$TMP_DIR"/* "$TARGET_DIR"/
 
-  git read-tree --prefix="$TARGET_DIR" -u "$DEV_BRANCH"
-  git add "$TARGET_DIR"  # ✅ 이거 추가!
-  git commit -m "merge ${DEV_BRANCH} into ${TARGET_DIR}" || echo "Nothing to commit for $1"
+  git worktree remove "$TMP_DIR" --force
+
+  git add "$TARGET_DIR"
+  git commit -m "Reset $TARGET_DIR with $DEV_BRANCH" || echo "Nothing to commit for $SERVICE"
 }
 
 if [ "$INPUT" == "all" ]; then
@@ -69,6 +72,7 @@ else
   merge_service "$INPUT"
 fi
 
-echo "Pushing to main..."
+echo ""
+echo "Pushing to main branch..."
 git push origin main
 echo "Done."
