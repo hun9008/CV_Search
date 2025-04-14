@@ -1,10 +1,14 @@
 #!/bin/bash
 set -e
 
-MYSQL_ROOT_PASSWORD="$1"
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
+
+MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-}"
 
 if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
-  echo "MYSQL_ROOT_PASSWORD가 전달되지 않았습니다."
+  echo "MYSQL_ROOT_PASSWORD가 설정되지 않았습니다 (.env 또는 인자)."
   exit 1
 fi
 
