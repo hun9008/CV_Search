@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# ========================================
-# Merge dev_<service> into main/<service>/
-# Usage:
-#   ./merge_dev_to_main.sh spring
-#   ./merge_dev_to_main.sh all
-# ========================================
-
 SERVICES=("spring" "crawl" "front" "RDB" "ES")
 
 print_usage() {
@@ -36,14 +29,26 @@ if [ "$CURRENT_BRANCH" != "main" ]; then
   exit 1
 fi
 
+merge_service() {
+  DEV_BRANCH="dev_$1"
+  TARGET_DIR="$1/"
+
+  echo "Merging $DEV_BRANCH into $TARGET_DIR..."
+
+  # 기존 파일 제거
+  if [ -d "$TARGET_DIR" ]; then
+    echo "Cleaning up $TARGET_DIR before merging..."
+    git rm -r --cached "$TARGET_DIR" || true
+    rm -rf "$TARGET_DIR"
+  fi
+
+  git read-tree --prefix="$TARGET_DIR" -u "$DEV_BRANCH"
+  git commit -m "merge ${DEV_BRANCH} into ${TARGET_DIR}" || echo "Nothing to commit for $1"
+}
+
 if [ "$INPUT" == "all" ]; then
   for service in "${SERVICES[@]}"; do
-    DEV_BRANCH="dev_${service}"
-    TARGET_DIR="${service}/"
-
-    echo "Merging $DEV_BRANCH into $TARGET_DIR..."
-    git read-tree --prefix="$TARGET_DIR" -u "$DEV_BRANCH"
-    git commit -m "merge ${DEV_BRANCH} into ${TARGET_DIR}"
+    merge_service "$service"
   done
 else
   if [[ ! " ${SERVICES[*]} " =~ " ${INPUT} " ]]; then
@@ -51,13 +56,7 @@ else
     print_usage
     exit 1
   fi
-
-  DEV_BRANCH="dev_${INPUT}"
-  TARGET_DIR="${INPUT}/"
-
-  echo "Merging $DEV_BRANCH into $TARGET_DIR..."
-  git read-tree --prefix="$TARGET_DIR" -u "$DEV_BRANCH"
-  git commit -m "merge ${DEV_BRANCH} into ${TARGET_DIR}"
+  merge_service "$INPUT"
 fi
 
 echo "Pushing to main..."
