@@ -44,7 +44,7 @@ CREATE TABLE jobs (
                       id BIGINT PRIMARY KEY AUTO_INCREMENT,  -- 공고 고유 ID
                       company_name TEXT,               -- 회사 이름
                       title TEXT,                      -- 채용 공고 제목
-                      region_id, BIGINT,               -- 지역 아이디    
+                      region_id BIGINT,               -- 지역 아이디    
                       department TEXT,                 -- 부서명
                       require_experience TEXT,         -- ["경력무관", "신입", "경력"]
                       job_description TEXT,            -- 직무 기술서. (이 직무는 뭐하는 )        
