@@ -107,12 +107,12 @@ CREATE TABLE applications (
 -- 관리자 로그 테이블
 CREATE TABLE admin_logs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,                 -- 로그 ID
-    admin_id BIGINT NOT NULL,                             -- 관리자 ID
+    user_id BIGINT NOT NULL,                              -- 사용자 ID (user's role is ADMIN)
     action_type ENUM('USER_DELETE', 'JOB_UPDATE', 'FEEDBACK_REVIEW', 'SYSTEM_LOG', 'JOB_REGISTER'), -- 작업 종류
     details TEXT,                                         -- 상세 설명
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,        -- 생성 일자 
     last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
-    FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Region 테이블
