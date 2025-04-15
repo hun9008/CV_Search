@@ -60,6 +60,7 @@ CREATE TABLE jobs (
     archived_at DATETIME DEFAULT NULL,                -- 공고 숨겨진 시간 (서버 입장)
     raw_jobs_text TEXT NOT NULL,                      -- 크롤링 원문
     url TEXT                                          -- 공고 상세보기 링크
+    FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE SET NULL -- 지역 외래 키
 );
 
 -- 피드백 테이블 (CV와 채용공고의 1:1 매칭 피드백)
