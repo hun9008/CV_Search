@@ -34,8 +34,8 @@ CREATE TABLE cv (
     education TEXT,                                    -- 학력 / 교육 이수 내역
     experience TEXT,                                   -- 프로젝트, 근무 경력 등
     awards TEXT,                                       -- 수상 내역
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- 생성 일자
-    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- 생성 일자
+    last_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -55,7 +55,8 @@ CREATE TABLE jobs (
     apply_start_date DATE,                 -- 채용 시작일 (회사 입장)
     apply_end_date DATE,                   -- 채용 마감일 (회사 입장)
     is_public BOOLEAN DEFAULT TRUE,        -- 사용자에게 노출 여부
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,    -- 공고 등록된 시간 (서버 입장)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,    -- 생성 일자 (서버 입장)
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자 (서버 입장)
     expired_at DATETIME DEFAULT NULL,                 -- 공고 내려간 시간 (서버 입장)
     archived_at DATETIME DEFAULT NULL,                -- 공고 숨겨진 시간 (서버 입장)
     raw_jobs_text TEXT NOT NULL,                      -- 크롤링 원문
@@ -71,8 +72,8 @@ CREATE TABLE cv_feedback (
     feedback TEXT NOT NULL,                             -- 피드백 내용
     score INT DEFAULT 0,                                -- 유사도 점수
     confirmed BOOLEAN DEFAULT FALSE,                    -- 피드백 확인 여부
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,      -- 피드백 생성 시간 
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 피드백 수정 시간 
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,      -- 생성 일자 
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
     FOREIGN KEY (cv_id) REFERENCES cv(id) ON DELETE CASCADE,
     FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
     UNIQUE(cv_id, job_id)                               -- 한 쌍당 하나의 피드백
@@ -83,7 +84,8 @@ CREATE TABLE bookmarks (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,              -- 북마크 ID
     user_id BIGINT NOT NULL,                           -- 사용자 ID
     job_id BIGINT NOT NULL,                            -- 공고 ID
-    saved_at DATETIME DEFAULT CURRENT_TIMESTAMP,       -- 저장 시점
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- 생성 일자 
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
     UNIQUE(user_id, job_id)                            -- 중복 방지
@@ -95,8 +97,9 @@ CREATE TABLE applications (
     user_id BIGINT NOT NULL,                              -- 사용자 ID
     job_id BIGINT NOT NULL,                               -- 공고 ID
     apply_status ENUM('지원', '서류전형', '코테', '면접', '최종합격', '불합격') DEFAULT '지원', -- 상태
-    applied_at DATETIME DEFAULT CURRENT_TIMESTAMP,        -- 지원일
     note TEXT,                                            -- 메모
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,        -- 생성 일자 
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
 );
@@ -106,8 +109,9 @@ CREATE TABLE admin_logs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,                 -- 로그 ID
     admin_id BIGINT NOT NULL,                             -- 관리자 ID
     action_type ENUM('USER_DELETE', 'JOB_UPDATE', 'FEEDBACK_REVIEW', 'SYSTEM_LOG', 'JOB_REGISTER'), -- 작업 종류
-    details TEXT,                                          -- 상세 설명
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,         -- 작업 시간 
+    details TEXT,                                         -- 상세 설명
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,        -- 생성 일자 
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
     FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
