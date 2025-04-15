@@ -42,16 +42,16 @@ CREATE TABLE cv (
 -- 채용 공고 테이블
 CREATE TABLE jobs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,  -- 공고 고유 ID
-    company_name TEXT,                     -- 회사 이름
-    title TEXT,                            -- 채용 공고 제목
     region_id BIGINT,                      -- 지역 아이디    
-    department TEXT,                       -- 부서명
-    require_experience TEXT,               -- 요구 경력 ["경력무관", "신입", "경력"]
-    job_description TEXT,                  -- 직무 기술서
-    job_type TEXT,                         -- 근무 유형 ["정규직", "계약직", "인턴","아르바이트","프리랜서","파견직"]                       
+    company_name VARCHAR(255),             -- 회사 이름
+    title VARCHAR(255),                    -- 채용 공고 제목
+    department VARCHAR(255),               -- 부서명
+    require_experience VARCHAR(255),       -- 요구 경력 ["경력무관", "신입", "경력"]
+    job_type VARCHAR(255),                  -- 근무 유형 ["정규직", "계약직", "인턴","아르바이트","프리랜서","파견직"]                       
     requirements TEXT,                     -- 필수 요구 조건
     preferred_qualifications TEXT,         -- 우대 조건
     ideal_candidate TEXT,                  -- 인재상
+    job_description TEXT,                  -- 직무 기술서
     apply_start_date DATE,                 -- 채용 시작일 (회사 입장)
     apply_end_date DATE,                   -- 채용 마감일 (회사 입장)
     is_public BOOLEAN DEFAULT TRUE,        -- 사용자에게 노출 여부
