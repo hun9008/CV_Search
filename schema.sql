@@ -9,8 +9,8 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,                -- 사용자 이메일 (고유값)
     name VARCHAR(100) NOT NULL,                        -- 사용자 이름
     role ENUM('USER', 'ADMIN') DEFAULT 'USER',         -- 사용자 권한: 일반 사용자 또는 관리자
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- 계정 생성 시간
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 시간
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- 생성 일자
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
 );
 
 -- OAuth 로그인 정보 테이블 (Google, Kakao 등)
@@ -34,8 +34,8 @@ CREATE TABLE cv (
     education TEXT,                                    -- 학력 / 교육 이수 내역
     experience TEXT,                                   -- 프로젝트, 근무 경력 등
     awards TEXT,                                       -- 수상 내역
-    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,    -- 업로드된 시간
-    last_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 마지막 업로드된 시간
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- 생성 일자
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
