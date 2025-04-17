@@ -24,5 +24,4 @@ public class UserDto {
                 .createdAt(user.getCreatedAt())
                 .build();
     }
-
 }
