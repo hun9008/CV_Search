@@ -18,4 +18,5 @@ public class JwtUtils {
         }
         return jwtTokenProvider.getEmail(authHeader.substring(7));
     }
+
 }

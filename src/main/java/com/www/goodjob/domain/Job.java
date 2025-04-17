@@ -47,10 +47,10 @@ public class Job {
     private String description; // 직무 기술서
 
     @Column(name = "apply_start_date")
-    private Date startDate; // 채용 시작일 (회사 입장)
+    private Date applyStartDate; // 채용 시작일 (회사 입장)
 
     @Column(name = "apply_end_date")
-    private Date endDate; // 채용 마감일 (회사 입장)
+    private Date applyEndDate; // 채용 마감일 (회사 입장)
 
     @Column(name = "is_public")
     private Boolean isPublic; // 사용자에게 노출 여부 (FALSE 시 숨김)

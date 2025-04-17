@@ -76,3 +76,6 @@ server:
       force: true
   forward-headers-strategy: framework
 
+anthropic:
+  api-key: ${ANTHROPIC_API_KEY}
+
