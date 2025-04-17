@@ -195,13 +195,13 @@ const VisitResultSchema = new Schema({
     default: Date.now
   },
   url: String
-  }, {
-    timestamps: {
-      createdAt: 'created_at',
-      updatedAt: 'updated_at'
-    },
-    collection: 'domains'
-  });
+}, {
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+  },
+  collection: 'domains'
+});
 
 // URL로 검색하는 static 메서드 추가
 VisitResultSchema.statics.findByUrl = async function(url) {

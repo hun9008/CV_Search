@@ -1,0 +1,35 @@
+{
+  "name": "crawl-ts",
+  "version": "1.0.0",
+  "description": "TypeScript implementation of web crawler",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "jest"
+  },
+  "keywords": [
+    "crawler",
+    "typescript",
+    "web",
+    "scraping"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dotenv": "^16.5.0",
+    "mongoose": "^8.0.0",
+    "puppeteer": "^21.11.0",
+    "robots-parser": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.7",
+    "@types/node": "^20.8.10",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}

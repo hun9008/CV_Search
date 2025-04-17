@@ -1,0 +1,81 @@
+/**
+ * 크롤러 애플리케이션 진입점
+ */
+import { ChromeBrowserManager } from './browser/ChromeBrowserManager';
+import { WebContentExtractor } from './content/WebContentExtractor';
+import { MongoDbUrlManager } from './url/MongoDbUrlManager';
+import { MongoDbConnector } from './database/MongoDbConnector';
+import { WebCrawler } from './crawler/WebCrawler';
+import CONFIG from './config/config';
+import { defaultLogger as logger } from './utils/logger';
+
+// 환경 변수에서 MongoDB URI 가져오기 (없으면 기본값 사용)
+const MONGODB_URI = process.env.MONGODB_ADMIN_URI || 'mongodb://localhost:27017/crawl_db';
+
+/**
+ * 크롤러 생성
+ * @param options 크롤러 옵션
+ * @returns 크롤러 인스턴스
+ */
+function createCrawler(options = {}) {
+  // 명령줄 인수에서 옵션 추출
+  const args = process.argv.slice(2);
+  const strategy = args[0] || CONFIG.CRAWLER.STRATEGY;
+  const specificDomain = args[1] || CONFIG.CRAWLER.BASE_DOMAIN;
+  const startUrl = args[2] || CONFIG.CRAWLER.START_URL;
+
+  logger.debug(`크롤러 생성 - 전략: ${strategy}, 도메인: ${specificDomain}, 시작 URL: ${startUrl}`);
+
+  // 각 컴포넌트 초기화
+  const browserManager = new ChromeBrowserManager();
+  const contentExtractor = new WebContentExtractor();
+  const urlManager = new MongoDbUrlManager({
+    strategy,
+    specificDomain
+  });
+  const dbConnector = new MongoDbConnector(MONGODB_URI);
+
+  // 크롤러 인스턴스 생성
+  return new WebCrawler({
+    browserManager,
+    contentExtractor,
+    urlManager,
+    dbConnector,
+    delayBetweenRequests: CONFIG.CRAWLER.DELAY_BETWEEN_REQUESTS,
+    headless: CONFIG.BROWSER.HEADLESS,
+    maxUrls: CONFIG.CRAWLER.MAX_URLS,
+    strategy,
+    datab_uri: MONGODB_URI
+  });
+}
+
+/**
+ * 애플리케이션 실행
+ */
+async function main() {
+  logger.debug('===== 크롤링 시작 =====');
+
+  try {
+    // 크롤러 생성 및 실행
+    const crawler = createCrawler();
+    await crawler.run();
+
+    logger.debug('===== 크롤링 요약 =====');
+
+    // 종료 처리
+    process.exit(0);
+  } catch (error) {
+    logger.error(`실행 중 오류가 발생했습니다: ${error}`);
+    process.exit(1);
+  }
+}
+
+// 이 파일이 직접 실행될 때 main 함수 호출
+if (require.main === module) {
+  main().catch(error => {
+    logger.error('프로그램 실행 중 처리되지 않은 오류:', error);
+    process.exit(1);
+  });
+}
+
+export { createCrawler };
