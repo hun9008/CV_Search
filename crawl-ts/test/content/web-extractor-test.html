@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebContentExtractor Test Page</title>
+  <meta name="description" content="Test description for WebContentExtractor">
+  <meta name="keywords" content="test, extractor, content">
+  <meta property="og:title" content="OG Title">
+</head>
+<body>
+  <h1>Test Content for WebContentExtractor</h1>
+  <p>This is a test paragraph for content extraction testing.</p>
+  <div style="display:none">This text should not be extracted.</div>
+
+  <a href="https://example.com/normal-link">Normal Link</a>
+  <a href="/relative-link">Relative Link</a>
+  <a href="javascript:void(0)">JavaScript Link</a>
+  <a href="mailto:test@example.com">Email Link</a>
+  <a onclick="window.location.href='https://example.com/redirect'">Redirect Div</a>
+
+  <script>
+    const img = document.createElement('img');
+    img.src = 'https://example.com/test-image.jpg';
+    img.alt = 'test';
+    document.body.appendChild(img);
+  </script>
+</body>
+</html>
+`;

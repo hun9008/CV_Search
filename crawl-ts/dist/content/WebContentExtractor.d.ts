@@ -22,4 +22,6 @@ export declare class WebContentExtractor implements IContentExtractor {
      * @returns 추출된 URL 목록
      */
     extractLinks(page: Page, allowedDomains: string[]): Promise<string[]>;
+    extractOnclickLinks(page: Page): Promise<string[]>;
+    collectOnclickScriptsWithScroll(page: Page): Promise<string[]>;
 }

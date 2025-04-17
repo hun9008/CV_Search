@@ -135,7 +135,7 @@ export class WebCrawler implements ICrawler {
       try {
         // JavaScript 실행을 통한 추가 URL 추출 (onclick 이벤트 등)
         // 이 예제에서는 간소화를 위해 생략하고 빈 배열 할당
-        subUrlResult.onclickUrls = [];
+        subUrlResult.onclickUrls = await this.contentExtractor.extractOnclickLinks(page ,[domain]);
         logger.debug('JavaScript 이벤트 처리 생략 (간소화된 구현)');
       } catch (error) {
         logger.error('JavaScript 실행 중 오류:', error);

@@ -57,10 +57,7 @@ class ChromeBrowserManager {
             // Puppeteer 동적 임포트 (필요할 때만 로드)
             const puppeteer = await Promise.resolve().then(() => __importStar(require('puppeteer')));
             this.browser = await puppeteer.launch({
-                headless: config_1.default.BROWSER.HEADLESS ? 'new' : false,
-                ignoreHTTPSErrors: true,
-                defaultViewport: null,
-                ignoreDefaultArgs: ['--enable-automation'],
+                headless: config_1.default.BROWSER.HEADLESS ? true : false,
                 args: config_1.default.BROWSER.LAUNCH_ARGS,
                 timeout: 10000, // 10 seconds
                 protocolTimeout: 20000, // 20 seconds

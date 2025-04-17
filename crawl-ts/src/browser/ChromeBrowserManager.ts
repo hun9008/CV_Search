@@ -25,10 +25,7 @@ export class ChromeBrowserManager implements IBrowserManager {
       const puppeteer = await import('puppeteer');
 
       this.browser = await puppeteer.launch({
-        headless: CONFIG.BROWSER.HEADLESS ? 'new' : false,
-        ignoreHTTPSErrors: true,
-        defaultViewport: null,
-        ignoreDefaultArgs: ['--enable-automation'],
+        headless: CONFIG.BROWSER.HEADLESS ? true : false,
         args: CONFIG.BROWSER.LAUNCH_ARGS,
         timeout: 10000, // 10 seconds
         protocolTimeout: 20000, // 20 seconds

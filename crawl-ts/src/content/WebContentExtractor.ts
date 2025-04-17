@@ -206,4 +206,62 @@ export class WebContentExtractor implements IContentExtractor {
       return [];
     }
   }
+
+  async  extractOnclickLinks(page: Page , allowedDomains : string[]): Promise<string[]> {
+  // 1. 스크롤하면서 모든 a[onclick] 태그 수집
+  const onclickScripts = await this.collectOnclickScriptsWithScroll(page);
+
+  // 2. 각 onclick 스크립트를 병렬로 실행해 redirect된 URL 수집
+  const redirectedUrls = await Promise.all(
+    onclickScripts.map(async (script) => {
+      const tempPage = await page.browser().newPage();
+      try {
+        const html = await page.content();
+        await tempPage.setContent(html);
+
+        await tempPage.evaluate(script);
+        await tempPage.waitForNavigation({ waitUntil: 'load', timeout: 3000 }).catch(() => {});
+        console.log(tempPage.url());
+        return tempPage.url();
+
+      } catch (err) {
+        console.error(`Error executing onclick script: ${script}`, err);
+        return null;
+      } finally {
+        await tempPage.close();
+      }
+    })
+  );
+  // 3. 유효한 URL 중 allowedDomains에 해당하는 것만 필터링
+  const filteredUrls = redirectedUrls.filter((url): url is string =>
+    !!url && allowedDomains.some(domain => url.includes(domain))
+  );
+
+  return filteredUrls;
+}
+
+async  collectOnclickScriptsWithScroll(page: Page): Promise<string[]> {
+  const collected = new Set<string>();
+  let previousHeight = 0;
+
+  for (let i = 0; i < 10; i++) { // 제한적으로 10번까지만 스크롤
+    const newOnclicks = await page.$$eval('a[onclick]', (anchors) =>
+      anchors.map((a) => a.getAttribute('onclick') || '')
+    );
+    newOnclicks.forEach((s) => collected.add(s));
+
+    // 스크롤을 아래로 내림
+    const currentHeight = await page.evaluate(() => {
+      window.scrollBy(0, window.innerHeight);
+      return document.body.scrollHeight;
+    });
+
+    if (currentHeight === previousHeight) break;
+    previousHeight = currentHeight;
+    // 새 콘텐츠 로딩을 기다림
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  return Array.from(collected);
+}
 }
