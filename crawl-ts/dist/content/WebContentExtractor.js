@@ -181,7 +181,7 @@ class WebContentExtractor {
             return [];
         }
     }
-    async extractOnclickLinks(page) {
+    async extractOnclickLinks(page, allowedDomains) {
         // 1. 스크롤하면서 모든 a[onclick] 태그 수집
         const onclickScripts = await this.collectOnclickScriptsWithScroll(page);
         // 2. 각 onclick 스크립트를 병렬로 실행해 redirect된 URL 수집
@@ -192,6 +192,7 @@ class WebContentExtractor {
                 await tempPage.setContent(html);
                 await tempPage.evaluate(script);
                 await tempPage.waitForNavigation({ waitUntil: 'load', timeout: 3000 }).catch(() => { });
+                console.log(tempPage.url());
                 return tempPage.url();
             }
             catch (err) {
@@ -202,7 +203,9 @@ class WebContentExtractor {
                 await tempPage.close();
             }
         }));
-        return redirectedUrls.filter((url) => !!url);
+        // 3. 유효한 URL 중 allowedDomains에 해당하는 것만 필터링
+        const filteredUrls = redirectedUrls.filter((url) => !!url && allowedDomains.some(domain => url.includes(domain)));
+        return filteredUrls;
     }
     async collectOnclickScriptsWithScroll(page) {
         const collected = new Set();

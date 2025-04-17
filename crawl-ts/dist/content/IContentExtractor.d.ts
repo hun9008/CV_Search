@@ -27,5 +27,5 @@ export interface IContentExtractor {
     * @param allowedDomains 허용된 도메인 목록
     * @returns 추출된 URL 목록
     */
-    extractOnclickLinks(page: Page): Promise<string[]>;
+    extractOnclickLinks(page: Page, allowedDomains: string[]): Promise<string[]>;
 }
