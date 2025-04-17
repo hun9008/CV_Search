@@ -62,6 +62,7 @@ CREATE TABLE jobs (
     raw_jobs_text TEXT NOT NULL,                      -- 크롤링 원문
     url TEXT                                          -- 공고 상세보기 링크
     FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE SET NULL -- 지역 외래 키
+    fabicon TEXT DEFAULT NULL,                             -- 파비콘 base64
 );
 
 -- 피드백 테이블 (CV와 채용공고의 1:1 매칭 피드백)
