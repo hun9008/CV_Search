@@ -85,7 +85,6 @@ CREATE TABLE bookmarks (
     user_id BIGINT NOT NULL,                           -- 사용자 ID
     job_id BIGINT NOT NULL,                            -- 공고 ID
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- 생성 일자 
-    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
     UNIQUE(user_id, job_id)                            -- 중복 방지
