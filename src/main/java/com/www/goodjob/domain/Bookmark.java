@@ -5,7 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "bookmark")
+@Table(name = "bookmarks") // s추가
 @Getter
 @Setter
 @NoArgsConstructor
