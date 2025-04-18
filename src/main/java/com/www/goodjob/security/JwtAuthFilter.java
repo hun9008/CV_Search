@@ -1,6 +1,7 @@
 package com.www.goodjob.security;
 
-import com.www.goodjob.service.JwtTokenProvider;
+import com.www.goodjob.domain.User;
+import com.www.goodjob.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -14,12 +15,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class JwtAuthFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -28,22 +30,27 @@ public class JwtAuthFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String path = httpRequest.getRequestURI();
 
-        // "/auth/callback-endpoint"는 필터에서 제외
         if (path.equals("/auth/callback-endpoint")) {
             chain.doFilter(request, response);
             return;
         }
 
-        String token = httpRequest.getHeader("Authorization"); // "Bearer xxx"
+        String token = httpRequest.getHeader("Authorization");
 
         if (token != null && token.startsWith("Bearer ")) {
             String jwt = token.substring(7);
             if (jwtTokenProvider.validateToken(jwt)) {
                 String email = jwtTokenProvider.getEmail(jwt);
+
+                User user = userRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+
+                CustomUserDetails userDetails = new CustomUserDetails(user);
+
                 Authentication auth = new UsernamePasswordAuthenticationToken(
-                        email,
+                        userDetails,
                         null,
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                        userDetails.getAuthorities()
                 );
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

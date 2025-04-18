@@ -1,4 +1,4 @@
-package com.www.goodjob.service;
+package com.www.goodjob.security;
 
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,10 +74,4 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
-    /**
-     * JwtAuthFilter 인스턴스 생성 (SecurityConfig에서 사용)
-     */
-    public com.www.goodjob.security.JwtAuthFilter jwtAuthFilter() {
-        return new com.www.goodjob.security.JwtAuthFilter(this);
-    }
 }

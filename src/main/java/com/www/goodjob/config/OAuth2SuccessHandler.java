@@ -7,7 +7,7 @@ import com.www.goodjob.enums.UserRole;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.CustomOAuth2User;
-import com.www.goodjob.service.JwtTokenProvider;
+import com.www.goodjob.security.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

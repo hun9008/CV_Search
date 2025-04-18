@@ -1,14 +1,11 @@
 package com.www.goodjob.controller;
 
-import com.www.goodjob.domain.User;
-import com.www.goodjob.repository.UserRepository;
-import com.www.goodjob.service.JwtTokenProvider;
+import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.RecommendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,21 +13,13 @@ import java.util.Map;
 public class RecommendController {
 
     private final RecommendService recommendService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
 
     @PostMapping("/topk_list")
     public ResponseEntity<String> recommend(
-            @RequestHeader("Authorization") String authHeader,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam int topk
     ) {
-        String token = authHeader.replace("Bearer ", "");
-        String email = jwtTokenProvider.getEmail(token);
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Long userId = user.getId();
-
+        Long userId = userDetails.getId();
         String result = recommendService.requestRecommendation(userId, topk);
         return ResponseEntity.ok(result);
     }

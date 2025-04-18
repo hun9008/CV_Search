@@ -1,8 +1,9 @@
 package com.www.goodjob.config;
 
+import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.JwtAuthFilter;
 import com.www.goodjob.security.CustomOAuth2UserService;
-import com.www.goodjob.service.JwtTokenProvider;
+import com.www.goodjob.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
@@ -58,7 +60,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new JwtAuthFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(jwtTokenProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/auth/login")
                         .successHandler(oAuth2SuccessHandler)
