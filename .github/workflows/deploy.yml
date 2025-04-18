@@ -40,6 +40,7 @@ jobs:
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          ANTHROPIC_API_KEY : ${{ secrets.ANTHROPIC_API_KEY }}
 
         run: |
           sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
@@ -65,6 +66,7 @@ jobs:
             echo "AWS_REGION=$AWS_REGION" >> .env
             echo "AWS_S3_BUCKET=$AWS_S3_BUCKET" >> .env
             echo "FASTAPI_HOST=$FASTAPI_HOST" >> .env
+            echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> .env
           
             docker-compose down || true
             docker-compose up -d --build
