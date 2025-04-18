@@ -125,13 +125,13 @@ CREATE TABLE regions (
 
 CREATE TABLE recommend_score (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,                 -- 추천 점수 ID
-    user_id BIGINT NOT NULL,                              -- 사용자 ID
+    cv_id BIGINT NOT NULL,                                -- 이력서 ID
     job_id BIGINT NOT NULL,                               -- 공고 ID
-    score FLOAT NOT NULL,                                 -- 추천 점수 (ex: 0.0 ~ 1.0 범위)
+    score FLOAT NOT NULL,                                 -- 추천 점수 (예: 0.0 ~ 1.0)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,        -- 생성 일자
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
-    UNIQUE(user_id, job_id)                               -- 동일 사용자-공고 중복 방지
+    UNIQUE(cv_id, job_id),                                -- 동일 이력서-공고 중복 방지
+    FOREIGN KEY (cv_id) REFERENCES cv(id) ON DELETE CASCADE,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
 );
 
 -- -- 사용자 검색 히스토리 테이블
