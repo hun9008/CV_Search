@@ -2,10 +2,9 @@ package com.www.goodjob.controller;
 
 import com.www.goodjob.domain.Job;
 import com.www.goodjob.domain.User;
-import com.www.goodjob.dto.UserDto;
 import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.service.BookmarkService;
-import com.www.goodjob.service.JwtTokenProvider;
+import com.www.goodjob.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

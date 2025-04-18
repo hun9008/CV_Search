@@ -2,7 +2,7 @@ package com.www.goodjob.integrate;
 
 import com.www.goodjob.domain.User;
 import com.www.goodjob.repository.UserRepository;
-import com.www.goodjob.service.JwtTokenProvider;
+import com.www.goodjob.security.JwtTokenProvider;
 import com.www.goodjob.service.S3Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

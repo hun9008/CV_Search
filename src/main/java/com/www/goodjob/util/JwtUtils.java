@@ -1,6 +1,6 @@
 package com.www.goodjob.util;
 
-import com.www.goodjob.service.JwtTokenProvider;
+import com.www.goodjob.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;

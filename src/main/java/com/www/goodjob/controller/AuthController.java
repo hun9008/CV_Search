@@ -3,14 +3,15 @@ package com.www.goodjob.controller;
 import com.www.goodjob.domain.User;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
-import com.www.goodjob.service.JwtTokenProvider;
-import jakarta.servlet.http.HttpServletRequest;
+import com.www.goodjob.security.CustomUserDetails;
+import com.www.goodjob.security.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -64,9 +65,6 @@ public class AuthController {
 
         String email = jwtTokenProvider.getEmail(refreshToken);
         String newAccessToken = jwtTokenProvider.generateAccessToken(email);
-
-        System.out.println("✅ accessToken = " + newAccessToken);  // 👈 여기 추가
-
         boolean isFirstLogin = !userRepository.existsByEmail(email);
 
         return ResponseEntity.ok(Map.of(
@@ -91,33 +89,15 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "로그아웃 되었습니다."));
     }
 
-    // 회원 탈퇴 + refresh_token 삭제
     @DeleteMapping("/withdraw")
     public ResponseEntity<?> withdraw(HttpServletResponse response,
-                                      @RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Access token이 필요합니다."));
-        }
+                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getUser();
 
-        String accessToken = authHeader.substring(7);
-        if (!jwtTokenProvider.validateToken(accessToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "유효하지 않은 access token입니다."));
-        }
-
-        String email = jwtTokenProvider.getEmail(accessToken);
-        User user = userRepository.findByEmail(email).orElse(null);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "해당 유저를 찾을 수 없습니다."));
-        }
-
-        // OAuth 연동 정보 삭제 → 사용자 삭제
         userOAuthRepository.deleteAllByUser(user);
         userRepository.delete(user);
 
-        // refresh_token 쿠키 삭제
+        // 쿠키 제거
         ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
                 .secure(true)
@@ -129,4 +109,5 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("message", "회원 탈퇴가 완료되었고, 로그아웃 처리되었습니다."));
     }
+
 }
