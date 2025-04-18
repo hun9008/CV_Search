@@ -6,35 +6,42 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "cv_feedback", uniqueConstraints = @UniqueConstraint(columnNames = {"cv_id", "job_id"}))
+@Table(name = "cv_feedback", uniqueConstraints = @UniqueConstraint(columnNames = {"recommend_score_id"}))
 public class CvFeedback {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "cv_id", nullable = false)
-    private Cv cv;
-
-    @ManyToOne
-    @JoinColumn(name = "job_id", nullable = false)
-    private Job job;
+    // Cv + Job 조합을 가진 추천 결과에 대한 외래 키
+    @OneToOne
+    @JoinColumn(name = "recommend_score_id", nullable = false, unique = true)
+    private RecommendScore recommendScore;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String feedback;
 
-    private int score;
-
     private boolean confirmed;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "last_updated_at")
+    @Column(name = "last_updated_at", nullable = false)
     private LocalDateTime lastUpdatedAt = LocalDateTime.now();
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.lastUpdatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.lastUpdatedAt = LocalDateTime.now();
+    }
 }

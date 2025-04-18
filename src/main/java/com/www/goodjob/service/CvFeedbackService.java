@@ -51,10 +51,7 @@ public class CvFeedbackService {
 
         // 6. DB 저장
         CvFeedback newFeedback = CvFeedback.builder()
-                .cv(cv)
-                .job(job)
                 .feedback(feedback)
-                .score(0)
                 .confirmed(false)
                 .build();
 
