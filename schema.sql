@@ -123,6 +123,16 @@ CREATE TABLE regions (
     sigungu VARCHAR(100) NOT NULL             -- 시/군/구
 );
 
+CREATE TABLE recommend_score (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,                 -- 추천 점수 ID
+    user_id BIGINT NOT NULL,                              -- 사용자 ID
+    job_id BIGINT NOT NULL,                               -- 공고 ID
+    score FLOAT NOT NULL,                                 -- 추천 점수 (ex: 0.0 ~ 1.0 범위)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,        -- 생성 일자
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
+    UNIQUE(user_id, job_id)                               -- 동일 사용자-공고 중복 방지
+);
 
 -- -- 사용자 검색 히스토리 테이블
 -- CREATE TABLE search_history (
