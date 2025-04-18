@@ -65,9 +65,12 @@ public class AuthController {
         String email = jwtTokenProvider.getEmail(refreshToken);
         String newAccessToken = jwtTokenProvider.generateAccessToken(email);
 
+        System.out.println("✅ accessToken = " + newAccessToken);  // 👈 여기 추가
+
         boolean isFirstLogin = !userRepository.existsByEmail(email);
 
         return ResponseEntity.ok(Map.of(
+                "email", email,
                 "accessToken", newAccessToken,
                 "firstLogin", isFirstLogin
         ));
