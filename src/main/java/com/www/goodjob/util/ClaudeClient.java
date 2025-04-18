@@ -14,7 +14,6 @@ public class ClaudeClient {
     private final AnthropicClient client;
 
     public ClaudeClient(@Value("${anthropic.api-key}") String apiKey) {
-        System.out.println("✅ Claude API KEY = " + apiKey);
         this.client = AnthropicOkHttpClient.builder()
                 .apiKey(apiKey)
                 .build();
