@@ -65,19 +65,27 @@ CREATE TABLE jobs (
     fabicon TEXT DEFAULT NULL,                             -- 파비콘 base64
 );
 
--- 피드백 테이블 (CV와 채용공고의 1:1 매칭 피드백)
+CREATE TABLE recommend_score (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,                 -- 추천 점수 ID
+    cv_id BIGINT NOT NULL,                                -- 이력서 ID
+    job_id BIGINT NOT NULL,                               -- 공고 ID
+    score FLOAT NOT NULL,                                 -- 추천 점수 (예: 0.0 ~ 1.0)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,        -- 생성 일자
+    UNIQUE(cv_id, job_id),                                -- 동일 이력서-공고 중복 방지
+    FOREIGN KEY (cv_id) REFERENCES cv(id) ON DELETE CASCADE,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
+);
+
+-- 피드백 테이블 (CV와 채용공고의 매칭 피드백)
 CREATE TABLE cv_feedback (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,               -- 피드백 고유 ID
-    cv_id BIGINT NOT NULL,                              -- 이력서 ID
-    job_id BIGINT NOT NULL,                             -- 공고 ID
+    recommend_score_id BIGINT NOT NULL,                 -- 추천 점수 매핑 ID
     feedback TEXT NOT NULL,                             -- 피드백 내용
-    score INT DEFAULT 0,                                -- 유사도 점수
     confirmed BOOLEAN DEFAULT FALSE,                    -- 피드백 확인 여부
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,      -- 생성 일자 
-    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
-    FOREIGN KEY (cv_id) REFERENCES cv(id) ON DELETE CASCADE,
-    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
-    UNIQUE(cv_id, job_id)                               -- 한 쌍당 하나의 피드백
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (recommend_score_id) REFERENCES recommend_score(id) ON DELETE CASCADE,
+    UNIQUE(recommend_score_id)                          -- 각 매칭마다 1개의 피드백만 가능
 );
 
 -- 북마크 테이블
@@ -121,17 +129,6 @@ CREATE TABLE regions (
     cd VARCHAR(10) NOT NULL UNIQUE,           -- 행정구역 코드
     sido VARCHAR(50) NOT NULL,                -- 시/도
     sigungu VARCHAR(100) NOT NULL             -- 시/군/구
-);
-
-CREATE TABLE recommend_score (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,                 -- 추천 점수 ID
-    cv_id BIGINT NOT NULL,                                -- 이력서 ID
-    job_id BIGINT NOT NULL,                               -- 공고 ID
-    score FLOAT NOT NULL,                                 -- 추천 점수 (예: 0.0 ~ 1.0)
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,        -- 생성 일자
-    UNIQUE(cv_id, job_id),                                -- 동일 이력서-공고 중복 방지
-    FOREIGN KEY (cv_id) REFERENCES cv(id) ON DELETE CASCADE,
-    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
 );
 
 -- -- 사용자 검색 히스토리 테이블
