@@ -40,38 +40,24 @@ exports.runGeminiParser = runGeminiParser;
 const dotenv = __importStar(require("dotenv"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const GeminiParser_1 = require("./GeminiParser");
+const MongoDbConnector_1 = require("../database/MongoDbConnector");
 // Load environment variables
 dotenv.config();
-// MongoDB connection string
-const MONGODB_URI = process.env.MONGODB_ADMIN_URI || 'mongodb://localhost:27017/cv_search';
-/**
- * Connect to MongoDB
- */
-async function connectToDatabase() {
-    try {
-        await mongoose_1.default.connect(MONGODB_URI, {
-            dbName: process.env.MONGODB_DB_NAME,
-        });
-        console.log('Connected to MongoDB');
-    }
-    catch (error) {
-        console.error('Failed to connect to MongoDB:', error);
-        process.exit(1);
-    }
-}
 /**
  * Initialize and run the GeminiParser
  */
 async function runGeminiParser() {
     try {
         // Connect to MongoDB
-        await connectToDatabase();
+        const db = new MongoDbConnector_1.MongoDbConnector();
+        await db.connect();
         console.log('Starting GeminiParser...');
         // Create an instance of GeminiParser
         const parser = new GeminiParser_1.GeminiParser({
             apiKey: process.env.GEMINI_API_KEY,
             apiKeys: process.env.GEMINI_API_KEYS?.split(','),
             model: process.env.GEMINI_MODEL || 'gemini-1.5-flash-latest',
+            dbConnector: db,
             useCache: true
         });
         // Initialize the parser

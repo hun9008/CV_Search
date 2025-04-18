@@ -12,7 +12,14 @@
     "parse:build": "npm run build && dotenv node dist/index.js",
     "parse:gemini": "dotenv ts-node src/scripts/runGeminiParser.ts",
     "parse:gemini:prod": "dotenv -e .env.production ts-node src/scripts/runGeminiParser.ts",
-    "parse:gemini:dev": "dotenv -e .env.development ts-node src/scripts/runGeminiParser.ts"
+    "parse:gemini:dev": "dotenv -e .env.development ts-node src/scripts/runGeminiParser.ts",
+    "favicon": "dotenv ts-node src/scripts/getFavicon.ts",
+    "favicon:dev": "dotenv -e .env.development ts-node src/scripts/getFavicon.ts",
+    "favicon:prod": "dotenv -e .env.production ts-node src/scripts/getFavicon.ts",
+    "server": "dotenv ts-node src/server/index.ts",
+    "server:build": "npm run build && dotenv node dist/server/index.js",
+    "server:dev": "dotenv -e .env.development ts-node src/server/index.ts",
+    "server:prod": "dotenv -e .env.production node dist/server/index.js"
   },
   "keywords": [
     "crawler",
@@ -24,11 +31,17 @@
   "license": "ISC",
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
-    "axios": "^1.6.2",
+    "axios": "^1.8.4",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "isomorphic-fetch": "^3.0.0",
+    "mongodb": "^6.15.0",
     "mongoose": "^8.0.0",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.14.0",
     "node-fetch": "^3.3.2",
     "puppeteer": "^24.6.1",
     "robots-parser": "^3.0.1",
@@ -38,8 +51,10 @@
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.27.0",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/jest": "^29.5.14",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^20.8.10",
     "babel-jest": "^29.7.0",
     "dotenv-cli": "^8.0.0",
@@ -48,8 +63,9 @@
     "jest-environment-node": "^29.7.0",
     "jest-html-reporter": "^4.1.0",
     "jest-puppeteer": "^11.0.0",
+    "mongodb-memory-server": "^10.1.4",
     "ts-jest": "^29.3.2",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.2.2"
   }
 }

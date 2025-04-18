@@ -10,7 +10,6 @@ export interface IRawContent {
    * 페이지 제목
    */
   title?: string;
-
   /**
    * 페이지 텍스트 내용
    */
@@ -26,6 +25,10 @@ export interface IRawContent {
    */
   domain?: string;
 
+  /**
+  *
+  */
+  favicon?: String;
   /**
    * 크롤링 시간
    */
@@ -43,14 +46,14 @@ export interface IRawContent {
  */
 export interface IGeminiResponse {
   /**
-   * 파싱 성공 여부 (채용 공고인지 여부)
+   * 채용 공고인지 여부
    */
-  success: boolean;
+  is_recruit_info: boolean;
 
-  /**
-   * 실패 이유 (success가 false인 경우)
+   /**
+   * IT 채용 공고인지 여부
    */
-  reason?: string;
+  is_it_recruit_info: boolean;
 
   /**
    * 회사명
@@ -65,7 +68,12 @@ export interface IGeminiResponse {
   /**
    * 지역
    */
-  location?: string;
+  region_text?: string;
+
+  /**
+   * 지역번호
+   */
+  region_id?: string;
 
   /**
    * 경력 요구 사항
@@ -133,6 +141,8 @@ export interface IDbRecruitInfo extends IBotRecruitInfo {
    */
   url: string;
 
+  is_parse_success: boolean;
+
   favicon?: String;
 
   /**
@@ -160,7 +170,7 @@ export interface IDbRecruitInfo extends IBotRecruitInfo {
    */
   is_public: boolean;
 
-  region_id?: String;
+
   /**
    * 메타데이터
    */
@@ -177,12 +187,15 @@ const RecruitInfoSchema = new Schema<IDbRecruitInfo>({
   updated_at: { type: Date, required: true, default: Date.now },
   is_public: { type: Boolean, required: true, default: false },
   favicon: { type: String },
+  is_parse_success: { type: Boolean, required: true },
+
   // 👇 IGeminiResponse 필드들도 명시해야 함
-  success: { type: Boolean, required: true },
-  reason: { type: String },
+  is_recruit_info: { type: Boolean, required: true },
+  is_it_recruit_info : { type: Boolean, required: true },
   company_name: { type: String },
   department: { type: String },
-  location: { type: String },
+  region_text: { type: String },
+  region_id:{type:String},
   require_experience: { type: String },
   job_description: { type: String },
   job_type: { type: String },

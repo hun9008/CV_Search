@@ -20,10 +20,5 @@ export interface IDbConnector {
    */
   disconnect(): Promise<void>;
 
-  /**
-   * 방문 결과 저장
-   * @param subUrlResult 방문 결과 객체
-   * @returns 저장 성공 여부
-   */
-  saveVisitResult(subUrlResult: SubUrl): Promise<boolean>;
+
 }

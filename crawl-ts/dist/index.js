@@ -14,8 +14,6 @@ const MongoDbConnector_1 = require("./database/MongoDbConnector");
 const WebCrawler_1 = require("./crawler/WebCrawler");
 const config_1 = __importDefault(require("./config/config"));
 const logger_1 = require("./utils/logger");
-// 환경 변수에서 MongoDB URI 가져오기 (없으면 기본값 사용)
-const MONGODB_URI = process.env.MONGODB_ADMIN_URI || 'mongodb://localhost:27017/crawl_db';
 /**
  * 크롤러 생성
  * @param options 크롤러 옵션
@@ -35,7 +33,7 @@ function createCrawler(options = {}) {
         strategy,
         specificDomain
     });
-    const dbConnector = new MongoDbConnector_1.MongoDbConnector(MONGODB_URI);
+    const dbConnector = new MongoDbConnector_1.MongoDbConnector();
     // 크롤러 인스턴스 생성
     return new WebCrawler_1.WebCrawler({
         browserManager,
@@ -46,7 +44,6 @@ function createCrawler(options = {}) {
         headless: config_1.default.BROWSER.HEADLESS,
         maxUrls: config_1.default.CRAWLER.MAX_URLS,
         strategy,
-        datab_uri: MONGODB_URI
     });
 }
 /**

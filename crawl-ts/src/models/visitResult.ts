@@ -39,6 +39,7 @@ export interface ISubUrl {
     url?: string;
   }>;
 
+  isRecruit?: boolean;
   /**
    * 객체 형태로 변환
    */
@@ -51,6 +52,7 @@ export interface ISubUrl {
 export interface IVisitResult extends Document {
   domain: string;
   suburl_list: ISubUrl[];
+  favicon?: string;
   updated_at?: Date;
   created_at?: Date;
 }
@@ -201,6 +203,7 @@ const SubUrlSchema = new Schema({
 const VisitResultSchema = new Schema({
   domain: { type: String, required: true, unique: true, index: true },
   suburl_list: [SubUrlSchema],
+  favicon : String,
   updated_at: { type: Date, default: Date.now },
   created_at: { type: Date, default: Date.now },
 }, {
@@ -228,6 +231,7 @@ export class VisitResult {
   suburl_list: ISubUrl[];
   updated_at: Date;
   created_at: Date;
+
 
   /**
    * VisitResult 생성자

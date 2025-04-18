@@ -1,4 +1,5 @@
 import { Page } from 'puppeteer';
+import { IDbConnector } from '../database';
 import { IBotRecruitInfo, IDbRecruitInfo, IRawContent } from '../models/recruitinfoModel';
 
 /**
@@ -30,6 +31,11 @@ export interface IParser {
    * 파서 초기화
    * @param options 초기화 옵션
    */
+
+
+
+  dbConnector: IDbConnector;
+
   initialize(options?: Record<string, any>): Promise<boolean>;
   /**
    * Parser 시작
@@ -60,11 +66,6 @@ export interface IParser {
    */
   parseRawContent(rawContent: IRawContent): Promise<IBotRecruitInfo>;
 
-  /**
-   * 텍스트 콘텐츠 직접 파싱
-   * @param text 파싱할 텍스트
-   */
-  parseContent(text: string): Promise<IBotRecruitInfo>;
 
   /**
    * DB 저장용 모델로 변환

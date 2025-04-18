@@ -11,13 +11,9 @@ const mongoose_1 = __importDefault(require("mongoose"));
  * MongoDB 데이터베이스 연결 구현체
  */
 class MongoDbConnector {
-    /**
-     * MongoDB 연결 관리자 생성자
-     * @param dbUri MongoDB 연결 URI
-     */
-    constructor(dbUri) {
+    constructor({ dbUri } = {}) {
         this.isConnected = false;
-        this.dbUri = dbUri;
+        this.dbUri = dbUri ?? process.env.MONGODB_ADMIN_URI ?? "default";
     }
     /**
      * 데이터베이스 연결

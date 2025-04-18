@@ -9,8 +9,6 @@ import { WebCrawler } from './crawler/WebCrawler';
 import CONFIG from './config/config';
 import { defaultLogger as logger } from './utils/logger';
 
-// 환경 변수에서 MongoDB URI 가져오기 (없으면 기본값 사용)
-const MONGODB_URI = process.env.MONGODB_ADMIN_URI || 'mongodb://localhost:27017/crawl_db';
 
 /**
  * 크롤러 생성
@@ -33,7 +31,7 @@ function createCrawler(options = {}) {
     strategy,
     specificDomain
   });
-  const dbConnector = new MongoDbConnector(MONGODB_URI);
+  const dbConnector = new MongoDbConnector();
 
   // 크롤러 인스턴스 생성
   return new WebCrawler({
@@ -45,7 +43,6 @@ function createCrawler(options = {}) {
     headless: CONFIG.BROWSER.HEADLESS,
     maxUrls: CONFIG.CRAWLER.MAX_URLS,
     strategy,
-    datab_uri: MONGODB_URI
   });
 }
 

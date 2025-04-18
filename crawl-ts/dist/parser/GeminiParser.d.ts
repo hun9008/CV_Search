@@ -1,6 +1,6 @@
 import { IParser, SaveParsedContentOptions } from './IParser';
 import { IBotRecruitInfo, IDbRecruitInfo, IRawContent } from '../models/recruitinfoModel';
-import { Page } from 'puppeteer';
+import { IDbConnector } from '../database';
 export interface GeminiParserOptions {
     /**
      * API 키
@@ -14,6 +14,10 @@ export interface GeminiParserOptions {
      * 모델 이름
      */
     model?: string;
+    /**
+     * DB 커넥터
+     */
+    dbConnector: IDbConnector;
     /**
      * 캐시 디렉토리 경로
      */
@@ -45,6 +49,10 @@ interface KeyStatusInfo {
     isClientInitialized: boolean;
     model: string;
 }
+export declare class ParseError extends Error {
+    cause: unknown;
+    constructor(message: string, cause?: unknown);
+}
 /**
  * GeminiParser - Google의 Gemini API를 사용하는 파서
  */
@@ -61,11 +69,12 @@ export declare class GeminiParser implements IParser {
     private readonly parsedContentDir;
     private readonly useCache;
     private initialized;
+    dbConnector: IDbConnector;
     /**
      * GeminiParser 생성자
      * @param options 파서 옵션
      */
-    constructor(options?: GeminiParserOptions);
+    constructor(options: GeminiParserOptions);
     /**
      * 파서 초기화
      * @param options 초기화 옵션
@@ -149,16 +158,6 @@ export declare class GeminiParser implements IParser {
      * @param rawContent 원본 콘텐츠
      */
     parseRawContent(rawContent: IRawContent): Promise<IBotRecruitInfo>;
-    /**
-     * 텍스트 콘텐츠 직접 파싱
-     * @param text 파싱할 텍스트
-     */
-    parseContent(text: string): Promise<IBotRecruitInfo>;
-    /**
-     * 웹 페이지 파싱
-     * @param page Puppeteer Page 객체
-     */
-    parsePage(page: Page): Promise<IBotRecruitInfo>;
     /**
      * DB 저장용 모델로 변환
      * @param botRecruitInfo 봇 파싱 결과

@@ -23,8 +23,6 @@ export class WebCrawler implements ICrawler {
   maxUrls: number;
   strategy: string;
   currentUrl?: string;
-  datab_uri: string;
-
   isRunning: boolean = false;
 
   /**
@@ -40,7 +38,6 @@ export class WebCrawler implements ICrawler {
     headless: boolean;
     maxUrls: number;
     strategy: string;
-    datab_uri: string;
   }) {
     this.browserManager = options.browserManager;
     this.contentExtractor = options.contentExtractor;
@@ -50,7 +47,6 @@ export class WebCrawler implements ICrawler {
     this.headless = options.headless;
     this.maxUrls = options.maxUrls;
     this.strategy = options.strategy;
-    this.datab_uri = options.datab_uri;
   }
 
   /**

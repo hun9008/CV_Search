@@ -18,7 +18,6 @@ export declare class WebCrawler implements ICrawler {
     maxUrls: number;
     strategy: string;
     currentUrl?: string;
-    datab_uri: string;
     isRunning: boolean;
     /**
      * 웹 크롤러 생성자
@@ -33,7 +32,6 @@ export declare class WebCrawler implements ICrawler {
         headless: boolean;
         maxUrls: number;
         strategy: string;
-        datab_uri: string;
     });
     /**
      * 크롤러 초기화

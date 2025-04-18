@@ -14,6 +14,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { URL } from 'url';
 import fetch from 'node-fetch'
+import { IDbConnector } from '../database';
 
 let logger: any;
 try {
@@ -33,7 +34,7 @@ try {
 }
 
 // --- 상수 ---
-const DEFAULT_MODEL_NAME = 'gemini-1.5-flash-latest';
+const DEFAULT_MODEL_NAME = 'gemini-2.0-flash-latest';
 const RATE_LIMIT_HTTP_STATUS = 429;
 const RATE_LIMIT_MESSAGE_FRAGMENT = 'Resource has been exhausted';
 const JSON_MIME_TYPE = 'application/json';
@@ -57,6 +58,13 @@ export interface GeminiParserOptions {
    * 모델 이름
    */
   model?: string;
+
+
+  /**
+   * DB 커넥터
+   */
+  dbConnector: IDbConnector;
+
 
   /**
    * 캐시 디렉토리 경로
@@ -95,6 +103,20 @@ interface KeyStatusInfo {
   model: string;
 }
 
+export class ParseError extends Error {
+  public cause: unknown;
+
+  constructor(message: string, cause?: unknown) {
+    super(message);
+    this.name = 'ParseError';
+    this.cause = cause;
+    // Stack trace 유지 (V8 기반 환경에서만 동작)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, ParseError);
+    }
+  }
+}
+
 /**
  * GeminiParser - Google의 Gemini API를 사용하는 파서
  */
@@ -112,11 +134,12 @@ export class GeminiParser implements IParser {
   private readonly useCache: boolean;
   private initialized: boolean = false;
 
+  dbConnector: IDbConnector;
   /**
    * GeminiParser 생성자
    * @param options 파서 옵션
    */
-  constructor(options: GeminiParserOptions = {}) {
+  constructor(options: GeminiParserOptions) {
     // 기본 설정
     this.modelName = options.model || DEFAULT_MODEL_NAME;
     this.maxRetries = options.maxRetries || 3;
@@ -125,6 +148,8 @@ export class GeminiParser implements IParser {
     this.rawContentDir = path.join(this.cacheDir, RAW_CONTENT_DIR);
     this.parsedContentDir = path.join(this.cacheDir, PARSED_CONTENT_DIR);
     this.useCache = options.useCache !== undefined ? options.useCache : true;
+    this.dbConnector =options.dbConnector
+
     // API 키 설정은 initialize 메서드에서 수행
   }
 
@@ -339,7 +364,6 @@ export class GeminiParser implements IParser {
       }
 
       const pipeline = [
-        { $match: { 'suburl_list.visited': true, 'suburl_list.success': true } },
         { $unwind: '$suburl_list' },
         {
           $match: {
@@ -356,6 +380,7 @@ export class GeminiParser implements IParser {
           $project: {
             _id: 0,
             domain: 1,
+            favicon: 1, // favicon 필드 추가
             url: '$suburl_list.url',
             text: '$suburl_list.text',
             title: '$suburl_list.title',
@@ -440,25 +465,15 @@ export class GeminiParser implements IParser {
       const id = options.id || uuidv4();
       const destination = options.destination || 'cache';
 
-      if (destination === 'cache' && this.useCache) {
-        await this._saveParsedContentToCache(id, parsedContent);
-        logger.debug(`파싱 결과가 캐시에 저장됨 (ID: ${id})`);
-        return true;
-      } else if (destination === 'file') {
-        // 파일에 저장하는 로직
-        const filePath = path.join(process.cwd(), 'exports', `parsed_${id}.json`);
-        await fs.mkdir(path.dirname(filePath), { recursive: true });
-        await fs.writeFile(filePath, JSON.stringify(parsedContent, null, 2), 'utf-8');
-        logger.debug(`파싱 결과가 파일에 저장됨: ${filePath}`);
-        return true;
-      } else if (destination === 'db') {
+     if (destination === 'db') {
         // DB에 저장하는 로직
         // 여기서는 미구현, 실제 구현시 DB 클라이언트가 필요
+
         const dbRecruitInfo: IDbRecruitInfo = this.makeDbRecruitInfo(parsedContent, rawContent);
+
         //
         const newRecruit = new RecruitInfoModel(dbRecruitInfo);
         await newRecruit.save();
-        console.log('채용공고 저장 성공!');
         return true;
       }
 
@@ -505,92 +520,13 @@ export class GeminiParser implements IParser {
       const startTime = Date.now();
 
       // API 호출로 채용 정보 파싱
-      const recruitmentInfo = await this._parseRecruitment(textToAnalyze);
-
-      return recruitmentInfo;
+      return await this._parseRecruitment(textToAnalyze);
     } catch (error) {
-      logger.error(`원본 콘텐츠 파싱 중 오류: ${(error as Error).message}`);
-      return {
-        success: false,
-        reason: `파싱 오류: ${(error as Error).message}`,
-      };
+        throw new ParseError("Failed to parse recruitment info", error);
     }
   }
 
-  /**
-   * 텍스트 콘텐츠 직접 파싱
-   * @param text 파싱할 텍스트
-   */
-  async parseContent(text: string): Promise<IBotRecruitInfo> {
-    try {
-      // 초기화 확인
-      if (!this.initialized) {
-        await this.initialize();
-      }
 
-      // IRawContent 객체 생성
-      const rawContent: IRawContent = {
-        text,
-        url: 'direct-input',
-        crawledAt: new Date()
-      };
-
-      // 파싱 실행
-      return this.parseRawContent(rawContent);
-    } catch (error) {
-      logger.error(`텍스트 파싱 중 오류: ${(error as Error).message}`);
-      return {
-        success: false,
-        reason: `파싱 오류: ${(error as Error).message}`
-      };
-    }
-  }
-
-  /**
-   * 웹 페이지 파싱
-   * @param page Puppeteer Page 객체
-   */
-  async parsePage(page: Page): Promise<IBotRecruitInfo> {
-    try {
-      // 초기화 확인
-      if (!this.initialized) {
-        await this.initialize();
-      }
-
-      // 페이지에서 정보 추출
-      const pageContent = await page.evaluate(() => {
-        return {
-          title: document.title,
-          text: document.body.innerText,
-          url: window.location.href
-        };
-      });
-
-      // 도메인 추출
-      const domain = this._extractDomain(pageContent.url);
-
-      // IRawContent 객체 생성
-      const rawContent: IRawContent = {
-        title: pageContent.title,
-        text: pageContent.text,
-        url: pageContent.url,
-        domain,
-        crawledAt: new Date(),
-        metadata: {
-          source: 'puppeteer'
-        }
-      };
-
-      // 파싱 실행
-      return this.parseRawContent(rawContent);
-    } catch (error) {
-      logger.error(`페이지 파싱 중 오류: ${(error as Error).message}`);
-      return {
-        success: false,
-        reason: `페이지 파싱 오류: ${(error as Error).message}`
-      };
-    }
-  }
 
   /**
    * DB 저장용 모델로 변환
@@ -602,13 +538,15 @@ export class GeminiParser implements IParser {
 
     return {
       ...botRecruitInfo,
+      is_parse_success : true,
       title: rawContent.title || '제목 없음',
       url: rawContent.url,
       raw_text: rawContent.text,
+      favicon : rawContent.favicon || undefined,
       domain: rawContent.domain,
       created_at: now,
       updated_at: now,
-      is_public: botRecruitInfo.success, // 채용 정보인 경우에만 공개
+      is_public: true, // 채용 정보인 경우에만 공개
     };
   }
 
@@ -673,14 +611,13 @@ export class GeminiParser implements IParser {
     return {
       type: SchemaType.OBJECT,
       properties: {
-        success: {
+        is_recruit_info: {
           type: SchemaType.BOOLEAN,
           description: "분석된 텍스트가 채용공고인지 여부 (true=채용공고, false=채용공고 아님)",
         },
-        reason: {
-          type: SchemaType.STRING,
-          description: "채용공고가 아닌 경우(success=false), 그 이유",
-          nullable: true
+        is_it_recruit_info: {
+          type: SchemaType.BOOLEAN,
+          description: "분석된 텍스트가 IT 채용공고인지 여부 (true=IT채용공고, false=IT채용공고 아님)",
         },
         company_name: {
           type: SchemaType.STRING,
@@ -692,13 +629,20 @@ export class GeminiParser implements IParser {
           description: "채용하는 부서 또는 팀 이름",
           nullable: true
         },
-        location: {
+        region_text: {
           type: SchemaType.STRING,
           description: "근무 지역 또는 회사 위치",
           nullable: true
         },
+        region_id: {
+          type: SchemaType.STRING,
+          description: "근무 지역 또는 회사 위치의 대한민국 법정동 코드(예 서울시 강남구=1168000000 )",
+          nullable: true
+        },
         require_experience: {
           type: SchemaType.STRING,
+          enum: ['경력무관', '신입', '경력'],
+          format: "enum",
           description: "요구되는 경력 수준 (경력무관, 신입, 경력)",
           nullable: true
         },
@@ -715,11 +659,13 @@ export class GeminiParser implements IParser {
         apply_start_date: {
           type: SchemaType.STRING,
           description: "채용 공고 게시 시작일 또는 지원 접수 시작일 (YYYY-MM-DD 형식)",
+          format : "date-time",
           nullable: true
         },
         apply_end_date: {
           type: SchemaType.STRING,
-          description: "채용 공고 마감일 또는 지원 접수 마감일 (YYYY-MM-DD 형식, '상시채용', '채용시 마감' 등도 가능)",
+          description: "채용 공고 마감일 또는 지원 접수 마감일 (YYYY-MM-DD 형식, '상시채용', '채용시 마감' 등이라면 null)",
+          format : "date-time",
           nullable: true
         },
         requirements: {
@@ -738,7 +684,7 @@ export class GeminiParser implements IParser {
           nullable: true
         }
       },
-      required: ["success"]
+      required: ["is_recruit_info" ,"is_it_recruit_info"]
     } as Schema;
   }
 
@@ -752,24 +698,25 @@ export class GeminiParser implements IParser {
 당신은 전문적인 채용 정보 분석가입니다. 다음 텍스트가 채용 공고인지 분석하세요.
 
 지시사항:
-1. 텍스트가 채용 공고인지 여부를 판단하세요.
+1. 텍스트가 채용 공고인지 여부를 판단하세요.(회사 소개 글은 채용공고가 아님을 유의해서 판단하세요)
 2. 채용 공고가 맞다면:
-   - "success" 필드를 true로 설정하세요.
+   - "is_recruit_info" 필드를 true로 설정하세요.
    - 다음 정보를 추출하여 해당 필드에 입력하세요. 정보가 없다면 null이나 빈 문자열로 설정하세요.
+     - is_it_recruit_info: it 직군의 채용정보 이라면 true , 아니라면 false 로 설정하세요 (채용공고인 동시에 IT직군이여야합니다.)
      - company_name: 채용하는 회사명
      - department: 채용하는 부서 또는 팀
-     - location: 근무 지역 또는 회사 위치
+     - region_text: 근무 지역 또는 회사 위치
+     - region_id: region_text의 값을 대한민국 법정동 코드 (예)서울시 강남구일 경우 1168000000)로 정규화해서 넣어줘.
      - require_experience: 요구되는 경력 수준 ("경력무관", "신입", "경력"). 가능하면 이 세 가지 카테고리로 매핑해주세요.
-     - job_description: 주요 업무 내용에 대한 요약
-     - job_type: 고용 형태. 표준 용어를 사용하세요 (정규직, 계약직, 인턴, 아르바이트, 프리랜서, 파견직).
+     - job_description: 주요 업무 내용이나 직무기술서에 대한 내용을 기술하세요.
+     - job_type: 고용 형태. 표준 용어를 사용하세요 (정규직, 계약직, 인턴, 아르바이트, 프리랜서, 파견직).만약 여러가지라면 /로 구분해서 작성해주세요(예 정규직/피견직)
      - apply_start_date: 지원 시작일 또는 게시일 (가능한 YYYY-MM-DD 형식)
      - apply_end_date: 지원 마감일 (가능한 YYYY-MM-DD 형식, 또는 "상시채용", "채용시 마감" 등)
      - requirements: 필수 자격 요건
      - preferred_qualifications: 우대 사항
      - ideal_candidate: 회사가 찾는 인재상
 3. 채용 공고가 아니라면:
-   - "success" 필드를 false로 설정하세요.
-   - "reason" 필드에 채용 공고가 아닌 이유를 간략하게 설명하세요(예: "뉴스 기사", "회사 소개", "교육 과정 안내").
+   - "is_recruit_info" 필드를 false로 설정하세요.
    - 나머지 필드는 null로 설정하세요.
 4. 결과는 한국어로 작성하세요.
 
@@ -815,12 +762,11 @@ ${content}
       }
 
       try {
+        logger.debug(responseText);
         const parsedResponse = JSON.parse(responseText) as IBotRecruitInfo;
-
-        if (typeof parsedResponse.success === 'boolean') {
+        if (typeof parsedResponse.is_recruit_info === 'boolean') {
           return parsedResponse;
         }
-
         throw new Error('API 응답의 구조가 예상과 다릅니다 (success 필드 누락).');
       } catch (parseError: any) {
         logger.error(`Gemini API 응답 JSON 파싱 실패: ${parseError.message}`);
@@ -843,6 +789,57 @@ ${content}
       isClientInitialized: !!this.genAI,
       model: this.modelName,
     };
+  }
+
+  /**
+   * VisitResult의 domain document에서, suburl_list에서 맞는 url을 찾아서 isRecruit를
+   * 업데이트합니다.
+   * @param rawContent 원본 콘텐츠
+   * @param parsedContent 파싱된 채용 정보
+   * @returns 업데이트 성공 여부
+   */
+  async updateRecruitStatus(rawContent: IRawContent, parsedContent: IBotRecruitInfo): Promise<boolean> {
+    try {
+      if (!rawContent.url || !rawContent.domain) {
+        logger.warn('URL 또는 도메인 정보가 없어 isRecruit 상태를 업데이트할 수 없습니다.');
+        return false;
+      }
+
+      // 채용 정보 여부 결정
+      const isRecruit = parsedContent.is_recruit_info === true;
+      const isItRecruit = parsedContent.is_it_recruit_info === true;
+
+      logger.info(`URL의 isRecruit 상태 업데이트 중: ${rawContent.url}, isRecruit=${isRecruit}, isItRecruit=${isItRecruit}`);
+
+      // MongoDB 도메인 문서에서 특정 URL의 isRecruit 필드 업데이트
+      const updateResult = await VisitResultModel.updateOne(
+        {
+          domain: rawContent.domain,
+          'suburl_list.url': rawContent.url
+        },
+        {
+          $set: {
+            'suburl_list.$.isRecruit': isRecruit
+          }
+        }
+      );
+      // console.log(updateResult); // 이거 꼭 찍어봐!
+      if (updateResult.matchedCount === 0) {
+        logger.warn(`URL을 찾을 수 없음: ${rawContent.url}`);
+        return false;
+      }
+
+      if (updateResult.modifiedCount === 0) {
+        logger.warn(`URL은 찾았으나 업데이트되지 않음 (이미 같은 값으로 설정됨): ${rawContent.url}`);
+        return true; // 문서는 찾았으나 변경이 없는 경우도 성공으로 간주
+      }
+
+      logger.info(`URL의 isRecruit 상태 업데이트 성공: ${rawContent.url}`);
+      return true;
+    } catch (error) {
+      logger.error(`URL의 isRecruit 상태 업데이트 중 오류: ${(error as Error).message}`);
+      return false;
+    }
   }
 
   /**
@@ -882,25 +879,33 @@ ${content}
 
           // 파싱 수행
           const parsedContent = await this.parseRawContent(rawContent);
+          if (parsedContent.is_recruit_info) {
+            // 파싱 결과 저장
+            const saved = await this.saveParsedContent(rawContent, parsedContent, { destination: 'db' });
 
-          // 파싱 결과 저장
-          const saved = await this.saveParsedContent(rawContent, parsedContent, { destination: 'db' });
-
-          if (saved) {
-            successCount++;
-            logger.info(`[${i+1}/${rawContents.length}] 파싱 및 저장 성공: ${rawContent.url.substring(0, 50)}...`);
-          } else {
-            failureCount++;
-            logger.warn(`[${i+1}/${rawContents.length}] 파싱 결과 저장 실패: ${rawContent.url.substring(0, 50)}...`);
+            if (saved) {
+              successCount++;
+              logger.info(`[${i + 1}/${rawContents.length}] 파싱 및 저장 성공: ${rawContent.url.substring(0, 50)}...`);
+            }
           }
+
+          // isRecruit 상태 업데이트
+          const updated = await this.updateRecruitStatus(rawContent, parsedContent);
+          if (updated) {
+            logger.info(`[${i+1}/${rawContents.length}] isRecruit 상태 업데이트 성공: ${rawContent.url.substring(0, 50)}...`);
+          }
+
         } catch (error) {
-          failureCount++;
-          logger.error(`[${i+1}/${rawContents.length}] 파싱 처리 중 오류: ${(error as Error).message}`);
+        failureCount++;
+         const prefix = `[${i + 1}/${rawContents.length}]`;
+        if (error instanceof ParseError) {
+          logger.error(`${prefix} ParserError 발생: ${error.message}`);
+        } else {
+          logger.error(`${prefix} 일반 오류 발생: ${(error as Error).message}`);
+        }
         }
       }
-
       logger.info(`파싱 처리 완료 - 성공: ${successCount}, 실패: ${failureCount}`);
-
       return () => {};
     } catch (error) {
       logger.error(`파서 실행 중 오류 발생: ${(error as Error).message}`);

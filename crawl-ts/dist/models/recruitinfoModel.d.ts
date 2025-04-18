@@ -35,13 +35,13 @@ export interface IRawContent {
  */
 export interface IGeminiResponse {
     /**
-     * 파싱 성공 여부 (채용 공고인지 여부)
+     * 채용 공고인지 여부
      */
-    success: boolean;
+    is_recruit_info: boolean;
     /**
-     * 실패 이유 (success가 false인 경우)
-     */
-    reason?: string;
+    * IT 채용 공고인지 여부
+    */
+    is_it_recruit_info: boolean;
     /**
      * 회사명
      */
@@ -53,7 +53,11 @@ export interface IGeminiResponse {
     /**
      * 지역
      */
-    location?: string;
+    region_text?: string;
+    /**
+     * 지역번호
+     */
+    region_id?: string;
     /**
      * 경력 요구 사항
      */
@@ -105,6 +109,7 @@ export interface IDbRecruitInfo extends IBotRecruitInfo {
      * 채용공고 URL
      */
     url: string;
+    is_parse_success: boolean;
     favicon?: String;
     /**
      * 원본 텍스트
@@ -126,7 +131,6 @@ export interface IDbRecruitInfo extends IBotRecruitInfo {
      * 공개 여부
      */
     is_public: boolean;
-    region_id?: String;
     /**
      * 메타데이터
      */

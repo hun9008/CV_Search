@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favicon Gallery</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .favicon-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .favicon-item {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .favicon-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+        }
+
+        .favicon-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            height: 80px;
+        }
+
+        .favicon-img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .favicon-img.original {
+            border: 1px dashed #ccc;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .favicon-domain {
+            font-size: 14px;
+            word-break: break-all;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .favicon-error {
+            color: #d9534f;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        .favicon-actions {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .favicon-actions button {
+            padding: 5px 8px;
+            font-size: 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .favicon-actions button:hover {
+            background-color: #e9ecef;
+        }
+
+        .stats {
+            background-color: #f0f8ff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .button-row {
+            margin: 20px 0;
+        }
+
+        .button-row button {
+            margin-right: 10px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .button-row button:hover {
+            background-color: #3367d6;
+        }
+
+        #download-all {
+            background-color: #34a853;
+        }
+
+        #download-all:hover {
+            background-color: #2e8b57;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Favicon Gallery</h1>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html">URL Search</a></li>
+                <li><a href="jobs.html">Recruitment Info</a></li>
+                <li><a href="jobs-claude.html">Claude Recruitment Info</a></li>
+                <li><a href="mysql-jobs.html">MySQL Recruitment Info</a></li>
+                <li><a href="stats.html">Statistics</a></li>
+                <li><a href="favicons.html" class="active">Favicons</a></li>
+            </ul>
+        </nav>
+
+        <div class="error-message" id="error-container"></div>
+
+        <div class="stats" id="stats-container">
+            <div>Loading...</div>
+        </div>
+
+        <div class="button-row">
+            <button id="refresh-btn">Refresh List</button>
+            <button id="download-all">Download All Favicons (ZIP)</button>
+        </div>
+
+        <div id="favicon-list" class="favicon-gallery">
+            <div class="loading">Loading favicons...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const faviconList = document.getElementById('favicon-list');
+            const statsContainer = document.getElementById('stats-container');
+            const refreshBtn = document.getElementById('refresh-btn');
+            const downloadAllBtn = document.getElementById('download-all');
+            const errorContainer = document.getElementById('error-container');
+
+            // API base URL
+            const API_BASE_URL = '/api';
+
+            // Load all favicons
+            function loadFavicons() {
+                faviconList.innerHTML = '<div class="loading">Loading favicons...</div>';
+                statsContainer.innerHTML = '<div>Loading...</div>';
+                errorContainer.style.display = 'none';
+
+                fetch(`${API_BASE_URL}/favicons`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            displayFavicons(data.domains);
+
+                            // Update stats
+                            statsContainer.innerHTML = `
+                                <div>Found <strong>${data.count}</strong> domains with favicons</div>
+                                <div>Last updated: ${new Date().toLocaleString()}</div>
+                            `;
+                        } else {
+                            showError('Failed to load favicons: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        showError('Error loading favicons: ' + error.message);
+                        console.error('Favicon loading error:', error);
+                    });
+            }
+
+            // Display favicon items
+            function displayFavicons(domains) {
+                if (!domains || domains.length === 0) {
+                    faviconList.innerHTML = '<p>No favicons found in the database.</p>';
+                    return;
+                }
+
+                faviconList.innerHTML = '';
+
+                domains.forEach(domain => {
+                    const faviconItem = document.createElement('div');
+                    faviconItem.className = 'favicon-item';
+
+                    const faviconContainer = document.createElement('div');
+                    faviconContainer.className = 'favicon-container';
+
+                    // Original favicon
+                    const faviconImg = document.createElement('img');
+                    faviconImg.className = 'favicon-img original';
+                    faviconImg.src = `${API_BASE_URL}/favicon/${encodeURIComponent(domain)}`;
+                    faviconImg.alt = `${domain} favicon`;
+                    faviconImg.title = domain;
+
+                    // Error handling for favicon loading
+                    faviconImg.onerror = function() {
+                        this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>';
+
+                        const errorMsg = document.createElement('div');
+                        errorMsg.className = 'favicon-error';
+                        errorMsg.textContent = 'Failed to load';
+                        faviconContainer.appendChild(errorMsg);
+                    };
+
+                    faviconContainer.appendChild(faviconImg);
+
+                    const domainText = document.createElement('div');
+                    domainText.className = 'favicon-domain';
+                    domainText.textContent = domain;
+
+                    const actionButtons = document.createElement('div');
+                    actionButtons.className = 'favicon-actions';
+
+                    const openButton = document.createElement('button');
+                    openButton.textContent = 'Visit Site';
+                    openButton.addEventListener('click', () => {
+                        window.open(`https://${domain}`, '_blank');
+                    });
+
+                    const downloadButton = document.createElement('button');
+                    downloadButton.textContent = 'Download';
+                    downloadButton.addEventListener('click', () => {
+                        downloadFavicon(domain);
+                    });
+
+                    actionButtons.appendChild(openButton);
+                    actionButtons.appendChild(downloadButton);
+
+                    faviconItem.appendChild(faviconContainer);
+                    faviconItem.appendChild(domainText);
+                    faviconItem.appendChild(actionButtons);
+
+                    faviconList.appendChild(faviconItem);
+                });
+            }
+
+            // Function to download a single favicon
+            function downloadFavicon(domain) {
+                fetch(`${API_BASE_URL}/favicon/${encodeURIComponent(domain)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = `favicon-${domain}.${getExtensionFromContentType(blob.type)}`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    })
+                    .catch(error => {
+                        showError(`Error downloading favicon for ${domain}: ${error.message}`);
+                    });
+            }
+
+            // Helper function to get file extension from content type
+            function getExtensionFromContentType(contentType) {
+                const types = {
+                    'image/png': 'png',
+                    'image/jpeg': 'jpg',
+                    'image/jpg': 'jpg',
+                    'image/gif': 'gif',
+                    'image/svg+xml': 'svg',
+                    'image/x-icon': 'ico',
+                    'image/vnd.microsoft.icon': 'ico'
+                };
+
+                return types[contentType] || 'png';
+            }
+
+            // Show error message
+            function showError(message) {
+                errorContainer.textContent = message;
+                errorContainer.style.display = 'block';
+            }
+
+            // Event listeners
+            refreshBtn.addEventListener('click', loadFavicons);
+
+            downloadAllBtn.addEventListener('click', function() {
+                alert('ZIP download functionality would be implemented here.\nThis would require server-side ZIP creation or a client-side ZIP library.');
+            });
+
+            // Initial load
+            loadFavicons();
+        });
+    </script>
+</body>
+</html>

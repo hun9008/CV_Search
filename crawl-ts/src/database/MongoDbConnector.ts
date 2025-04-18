@@ -9,15 +9,9 @@ import mongoose from 'mongoose';
 export class MongoDbConnector implements IDbConnector {
   private dbUri: string;
   isConnected: boolean = false;
-
-  /**
-   * MongoDB 연결 관리자 생성자
-   * @param dbUri MongoDB 연결 URI
-   */
-  constructor(dbUri: string) {
-    this.dbUri = dbUri;
+    constructor({ dbUri }: { dbUri?: string } = {}) {
+    this.dbUri = dbUri ?? process.env.MONGODB_ADMIN_URI ?? "default";
   }
-
   /**
    * 데이터베이스 연결
    */

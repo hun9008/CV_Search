@@ -23,7 +23,6 @@ class WebCrawler {
         this.headless = options.headless;
         this.maxUrls = options.maxUrls;
         this.strategy = options.strategy;
-        this.datab_uri = options.datab_uri;
     }
     /**
      * 크롤러 초기화
