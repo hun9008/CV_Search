@@ -126,9 +126,9 @@ CREATE TABLE admin_logs (
 -- Region 테이블
 CREATE TABLE regions (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    cd VARCHAR(10) NOT NULL UNIQUE,           -- 행정구역 코드
-    sido VARCHAR(50) NOT NULL,                -- 시/도
-    sigungu VARCHAR(100) NOT NULL             -- 시/군/구
+    cd VARCHAR(10) NOT NULL UNIQUE,       -- 행정구역 코드 (10자리)
+    sido VARCHAR(20) NOT NULL,            -- 시/도 (예: 서울, 경기)
+    sigungu VARCHAR(50)                   -- 시/군/구 (예: 종로구, 수원시)
 );
 
 -- -- 사용자 검색 히스토리 테이블
