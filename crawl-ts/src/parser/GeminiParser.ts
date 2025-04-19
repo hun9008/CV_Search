@@ -15,6 +15,7 @@ import * as path from 'path';
 import { URL } from 'url';
 import fetch from 'node-fetch'
 import { IDbConnector } from '../database';
+import { MySqlRecruitInfoService } from '../database/MySqlRecruitInfoService';
 
 let logger: any;
 try {
@@ -65,6 +66,11 @@ export interface GeminiParserOptions {
    */
   dbConnector: IDbConnector;
 
+
+  /**
+   * DB 서비스
+   */
+  mySqlService: MySqlRecruitInfoService;
 
   /**
    * 캐시 디렉토리 경로
@@ -135,6 +141,8 @@ export class GeminiParser implements IParser {
   private initialized: boolean = false;
 
   dbConnector: IDbConnector;
+
+  mySqlService: MySqlRecruitInfoService;
   /**
    * GeminiParser 생성자
    * @param options 파서 옵션
@@ -148,7 +156,8 @@ export class GeminiParser implements IParser {
     this.rawContentDir = path.join(this.cacheDir, RAW_CONTENT_DIR);
     this.parsedContentDir = path.join(this.cacheDir, PARSED_CONTENT_DIR);
     this.useCache = options.useCache !== undefined ? options.useCache : true;
-    this.dbConnector =options.dbConnector
+    this.dbConnector = options.dbConnector;
+    this.mySqlService = options.mySqlService;
 
     // API 키 설정은 initialize 메서드에서 수행
   }
@@ -455,7 +464,7 @@ export class GeminiParser implements IParser {
    * @param parsedContent 파싱된 콘텐츠
    * @param options 저장 옵션
    */
-  async saveParsedContent(rawContent: IRawContent, parsedContent: IBotRecruitInfo, options: SaveParsedContentOptions = {}): Promise<boolean> {
+  async saveParsedContent(dbRecruitInfo : IDbRecruitInfo, options: SaveParsedContentOptions = {}): Promise<boolean> {
     try {
       // 초기화 확인
       if (!this.initialized) {
@@ -468,9 +477,6 @@ export class GeminiParser implements IParser {
      if (destination === 'db') {
         // DB에 저장하는 로직
         // 여기서는 미구현, 실제 구현시 DB 클라이언트가 필요
-
-        const dbRecruitInfo: IDbRecruitInfo = this.makeDbRecruitInfo(parsedContent, rawContent);
-
         //
         const newRecruit = new RecruitInfoModel(dbRecruitInfo);
         await newRecruit.save();
@@ -879,12 +885,15 @@ ${content}
 
           // 파싱 수행
           const parsedContent = await this.parseRawContent(rawContent);
-          if (parsedContent.is_recruit_info) {
+          if (parsedContent.is_recruit_info && parsedContent.job_description) {
             // 파싱 결과 저장
-            const saved = await this.saveParsedContent(rawContent, parsedContent, { destination: 'db' });
+            const dbRecruitInfo = this.makeDbRecruitInfo( parsedContent,rawContent);
+            const saved = await this.saveParsedContent(dbRecruitInfo, { destination: 'db' });
 
             if (saved) {
               successCount++;
+              const result = await this.mySqlService.saveRecruitInfo(dbRecruitInfo);
+              console.log(result);
               logger.info(`[${i + 1}/${rawContents.length}] 파싱 및 저장 성공: ${rawContent.url.substring(0, 50)}...`);
             }
           }

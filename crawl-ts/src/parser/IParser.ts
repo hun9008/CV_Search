@@ -58,7 +58,7 @@ export interface IParser {
    * @param parsedContent 파싱된 콘텐츠
    * @param options 저장 옵션
    */
-  saveParsedContent(rawContent: IRawContent, parsedContent: IBotRecruitInfo, options?: SaveParsedContentOptions): Promise<boolean>;
+  saveParsedContent(dbRecruitInfo : IDbRecruitInfo, options?: SaveParsedContentOptions): Promise<boolean>;
 
   /**
    * 원본 콘텐츠를 파싱하여 채용 정보 추출

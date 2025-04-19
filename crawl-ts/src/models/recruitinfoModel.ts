@@ -1,5 +1,5 @@
-
 import mongoose, { Schema } from 'mongoose';
+import { Sequelize, Model, DataTypes, Optional } from 'sequelize';
 
 /**
  * 원본 콘텐츠 인터페이스
@@ -266,6 +266,214 @@ RecruitInfoSchema.statics.findExpiringIn = function(days = 7, options = {}) {
     .exec();
 };
 
+/**
+ * MySQL DB용 채용 정보 인터페이스
+ * IDbRecruitInfo에서 일부 필드를 제외하고 상속받음
+ */
+export interface MysqlDbRecruitInfo extends Omit<IDbRecruitInfo, 'is_parse_success' | 'is_recruit_info' | 'is_it_recruit_info'> {
+  // 특정 필드 재정의 (필요시)
+  id?: number; // MySQL에서 auto-increment ID
+}
 
+/**
+ * Sequelize 모델 정의를 위한 인터페이스
+ * (creationAttributes에 사용됨)
+ */
+interface RecruitInfoCreationAttributes extends Optional<MysqlDbRecruitInfo, 'id'> {}
+
+/**
+ * Sequelize용 RecruitInfo 모델 클래스
+ */
+export class RecruitInfoSequelize extends Model<MysqlDbRecruitInfo, RecruitInfoCreationAttributes> implements MysqlDbRecruitInfo {
+  public id!: number;
+  public title!: string;
+  public url!: string;
+  public raw_text!: string;
+  public domain?: string;
+  public created_at!: Date;
+  public updated_at!: Date;
+  public is_public!: boolean;
+  public favicon?: string;
+
+  // IGeminiResponse에서 상속받은 필드들
+  public company_name?: string;
+  public department?: string;
+  public region_text?: string;
+  public region_id?: string;
+  public require_experience?: string;
+  public job_description?: string;
+  public job_type?: string;
+  public apply_start_date?: string;
+  public apply_end_date?: string;
+  public requirements?: string;
+  public preferred_qualifications?: string;
+  public ideal_candidate?: string;
+  public metadata?: Record<string, any>;
+
+  // 타임스탬프 필드
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+}
+
+/**
+ * Sequelize 모델 초기화 함수
+ * @param sequelize Sequelize 인스턴스
+ * @returns 초기화된 RecruitInfo 모델
+ */
+export function initRecruitInfoModel(sequelize: Sequelize): typeof RecruitInfoSequelize {
+  RecruitInfoSequelize.init(
+    {
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      title: {
+        type: DataTypes.STRING(512),
+        allowNull: false,
+      },
+      url: {
+        type: DataTypes.STRING(2048),
+        allowNull: false,
+        unique: true,
+      },
+      raw_text: {
+        type: DataTypes.TEXT('medium'),
+        allowNull: false,
+      },
+      domain: {
+        type: DataTypes.STRING(255),
+      },
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      updated_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      is_public: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      favicon: {
+        type: DataTypes.TEXT,
+      },
+      company_name: {
+        type: DataTypes.STRING(255),
+      },
+      department: {
+        type: DataTypes.STRING(255),
+      },
+      region_text: {
+        type: DataTypes.STRING(255),
+      },
+      region_id: {
+        type: DataTypes.STRING(100),
+      },
+      require_experience: {
+        type: DataTypes.STRING(255),
+      },
+      job_description: {
+        type: DataTypes.TEXT,
+      },
+      job_type: {
+        type: DataTypes.STRING(100),
+      },
+      apply_start_date: {
+        type: DataTypes.STRING(50),
+      },
+      apply_end_date: {
+        type: DataTypes.STRING(50),
+      },
+      requirements: {
+        type: DataTypes.TEXT,
+      },
+      preferred_qualifications: {
+        type: DataTypes.TEXT,
+      },
+      ideal_candidate: {
+        type: DataTypes.TEXT,
+      },
+      metadata: {
+        type: DataTypes.JSON,
+      },
+    },
+    {
+      sequelize,
+      tableName: process.env.MYSQL_RECRUIT_TABLE || 'recruit_infos',
+      timestamps: true, // createdAt, updatedAt 자동 관리
+      underscored: true, // 스네이크_케이스 컬럼명 사용
+      indexes: [
+        {
+          unique: true,
+          fields: ['url'],
+        },
+        {
+          fields: ['domain'],
+        },
+        {
+          fields: ['company_name'],
+        },
+        {
+          fields: ['is_public'],
+        },
+      ],
+    }
+  );
+
+  return RecruitInfoSequelize;
+}
+
+/**
+ * MySQL RecruitInfo 저장 함수
+ * @param sequelize Sequelize 인스턴스
+ * @param recruitInfo 저장할 채용 정보 객체
+ * @returns 저장된 채용 정보 객체
+ */
+export async function saveRecruitInfoToMySql(
+  sequelize: Sequelize,
+  recruitInfo: Omit<MysqlDbRecruitInfo, 'id' | 'created_at' | 'updated_at'>
+): Promise<RecruitInfoSequelize> {
+  try {
+    // RecruitInfo 모델이 초기화되어 있지 않으면 초기화
+    if (!RecruitInfoSequelize.sequelize) {
+      initRecruitInfoModel(sequelize);
+    }
+
+    // 현재 시간
+    const now = new Date();
+
+    // 데이터 준비
+    const recruitData: RecruitInfoCreationAttributes = {
+      ...recruitInfo,
+      created_at: now,
+      updated_at: now
+    };
+
+    // URL로 기존 데이터 확인
+    const existingRecord = await RecruitInfoSequelize.findOne({
+      where: { url: recruitInfo.url }
+    });
+
+    if (existingRecord) {
+      // 기존 데이터 업데이트
+      await existingRecord.update({
+        ...recruitData,
+        updated_at: now
+      });
+      return existingRecord;
+    } else {
+      // 새 데이터 생성
+      return await RecruitInfoSequelize.create(recruitData);
+    }
+  } catch (error) {
+    console.error('MySQL에 채용 정보 저장 중 오류:', error);
+    throw error;
+  }
+}
 
 export const RecruitInfoModel = mongoose.model<IDbRecruitInfo>('recruitInfos', RecruitInfoSchema);

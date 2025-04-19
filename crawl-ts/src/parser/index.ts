@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { GeminiParser } from './GeminiParser';
 import { MongoDbConnector } from '../database/MongoDbConnector';
-import { MySqlConnector } from '../database/MySqlConnector';
+import { MySqlRecruitInfoService } from '../database/MySqlRecruitInfoService';
 // Load environment variables
 dotenv.config();
 
@@ -11,12 +11,12 @@ dotenv.config();
  */
 export async function runGeminiParser(): Promise<void> {
   let db: MongoDbConnector | null = null;
-  let mysql: MySqlConnector | null = null;
+  let mysql: MySqlRecruitInfoService | null = null;
 
   try {
     // Connect to MongoDB
     db = new MongoDbConnector();
-    mysql = new MySqlConnector();
+    mysql = new MySqlRecruitInfoService({});
     await db.connect();
     await mysql.connect();
 
@@ -28,6 +28,7 @@ export async function runGeminiParser(): Promise<void> {
       apiKeys: process.env.GEMINI_API_KEYS?.split(','),
       model: process.env.GEMINI_MODEL || 'gemini-1.5-flash-latest',
       dbConnector: db,
+      mySqlService: mysql,
       useCache: true
     });
 
@@ -39,7 +40,7 @@ export async function runGeminiParser(): Promise<void> {
     }
 
     // Run the parser to process raw content
-    const runFunction = await parser.run();
+     await parser.run();
 
     // Wait a bit before disconnecting from the database
     setTimeout(async () => {
