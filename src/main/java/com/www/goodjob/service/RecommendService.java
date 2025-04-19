@@ -82,7 +82,7 @@ public class RecommendService {
 
         // 5. 저장
         CvFeedback newFeedback = CvFeedback.builder()
-                .recommendScore(score)
+                .recommendScore(score) // ← score 자체를 저장하는 게 아니라, recommendScore 엔티티를 참조
                 .feedback(feedback)
                 .confirmed(false)
                 .build();

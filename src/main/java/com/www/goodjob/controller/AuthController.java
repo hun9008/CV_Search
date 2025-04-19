@@ -1,6 +1,7 @@
 package com.www.goodjob.controller;
 
 import com.www.goodjob.domain.User;
+import com.www.goodjob.enums.UserRole;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.CustomUserDetails;
@@ -108,6 +109,28 @@ public class AuthController {
         response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
         return ResponseEntity.ok(Map.of("message", "회원 탈퇴가 완료되었고, 로그아웃 처리되었습니다."));
+    }
+
+    @PostMapping("/master-token")
+    public ResponseEntity<?> issueMasterToken(@RequestParam String key) {
+        if (!"masterKey".equals(key)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid master key");
+        }
+
+        // 관리자로 간주될 마스터 유저 이메일
+        String email = "testadmin@goodjob.com";
+
+        // 존재하지 않으면 생성
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> userRepository.save(User.builder()
+                        .email(email)
+                        .name("마스터계정")
+                        .role(UserRole.ADMIN)
+                        .build()));
+
+        // AccessToken만 발급
+        String accessToken = jwtTokenProvider.generateAccessToken(email);
+        return ResponseEntity.ok(Map.of("accessToken", accessToken));
     }
 
 }
