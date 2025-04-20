@@ -1,0 +1,189 @@
+#!/usr/bin/env node
+/**
+ * MongoDB(VisitResult) -> Redis 마이그레이션 스크립트
+ *
+ * VisitResult 컬렉션의 suburl_list를 Redis로 마이그레이션합니다.
+ * 모든 URL은 기본적으로 'not_visited' 상태로 설정됩니다.
+ */
+
+import { MongoDbConnector } from '../database/MongoDbConnector';
+import { redis } from '../database/RedisConnector';
+import RedisUrlManager, { UrlStatus } from '../database/RedisUrlManager';
+import { VisitResultModel } from '../models/visitResult';
+import * as dotenv from 'dotenv';
+
+// 환경 변수 로드
+dotenv.config();
+
+// MongoDB 모델 정의 (schema만 필요함)
+interface SubUrl {
+  url: string;
+  domain: string;
+  visited?: boolean;
+  success?: boolean;
+  // 다른 필드들은 생략
+}
+
+interface MigrationStats{
+
+    totalDomains: number,
+    totalUrls: number,
+    processedUrls: number,
+    skippedUrls: number,
+    errors: number,
+}
+
+  const stats: MigrationStats = {
+    totalDomains: 0,
+    totalUrls: 0,
+    processedUrls: 0,
+    skippedUrls: 0,
+    errors: 0,
+  };
+/**
+ * MongoDB에서 Redis로 URL 데이터 마이그레이션
+ */
+async function migrateSubUrlsToRedis(): Promise<void> {
+
+  const mongoDb = new MongoDbConnector();
+
+  try {
+    console.log('MongoDB 연결 중...');
+    await mongoDb.connect();
+
+    console.log('MongoDB 연결 성공');
+
+    console.log('Redis 연결 확인 중...');
+    await redis.connect();
+    console.log('Redis 연결 성공');
+
+    // RedisUrlManager 인스턴스 가져오기
+    const redisUrlManager = RedisUrlManager.getInstance();
+
+    // Redis 초기화 여부 확인
+    const shouldReset = process.argv.includes('--reset');
+    if (shouldReset) {
+      console.log('Redis 데이터 초기화 중...');
+      const keys = await redis.keys('domain:*:urls');
+      keys.push(...await redis.keys('status:*:urls'));
+      keys.push('url:status', 'url:domain', 'domains'); // domains 세트도 초기화
+
+      if (keys.length > 0) {
+        await redis.del(keys);
+        console.log(`${keys.length}개의 키가 초기화되었습니다.`);
+      }
+    }
+
+    // MongoDB에서 도메인 목록 조회
+    const domains = await VisitResultModel.find({}, { domain: 1 });
+    stats.totalDomains = domains.length;
+    console.log(`총 ${stats.totalDomains}개의 도메인을 발견했습니다.`);
+
+    // 각 도메인에 대해 처리
+    for (let i = 0; i < domains.length; i++) {
+      const domainDoc = domains[i];
+      console.log(`[${i+1}/${domains.length}] 도메인 '${domainDoc.domain}' 처리 중...`);
+      if (!domainDoc.domain) {
+        continue;
+      }
+
+      // 도메인을 'domains' 세트에 추가
+      await redisUrlManager.addDomain(domainDoc.domain);
+
+      // 도메인에 대한 모든 suburl_list 가져오기
+      const result = await VisitResultModel.findOne(
+        { domain: domainDoc.domain },
+        { suburl_list: 1 }
+      );
+
+      if (!result || !result.suburl_list || result.suburl_list.length === 0) {
+        console.log(`  도메인 '${domainDoc.domain}'에 URL이 없습니다.`);
+        continue;
+      }
+
+      const urlCount = result.suburl_list.length;
+      stats.totalUrls += urlCount;
+      console.log(`  총 ${urlCount}개의 URL을 발견했습니다.`);
+
+      // 각 URL을 Redis에 추가
+      for (const subUrl of result.suburl_list) {
+        if (subUrl.url == null || subUrl.domain==null || domainDoc.domain==null) {
+          stats.skippedUrls++;
+          continue;
+        }
+        try {
+          // URL 상태를 not_visited로 초기화하여 Redis에 추가
+          await redisUrlManager.addUrl(
+            subUrl.url,
+            domainDoc.domain,
+            UrlStatus.NOT_VISITED
+          );
+          stats.processedUrls++;
+
+          if (stats.processedUrls % 1000 === 0) {
+            console.log(`  ${stats.processedUrls}개의 URL이 처리되었습니다.`);
+          }
+        } catch (error) {
+          console.error(`  URL '${subUrl.url}' 처리 중 오류:`, error);
+          stats.errors++;
+        }
+      }
+
+      console.log(`  도메인 '${domainDoc.domain}'의 ${urlCount}개 URL 처리 완료`);
+    }
+
+    // 전체 도메인 목록 가져오기
+    const allDomains = await redisUrlManager.getAllDomains();
+    console.log(`\n총 ${allDomains.length}개 도메인이 Redis에 저장되었습니다.`);
+
+    // 도메인별 통계 출력
+    console.log('\n===== 도메인별 통계 =====');
+    for (const domain of allDomains) {
+      const domainStats = await redisUrlManager.getDomainStats(domain);
+      console.log(`${domain}: 총 ${await redis.sCard(`domain:${domain}:urls`)}개 URL`);
+      console.log(`  - ${UrlStatus.NOT_VISITED}: ${domainStats[UrlStatus.NOT_VISITED]}개`);
+      console.log(`  - ${UrlStatus.VISITING}: ${domainStats[UrlStatus.VISITING]}개`);
+      console.log(`  - ${UrlStatus.VISITED}: ${domainStats[UrlStatus.VISITED]}개`);
+      console.log(`  - ${UrlStatus.FAILED}: ${domainStats[UrlStatus.FAILED]}개`);
+    }
+
+    // 전체 통계 출력
+    console.log('\n===== 마이그레이션 결과 =====');
+    console.log(`총 도메인 수: ${stats.totalDomains}개`);
+    console.log(`총 URL 수: ${stats.totalUrls}개`);
+    console.log(`처리된 URL 수: ${stats.processedUrls}개`);
+    console.log(`건너뛴 URL 수: ${stats.skippedUrls}개`);
+    console.log(`오류 발생 URL 수: ${stats.errors}개`);
+    console.log('===========================');
+
+  } catch (error) {
+    console.error('마이그레이션 중 오류 발생:', error);
+  } finally {
+    // 연결 종료
+    try {
+      await mongoDb.disconnect();
+      console.log('MongoDB 연결 종료');
+
+      await redis.disconnect();
+      console.log('Redis 연결 종료');
+    } catch (err) {
+      console.error('연결 종료 중 오류:', err);
+    }
+  }
+}
+
+// 스크립트 실행
+if (require.main === module) {
+
+  migrateSubUrlsToRedis()
+    .then(() => {
+      console.log('마이그레이션이 완료되었습니다.');
+      process.exit(0);
+    })
+    .catch(error => {
+      console.error('마이그레이션 중 예상치 못한 오류 발생:', error);
+      process.exit(1);
+    });
+}
+
+export default migrateSubUrlsToRedis;
