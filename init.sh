@@ -12,15 +12,13 @@ if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
   exit 1
 fi
 
-export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"
-
 echo "Waiting for MySQL to be ready..."
 
-until docker exec mysql-goodjob sh -c 'MYSQL_PWD=$MYSQL_PWD mysqladmin ping -uroot --silent'; do
+until docker exec mysql-goodjob sh -c "export MYSQL_PWD='$MYSQL_ROOT_PASSWORD'; mysqladmin ping -uroot --silent"; do
   echo "Waiting for MySQL..."
   sleep 2
 done
 
 echo "Applying schema.sql..."
-docker exec -i mysql-goodjob sh -c 'MYSQL_PWD=$MYSQL_PWD mysqladmin -uroot' < schema.sql
+docker exec -i mysql-goodjob sh -c "export MYSQL_PWD='$MYSQL_ROOT_PASSWORD'; mysql -uroot" < schema.sql
 echo "[Success] schema.sql applied."
