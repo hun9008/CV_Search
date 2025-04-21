@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     gcc \
     build-essential \
+    poppler-utils \
  && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip

@@ -315,6 +315,20 @@ def rdb_save_cv(s3_url, user_id):
 
 def es_save_cv(s3_url, u_id):
 
+    if not es.indices.exists(index=CV_INDEX_NAME):
+        es.indices.create(
+            index=CV_INDEX_NAME,
+            body={
+                "mappings": {
+                    "properties": {
+                        "text": {"type": "text"},
+                        "vector": {"type": "dense_vector", "dims": 384},
+                        "u_id": {"type": "keyword"}
+                    }
+                }
+            }
+        )
+
     run_vila(s3_url)
 
     raw_text = open("/tmp/temp_cv.txt", "r", encoding="utf-8").read()
@@ -341,6 +355,19 @@ def es_save_cv(s3_url, u_id):
 
 def es_save_jobs():
     
+    if not es.indices.exists(index=JOBS_INDEX_NAME):
+        es.indices.create(
+            index=JOBS_INDEX_NAME,
+            body={
+                "mappings": {
+                    "properties": {
+                        "text": {"type": "text"},
+                        "vector": {"type": "dense_vector", "dims": 384}
+                    }
+                }
+            }
+        )
+        
     jobs = fetch_job_data()
 
     # jobs가 비어있을 경우 예외처리

@@ -7,3 +7,4 @@ __pycache__
 .pytest_cache
 .env.es
 
+readme.md
