@@ -5,9 +5,17 @@ import { IBotRecruitInfo, IRawContent } from '../../src/models/recruitinfoModel'
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import * as dotenv from 'dotenv';
+import MessageService from '../../src/message/messageService';
+import RabbitMQManager from '../../src/message/rabbitMQManager';
+import { MySqlRecruitInfoService } from '../../src/database/MySqlRecruitInfoService';
+import { RedisUrlManager } from '../../src/url/RedisUrlManager';
 
 // 환경 변수 로드
 dotenv.config();
+
+jest.mock('../../src/url/rabbitMQManager');
+jest.mock('../../src/message/messageService');
+jest.mock('../../src/database/MySqlRecruitInfoService');
 
 // 테스트 그룹 분리
 describe('GeminiParser', () => {
@@ -37,10 +45,15 @@ describe('GeminiParser', () => {
   beforeEach(() => {
     // GeminiParser 옵션 설정
     const options: GeminiParserOptions = {
-      dbConnector,
-      apiKey: process.env.GEMINI_API_KEY,
+      // dbConnector의 메서드를 모킹하여 실제 DB 연결 없이 동작하도록 처리합니다.
+      dbConnector: new  MongoDbConnector(),
+      messageService: new MessageService(),
+      mySqlService: new MySqlRecruitInfoService({}),
+      redisUrlManager : new RedisUrlManager(),
+      // 실제 API 키 대신 모의 API 키 사용
+      apiKey: 'mock-api-key',
       useCache: false,  // 테스트에서는 캐시 사용 안 함
-      model: 'gemini-2.0-flash'
+      model: 'gemini-mock-model'
     };
 
     // GeminiParser 인스턴스 생성
