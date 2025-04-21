@@ -1,5 +1,6 @@
 .sidebar {
     max-width: 240px;
+    width: 240px;
     display: flex;
     font-family: 'Noto Sans CJK KR';
 
@@ -13,6 +14,16 @@
         flex-direction: column;
         height: 100%;
         padding: 1.5rem 0;
+        width: 100%;
+    }
+
+    &__hidden {
+        max-width: 0;
+        width: 0;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+        opacity: 0;
     }
 
     &__logo {
@@ -27,11 +38,17 @@
         line-height: 20px;
         letter-spacing: 0.1px;
         cursor: pointer;
+
+        transition: all 0.3s ease; // 로고에도 전환 효과 추가
+        white-space: nowrap; // 텍스트가 줄바꿈되지 않도록 설정
+        opacity: 1;
+        width: auto;
     }
 
     &__navigation {
         flex: 1;
         margin-top: 2rem;
+        transition: all 0.3s ease; // 네비게이션에도 전환 효과 추가
     }
 
     &__menu {
@@ -56,7 +73,9 @@
         font-size: 16px;
         font-style: normal;
         font-weight: 400;
-        line-height: 20px; /* 125% */
+        line-height: 20px;
+
+        overflow: hidden; // 내부 요소가 넘치지 않도록 설정
 
         &:hover {
             background-color: #f2f3fe;
@@ -72,11 +91,20 @@
 
     &__menuIcon {
         margin-right: 1rem;
+
+        transition: margin 0.3s ease; // 아이콘 마진에 전환 효과 추가
+        flex-shrink: 0; // 아이콘이 축소되지 않도록 설정
     }
 
     &__menuText {
         font-size: 1rem;
         font-weight: 500;
+
+        transition: all 0.3s ease; // 텍스트에 전환 효과 추가
+        white-space: nowrap; // 텍스트가 줄바꿈되지 않도록 설정
+        opacity: 1;
+        width: auto;
+        overflow: hidden; // 텍스트가 넘치지 않도록 설정
     }
 
     @media (max-width: 768px) {

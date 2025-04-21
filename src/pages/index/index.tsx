@@ -1,13 +1,20 @@
+'use client';
+
 import styles from './styles/index.module.scss';
 import SideBar from '../../components/common/sideBar/SideBar';
 import MainHeader from '../../components/common/header/MainHeader';
 import JobList from './components/jobList/JobList';
+import MyCv from './components/myCv/MyCv';
+import Manage from './components/manage/Manage';
+import Bookmark from './components/bookmark/BookMark';
 import { useState } from 'react';
-import Job from './types/job';
+import type Job from './types/job';
+import usePageStore from '../../store/pageStore';
 
 function Index() {
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-    const [activeContent, setActiveContent] = useState<'jobList' | 'otherContent'>('jobList');
+    const activeContent = usePageStore((state) => state.activeContent);
+    const isCompactMenu = usePageStore((state) => state.isCompactMenu);
 
     const handleJobSelect = (job: Job) => {
         setSelectedJob(job);
@@ -17,16 +24,15 @@ function Index() {
         <div className={styles.layout}>
             <SideBar />
 
-            <div className={styles.mainContent}>
+            <div className={`${styles.mainContent} ${isCompactMenu ? styles.sidebarHidden : ''}`}>
                 <MainHeader />
 
                 <div className={styles.mainContent__container}>
-                    {activeContent === 'jobList' ? (
+                    {activeContent === '추천 공고' && (
                         <div className={styles.mainContent__jobSection}>
                             <div className={styles.mainContent__jobList}>
                                 <JobList onJobSelect={handleJobSelect} />
                             </div>
-
                             {selectedJob && (
                                 <div className={styles.mainContent__jobDetail}>
                                     {/* <JobDetail job={selectedJob} /> */}
@@ -34,15 +40,10 @@ function Index() {
                                 </div>
                             )}
                         </div>
-                    ) : (
-                        <div>A</div>
-                        // <div className={styles.mainContent__otherContent}>
-                        //     {/* 컨텐츠 컴포넌트를 추가 */}
-                        //     <div className={styles.mainContent__placeholder}>
-                        //         <h2>contents</h2>
-                        //     </div>
-                        // </div>
                     )}
+                    {activeContent === '지원 관리' && <Manage />}
+                    {activeContent === '북마크' && <Bookmark />}
+                    {activeContent === '나의 CV' && <MyCv />}
                 </div>
             </div>
         </div>
