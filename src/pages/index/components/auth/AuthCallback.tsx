@@ -2,10 +2,12 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../../../store/authStore';
+import useUserStore from '../../../../store/userStore';
 
 function AuthCallback() {
     const navigate = useNavigate();
-    const { setTokens } = useAuthStore();
+    const { setTokens, setIsLoggedIn } = useAuthStore();
+    const { fetchUserData } = useUserStore();
 
     useEffect(() => {
         axios
@@ -21,12 +23,15 @@ function AuthCallback() {
                     return;
                 }
 
-                setTokens(accessToken);
-                console.log(accessToken);
+                setTokens(accessToken); // 토큰 저장
+                setIsLoggedIn(true); // 로그인 처리
+                fetchUserData(accessToken); // 유저 데이터 불러오기
 
                 if (firstLogin) {
-                    navigate('/signUp/detail');
+                    // +이력서를 올리지 않았다면
+                    navigate('/signUp/detail', { replace: true });
                 } else {
+                    // navigate('/main', { replace: true });
                     navigate('/main');
                 }
             })

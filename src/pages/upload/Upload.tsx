@@ -2,13 +2,18 @@ import { useState, useRef, useCallback } from 'react';
 import { UploadCloud, FileText, X, Check, AlertCircle } from 'lucide-react';
 import style from './styles/Upload.module.scss';
 import { useNavigate } from 'react-router-dom';
+import useFileStore from '../../store/fileStore';
+import useS3Store from '../../store/s3Store';
 
 function Upload() {
-    const [file, setFile] = useState<File | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
+    const { setFile, uploadFile } = useFileStore();
+    const file = useFileStore((state) => state.file);
+    const { getPresignedURL } = useS3Store();
+
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
@@ -17,7 +22,7 @@ function Upload() {
         validateAndSetFile(selectedFile);
     };
 
-    const validateAndSetFile = (selectedFile?: File) => {
+    const validateAndSetFile = async (selectedFile?: File) => {
         setError(null);
 
         if (!selectedFile) return;
@@ -36,22 +41,30 @@ function Upload() {
             setError(`파일 크기는 ${maxSizeMB}MB 이하여야 합니다.`);
             return;
         }
-        setFile(selectedFile);
-
-        // 파일 업로드 시뮬레이션
-        simulateUpload();
+        setFile(selectedFile); // 파일 세팅
+        try {
+            const presignedURL = await getPresignedURL(selectedFile.name); // 서버로부터 S3 업로드 URL을 받아옴
+            if (typeof presignedURL === 'string' && presignedURL) {
+                fileUpload(selectedFile, presignedURL);
+            } else {
+                setError('업로드 URL을 받아오는 데 실패했습니다.');
+            }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
-    const simulateUpload = () => {
+    const fileUpload = (selectedFile: File, presignedURL: string) => {
         setIsUploading(true);
         setUploadSuccess(false);
 
-        // 업로드 시뮬레이션 (실제 구현에서는 API 호출로 대체)
+        uploadFile(selectedFile, presignedURL);
 
+        // pdf 업로드와 스프링 서버의 CV 처리 시간을 벌어줌
         setTimeout(() => {
             setIsUploading(false);
             setUploadSuccess(true);
-        }, 2000);
+        }, 2500);
     };
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {

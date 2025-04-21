@@ -1,23 +1,52 @@
-import style from './styles/index.module.scss';
+import styles from './styles/index.module.scss';
 import SideBar from '../../components/common/sideBar/SideBar';
-import Header from '../../components/common/header/MainHeader';
+import MainHeader from '../../components/common/header/MainHeader';
+import JobList from './components/jobList/JobList';
+import { useState } from 'react';
+import Job from './types/job';
 
-function index() {
+function Index() {
+    const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+    const [activeContent, setActiveContent] = useState<'jobList' | 'otherContent'>('jobList');
+
+    const handleJobSelect = (job: Job) => {
+        setSelectedJob(job);
+    };
+
     return (
-        <div className={style.layout}>
+        <div className={styles.layout}>
             <SideBar />
 
-            {/* 사이드바 컴포넌트 */}
-            <div className={style.mainContent}>
-                <Header />
-                {/* 헤더 컴포넌트 */}
-                <div className={style.mainContent__area}>
-                    {/* 사이드바의 위치에 따라서 다른 컨텐츠 출력 */}
-                    <div>JobList</div>
+            <div className={styles.mainContent}>
+                <MainHeader />
+
+                <div className={styles.mainContent__container}>
+                    {activeContent === 'jobList' ? (
+                        <div className={styles.mainContent__jobSection}>
+                            <div className={styles.mainContent__jobList}>
+                                <JobList onJobSelect={handleJobSelect} />
+                            </div>
+
+                            {selectedJob && (
+                                <div className={styles.mainContent__jobDetail}>
+                                    {/* <JobDetail job={selectedJob} /> */}
+                                    공고 디테일
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div>A</div>
+                        // <div className={styles.mainContent__otherContent}>
+                        //     {/* 컨텐츠 컴포넌트를 추가 */}
+                        //     <div className={styles.mainContent__placeholder}>
+                        //         <h2>contents</h2>
+                        //     </div>
+                        // </div>
+                    )}
                 </div>
             </div>
         </div>
     );
 }
 
-export default index;
+export default Index;

@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useCallback, useRef, useState } from 'react'; // 추가
 import Header from '../../components/common/header/Header';
 import { UploadCloud, FileText, X, Check, AlertCircle } from 'lucide-react';
+import useFileStore from '../../store/fileStore';
+import useS3Store from '../../store/s3Store';
 
 function Index() {
-    const [file, setFile] = useState<File | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 여부 기본값 false, 이후 store.ts에서 관리
+    const { setFile, uploadFile } = useFileStore();
+    const file = useFileStore((state) => state.file);
+    const { getPresignedURL } = useS3Store();
 
     const navigate = useNavigate();
 
@@ -25,7 +27,7 @@ function Index() {
         validateAndSetFile(selectedFile);
     };
 
-    const validateAndSetFile = (selectedFile?: File) => {
+    const validateAndSetFile = async (selectedFile?: File) => {
         setError(null);
         if (!selectedFile) return;
 
@@ -43,19 +45,29 @@ function Index() {
         }
         setFile(selectedFile);
 
-        fileUpload();
+        try {
+            const presignedURL = await getPresignedURL(selectedFile.name); // 서버로부터 S3 업로드 URL을 받아옴
+            if (typeof presignedURL === 'string' && presignedURL) {
+                fileUpload(selectedFile, presignedURL);
+            } else {
+                setError('업로드 URL을 받아오는 데 실패했습니다.');
+            }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
-    const fileUpload = () => {
+    const fileUpload = (selectedFile: File, presignedURL: string) => {
         setIsUploading(true);
         setUploadSuccess(false);
 
-        console.log('test');
-        // 업로드 테스트 => S3 저장으로 변경
+        uploadFile(selectedFile, presignedURL);
+
+        // pdf 업로드와 스프링 서버의 CV 처리 시간을 벌어줌
         setTimeout(() => {
             setIsUploading(false);
             setUploadSuccess(true);
-        }, 2000);
+        }, 2500);
     };
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -89,26 +101,18 @@ function Index() {
         fileInputRef.current?.click();
     };
 
-    const toggleLogin = () => {
-        // 테스트용!!!!!! 배포 시 반드시 지울 것
-        setIsLoggedIn(!isLoggedIn);
-    };
-
-    const handleUploadBoxClick = () => {
-        fileInputRef.current.click();
-    };
-
     const moveToMainPage = () => {
-        navigate('./upload');
+        navigate('./main');
     };
 
     return (
         <div className={style.page}>
-            <Header isLoggedIn={isLoggedIn} />
+            <Header />
 
             <div className={style.page__main}>
                 <div className={style.page__content}>
                     <div className={style.page__text}>
+                        <br />
                         <h1 className={style.page__title}>
                             goodJob이 찾아주는
                             <br />
@@ -116,10 +120,13 @@ function Index() {
                             <br />
                             지금 시작하세요.
                         </h1>
+                        <br />
                         <p className={style.page__subtitle}>Get matched with your perfect job</p>
                         {/* <button className={style.page__landingButton} onClick={toggleLogin}>
                             Get Started
                         </button> */}
+                        <br />
+                        <br />
                         <button className={style.page__landingButton} onClick={moveToMainPage}>
                             Get Started
                         </button>
@@ -162,11 +169,13 @@ function Index() {
                                         <span>또는</span>
                                     </div>
 
-                                    <button
-                                        className={style.dragAndDropCard__button}
-                                        onClick={handleButtonClick}>
-                                        파일에서 선택
-                                    </button>
+                                    <div className={style.fileButtonContainer}>
+                                        <button
+                                            className={style.dragAndDropCard__button}
+                                            onClick={handleButtonClick}>
+                                            파일에서 선택
+                                        </button>
+                                    </div>
                                 </div>
                             )}
 
@@ -208,14 +217,17 @@ function Index() {
                                                 <Check size={20} />
                                                 <span>업로드 완료</span>
                                             </div>
-                                            <button
-                                                className={`${style.dragAndDropCard__button} ${
-                                                    !file || isUploading ? style.disabled : ''
-                                                }`}
-                                                onClick={handleContinue}
-                                                disabled={!file || isUploading}>
-                                                계속하기
-                                            </button>
+
+                                            <div className={style.buttonContainer}>
+                                                <button
+                                                    className={`${style.dragAndDropCard__button} ${
+                                                        !file || isUploading ? style.disabled : ''
+                                                    }`}
+                                                    onClick={handleContinue}
+                                                    disabled={!file || isUploading}>
+                                                    계속하기
+                                                </button>
+                                            </div>
                                         </>
                                     )}
                                 </div>
@@ -228,7 +240,6 @@ function Index() {
                             </div>
                         )}
 
-                        <br />
                         <div className={style.terms}>
                             <p className={style.terms__main}>
                                 이력서를 업로드하면 맞춤 공고와 피드백을 제공합니다.

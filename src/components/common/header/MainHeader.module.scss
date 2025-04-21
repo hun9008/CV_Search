@@ -1,0 +1,154 @@
+.header {
+    display: flex;
+    flex-direction: row;
+    height: 80px;
+
+    padding: 20px; // 수정 필요
+    background-color: #ffffff;
+
+    z-index: 5;
+    transition: all 0.3s ease;
+    border-radius: 20px;
+    align-items: center;
+    justify-content: space-between;
+
+    &__container {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        height: 100%;
+        width: 100%;
+        padding: 0 1.5rem;
+    }
+
+    &__menuButton {
+        // display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333333;
+        padding: 0.5rem;
+        margin-right: 0.5rem;
+    }
+
+    &__search {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        max-width: 240px;
+
+        &Icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #969696;
+        }
+
+        &Input {
+            width: 100%;
+            height: 40px;
+            padding: 0 1rem 0 2.5rem;
+            border-radius: 20px;
+            border: none;
+            background-color: #f4f5f6;
+            font-size: 0.9rem;
+
+            &:focus {
+                outline: none;
+                border-color: #0060c6;
+                background-color: #ffffff;
+            }
+
+            &::placeholder {
+                color: #969696;
+            }
+        }
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: end;
+        width: 100%;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    &__actionButton {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333333;
+        padding: 0.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #f4f5f6;
+        }
+    }
+
+    &__authButtons {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    &__signUpButton,
+    &__signInButton {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: normal;
+        font-family: 'Noto Sans CJK KR';
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    &__signInButton {
+        background-color: #f4f5f6;
+        color: #333333;
+        border: none;
+        &:hover {
+            background-color: #f4f5f6;
+        }
+    }
+
+    &__signUpButton {
+        background-color: #1877f2;
+        color: #ffffff;
+        border: 1px solid #1877f2;
+
+        &:hover {
+            background-color: #1464d8;
+        }
+    }
+
+    @media (max-width: 768px) {
+        left: 70px;
+
+        &__search {
+            max-width: 300px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        left: 0;
+        bottom: 60px;
+
+        &__menuButton {
+            display: block;
+        }
+
+        &__search {
+            max-width: 200px;
+        }
+
+        &__authButtons {
+            display: none;
+        }
+    }
+}

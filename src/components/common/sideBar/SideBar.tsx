@@ -1,12 +1,11 @@
-'use client';
-
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ClipboardList, Star, Bookmark, User } from 'lucide-react';
 import { useState } from 'react';
 import style from './SideBar.module.scss';
 
 function SideBar() {
     const [activeMenu, setActiveMenu] = useState('추천 공고');
+    const navigate = useNavigate();
     const menuItems = [
         {
             id: '지원 관리',
@@ -32,13 +31,18 @@ function SideBar() {
 
     const handleMenuClick = (menuId: string) => {
         console.log(menuId);
-        // setActiveMenu(menuId);
+        setActiveMenu(menuId);
+    };
+    const handleLogoClick = () => {
+        navigate('/');
     };
 
     return (
         <div className={style.sidebar}>
             <div className={style.sidebar__container}>
-                <div className={style.sidebar__logo}>goodJob</div>
+                <div className={style.sidebar__logo} onClick={handleLogoClick}>
+                    goodJob
+                </div>
 
                 <div className={style.sidebar__navigation}>
                     <ul className={style.sidebar__menu}>

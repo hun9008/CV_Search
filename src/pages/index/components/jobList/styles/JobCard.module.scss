@@ -1,0 +1,129 @@
+.jobCard {
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    display: flex;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+    }
+
+    &.selected {
+        border-color: #1877f2;
+        box-shadow: 0 0 0 1px #1877f2;
+    }
+
+    &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        color: #1877f2;
+        margin-right: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    &__content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+
+        &__title {
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+        }
+    }
+
+    &__title {
+        font-family: 'Noto Sans CJK KR';
+        font-size: 1rem;
+        font-weight: 700;
+        line-height: 24px;
+        font-style: normal;
+        color: #333333;
+        margin: 0 0 0.25rem;
+    }
+
+    &__company {
+        font-family: 'Noto Sans CJK KR';
+        font-size: 0.9rem;
+        font-weight: 500;
+        font-style: normal;
+        color: #666666;
+        margin: 0;
+    }
+
+    &__tags {
+        font-family: 'Noto Sans CJK KR';
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        flex: 1;
+        gap: 0.5rem;
+        align-items: start;
+
+        &__tag {
+            color: #03c75a;
+            font-size: 0.75rem;
+        }
+
+        &__location {
+            font-size: 0.75rem;
+
+            color: #666666;
+            font-weight: 500;
+            margin: 0;
+            text-align: center;
+            white-space: nowrap;
+            padding-right: 7px;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        flex: none;
+
+        flex-shrink: 0;
+    }
+
+    &__bookmark {
+        background: none;
+        border: none;
+        color: #b1b5c3;
+        cursor: pointer;
+        padding: 0.25rem;
+        margin-bottom: 0.1rem;
+
+        &.active {
+            color: #f4b11f;
+        }
+    }
+
+    &__score {
+        font-family: 'Noto Sans';
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #333333;
+        margin-bottom: 1rem;
+    }
+}

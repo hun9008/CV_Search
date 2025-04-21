@@ -23,7 +23,7 @@
     }
 
     &__logo {
-        font-size: 2rem;
+        font-size: 40px;
         font-weight: 600;
         font-style: normal;
         color: #1877f2;
@@ -63,7 +63,7 @@
             padding: 0.75rem 1rem 0.75rem 2.5rem;
             border-radius: 50px;
             border: 1px solid #020202;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: transparent;
             font-size: 0.9rem;
 
             &:focus {
@@ -233,12 +233,13 @@
             width: 100%;
             position: relative;
 
-            &Input {
+            input {
                 width: 100%;
                 padding: 0.75rem 1rem 0.75rem 2.5rem;
                 border-radius: 50px;
                 border: 1px solid #020202;
                 background-color: rgba(255, 255, 255, 0.8);
+
                 font-size: 0.9rem;
 
                 &:focus {

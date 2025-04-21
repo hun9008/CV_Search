@@ -1,12 +1,11 @@
 .sidebar {
-    width: 250px;
-    height: 100vh;
-    background-color: #ffffff;
+    max-width: 240px;
+    display: flex;
+    font-family: 'Noto Sans CJK KR';
 
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 10;
+    justify-content: center;
+    background-color: #ffffff;
+    border-radius: 24px;
     transition: all 0.3s ease;
 
     &__container {
@@ -27,6 +26,7 @@
         font-weight: 600;
         line-height: 20px;
         letter-spacing: 0.1px;
+        cursor: pointer;
     }
 
     &__navigation {
@@ -53,6 +53,11 @@
         transition: all 0.2s ease;
         border-left: 3px solid transparent;
 
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 20px; /* 125% */
+
         &:hover {
             background-color: #f2f3fe;
             color: #0060c6;
@@ -61,7 +66,7 @@
         &.active {
             background-color: #f2f3fe;
             color: #0060c6;
-            // border-left: 3px solid #0060c6;
+            border-left: 3px solid #0060c6;
         }
     }
 

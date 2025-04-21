@@ -2,14 +2,14 @@ import { useState } from 'react';
 import style from './Header.module.scss';
 import { Search, Bell, User, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../../../store/authStore';
 
-interface HeaderProps {
-    isLoggedIn: boolean;
-}
-
-function Header({ isLoggedIn }: HeaderProps) {
+function Header() {
     const [searchQuery, setSearchQuery] = useState('');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+    // 테스트용
+    const { setIsLoggedIn } = useAuthStore();
 
     const navigate = useNavigate();
 
@@ -22,6 +22,11 @@ function Header({ isLoggedIn }: HeaderProps) {
 
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!mobileMenuOpen);
+    };
+
+    //테스트용
+    const toggleLoginStatus = () => {
+        setIsLoggedIn(!isLoggedIn);
     };
 
     return (
@@ -58,6 +63,8 @@ function Header({ isLoggedIn }: HeaderProps) {
                                 size={38}
                             />
                             <User className={style.header__profile} aria-label="프로필" size={38} />
+                            {/* 테스트 버튼 */}
+                            <button onClick={toggleLoginStatus}>로그인 상태 전환</button>
                         </>
                     ) : (
                         <>
@@ -71,6 +78,8 @@ function Header({ isLoggedIn }: HeaderProps) {
                             <button className={style.header__authButton} onClick={moveToSignInPage}>
                                 로그인
                             </button>
+                            {/* 테스트 버튼 */}
+                            <button onClick={toggleLoginStatus}>로그인 상태 전환</button>
                         </>
                     )}
                 </div>
