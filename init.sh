@@ -22,5 +22,5 @@ until docker exec mysql-goodjob sh -c 'MYSQL_PWD=$MYSQL_PWD mysqladmin ping -uro
 done
 
 echo "Applying schema.sql..."
-docker exec -i mysql-goodjob sh -c 'MYSQL_PWD=$MYSQL_PWD mysql -uroot' < schema.sql
+docker exec -i mysql-goodjob sh -c "MYSQL_PWD='$MYSQL_ROOT_PASSWORD' mysql -uroot" < schema.sql
 echo "[Success] schema.sql applied."
