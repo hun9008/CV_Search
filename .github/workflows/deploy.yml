@@ -1,4 +1,4 @@
-name: Deploy to EC2 with Password
+name: Deploy to NCP with Password
 
 on:
   push:
@@ -16,17 +16,17 @@ jobs:
       - name: Install sshpass
         run: sudo apt-get install -y sshpass
 
-      - name: Deploy to EC2
+      - name: Deploy to NCP
         env:
-          EC2_USER: ${{ secrets.EC2_USER }}
-          EC2_HOST: ${{ secrets.EC2_RDB_HOST }}
-          EC2_PASSWORD: ${{ secrets.EC2_PASSWORD }}
+          NCP_USER: ${{ secrets.NCP_USER }}
+          NCP_HOST: ${{ secrets.NCP_RDB_HOST }}
+          NCP_PASSWORD: ${{ secrets.NCP_PASSWORD }}
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         run: |
-          sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
+          sshpass -p "$NCP_PASSWORD" ssh -o StrictHostKeyChecking=no $NCP_USER@$NCP_HOST << EOF
             cd CV_Search
           
             git fetch origin dev_RDB

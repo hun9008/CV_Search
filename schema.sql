@@ -35,7 +35,7 @@ CREATE TABLE cv (
     experience TEXT,                                   -- 프로젝트, 근무 경력 등
     awards TEXT,                                       -- 수상 내역
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- 생성 일자
-    last_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
+    last_updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 마지막 수정 일자
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -56,13 +56,14 @@ CREATE TABLE jobs (
     apply_end_date DATE,                   -- 채용 마감일 (회사 입장)
     is_public BOOLEAN DEFAULT TRUE,        -- 사용자에게 노출 여부
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,    -- 생성 일자 (서버 입장)
-    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자 (서버 입장)
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 마지막 수정 일자 (서버 입장)
     expired_at DATETIME DEFAULT NULL,                 -- 공고 내려간 시간 (서버 입장)
     archived_at DATETIME DEFAULT NULL,                -- 공고 숨겨진 시간 (서버 입장)
     raw_jobs_text TEXT NOT NULL,                      -- 크롤링 원문
-    url TEXT                                          -- 공고 상세보기 링크
-    FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE SET NULL -- 지역 외래 키
-    fabicon TEXT DEFAULT NULL,                             -- 파비콘 base64
+    url TEXT,                                          -- 공고 상세보기 링크
+    FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE SET NULL, -- 지역 외래 키
+    favicon TEXT DEFAULT NULL,                             -- 파비콘 base64
+    region_text VARCHAR(255) DEFAULT NULL
 );
 
 CREATE TABLE recommend_score (
@@ -107,7 +108,7 @@ CREATE TABLE applications (
     apply_status ENUM('지원', '서류전형', '코테', '면접', '최종합격', '불합격') DEFAULT '지원', -- 상태
     note TEXT,                                            -- 메모
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,        -- 생성 일자 
-    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 마지막 수정 일자
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
 );
@@ -119,7 +120,7 @@ CREATE TABLE admin_logs (
     action_type ENUM('USER_DELETE', 'JOB_UPDATE', 'FEEDBACK_REVIEW', 'SYSTEM_LOG', 'JOB_REGISTER'), -- 작업 종류
     details TEXT,                                         -- 상세 설명
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,        -- 생성 일자 
-    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 마지막 수정 일자
+    last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 마지막 수정 일자
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
