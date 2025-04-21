@@ -2,20 +2,18 @@ import {
   GoogleGenerativeAI,
   Schema,
   SchemaType,
-  GenerativeModel
 } from '@google/generative-ai';
-import { MongoDbConnector } from '../database/MongoDbConnector';
 import { IParser, SaveParsedContentOptions } from './IParser';
 import { IBotRecruitInfo, IDbRecruitInfo, IRawContent, RecruitInfoModel } from '../models/recruitinfoModel';
-import { VisitResultModel } from '../models/visitResult';
-import { Page } from 'puppeteer';
+import { VisitResultModel } from '@models/visitResult';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { URL } from 'url';
-import fetch from 'node-fetch'
 import { IDbConnector } from '../database';
-import { MySqlRecruitInfoService } from '../database/MySqlRecruitInfoService';
+import { MySqlRecruitInfoService } from '@database/MySqlRecruitInfoService';
+import { MessageService, QueueNames } from '@message/messageService';
+import { RedisUrlManager ,URLSTAUS} from '@url/RedisUrlManager';
 
 let logger: any;
 try {
@@ -60,17 +58,20 @@ export interface GeminiParserOptions {
    */
   model?: string;
 
-
   /**
    * DB 커넥터
    */
   dbConnector: IDbConnector;
 
-
   /**
    * DB 서비스
    */
   mySqlService: MySqlRecruitInfoService;
+
+  /**
+   * URL Mannager
+   */
+
 
   /**
    * 캐시 디렉토리 경로
@@ -91,6 +92,13 @@ export interface GeminiParserOptions {
    * API 요청 타임아웃
    */
   timeout?: number;
+
+
+  redisUrlManager: RedisUrlManager;
+  /**
+   * Message Service
+   */
+  messageService: MessageService;
 
   /**
    * 기타 옵션
@@ -143,6 +151,11 @@ export class GeminiParser implements IParser {
   dbConnector: IDbConnector;
 
   mySqlService: MySqlRecruitInfoService;
+
+  redisUrlManager: RedisUrlManager;
+
+  messageService: MessageService;
+
   /**
    * GeminiParser 생성자
    * @param options 파서 옵션
@@ -158,7 +171,8 @@ export class GeminiParser implements IParser {
     this.useCache = options.useCache !== undefined ? options.useCache : true;
     this.dbConnector = options.dbConnector;
     this.mySqlService = options.mySqlService;
-
+    this.messageService = options.messageService;
+    this.redisUrlManager = options.redisUrlManager;
     // API 키 설정은 initialize 메서드에서 수행
   }
 
@@ -204,6 +218,9 @@ export class GeminiParser implements IParser {
       if (this.useCache) {
         await this._ensureCacheDirs();
       }
+      await this.mySqlService.connect();
+      await this.dbConnector.connect();
+      await this.messageService.connect();
 
       this.initialized = true;
       logger.info(`GeminiParser 초기화 완료 (모델: ${this.modelName}, 캐시: ${this.useCache ? '사용' : '미사용'})`);
@@ -372,15 +389,42 @@ export class GeminiParser implements IParser {
         await this.initialize();
       }
 
+      if (!this.messageService) {
+        throw new Error('RabbitMQManager 또는 MessageService가 초기화되지 않았습니다.');
+      }
+
+      const rawContents: IRawContent[] = await this.messageService.consumeMessages<IRawContent>(
+        'visit_results',
+        batchSize
+      );
+
+      if (rawContents.length === 0) {
+        logger.warn('조건에 맞는 원본 콘텐츠가 없습니다.');
+      }
+
+      return rawContents;
+    } catch (error) {
+      logger.error(`원본 콘텐츠 로드 중 오류: ${(error as Error).message}`);
+      return [];
+    }
+  }
+
+   async loadMongoRawContent(batchSize: number): Promise<IRawContent[]> {
+    try {
+      // 초기화 확인
+      if (!this.initialized) {
+        await this.initialize();
+      }
+
       const pipeline = [
         { $unwind: '$suburl_list' },
         {
           $match: {
             'suburl_list.visited': true,
             'suburl_list.success': true,
-            $or: [
-              { 'suburl_list.isRecruit': null },
-              { 'suburl_list.isRecruit': { $exists: false } }
+            $and: [
+              { 'suburl_list.isRecruit': true },
+              { 'suburl_list.isRecruit': { $exists: true } }
             ]
           }
         },
@@ -783,6 +827,7 @@ ${content}
     return this._executeApiCallWithRetries(apiCall);
   }
 
+
   /**
    * 현재 API 키 상태 조회
    */
@@ -806,41 +851,11 @@ ${content}
    */
   async updateRecruitStatus(rawContent: IRawContent, parsedContent: IBotRecruitInfo): Promise<boolean> {
     try {
-      if (!rawContent.url || !rawContent.domain) {
-        logger.warn('URL 또는 도메인 정보가 없어 isRecruit 상태를 업데이트할 수 없습니다.');
-        return false;
+      if (parsedContent.is_recruit_info===true) {
+        await this.redisUrlManager.setURLStatus(rawContent.url, URLSTAUS.HAS_RECRUITINFO);
+      } else {
+        await this.redisUrlManager.setURLStatus(rawContent.url, URLSTAUS.NO_RECRUITINFO);
       }
-
-      // 채용 정보 여부 결정
-      const isRecruit = parsedContent.is_recruit_info === true;
-      const isItRecruit = parsedContent.is_it_recruit_info === true;
-
-      logger.info(`URL의 isRecruit 상태 업데이트 중: ${rawContent.url}, isRecruit=${isRecruit}, isItRecruit=${isItRecruit}`);
-
-      // MongoDB 도메인 문서에서 특정 URL의 isRecruit 필드 업데이트
-      const updateResult = await VisitResultModel.updateOne(
-        {
-          domain: rawContent.domain,
-          'suburl_list.url': rawContent.url
-        },
-        {
-          $set: {
-            'suburl_list.$.isRecruit': isRecruit
-          }
-        }
-      );
-      // console.log(updateResult); // 이거 꼭 찍어봐!
-      if (updateResult.matchedCount === 0) {
-        logger.warn(`URL을 찾을 수 없음: ${rawContent.url}`);
-        return false;
-      }
-
-      if (updateResult.modifiedCount === 0) {
-        logger.warn(`URL은 찾았으나 업데이트되지 않음 (이미 같은 값으로 설정됨): ${rawContent.url}`);
-        return true; // 문서는 찾았으나 변경이 없는 경우도 성공으로 간주
-      }
-
-      logger.info(`URL의 isRecruit 상태 업데이트 성공: ${rawContent.url}`);
       return true;
     } catch (error) {
       logger.error(`URL의 isRecruit 상태 업데이트 중 오류: ${(error as Error).message}`);
@@ -849,7 +864,7 @@ ${content}
   }
 
   /**
-   * Parser 시작
+   * Parser 몽고 DB와 연동해서 시작
    * 원본 콘텐츠를 로드하고 파싱한 후 결과를 저장합니다.
    */
   async run(): Promise<() => void> {
@@ -862,10 +877,11 @@ ${content}
       logger.info(`${this.getName()} 파서 실행 시작`);
 
       // 배치 크기 설정
-      const batchSize = 100;
+      const batchSize = 100000;
 
       // 원본 콘텐츠 로드
-      const rawContents = await this.loadRawContent(batchSize);
+      //loadRawContent
+      const rawContents = await this.loadMongoRawContent(batchSize);
 
       if (rawContents.length === 0) {
         logger.warn('처리할 원본 콘텐츠가 없습니다.');
@@ -888,14 +904,14 @@ ${content}
           if (parsedContent.is_recruit_info && parsedContent.job_description) {
             // 파싱 결과 저장
             const dbRecruitInfo = this.makeDbRecruitInfo( parsedContent,rawContent);
-            const saved = await this.saveParsedContent(dbRecruitInfo, { destination: 'db' });
+            // const saved = await this.saveParsedContent(dbRecruitInfo, { destination: 'db' });
 
-            if (saved) {
+            // if (saved) {
               successCount++;
               const result = await this.mySqlService.saveRecruitInfo(dbRecruitInfo);
               console.log(result);
               logger.info(`[${i + 1}/${rawContents.length}] 파싱 및 저장 성공: ${rawContent.url.substring(0, 50)}...`);
-            }
+            // }
           }
 
           // isRecruit 상태 업데이트
