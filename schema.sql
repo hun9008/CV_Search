@@ -39,6 +39,15 @@ CREATE TABLE cv (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Region 테이블
+CREATE TABLE regions (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    cd VARCHAR(10) NOT NULL UNIQUE,       -- 행정구역 코드 (10자리)
+    sido VARCHAR(20) NOT NULL,            -- 시/도 (예: 서울, 경기)
+    sigungu VARCHAR(50)                   -- 시/군/구 (예: 종로구, 수원시 영통구) 
+    -- 시도만 있고 시군구 null 가능 (예: 서울, null)
+);
+
 -- 채용 공고 테이블
 CREATE TABLE jobs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,  -- 공고 고유 ID
@@ -124,14 +133,6 @@ CREATE TABLE admin_logs (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Region 테이블
-CREATE TABLE regions (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    cd VARCHAR(10) NOT NULL UNIQUE,       -- 행정구역 코드 (10자리)
-    sido VARCHAR(20) NOT NULL,            -- 시/도 (예: 서울, 경기)
-    sigungu VARCHAR(50)                   -- 시/군/구 (예: 종로구, 수원시 영통구) 
-    -- 시도만 있고 시군구 null 가능 (예: 서울, null)
-);
 
 -- -- 사용자 검색 히스토리 테이블
 -- CREATE TABLE search_history (
