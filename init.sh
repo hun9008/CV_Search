@@ -2,7 +2,9 @@
 set -e
 
 if [ -f .env ]; then
-  export $(grep -v '^#' .env | xargs)
+  set -a
+  source .env
+  set +a
 fi
 
 MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-}"
@@ -14,11 +16,11 @@ fi
 
 echo "Waiting for MySQL to be ready..."
 
-until docker exec mysql-goodjob mysqladmin ping -uroot -p"$MYSQL_ROOT_PASSWORD" --silent; do
+until docker exec mysql-goodjob mysqladmin ping -uroot --password="$MYSQL_ROOT_PASSWORD" --silent; do
   echo "Waiting for MySQL..."
   sleep 2
 done
 
 echo "Applying schema.sql..."
-docker exec -i mysql-goodjob mysql -uroot -p"$MYSQL_ROOT_PASSWORD" < schema.sql
+docker exec -i mysql-goodjob mysql -uroot --password="$MYSQL_ROOT_PASSWORD" < schema.sql
 echo "[Success] schema.sql applied."
