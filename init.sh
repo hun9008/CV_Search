@@ -7,20 +7,20 @@ if [ -f .env ]; then
   set +a
 fi
 
-MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-}"
-
 if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
-  echo "MYSQL_ROOT_PASSWORD가 설정되지 않았습니다 (.env 또는 인자)."
+  echo "MYSQL_ROOT_PASSWORD가 설정되지 않았습니다."
   exit 1
 fi
 
+export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"
+
 echo "Waiting for MySQL to be ready..."
 
-until docker exec mysql-goodjob mysqladmin ping -uroot --password="$MYSQL_ROOT_PASSWORD" --silent; do
+until docker exec mysql-goodjob sh -c 'MYSQL_PWD=$MYSQL_PWD mysqladmin ping -uroot --silent'; do
   echo "Waiting for MySQL..."
   sleep 2
 done
 
 echo "Applying schema.sql..."
-docker exec -i mysql-goodjob mysql -uroot --password="$MYSQL_ROOT_PASSWORD" < schema.sql
+docker exec -i mysql-goodjob sh -c 'MYSQL_PWD=$MYSQL_PWD mysql -uroot' < schema.sql
 echo "[Success] schema.sql applied."
