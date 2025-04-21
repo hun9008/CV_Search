@@ -1,4 +1,5 @@
 import amqp, { Channel, ChannelModel } from 'amqplib';
+import { QueueNames } from './messageService';
 
 /**
  * RabbitMQ Connection Manager
@@ -75,11 +76,22 @@ export class RabbitMQManager {
   }
 
   /**
+   * Get the current channel
+   * @returns The current channel or null if not connected
+   */
+  public getChannel(): Channel  {
+    if (!this.channel) {
+      throw new Error("channel이 존재하지 않습니다.");
+    }
+    return this.channel;
+  }
+
+  /**
    * Create a queue if it doesn't exist
    * @param queueName Name of the queue to create or check
    * @param options Queue options
    */
-  public async assertQueue(queueName: string, options: amqp.Options.AssertQueue = { durable: true }): Promise<amqp.Replies.AssertQueue> {
+  public async assertQueue(queueName: QueueNames, options: amqp.Options.AssertQueue = { durable: true }): Promise<amqp.Replies.AssertQueue> {
     try {
       if (!this.channel) {
         await this.connect();
@@ -103,7 +115,7 @@ export class RabbitMQManager {
    * @param options Message options
    * @returns True if message was sent successfully, false otherwise
    */
-  public async sendToQueue(queueName: string, message: any, options: amqp.Options.Publish = {}): Promise<boolean> {
+  public async sendToQueue(queueName: QueueNames, message: any, options: amqp.Options.Publish = {}): Promise<boolean> {
     try {
       if (!this.channel) {
         await this.connect();
