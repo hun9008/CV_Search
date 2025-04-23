@@ -1,5 +1,5 @@
 import amqp, { Channel, ChannelModel } from 'amqplib';
-import { QueueNames } from './messageService';
+import { QueueNames } from './MessageService';
 
 /**
  * RabbitMQ Connection Manager

@@ -1,4 +1,4 @@
-import { QueueNames } from './messageService';
+import { QueueNames } from './MessageService';
 import {  ConsumeMessage } from 'amqplib';
 
 

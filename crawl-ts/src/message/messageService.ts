@@ -1,4 +1,4 @@
-import RabbitMQManager from './rabbitMQManager';
+import RabbitMQManager from './RabbitMQManager';
 import { Channel, ConsumeMessage } from 'amqplib';
 import { IMessageService } from './IMessageService';
 /**
