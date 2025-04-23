@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { RecruitInfoModel } from '../../models/recruitinfoModel';
-import { VisitResultModel } from '../../models/visitResult';
+import { RecruitInfoModel } from '../../models/RecruitInfoModel';
+import { VisitResultModel } from '../../models/VisitResult';
 import { defaultLogger as logger } from '../../utils/logger';
 import { PipelineStage } from 'mongoose';
 

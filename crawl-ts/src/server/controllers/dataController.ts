@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { VisitResult, VisitResultModel, SubUrl } from '../../models/visitResult';
+import { VisitResult, VisitResultModel, SubUrl } from '../../models/VisitResult';
 import { defaultLogger as logger } from '../../utils/logger';
 import { PipelineStage } from 'mongoose';
 

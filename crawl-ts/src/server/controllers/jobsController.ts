@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { RecruitInfoModel } from '../../models/recruitinfoModel';
+import { RecruitInfoModel } from '../../models/RecruitInfoModel';
 import { defaultLogger as logger } from '../../utils/logger';
 
 /**
