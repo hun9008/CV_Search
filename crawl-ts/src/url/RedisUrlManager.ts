@@ -55,7 +55,10 @@ export const enum URLSTAUS
     constructor() {
       this.redisClient = redis;
     }
-
+   /**
+     * Connects to the Redis server.
+     * Attempts to establish a connection to the Redis server and checks the connection by sending a ping.
+     */
     async connect() {
       try {
         await this.redisClient.connect();
@@ -257,19 +260,12 @@ export const enum URLSTAUS
         }
 
         // 순차적으로 도메인 선택
-        if (this.currentDomainIndex >= this.availableDomains.length) {
-          this.currentDomainIndex = 0;
-        }
-
         const domain = this.availableDomains[this.currentDomainIndex];
-        this.currentDomainIndex++;
+        this.currentDomainIndex = (this.currentDomainIndex + 1) % this.availableDomains.length;
 
         const result = await this.getNextUrlFromDomain(domain);
+
         logger.debug(result?.url ?? '');
-        if (!result) {
-          this.recursionCount++;
-          return this.tryNextDomain();
-        }
         return result;
       } catch (error) {
         const err = error as any;
@@ -277,6 +273,8 @@ export const enum URLSTAUS
         return this.handleDomainError();
       }
     }
+
+
       /**
        * 주어진 텍스트의 sha256 해시를 생성하여, 해당 해시값을 포함하는 Redis 키(text:{sha256})가 존재하는지 확인
        * @param text 확인할 텍스트
@@ -324,19 +322,11 @@ export const enum URLSTAUS
      * @returns 랜덤 URL 또는 null
      */
     async getRandomUrlByStatus(status: UrlStatus): Promise<string | null> {
-
       return await redis.sRandMember(`status:${status}`);
     }
 
-    /**
-     * 다음 도메인 시도
-     * @returns URL 및 도메인 정보 객체 또는 null
-     */
-    async tryNextDomain(): Promise<{ url: string; domain: string } | null> {
-      // 재귀 제한 확인은 getNextUrl에서 처리
-      logger.info(`다른 도메인 시도 중... (${this.recursionCount}/${this.availableDomains.length})`);
-      return this.getNextUrl();
-    }
+
+
 
     /**
      * 방문하지 않은 URL 추가하기
@@ -370,7 +360,6 @@ export const enum URLSTAUS
         this.errorCount = 0;
         return null;
       }
-
       logger.info('오류 발생 후 다른 도메인에서 URL 가져오기 시도...');
       return this.getNextUrl();
     }
