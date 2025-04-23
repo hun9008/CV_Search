@@ -1,6 +1,5 @@
 import { IDbConnector } from './IDbConnector';
 import { defaultLogger as logger } from '../utils/logger';
-import { VisitResult, SubUrl, VisitResultModel, ISubUrl } from '../models/VisitResult';
 import mongoose from 'mongoose';
 
 /**
@@ -52,106 +51,5 @@ export class MongoDbConnector implements IDbConnector {
     }
   }
 
-  /**
-   * 방문 결과 저장
-   * @param subUrlResult 저장할 방문 결과 객체
-   * @returns 저장 성공 여부
-   */
-  async saveVisitResult(subUrlResult: SubUrl): Promise<boolean> {
-    const startTime = Date.now();
 
-    try {
-      if (!this.isConnected) {
-        await this.connect();
-      }
-
-      const domain = subUrlResult.domain;
-      const url = subUrlResult.url;
-
-      logger.debug(`도메인 ${domain}의 URL ${url} 방문 결과 저장 중...`);
-
-      // 도메인 문서 찾기 (없으면 생성)
-      let domainDoc = await VisitResult.findOne({ domain });
-
-      if (!domainDoc) {
-        domainDoc = new VisitResult({
-          domain,
-          suburl_list: [],
-        });
-        logger.debug(`도메인 ${domain}에 대한 새 문서 생성`);
-      }
-
-      // suburl_list 배열이 없으면 초기화
-      if (!domainDoc.suburl_list) {
-        domainDoc.suburl_list = [];
-      }
-
-      // 해당 URL 찾기
-      let existingUrlIndex = domainDoc.suburl_list.findIndex(item => item.url === url);
-
-      if (existingUrlIndex >= 0) {
-        domainDoc.suburl_list[existingUrlIndex] = subUrlResult.toObject() as unknown as ISubUrl;
-        logger.debug(`기존 URL ${url} 정보 업데이트`);
-      } else {
-        domainDoc.suburl_list.push(subUrlResult.toObject() as unknown as ISubUrl);
-        logger.debug(`새 URL ${url} 정보 추가`);
-      }
-
-      // 방금 저장한 URL 항목에 대한 요약 정보 표시
-      const savedUrlEntry = domainDoc.suburl_list.find(item => item.url === url);
-      if (savedUrlEntry) {
-        // 로깅만 수행
-        logger.debug(`URL ${url} 저장 완료`);
-      }
-
-      logger.debug(`도메인 ${domain} 문서 저장 완료`);
-
-      // 발견된 URL을 데이터베이스에 추가
-      const urlsToAdd = subUrlResult.crawledUrls || [];
-
-      // 각 URL 처리
-      for (const newUrl of urlsToAdd) {
-        try {
-          // suburl_list 배열에 이미 URL이 있는지 확인
-          const urlExists = domainDoc.suburl_list.some(item => item.url === newUrl);
-
-          if (!urlExists) {
-            // 새 URL을 suburl_list에 추가 - SubUrl 모델 사용
-            const newSubUrl = new SubUrl({
-              url: newUrl,
-              domain: domain,
-              visited: false,
-              discoveredAt: new Date(),
-              created_at: new Date()
-            });
-
-            logger.debug(`추가 url ${newUrl} 추가 완료`);
-            // toObject()로 변환하여 추가
-            domainDoc.suburl_list.push(newSubUrl.toObject() as unknown as ISubUrl);
-          }
-        } catch (urlError) {
-          logger.error(`URL 추가 중 오류 (${newUrl}):`, urlError);
-        }
-      }
-
-      // 도메인 문서 저장
-      domainDoc.updated_at = new Date();
-      await domainDoc.save();
-
-      const runtime = Date.now() - startTime;
-      logger.eventInfo('save_visit_result', { runtime });
-
-      return true;
-    } catch (error) {
-      logger.error(`방문 결과 저장 중 오류:`, error);
-
-      const runtime = Date.now() - startTime;
-      logger.eventInfo('save_visit_result', {
-        runtime,
-        error: error instanceof Error ? error.message : String(error)
-      });
-
-      return false;
-    }
-  }
 }
