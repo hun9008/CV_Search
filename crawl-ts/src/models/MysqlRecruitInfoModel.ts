@@ -142,8 +142,7 @@ export function initRecruitInfoModel(sequelize: Sequelize): typeof MysqlRecruitI
   return MysqlRecruitInfoSequelize;
 }
 
-
-  export const sequelize = new Sequelize(
+  export const mysqlRecruitInfoSequelize = new Sequelize(
       process.env.MYSQL_HOST ?? 'localhost',
       process.env.MYSQL_USER ?? 'root' ,
       process.env.MYSQL_PASSWORD ?? '',
@@ -166,4 +165,6 @@ export function initRecruitInfoModel(sequelize: Sequelize): typeof MysqlRecruitI
           timestamps: true // createdAt, updatedAt 자동 관리
         }
       }
-    );
+  );
+export const MysqlRecruitInfoModel = initRecruitInfoModel(mysqlRecruitInfoSequelize);
+export const mysqlRecruitInfoModel = new MysqlRecruitInfoModel();

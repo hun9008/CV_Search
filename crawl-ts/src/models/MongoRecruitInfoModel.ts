@@ -1,5 +1,5 @@
 // models/recruitinfoModel.ts
-import { IBaseRecruitInfo, ICacheDbRecruitInfo } from '@models/RecruitInfoModel';
+import { ICacheDbRecruitInfo } from '@models/RecruitInfoModel';
 import { Schema } from 'mongoose';
 import mongoose  from 'mongoose';
 
@@ -32,4 +32,4 @@ const RecruitInfoSchema = new Schema<ICacheDbRecruitInfo>({
 });
 
 
-export const RecruitInfoModel = mongoose.model<ICacheDbRecruitInfo>('recruitInfos', RecruitInfoSchema);
+export const MongoRecruitInfoModel = mongoose.model<ICacheDbRecruitInfo>('recruitInfos', RecruitInfoSchema);
