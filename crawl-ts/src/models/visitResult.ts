@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
 /**
  * SubUrl 모델 - 방문할 URL과 방문 결과를 저장하는 구조
@@ -101,6 +101,7 @@ export class SubUrl implements ISubUrl {
     stack?: string;
     url?: string;
   }> = [];
+  isRecruit?: boolean;
 
   /**
    * SubUrl 생성자
@@ -125,6 +126,7 @@ export class SubUrl implements ISubUrl {
     this.success = data.success || false;
     this.error = data.error;
     this.errors = data.errors || [];
+    this.isRecruit = data.isRecruit;
 
     if (data.crawlStats) {
       this.crawlStats = {
@@ -157,7 +159,8 @@ export class SubUrl implements ISubUrl {
       crawlStats: this.crawlStats,
       success: this.success,
       error: this.error,
-      errors: this.errors
+      errors: this.errors,
+      isRecruit: this.isRecruit
     };
   }
 }
@@ -197,7 +200,8 @@ const SubUrlSchema = new Schema({
     message: { type: String },
     stack: { type: String },
     url: { type: String }
-  }]
+  }],
+  isRecruit: { type: Boolean }
 });
 
 const VisitResultSchema = new Schema({
