@@ -5,14 +5,14 @@ import {
 } from '@google/generative-ai';
 import { IParser } from './IParser';
 import {  IBotRecruitInfo, ICacheDbRecruitInfo, IDbRecruitInfo, IRawContent } from '../models/RecruitInfoModel';
-import { VisitResultModel } from '@models/VisitResult';
+import { VisitResultModel } from '../models/VisitResult';
 import { URL } from 'url';
 import { IDbConnector } from '../database';
-import { QueueNames } from '@message/messageService';
-import { IMessageService } from '@message/IMessageService';
-import { URLSTAUS } from '@url/RedisUrlManager';
-import { IUrlManager } from '@url/IUrlManager';
-import { IRecruitInfoRepository } from '@database/IRecruitInfoRepository';
+import { QueueNames } from '../message/MessageService';
+import { IMessageService } from '../message/IMessageService';
+import { URLSTAUS } from '../url/RedisUrlManager';
+import { IUrlManager } from '../url/IUrlManager';
+import { IRecruitInfoRepository } from '../database/IRecruitInfoRepository';
 import { defaultLogger as logger } from '../utils/logger';
 import { MysqlRecruitInfoRepository } from '@database/MysqlRecruitInfoRepository';
 

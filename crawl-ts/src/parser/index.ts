@@ -4,7 +4,7 @@ import { MongoDbConnector } from '@database/MongoDbConnector';
 import { MysqlRecruitInfoRepository} from '@database/MysqlRecruitInfoRepository';
 import { MongoRecruitInfoModel } from '@models/MongoRecruitInfoModel';
 import { mysqlRecruitInfoModel, mysqlRecruitInfoSequelize } from '@models/MysqlRecruitInfoModel';
-import MessageService from '@message/messageService';
+import MessageService from '@message/MessageService';
 import { RedisUrlManager } from '@url/RedisUrlManager';
 import { MongoRecruitInfoRepository } from '@database/MongoRecruitInfoRepository';
 import { MysqlRecruitInfoSequelize } from '@models/MysqlRecruitInfoModel';
