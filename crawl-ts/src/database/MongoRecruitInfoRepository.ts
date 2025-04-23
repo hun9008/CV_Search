@@ -1,12 +1,12 @@
 // repositories/MongoRecruitInfoRepository.ts
 import { ICacheDbRecruitInfo } from '@models/RecruitInfoModel';
-import { RecruitInfoModel } from '@models/MongoRecruitInfoModel';
+import { MongoRecruitInfoModel } from '@models/MongoRecruitInfoModel';
 import { IRecruitInfoRepository } from './IRecruitInfoRepository';
 
 export class MongoRecruitInfoRepository implements IRecruitInfoRepository {
-  private recruitInfoModel: typeof RecruitInfoModel;
+  private recruitInfoModel: typeof MongoRecruitInfoModel;
 
-  constructor(recruitInfoModel: typeof RecruitInfoModel) {
+  constructor(recruitInfoModel: typeof MongoRecruitInfoModel) {
     this.recruitInfoModel = recruitInfoModel;
   }
 

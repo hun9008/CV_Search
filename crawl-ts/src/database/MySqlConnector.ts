@@ -1,6 +1,6 @@
 import { IDbConnector } from './IDbConnector';
 import { defaultLogger as logger } from '../utils/logger';
-import { SubUrl } from '../models/visitResult';
+import { SubUrl } from '../models/VisitResult';
 import mysql from 'mysql2/promise';
 
 /**

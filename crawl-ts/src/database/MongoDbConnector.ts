@@ -1,6 +1,6 @@
 import { IDbConnector } from './IDbConnector';
 import { defaultLogger as logger } from '../utils/logger';
-import { VisitResult, SubUrl, VisitResultModel, ISubUrl } from '../models/visitResult';
+import { VisitResult, SubUrl, VisitResultModel, ISubUrl } from '../models/VisitResult';
 import mongoose from 'mongoose';
 
 /**

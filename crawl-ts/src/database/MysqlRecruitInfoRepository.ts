@@ -9,8 +9,8 @@ import { IRecruitInfoRepository } from './IRecruitInfoRepository';
  * 채용 정보를 MySQL 데이터베이스에 저장하고 관리하는 서비스
  */
 export class MysqlRecruitInfoRepository implements IRecruitInfoRepository {
-  private recruitInfoModel: Model
-  private sequelize: Sequelize
+  private recruitInfoModel?: Model
+  private sequelize?: Sequelize
 
   /**
    * MySQL 서비스 생성자
