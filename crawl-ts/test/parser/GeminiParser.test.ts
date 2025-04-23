@@ -2,7 +2,7 @@ import { GeminiParser, GeminiParserOptions } from '../../src/parser/GeminiParser
 import { IDbConnector } from '@database/IDbConnector';
 import { IBotRecruitInfo, IRawContent } from '../../src/models/RecruitInfoModel';
 import * as dotenv from 'dotenv';
-import { MessageService, QueueNames } from '../../src/message/messageService';
+import { MessageService, QueueNames } from '../../src/message/MessageService';
 import { RedisUrlManager, URLSTAUS } from '../../src/url/RedisUrlManager';
 import { IRecruitInfoRepository } from '../../src/database/IRecruitInfoRepository';
 import { MysqlRecruitInfoRepository } from '@database/MysqlRecruitInfoRepository';

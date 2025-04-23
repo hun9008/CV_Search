@@ -1,5 +1,5 @@
-import MessageService, { QueueNames } from '../../src/message/messageService';
-import RabbitMQManager from '../../src/message/rabbitMQManager';
+import MessageService, { QueueNames } from '../../src/message/MessageService';
+import RabbitMQManager from '../../src/message/RabbitMQManager';
 
 // Mock RabbitMQManager
 jest.mock('../../src/message/rabbitMQManager', () => {

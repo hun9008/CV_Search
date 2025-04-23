@@ -1,6 +1,6 @@
 import amqp from 'amqplib';
-import RabbitMQManager from '../../src/message/rabbitMQManager';
-import { QueueNames } from '@message/messageService';
+import RabbitMQManager from '../../src/message/RabbitMQManager';
+import { QueueNames } from '@message/MessageService';
 // Mock amqplib
 
 jest.mock('amqplib', () => {
