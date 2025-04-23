@@ -1,8 +1,11 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  preset: 'jest-puppeteer',
+  preset:"jest-puppeteer",
   testEnvironment: 'node',
-  moduleFileExtensions: ['ts', 'js'],
+  moduleFileExtensions: [ "ts",
+    "tsx",
+    "js"],
+  coveragePathIgnorePatterns: ['WebContentExtractor.ts'],
   testMatch: ['**/test/**/*.test.ts'],
   transform: {
     '^.+\\.ts$': 'ts-jest',
