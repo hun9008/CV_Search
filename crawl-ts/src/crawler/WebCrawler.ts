@@ -1,64 +1,54 @@
-import { ICrawler } from './ICrawler';
-import { IBrowserManager } from '../browser/IBrowserManager';
-import { IContentExtractor } from '../content/IContentExtractor';
-import { IUrlManager } from '../url/IUrlManager';
-import { IDbConnector } from '../database/IDbConnector';
-import { SubUrl } from '../models/visitResult';
-import { defaultLogger as logger } from '../utils/logger';
-import { extractDomain } from '../url/urlUtils';
-import { Dialog } from 'puppeteer';
-
-/**
- * 웹 크롤러 구현체
- * 브라우저, 콘텐츠 추출, URL 관리, DB 연결 컴포넌트를 조합한 크롤러
- */
-export class WebCrawler implements ICrawler {
-  browserManager: IBrowserManager;
-  contentExtractor: IContentExtractor;
-  urlManager: IUrlManager;
-  dbConnector: IDbConnector;
-
-  delayBetweenRequests: number;
-  headless: boolean;
-  maxUrls: number;
-  strategy: string;
-  currentUrl?: string;
-  isRunning: boolean = false;
+  import { ICrawler } from './ICrawler';
+  import { IBrowserManager } from '../browser/IBrowserManager';
+  import { IContentExtractor } from '../content/IContentExtractor';
+  import { SubUrl, VisitResult } from '../models/VisitResult';
+  import { defaultLogger as logger } from '../utils/logger';
+  import { extractDomain } from '../url/urlUtils';
+  import { Dialog } from 'puppeteer';
+  import { IMessageService } from '../message/IMessageService';
+  import { IUrlManager } from '../url/IUrlManager';
+import { URLSTAUS } from '@url/RedisUrlManager';
 
   /**
-   * 웹 크롤러 생성자
-   * @param options 크롤러 옵션
+   * 웹 크롤러 구현체
+   * 브라우저, 콘텐츠 추출, URL 관리, DB 연결 컴포넌트를 조합한 크롤러
    */
-  constructor(options: {
+  export class WebCrawler implements ICrawler {
     browserManager: IBrowserManager;
     contentExtractor: IContentExtractor;
     urlManager: IUrlManager;
-    dbConnector: IDbConnector;
-    delayBetweenRequests: number;
-    headless: boolean;
-    maxUrls: number;
-    strategy: string;
-  }) {
-    this.browserManager = options.browserManager;
-    this.contentExtractor = options.contentExtractor;
-    this.urlManager = options.urlManager;
-    this.dbConnector = options.dbConnector;
-    this.delayBetweenRequests = options.delayBetweenRequests;
-    this.headless = options.headless;
-    this.maxUrls = options.maxUrls;
-    this.strategy = options.strategy;
-  }
+    messageService: IMessageService;
 
-  /**
-   * 크롤러 초기화
-   */
-  async initialize(): Promise<void> {
-    // 데이터베이스 연결
-    await this.dbConnector.connect();
-    logger.debug('크롤러 초기화 완료');
-  }
+    /**
+     * 웹 크롤러 생성자
+     * @param options 크롤러 옵션
+     */
+    constructor(options: {
+      browserManager: IBrowserManager;
+      contentExtractor: IContentExtractor;
+      messageService: IMessageService;
+      urlManager: IUrlManager;
 
-  /**
+    }) {
+      this.browserManager = options.browserManager;
+      this.contentExtractor = options.contentExtractor;
+      this.urlManager = options.urlManager;
+      this.messageService = options.messageService;
+    }
+
+    /**
+     * 크롤러 초기화
+     */
+    async initialize(): Promise<void> {
+      // 데이터베이스 연결
+      await this.messageService.connect();
+
+      await this.urlManager.connect();
+
+      logger.debug('크롤러 초기화 완료');
+    }
+
+    /**
    * URL 방문 및 데이터 추출
    * @param urlInfo 방문할 URL 정보
    * @returns 방문 결과
@@ -73,6 +63,8 @@ export class WebCrawler implements ICrawler {
       domain: domain,
       visited: true,
       visitedAt: new Date(),
+      herfUrls: [],
+      onclickUrls: [],
     });
 
     let page;
@@ -144,11 +136,12 @@ export class WebCrawler implements ICrawler {
       }
 
       subUrlResult.success = true;
-
+      // console.log(subUrlResult.herfUrls);
+      // console.log(subUrlResult.onclickUrls);
       // 모든 발견된 URL 병합
       subUrlResult.crawledUrls = Array.from(new Set([
-        ...(subUrlResult.herfUrls || []),
-        ...(subUrlResult.onclickUrls || [])
+        ...subUrlResult.herfUrls,
+        ...subUrlResult.onclickUrls
       ]));
 
       // 통계 정보 업데이트
@@ -165,6 +158,10 @@ export class WebCrawler implements ICrawler {
 
       return subUrlResult;
     } catch (error) {
+
+      if (!page) {
+        throw error;
+      }
       // 오류 정보를 결과 객체에 추가
       subUrlResult.success = false;
       subUrlResult.error = error instanceof Error ? error.message : String(error);
@@ -194,62 +191,59 @@ export class WebCrawler implements ICrawler {
     }
   }
 
-  /**
-   * URL 큐 처리
-   */
-  async processQueue(): Promise<void> {
-    if (this.isRunning) {
-      return;
-    }
-    this.isRunning = true;
-
-    try {
-      // 데이터베이스 연결
-      await this.dbConnector.connect();
-
-      // 방문 URL 카운터
-      let visitCount = 0;
-
-      // URL을 하나씩 가져와 처리
-      while (visitCount < this.maxUrls) {
-        try {
-          const nextUrlInfo = await this.urlManager.getNextUrl();
-          if (!nextUrlInfo) {
-            logger.debug('더 이상 방문할 URL이 없습니다.');
-            break;
-          }
-
-          visitCount++;
-          this.currentUrl = nextUrlInfo.url;
-
-          logger.debug(`URL ${visitCount}/${this.maxUrls} 처리 중...`);
-
-          // URL 방문 및 처리
-          const visitResult = await this.visitUrl(nextUrlInfo);
-
-          // 결과를 데이터베이스에 저장
-          await this.dbConnector.saveVisitResult(visitResult);
-
-          // 요청 사이 지연 추가
-          if (visitCount < this.maxUrls) {
-            logger.debug(`다음 URL 처리 전 ${this.delayBetweenRequests}ms 대기...`);
-            await new Promise(resolve => setTimeout(resolve, this.delayBetweenRequests));
-          }
-        } catch (error) {
-          logger.error(`URL 처리 중 오류:`, error);
-        } finally {
-          await this.browserManager.closeBrowser();
-        }
-      }
-
-      logger.debug(`큐 처리 완료. 총 ${visitCount}개 URL 방문`);
-    } catch (error) {
-      logger.error('큐 처리 중 오류:', error);
-    } finally {
-      await this.browserManager.closeBrowser();
-      this.isRunning = false;
-    }
+  async saveVisitResult(result: SubUrl): Promise<boolean> {
+    await this.messageService.sendVisitResult(result);
+    result.crawledUrls.map((url) => {
+      this.urlManager.addUrl(url, result.domain, URLSTAUS.NOT_VISITED)
+    })
+    await this.urlManager.setURLStatus(result.url, URLSTAUS.VISITED);
+    return true;
   }
+
+async processQueue(): Promise<void> {
+    let visitCount = 0;
+    while (true) {
+      try {
+        const nextUrlInfo = await this.urlManager.getNextUrl();
+        if (!nextUrlInfo) {
+
+          logger.debug('더 이상 방문할 URL이 없습니다.');
+          break;
+        }
+
+        visitCount++;
+
+        logger.debug(`URL ${visitCount} 처리 중...`);
+
+        const visitResult = await this.visitUrl(nextUrlInfo);
+
+        if (!visitResult.text) {
+          logger.debug("텍스트 없음, 건너뜀.");
+          continue;
+        }
+
+        const isSaveSuccess = await this.urlManager.saveTextHash(visitResult.text);
+        if (isSaveSuccess===false) {
+          logger.debug("중복된 텍스트, 저장하지 않음.");
+          this.urlManager.setURLStatus(visitResult.url, URLSTAUS.NO_RECRUITINFO);
+          continue;
+        }
+
+        await this.saveVisitResult(visitResult);
+
+        // if (visitCount < this.maxUrls) {
+        //   logger.debug(`다음 URL 처리 전 ${this.delayBetweenRequests}ms 대기...`);
+        //   await new Promise(resolve => setTimeout(resolve, this.delayBetweenRequests));
+        // }
+      } catch (error) {
+        throw error;
+      } finally {
+        await this.browserManager.closeBrowser();
+      }
+    }
+    logger.debug(`큐 처리 완료. 총 ${visitCount}개 URL 방문`);
+}
+
 
   /**
    * 크롤러 실행

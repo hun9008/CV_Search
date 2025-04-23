@@ -2,7 +2,8 @@ import { IBrowserManager } from '../browser/IBrowserManager';
 import { IContentExtractor } from '../content/IContentExtractor';
 import { IUrlManager } from '../url/IUrlManager';
 import { IDbConnector } from '../database/IDbConnector';
-import { SubUrl } from '../models/visitResult';
+import { SubUrl } from '../models/VisitResult';
+import { RedisUrlManager } from '../url/RedisUrlManager';
 
 /**
  * 크롤러 인터페이스
@@ -18,41 +19,22 @@ export interface ICrawler {
    * 콘텐츠 추출기
    */
   contentExtractor: IContentExtractor;
-
   /**
-   * URL 관리자
+   *  Redis URL 관리자
    */
   urlManager: IUrlManager;
 
-  /**
-   * 데이터베이스 커넥터
-   */
-  dbConnector: IDbConnector;
-
-  /**
-   * 요청 사이 지연 시간(ms)
-   */
-  delayBetweenRequests: number;
-
-  /**
-   * 헤드리스 모드 사용 여부
-   */
-  headless: boolean;
-
-  /**
-   * 최대 방문 URL 수
-   */
-  maxUrls: number;
-
-  /**
-   * 현재 URL
-   */
-  currentUrl?: string;
 
   /**
    * 크롤러 초기화
    */
   initialize(): Promise<void>;
+
+
+  /**
+   * 크롤로 결과 저장
+   */
+  saveVisitResult(result : SubUrl ): Promise<boolean>;
 
   /**
    * URL 방문

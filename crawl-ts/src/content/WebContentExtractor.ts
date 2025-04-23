@@ -96,7 +96,7 @@ export class WebContentExtractor implements IContentExtractor {
 
       return result;
     } catch (error) {
-      logger.error('콘텐츠 추출 중 오류:', error);
+      logger.error('콘텐츠 추출 중 오류');
       // 오류 발생 시 기본값 반환
       return {
         title: '',
@@ -202,15 +202,15 @@ export class WebContentExtractor implements IContentExtractor {
       logger.debug(`${uniqueLinks.length}개의 고유 URL 중 ${allowedLinks.length}개 URL이 도메인 필터를 통과했습니다.`);
       return allowedLinks;
     } catch (error) {
-      logger.error('링크 추출 중 오류:', error);
+      logger.error('링크 추출 중 오류',error);
       return [];
     }
   }
 
   async  extractOnclickLinks(page: Page , allowedDomains : string[]): Promise<string[]> {
-  // 1. 스크롤하면서 모든 a[onclick] 태그 수집
-  const onclickScripts = await this.collectOnclickScriptsWithScroll(page);
-
+    // 1. 스크롤하면서 모든 a[onclick] 태그 수집
+    const onclickScripts = await this.collectOnclickScriptsWithScroll(page);
+    console.debug(onclickScripts);
   // 2. 각 onclick 스크립트를 병렬로 실행해 redirect된 URL 수집
   const redirectedUrls = await Promise.all(
     onclickScripts.map(async (script) => {
@@ -232,12 +232,14 @@ export class WebContentExtractor implements IContentExtractor {
       }
     })
   );
-  // 3. 유효한 URL 중 allowedDomains에 해당하는 것만 필터링
-  const filteredUrls = redirectedUrls.filter((url): url is string =>
-    !!url && allowedDomains.some(domain => url.includes(domain))
-  );
 
-  return filteredUrls;
+  return Array.from(
+  new Set(
+    redirectedUrls.filter((url): url is string =>
+      !!url && allowedDomains.some(domain => url.includes(domain))
+    )
+  )
+);
 }
 
 async  collectOnclickScriptsWithScroll(page: Page): Promise<string[]> {
@@ -245,7 +247,7 @@ async  collectOnclickScriptsWithScroll(page: Page): Promise<string[]> {
   let previousHeight = 0;
 
   for (let i = 0; i < 10; i++) { // 제한적으로 10번까지만 스크롤
-    const newOnclicks = await page.$$eval('a[onclick]', (anchors) =>
+    const newOnclicks = await page.$$eval('*[onclick]', (anchors) =>
       anchors.map((a) => a.getAttribute('onclick') || '')
     );
     newOnclicks.forEach((s) => collected.add(s));
