@@ -3,11 +3,11 @@
  */
 import { ChromeBrowserManager } from './browser/ChromeBrowserManager';
 import { WebContentExtractor } from './content/WebContentExtractor';
-import { MongoDbUrlManager } from './url/MongoDbUrlManager';
-import { MongoDbConnector } from './database/MongoDbConnector';
 import { WebCrawler } from './crawler/WebCrawler';
 import CONFIG from './config/config';
 import { defaultLogger as logger } from './utils/logger';
+import MessageService from './message/messageService';
+import { RedisUrlManager } from './url/RedisUrlManager';
 
 
 /**
@@ -27,22 +27,15 @@ function createCrawler(options = {}) {
   // 각 컴포넌트 초기화
   const browserManager = new ChromeBrowserManager();
   const contentExtractor = new WebContentExtractor();
-  const urlManager = new MongoDbUrlManager({
-    strategy,
-    specificDomain
-  });
-  const dbConnector = new MongoDbConnector();
+  const messageService = new MessageService();
+  const redisUrlManager = new RedisUrlManager();
 
   // 크롤러 인스턴스 생성
   return new WebCrawler({
     browserManager,
     contentExtractor,
-    urlManager,
-    dbConnector,
-    delayBetweenRequests: CONFIG.CRAWLER.DELAY_BETWEEN_REQUESTS,
-    headless: CONFIG.BROWSER.HEADLESS,
-    maxUrls: CONFIG.CRAWLER.MAX_URLS,
-    strategy,
+    messageService,
+    redisUrlManager,
   });
 }
 
