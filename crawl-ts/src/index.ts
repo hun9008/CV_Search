@@ -6,7 +6,7 @@ import { WebContentExtractor } from './content/WebContentExtractor';
 import { WebCrawler } from './crawler/WebCrawler';
 import CONFIG from './config/config';
 import { defaultLogger as logger } from './utils/logger';
-import MessageService from './message/messageService';
+import MessageService from './message/MessageService';
 import { RedisUrlManager } from './url/RedisUrlManager';
 
 
@@ -28,14 +28,14 @@ function createCrawler(options = {}) {
   const browserManager = new ChromeBrowserManager();
   const contentExtractor = new WebContentExtractor();
   const messageService = new MessageService();
-  const redisUrlManager = new RedisUrlManager();
+  const urlManager = new RedisUrlManager();
 
   // 크롤러 인스턴스 생성
   return new WebCrawler({
     browserManager,
     contentExtractor,
     messageService,
-    redisUrlManager,
+    urlManager,
   });
 }
 
