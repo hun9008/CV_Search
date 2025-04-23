@@ -1,0 +1,189 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const puppeteer_1 = __importDefault(require("puppeteer"));
+const WebContentExtractor_1 = require("../../src/content/WebContentExtractor");
+jest.setTimeout(30000); // Keep reasonable timeout for Puppeteer
+describe('WebContentExtractor', () => {
+    let browser;
+    let page;
+    let contentExtractor;
+    beforeAll(async () => {
+        try {
+            browser = await puppeteer_1.default.launch({
+                headless: true, // Keep headless true for typical CI/testing
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            });
+            console.log('[SETUP] Puppeteer browser launched.');
+        }
+        catch (error) {
+            console.error('[ERROR] Failed to launch browser:', error);
+            // Throwing ensures the test suite fails clearly if setup fails
+            throw error;
+        }
+        contentExtractor = new WebContentExtractor_1.WebContentExtractor();
+    });
+    beforeEach(async () => {
+        page = await browser.newPage();
+        // Set content for each test to ensure isolation
+        await page.setContent(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>WebContentExtractor Test Page</title>
+        <meta name="description" content="Test description for WebContentExtractor">
+        <meta name="keywords" content="test, extractor, content">
+        <meta property="og:title" content="OG Title">
+      </head>
+      <body>
+        <h1>Test Content for WebContentExtractor</h1>
+        <p>This is a test paragraph for content extraction testing.</p>
+        <div style="display:none">This text should not be extracted</div>
+        <a href="https://example.com/normal-link">Normal Link</a>
+        <a href="https://another.com/other-link">Other Domain Link</a>
+        <a href="javascript:void(0)">JavaScript Link</a>
+        <a href="mailto:test@example.com">Email Link</a>
+        <a id="clickable-link" onclick="window.location.href='https://example.com/redirect'">Click Me Redirect</a>
+        <a id="clickable-link-2" onclick="someFunction()">Click Me Function</a>
+      </body>
+      </html>
+    `);
+        // console.log('[TEST] Test page content loaded.'); // Optional: Keep if useful for debugging
+    });
+    afterEach(async () => {
+        // Restore all mocks created with jest.spyOn
+        jest.restoreAllMocks();
+        if (page && !page.isClosed()) { // Check if page is closed before closing
+            await page.close();
+        }
+    });
+    afterAll(async () => {
+        if (browser) {
+            await browser.close();
+            console.log('[TEARDOWN] Puppeteer browser closed.');
+        }
+    });
+    // --- Integration Style Tests (Rely on Puppeteer's DOM interaction) ---
+    test('[Integration] should extract title, meta and visible text accurately', async () => {
+        const content = await contentExtractor.extractPageContent(page);
+        expect(content.title).toBe('WebContentExtractor Test Page');
+        // Check specific meta tags
+        expect(content.meta).toEqual(expect.objectContaining({
+            'description': 'Test description for WebContentExtractor',
+            'keywords': 'test, extractor, content',
+            'og:title': 'OG Title'
+        }));
+        // Check text content - be specific about what should/shouldn't be included
+        expect(content.text).toContain('Test Content for WebContentExtractor');
+        expect(content.text).toContain('This is a test paragraph for content extraction testing.');
+        expect(content.text).not.toContain('This text should not be extracted'); // Check hidden text exclusion
+        expect(content.text).toContain('Normal Link'); // Link text should be included
+        expect(content.text).toContain('Click Me Redirect');
+        // Ensure no errors were logged
+        // expect(logger.error).not.toHaveBeenCalled();
+    });
+    test('[Integration] should extract valid href links filtered by domain', async () => {
+        // Assuming extractLinks returns a specific structure, e.g., { hrefLinks: string[] }
+        // Adjust based on the actual return type of your method. If it just returns string[], update accordingly.
+        const linkResult = await contentExtractor.extractLinks(page, ['example.com']); // Filter by example.com
+        // Expecting a specific structure. Modify if your method returns just string[]
+        const expectedLinks = ['https://example.com/normal-link'];
+        // Check the structure and content. Adjust if your method returns only string[]
+        expect(linkResult).toBeDefined();
+        // If linkResult is directly string[]:
+        expect(linkResult).toEqual(expectedLinks);
+        // If linkResult is { hrefLinks: string[] }:
+        // expect(linkResult).toHaveProperty('hrefLinks');
+        // expect(linkResult.hrefLinks).toEqual(expect.arrayContaining(expectedLinks));
+        // expect(linkResult.hrefLinks).not.toContain('https://another.com/other-link'); // Verify filtering
+        // expect(linkResult.hrefLinks).not.toContain('javascript:void(0)');
+        // expect(linkResult.hrefLinks).not.toContain('mailto:test@example.com');
+        // expect(logger.error).not.toHaveBeenCalled();
+    });
+    // --- Unit Style Tests (Mocking dependencies) ---
+    test('[Unit] collectOnclickScriptsWithScroll should query DOM for onclick attributes', async () => {
+        const mockOnClickScripts = [
+            "window.location.href='https://example.com/redirect'",
+            "someFunction()"
+        ];
+        // Mock the Puppeteer method used internally by collectOnclickScriptsWithScroll
+        const $$evalSpy = jest.spyOn(page, '$$eval').mockResolvedValue(mockOnClickScripts);
+        const scripts = await contentExtractor.collectOnclickScriptsWithScroll(page);
+        // Verify the correct selector was used (adjust '*[onclick]' if needed)
+        expect($$evalSpy).toHaveBeenCalledWith('*[onclick]', expect.any(Function));
+        // Verify the result matches the mocked value
+        expect(scripts).toEqual(mockOnClickScripts);
+        // expect(logger.error).not.toHaveBeenCalled();
+    });
+    test('[Unit] extractOnclickLinks should process scripts and simulate clicks correctly', async () => {
+        const collectedScripts = [
+            "window.location.href='https://example.com/redirect'", // Valid redirect
+            "location.href = '/relative/path'", // Valid relative path
+            "someOtherFunction()", // Not a location change
+            "window.open('https://example.com/popup')", // Window open might be handled differently? Assume we extract this too for now.
+        ];
+        const baseUrl = 'https://base.com'; // Assume a base URL for relative paths
+        await page.goto(baseUrl); // Set a base URL for the page context
+        // 1. Mock the script collection step
+        const collectSpy = jest.spyOn(contentExtractor, 'collectOnclickScriptsWithScroll')
+            .mockResolvedValue(collectedScripts);
+        // 2. Mock browser.newPage and the interactions needed to get the final URL
+        //    We need to simulate the navigation caused by evaluating the script snippet.
+        const mockTempPage = {
+            // Simulate evaluating the script and the resulting navigation
+            evaluate: jest.fn().mockImplementation(async (script) => {
+                // Simple simulation: if script changes location.href, update internal URL
+                if (script.includes("window.location.href='https://example.com/redirect'")) {
+                    mockTempPage.url.mockReturnValue('https://example.com/redirect');
+                }
+                else if (script.includes("location.href = '/relative/path'")) {
+                    // Need URL module to resolve relative path
+                    const url = new URL('/relative/path', baseUrl);
+                    mockTempPage.url.mockReturnValue(url.toString());
+                }
+                else if (script.includes("window.open('https://example.com/popup'")) {
+                    // If window.open results in a new target URL we want
+                    mockTempPage.url.mockReturnValue('https://example.com/popup');
+                }
+                // Add more conditions if needed for other script types
+                return Promise.resolve(); // evaluate returns a promise
+            }),
+            waitForNavigation: jest.fn().mockResolvedValue(null), // Assume navigation completes
+            url: jest.fn().mockReturnValue(baseUrl), // Initial URL before evaluate changes it
+            close: jest.fn().mockResolvedValue(undefined),
+            browser: jest.fn(), // Add browser property if needed by internal logic
+            setContent: jest.fn().mockResolvedValue(undefined), // Add setContent if needed
+            // Add other methods if extractOnclickLinks uses them on the temp page
+        };
+        const newPageSpy = jest.spyOn(browser, 'newPage').mockResolvedValue(mockTempPage); // Use 'as any' carefully
+        // Execute the method under test
+        const allowedDomains = ['example.com', 'base.com']; // Include base.com for the relative path result
+        const links = await contentExtractor.extractOnclickLinks(page, allowedDomains);
+        // Verify mocks and results
+        expect(collectSpy).toHaveBeenCalledWith(page); // Was script collection called?
+        expect(newPageSpy).toHaveBeenCalledTimes(4); // Called for each script that implies navigation? Adjust count based on logic.
+        expect(mockTempPage.evaluate).toHaveBeenCalledTimes(4); // Called for relevant scripts
+        // Check evaluate calls with specific scripts (optional, but good for detail)
+        expect(mockTempPage.evaluate).toHaveBeenCalledWith("window.location.href='https://example.com/redirect'");
+        expect(mockTempPage.evaluate).toHaveBeenCalledWith("location.href = '/relative/path'");
+        expect(mockTempPage.evaluate).toHaveBeenCalledWith("window.open('https://example.com/popup')");
+        // Verify extracted links (adjust based on how your method handles window.open, relative paths, etc.)
+        expect(links).toEqual(expect.arrayContaining([
+            'https://example.com/redirect',
+            'https://base.com/relative/path', // Resolved relative URL
+            'https://example.com/popup' // Assuming window.open is extracted
+        ]));
+        // Ensure it respects allowedDomains (if applicable after navigation)
+        // This depends on whether filtering happens before or after simulation. Assuming after:
+        expect(links).toEqual([
+            'https://example.com/redirect',
+            'https://base.com/relative/path',
+            'https://example.com/popup'
+        ]);
+        expect(mockTempPage.close).toHaveBeenCalledTimes(4); // Ensure temp pages are closed
+        // expect(logger.error).not.toHaveBeenCalled();
+    });
+});
+//# sourceMappingURL=WebContentExtractor.test.js.map
