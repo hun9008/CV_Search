@@ -142,8 +142,9 @@ export function initRecruitInfoModel(sequelize: Sequelize): typeof MysqlRecruitI
   return MysqlRecruitInfoSequelize;
 }
 
+console.log(process.env.MYSQL_HOST);
   export const mysqlRecruitInfoSequelize = new Sequelize(
-      process.env.MYSQL_HOST ?? 'localhost',
+      process.env.MYSQL_DATABASE ?? 'localhost',
       process.env.MYSQL_USER ?? 'root' ,
       process.env.MYSQL_PASSWORD ?? '',
       {
