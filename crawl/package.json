@@ -45,6 +45,9 @@
     "redis": "^4.7.0",
     "reflect-metadata": "^0.2.2",
     "robots-parser": "^3.0.1",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.2",
+    "sqlite3": "^5.1.7",
     "typeorm": "^0.3.22",
     "typescript": "^5.8.3"
   },
