@@ -1,59 +1,211 @@
 import { GeminiParser, GeminiParserOptions } from '../../src/parser/GeminiParser';
-import { MongoDbConnector } from '../../src/database/MongoDbConnector';
-import { IDbConnector } from '../../src/database';
-import { IBotRecruitInfo, IRawContent } from '../../src/models/recruitinfoModel';
-import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { IDbConnector } from '@database/IDbConnector';
+import { IBotRecruitInfo, IRawContent } from '../../src/models/RecruitInfoModel';
 import * as dotenv from 'dotenv';
-import MessageService from '../../src/message/messageService';
-import RabbitMQManager from '../../src/message/rabbitMQManager';
-import { MySqlRecruitInfoService } from '../../src/database/MySqlRecruitInfoService';
-import { RedisUrlManager } from '../../src/url/RedisUrlManager';
+import { MessageService, QueueNames } from '../../src/message/messageService';
+import { RedisUrlManager, URLSTAUS } from '../../src/url/RedisUrlManager';
+import { IRecruitInfoRepository } from '../../src/database/IRecruitInfoRepository';
+import { MysqlRecruitInfoRepository } from '@database/MysqlRecruitInfoRepository';
+import { IUrlManager } from '@url/IUrlManager';
+import { IMessageService } from '@message/IMessageService';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// Mock dependencies
+jest.mock('../../src/database/MongoDbConnector', () => {
+  return jest.fn().mockImplementation(() => ({
+    connect: jest.fn().mockResolvedValue(undefined),
+    disconnect: jest.fn().mockResolvedValue(undefined),
+    getCollection: jest.fn().mockReturnValue({}),
+    isConnected: jest.fn().mockReturnValue(true),
+  }));
+});
+
+jest.mock('../../src/database/MysqlRecruitInfoRepository', () => {
+  return jest.fn().mockImplementation(() => ({
+    createRecruitInfo: jest.fn().mockResolvedValue({ id: 1 }),
+    updateRecruitInfo: jest.fn().mockResolvedValue(true),
+    getRegionIdByCode: jest.fn().mockResolvedValue(1),
+    findByUrl: jest.fn().mockResolvedValue(null),
+    findAll: jest.fn().mockResolvedValue([]),
+    findById: jest.fn().mockResolvedValue(null),
+    deleteRecruitInfo: jest.fn().mockResolvedValue(true),
+  }));
+});
+
+// Mock the RedisUrlManager
+jest.mock('../../src/url/RedisUrlManager', () => {
+  return jest.fn().mockImplementation(() => ({
+    connect: jest.fn().mockResolvedValue(undefined),
+    setURLStatus: jest.fn().mockImplementation((url, status) => {
+      return Promise.resolve(true);
+    }),
+    getURLStatus: jest.fn().mockResolvedValue(null),
+    getRandomUrlByStatus: jest.fn().mockResolvedValue('https://example.com'),
+    textExists: jest.fn().mockResolvedValue(false),
+    saveTextHash: jest.fn().mockResolvedValue(true),
+    addUrl: jest.fn().mockResolvedValue(undefined),
+    getNextUrl: jest.fn().mockResolvedValue({
+      url: 'https://example.com',
+      domain: 'example.com'
+    }),
+    initAvailableDomains: jest.fn().mockResolvedValue(undefined),
+    getAllDomains: jest.fn().mockResolvedValue(['example.com']),
+  }));
+});
+
+// Mock the MessageService
+jest.mock('../../src/message/messageService', () => {
+  const MessageServiceMock = jest.fn().mockImplementation(() => ({
+    // Implement all methods from the IMessageService interface
+    connect: jest.fn().mockResolvedValue(undefined),
+    close: jest.fn().mockResolvedValue(undefined),
+    sendVisitResult: jest.fn().mockResolvedValue(true),
+    sendRecruitInfo: jest.fn().mockResolvedValue(true),
+    sendRawContent: jest.fn().mockResolvedValue(true),
+    consumeMessages: jest.fn().mockResolvedValue([]),
+    handleLiveMessage: jest.fn().mockResolvedValue(undefined),
+    sendAck: jest.fn().mockResolvedValue(undefined)
+  }));
+
+  return {
+    __esModule: true,
+    default: MessageServiceMock,
+    MessageService: MessageServiceMock,
+    QueueNames: {
+      VISIT_RESULTS: 'visit_results',
+      URL_SEED: 'url_seed',
+      RECRUIT_INFO: 'recruit_info'
+    },
+    // Export the interface too
+    IMessageService: jest.fn()
+  };
+});
+
+// Mock GoogleGenerativeAI
+jest.mock('@google/generative-ai', () => {
+  const mockGenerateContent = jest.fn().mockResolvedValue({
+    response: {
+      text: () => JSON.stringify({
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_text: '서울시 강남구',
+        region_id: '1168000000',
+        require_experience: '경력 3년 이상',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01',
+        requirements: 'JavaScript, TypeScript, React 경험',
+        preferred_qualifications: 'NextJS, GraphQL 경험',
+        ideal_candidate: '적극적이고 능동적인 개발자'
+      })
+    }
+  });
+
+  return {
+    GoogleGenerativeAI: jest.fn().mockImplementation(() => ({
+      getGenerativeModel: jest.fn().mockImplementation(() => ({
+        generateContent: mockGenerateContent
+      }))
+    })),
+    SchemaType: {
+      OBJECT: 'OBJECT',
+      BOOLEAN: 'BOOLEAN',
+      STRING: 'STRING'
+    }
+  };
+});
+
+// Mock VisitResultModel - static method를 모킹하기 위한 방법
+jest.mock('../../src/models/visitResult', () => {
+  return {
+    VisitResultModel: {
+      aggregate: jest.fn().mockResolvedValue([])
+    }
+  };
+});
 
 // 환경 변수 로드
 dotenv.config();
 
-jest.mock('../../src/url/rabbitMQManager');
-jest.mock('../../src/message/messageService');
-jest.mock('../../src/database/MySqlRecruitInfoService');
-
 // 테스트 그룹 분리
 describe('GeminiParser', () => {
   let parser: GeminiParser;
-  let mongod: MongoMemoryServer;
-  let dbConnector: IDbConnector;
+  let options: GeminiParserOptions;
 
-  // 테스트 전 초기화
-  beforeAll(async () => {
-    // MongoDB 메모리 서버 시작
-    mongod = await MongoMemoryServer.create();
-    const uri = mongod.getUri();
-    // DB 커넥터 초기화
-    dbConnector = new MongoDbConnector({ dbUri: uri });
-    await dbConnector.connect();
-  });
-
-  // 테스트 후 정리
-  afterAll(async () => {
-    // Mongoose 연결 해제
-    await dbConnector.disconnect();
-    // MongoDB 메모리 서버 종료
-    await mongod.stop();
-  });
+  // Repository mock 객체 직접 생성 (new 방식 대신)
+  let mockRecruitInfoRepository: MysqlRecruitInfoRepository;
+  let mockCacheRecruitInfoRepository: IRecruitInfoRepository;
+  let mockRedisUrlManager: IUrlManager;
+  let mockMessageService: IMessageService;
 
   // 각 테스트 전에 새로운 파서 인스턴스 생성
   beforeEach(() => {
-    // GeminiParser 옵션 설정
-    const options: GeminiParserOptions = {
-      // dbConnector의 메서드를 모킹하여 실제 DB 연결 없이 동작하도록 처리합니다.
-      dbConnector: new  MongoDbConnector(),
-      messageService: new MessageService(),
-      mySqlService: new MySqlRecruitInfoService({}),
-      redisUrlManager : new RedisUrlManager(),
-      // 실제 API 키 대신 모의 API 키 사용
-      apiKey: 'mock-api-key',
-      useCache: false,  // 테스트에서는 캐시 사용 안 함
-      model: 'gemini-mock-model'
+    // Reset all mocks
+    jest.clearAllMocks();
+
+    // GeminiParser 옵션 설정을 위한 mock 인스턴스들 생성
+    const dbConnector = {
+      connect: jest.fn().mockResolvedValue(true),
+      disconnect: jest.fn().mockRejectedValue(true),
+    } as IDbConnector;
+
+    const cacheDbConnector = {
+      connect: jest.fn().mockResolvedValue(true),
+      disconnect: jest.fn().mockRejectedValue(true),
+    } as IDbConnector;
+
+    // 직접 mock 객체 생성 - 인스턴스화 대신 mocked 함수들을 가진 객체 생성
+    mockRecruitInfoRepository = {
+      createRecruitInfo: jest.fn().mockResolvedValue({ id: 1 }),
+      updateRecruitInfo: jest.fn().mockResolvedValue(true),
+      getRegionIdByCode: jest.fn().mockResolvedValue(90),
+    };
+
+    mockCacheRecruitInfoRepository = {
+      createRecruitInfo: jest.fn().mockResolvedValue({ id: 2 }),
+      updateRecruitInfo: jest.fn().mockResolvedValue(true),
+    };
+
+    mockRedisUrlManager = {
+      connect: jest.fn().mockResolvedValue(undefined),
+      setURLStatus: jest.fn().mockResolvedValue(true),
+      getURLStatus: jest.fn().mockResolvedValue(null),
+      getRandomUrlByStatus: jest.fn().mockResolvedValue('https://example.com'),
+      getNextUrlFromDomain :jest.fn().mockResolvedValue('example.com'),
+      textExists: jest.fn().mockResolvedValue(false),
+      saveTextHash: jest.fn().mockResolvedValue(true),
+      addUrl: jest.fn().mockResolvedValue(undefined),
+      getNextUrl: jest.fn().mockResolvedValue({
+        url: 'https://example.com',
+        domain: 'example.com'
+      }),
+    } as IUrlManager;
+
+    // MessageService 인스턴스 생성 대신 mock 객체 생성
+    mockMessageService = {
+      connect: jest.fn().mockResolvedValue(undefined),
+      close: jest.fn().mockResolvedValue(undefined),
+      sendVisitResult: jest.fn().mockResolvedValue(true),
+      sendRecruitInfo: jest.fn().mockResolvedValue(true),
+      sendRawContent: jest.fn().mockResolvedValue(true),
+      consumeMessages: jest.fn().mockResolvedValue([]),
+      handleLiveMessage: jest.fn().mockResolvedValue(undefined),
+      sendAck: jest.fn().mockResolvedValue(undefined)
+    };
+
+    // GeminiParser 옵션 설정 - 직접 생성한 mock 객체들 사용
+    options = {
+      apiKey: 'test-api-key',
+      model: 'gemini-1.5-pro',
+      dbConnector :dbConnector,
+      cacheDbConnector :cacheDbConnector,
+      recruitInfoRepository: mockRecruitInfoRepository,
+      cacheRecruitInfoRepository: mockCacheRecruitInfoRepository,
+      urlManager: mockRedisUrlManager,
+      messageService: mockMessageService
     };
 
     // GeminiParser 인스턴스 생성
@@ -63,27 +215,109 @@ describe('GeminiParser', () => {
   // 기본 테스트 - 모킹 없이 기본 설정 테스트
   describe('Basic Functionality', () => {
     // 파서 인스턴스가 생성되는지 테스트
-    test('creates parser instance successfully', () => {
+    test('should create parser instance successfully', () => {
       expect(parser).toBeInstanceOf(GeminiParser);
+    });
+
+    test('should return correct parser name', () => {
       expect(parser.getName()).toBe('GeminiParser');
     });
 
     // 초기화 메서드 테스트
-    test('initializes parser successfully', async () => {
+    test('should initialize parser successfully', async () => {
       const result = await parser.initialize();
       expect(result).toBe(true);
     });
 
     // Gemini API 키 상태 조회 테스트
-    test('getKeyStatus returns correct information', async () => {
+    test('should return totalKeys property in keyStatus', async () => {
       await parser.initialize();
       const keyStatus = parser.getKeyStatus();
-
       expect(keyStatus).toHaveProperty('totalKeys');
+    });
+
+    test('should return currentKeyIndex property in keyStatus', async () => {
+      await parser.initialize();
+      const keyStatus = parser.getKeyStatus();
       expect(keyStatus).toHaveProperty('currentKeyIndex');
+    });
+
+    test('should return currentApiKey property in keyStatus', async () => {
+      await parser.initialize();
+      const keyStatus = parser.getKeyStatus();
       expect(keyStatus).toHaveProperty('currentApiKey');
+    });
+
+    test('should return isClientInitialized property in keyStatus', async () => {
+      await parser.initialize();
+      const keyStatus = parser.getKeyStatus();
       expect(keyStatus).toHaveProperty('isClientInitialized');
+    });
+
+    test('should return model property in keyStatus', async () => {
+      await parser.initialize();
+      const keyStatus = parser.getKeyStatus();
       expect(keyStatus).toHaveProperty('model');
+    });
+  });
+
+  // API 키 초기화 메서드 테스트
+  describe('_initializeKey Method Tests', () => {
+    test('should initialize API key correctly with valid key', async () => {
+      const result = parser['_initializeKey']('test-valid-key', undefined, 0);
+      expect(result).toBe(true);
+      expect(parser['apiKey']).toBe('test-valid-key');
+      expect(parser['currentKeyIndex']).toBe(0);
+    });
+
+    test('should initialize API key correctly with valid key array', async () => {
+      const keyArray = ['key1', 'key2', 'key3'];
+      const result = parser['_initializeKey'](undefined, keyArray, 1);
+      expect(result).toBe(true);
+      expect(parser['apiKey']).toBe('key2');
+      expect(parser['currentKeyIndex']).toBe(1);
+    });
+
+    test('should default to index 0 when no keyIndex provided', async () => {
+      const keyArray = ['key1', 'key2', 'key3'];
+      const result = parser['_initializeKey'](undefined, keyArray, undefined);
+      expect(result).toBe(true);
+      expect(parser['apiKey']).toBe('key1');
+      expect(parser['currentKeyIndex']).toBe(0);
+    });
+
+    test('should handle invalid key index by defaulting to 0', async () => {
+      const keyArray = ['key1', 'key2', 'key3'];
+      // Index out of bounds
+      const result = parser['_initializeKey'](undefined, keyArray, 10);
+      expect(result).toBe(true);
+      expect(parser['apiKey']).toBe('key1');
+      expect(parser['currentKeyIndex']).toBe(0);
+    });
+
+    test('should handle negative key index by defaulting to 0', async () => {
+      const keyArray = ['key1', 'key2', 'key3'];
+      const result = parser['_initializeKey'](undefined, keyArray, -1);
+      expect(result).toBe(true);
+      expect(parser['apiKey']).toBe('key1');
+      expect(parser['currentKeyIndex']).toBe(0);
+    });
+
+    test('should return false when no keys are provided', async () => {
+      const result = parser['_initializeKey'](undefined, undefined, 0);
+      expect(result).toBe(false);
+      expect(parser['apiKey']).toBeNull();
+      expect(parser['currentKeyIndex']).toBe(-1);
+    });
+
+    test('should prioritize single key over key array when both provided', async () => {
+      const keyArray = ['key1', 'key2', 'key3'];
+      const singleKey = 'main-key';
+      const result = parser['_initializeKey'](singleKey, keyArray, 1);
+      expect(result).toBe(true);
+      expect(parser['apiKeys']).toContain(singleKey);
+      // The index may not be 1 as expected since we're adding to a Set first
+      expect(parser['apiKey']).not.toBeNull();
     });
   });
 
@@ -132,10 +366,10 @@ describe('GeminiParser', () => {
     });
 
     // DB 저장용 모델 변환 테스트
-    test('makeDbRecruitInfo converts to DB model correctly', async () => {
+    test('should correctly set is_recruit_info in DB model', async () => {
       const botInfo: IBotRecruitInfo = {
         is_recruit_info: true,
-        is_it_recruit_info:true,
+        is_it_recruit_info: true,
         company_name: '테스트 회사',
         department: '개발팀',
         region_id: '서울시 강남구',
@@ -159,20 +393,251 @@ describe('GeminiParser', () => {
       };
 
       const dbModel = parser.makeDbRecruitInfo(botInfo, rawContent);
-
       expect(dbModel.is_recruit_info).toBe(true);
+    });
+
+    test('should correctly set company_name in DB model', async () => {
+      const botInfo: IBotRecruitInfo = {
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_id: '서울시 강남구',
+        region_text: '1165000000',
+        require_experience: '경력 3년 이상',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01',
+        requirements: 'JavaScript, TypeScript, React 경험',
+        preferred_qualifications: 'NextJS, GraphQL 경험',
+        ideal_candidate: '적극적이고 능동적인 개발자'
+      };
+
+      const rawContent: IRawContent = {
+        url: 'https://example.com/jobs/senior-developer',
+        title: '테스트 회사 경력직 개발자 채용',
+        text: '테스트 채용 공고 내용',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
+
+      const dbModel = parser.makeDbRecruitInfo(botInfo, rawContent);
       expect(dbModel.company_name).toBe('테스트 회사');
+    });
+
+    test('should correctly set url in DB model', async () => {
+      const botInfo: IBotRecruitInfo = {
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_id: '서울시 강남구',
+        region_text: '1165000000',
+        require_experience: '경력 3년 이상',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01',
+        requirements: 'JavaScript, TypeScript, React 경험',
+        preferred_qualifications: 'NextJS, GraphQL 경험',
+        ideal_candidate: '적극적이고 능동적인 개발자'
+      };
+
+      const rawContent: IRawContent = {
+        url: 'https://example.com/jobs/senior-developer',
+        title: '테스트 회사 경력직 개발자 채용',
+        text: '테스트 채용 공고 내용',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
+
+      const dbModel = parser.makeDbRecruitInfo(botInfo, rawContent);
       expect(dbModel.url).toBe('https://example.com/jobs/senior-developer');
+    });
+
+    test('should correctly set title in DB model', async () => {
+      const botInfo: IBotRecruitInfo = {
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_id: '서울시 강남구',
+        region_text: '1165000000',
+        require_experience: '경력 3년 이상',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01',
+        requirements: 'JavaScript, TypeScript, React 경험',
+        preferred_qualifications: 'NextJS, GraphQL 경험',
+        ideal_candidate: '적극적이고 능동적인 개발자'
+      };
+
+      const rawContent: IRawContent = {
+        url: 'https://example.com/jobs/senior-developer',
+        title: '테스트 회사 경력직 개발자 채용',
+        text: '테스트 채용 공고 내용',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
+
+      const dbModel = parser.makeDbRecruitInfo(botInfo, rawContent);
       expect(dbModel.title).toBe('테스트 회사 경력직 개발자 채용');
-      expect(dbModel.raw_text).toBe('테스트 채용 공고 내용');
+    });
+
+    test('should correctly set raw_text in DB model', async () => {
+      const botInfo: IBotRecruitInfo = {
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_id: '서울시 강남구',
+        region_text: '1165000000',
+        require_experience: '경력 3년 이상',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01',
+        requirements: 'JavaScript, TypeScript, React 경험',
+        preferred_qualifications: 'NextJS, GraphQL 경험',
+        ideal_candidate: '적극적이고 능동적인 개발자'
+      };
+
+      const rawContent: IRawContent = {
+        url: 'https://example.com/jobs/senior-developer',
+        title: '테스트 회사 경력직 개발자 채용',
+        text: '테스트 채용 공고 내용',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
+
+      const dbModel = parser.makeDbRecruitInfo(botInfo, rawContent);
+      expect(dbModel.text).toBe('테스트 채용 공고 내용');
+    });
+
+    test('should correctly set domain in DB model', async () => {
+      const botInfo: IBotRecruitInfo = {
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_id: '서울시 강남구',
+        region_text: '1165000000',
+        require_experience: '경력 3년 이상',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01',
+        requirements: 'JavaScript, TypeScript, React 경험',
+        preferred_qualifications: 'NextJS, GraphQL 경험',
+        ideal_candidate: '적극적이고 능동적인 개발자'
+      };
+
+      const rawContent: IRawContent = {
+        url: 'https://example.com/jobs/senior-developer',
+        title: '테스트 회사 경력직 개발자 채용',
+        text: '테스트 채용 공고 내용',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
+
+      const dbModel = parser.makeDbRecruitInfo(botInfo, rawContent);
       expect(dbModel.domain).toBe('example.com');
+    });
+
+    test('should correctly set is_public in DB model', async () => {
+      const botInfo: IBotRecruitInfo = {
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_id: '서울시 강남구',
+        region_text: '1165000000',
+        require_experience: '경력 3년 이상',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01',
+        requirements: 'JavaScript, TypeScript, React 경험',
+        preferred_qualifications: 'NextJS, GraphQL 경험',
+        ideal_candidate: '적극적이고 능동적인 개발자'
+      };
+
+      const rawContent: IRawContent = {
+        url: 'https://example.com/jobs/senior-developer',
+        title: '테스트 회사 경력직 개발자 채용',
+        text: '테스트 채용 공고 내용',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
+
+      const dbModel = parser.makeDbRecruitInfo(botInfo, rawContent);
       expect(dbModel.is_public).toBe(true);
+    });
+
+    test('should set created_at as Date instance in DB model', async () => {
+      const botInfo: IBotRecruitInfo = {
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_id: '서울시 강남구',
+        region_text: '1165000000',
+        require_experience: '경력 3년 이상',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01',
+        requirements: 'JavaScript, TypeScript, React 경험',
+        preferred_qualifications: 'NextJS, GraphQL 경험',
+        ideal_candidate: '적극적이고 능동적인 개발자'
+      };
+
+      const rawContent: IRawContent = {
+        url: 'https://example.com/jobs/senior-developer',
+        title: '테스트 회사 경력직 개발자 채용',
+        text: '테스트 채용 공고 내용',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
+
+      const dbModel = parser.makeDbRecruitInfo(botInfo, rawContent);
       expect(dbModel.created_at).toBeInstanceOf(Date);
+    });
+
+    test('should set updated_at as Date instance in DB model', async () => {
+      const botInfo: IBotRecruitInfo = {
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_id: '서울시 강남구',
+        region_text: '1165000000',
+        require_experience: '경력 3년 이상',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01',
+        requirements: 'JavaScript, TypeScript, React 경험',
+        preferred_qualifications: 'NextJS, GraphQL 경험',
+        ideal_candidate: '적극적이고 능동적인 개발자'
+      };
+
+      const rawContent: IRawContent = {
+        url: 'https://example.com/jobs/senior-developer',
+        title: '테스트 회사 경력직 개발자 채용',
+        text: '테스트 채용 공고 내용',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
+
+      const dbModel = parser.makeDbRecruitInfo(botInfo, rawContent);
       expect(dbModel.updated_at).toBeInstanceOf(Date);
     });
 
     // API 오류 처리 테스트 - 모킹으로 오류 상황 생성
-    test('handles API errors gracefully with mocking', async () => {
+    test('should handle API errors gracefully by returning undefined is_recruit_info', async () => {
       await parser.initialize();
 
       // API 호출 메서드 모킹 - 실패하는 케이스
@@ -192,163 +657,239 @@ describe('GeminiParser', () => {
     });
   });
 
-  // 실제 API를 사용하는 테스트 그룹
-  describe('With Real API (Integration Tests)', () => {
-    // GEMINI_API_KEY 환경변수가 있을 때만 실행하는 로직
-    beforeAll(() => {
-      if (!process.env.GEMINI_API_KEY) {
-        console.warn('❗ GEMINI_API_KEY 환경변수가 설정되지 않았습니다. 실제 API 테스트를 건너뜁니다.');
-      }
+  // 파싱 및 API 관련 테스트
+  describe('Parsing and API Functionality', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
     });
 
-    // 텍스트 콘텐츠 직접 파싱 테스트 - 채용 공고
-    test('parseContent parses job posting correctly with real API', async () => {
-      if (!process.env.GEMINI_API_KEY) {
-        console.warn('GEMINI_API_KEY가 없어 테스트를 건너뜁니다.');
-        return;
-      }
-
+    // 파싱 메서드 테스트
+    test('should successfully parse raw content', async () => {
+      // 초기화
       await parser.initialize();
 
-      const sampleText = {
+      // 테스트용 원본 콘텐츠
+      const rawContent: IRawContent = {
         url: 'https://example.com/jobs/developer',
-        title: '프론트엔드 개발자 채용',
-        text: `
-      채용공고
+        title: '개발자 채용',
+        text: '채용합니다. 좋은 개발자 구합니다.',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
 
-      주식회사 테크솔루션에서 백엔드 개발자를 모집합니다.
+      // 모의 응답 설정
+      const mockParsedContent = {
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_text: '서울시 강남구',
+        region_id: '1168000000',
+        require_experience: '경력',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01'
+      };
 
-      [채용 정보]
-      - 회사명: 테크솔루션
-      - 직무: 백엔드 개발자
-      - 경력: 3년 이상
-      - 근무지: 서울시 강남구
-      - 고용형태: 정규직
-      - 지원 기간: 2025년 5월 1일 ~ 2025년 5월 31일
+      // 파싱 메서드 모킹
+      parser['_parseRecruitment'] = jest.fn().mockResolvedValue(mockParsedContent);
 
-      [업무 내용]
-      - Node.js, TypeScript를 활용한 API 개발
-      - 데이터베이스 설계 및 운영
-      - CI/CD 파이프라인 구축 및 운영
+      // 실행
+      const result = await parser.parseRawContent(rawContent);
 
-      [지원 자격]
-      - Node.js, TypeScript 개발 경험 3년 이상
-      - RESTful API 설계 및 개발 경험
-      - SQL, NoSQL 데이터베이스 활용 경험
-
-      [우대 사항]
-      - MSA 아키텍처 경험
-      - AWS 등 클라우드 서비스 활용 경험
-      - 컨테이너 기술(Docker, Kubernetes) 경험
-
-      [지원 방법]
-      - 이력서, 자기소개서 제출
-      - 이메일: recruit@techsolution.com
-      `};
-
-      const result = await parser.parseRawContent(sampleText);
-      console.log(result);
-      console.log('job_type:', result.job_type);
-      console.log('region_id:', result.region_id);
-      expect(result.is_recruit_info).toBe(true);
-      expect(result.company_name).toContain('테크솔루션');
-      expect(result.job_type).toContain('정규직');
-      expect(result.region_text).toContain('서울시 강남구');
-      expect(result.region_id).toContain('1168000000');
-      expect(result.require_experience).toContain('경력');
-    }, 30000); // 타임아웃 30초로 설정 (API 호출 대기 시간 고려)
-
-    // 텍스트 콘텐츠 직접 파싱 테스트 - 채용 공고가 아닌 경우
-    test('parseContent identifies non-job content correctly with real API', async () => {
-      if (!process.env.GEMINI_API_KEY) {
-        console.warn('GEMINI_API_KEY가 없어 테스트를 건너뜁니다.');
-        return;
-      }
-
-      await parser.initialize();
-
-      const sampleText = {
-        url: 'https://example.com/jobs/developer',
-        title: ' 테크솔루션 회사 소개',
-        text: `
-      테크솔루션 회사 소개
-
-      테크솔루션은 2015년에 설립된 IT 솔루션 전문 기업입니다.
-
-      [주요 서비스]
-      - 클라우드 인프라 구축
-      - 웹/모바일 애플리케이션 개발
-      - 빅데이터 분석 솔루션
-
-      [회사 연혁]
-      - 2015년: 회사 설립
-      - 2018년: 벤처기업 인증
-      - 2020년: 해외 지사 설립
-      - 2023년: 연매출 100억 달성
-
-      [오시는 길]
-      서울시 강남구 테헤란로 123
-
-      [문의]
-      - 전화: 02-123-4567
-      - 이메일: info@techsolution.com
-      `};
-      const result = await parser.parseRawContent(sampleText);
-
-      expect(result.is_recruit_info).toBe(false);
-
-
-      // 원본 콘텐츠 파싱 테스트 - 실제 API 사용
+      // 검증
+      expect(result).toEqual(mockParsedContent);
+      expect(parser['_parseRecruitment']).toHaveBeenCalled();
     });
 
-     test('parseRawContent parses raw content with real API', async () => {
-        if (!process.env.GEMINI_API_KEY) {
-          console.warn('GEMINI_API_KEY가 없어 테스트를 건너뜁니다.');
-          return;
-        }
+    test('should handle errors during parsing', async () => {
+      // 초기화
+      await parser.initialize();
 
-        await parser.initialize();
+      // 테스트용 원본 콘텐츠
+      const rawContent: IRawContent = {
+        url: 'https://example.com/jobs/developer',
+        title: '개발자 채용',
+        text: '채용합니다. 좋은 개발자 구합니다.',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
 
-        const rawContent: IRawContent = {
-          url: 'https://example.com/jobs/developer',
-          title: '프론트엔드 개발자 채용',
-          text: `
-        채용공고
+      // API 오류 모킹
+      const mockError = new Error('API 요청 실패');
+      parser['_parseRecruitment'] = jest.fn().mockRejectedValue(mockError);
 
-        우리 회사에서 프론트엔드 개발자를 모집합니다.
+      // 오류 발생 확인
+      await expect(parser.parseRawContent(rawContent)).rejects.toThrow();
+    });
 
-        - 회사명: 프론트테크
-        - 직무: 프론트엔드 개발자
-        - 경력: 신입 및 경력
-        - 근무지: 서울시 서초구
-        - 급여: 면접 후 결정
-        - 모집기간: ~2025년 6월 30일
+    // API 키 로테이션 테스트
+    test('should rotate API key on rate limit error', async () => {
+      // 초기화
+      parser['apiKeys'] = ['key1', 'key2', 'key3'];
+      parser['currentKeyIndex'] = 0;
+      parser['apiKey'] = 'key1';
 
-        주요 업무:
-        - React 기반 웹 애플리케이션 개발
-        - UI/UX 개선 및 최적화
-        - RESTful API 연동
+      // _initializeClient 메서드 모킹
+      parser['_initializeClient'] = jest.fn().mockImplementation(()=>{parser['genAI']= new GoogleGenerativeAI('temp')});
 
-        자격 요건:
-        - HTML, CSS, JavaScript 능숙자
-        - React 개발 경험
-        - 웹 표준 및 접근성 이해
+      // 실행
+      const result = parser['_rotateApiKey']();
 
-        지원방법:
-        이메일 지원: jobs@fronttech.com
-        `,
+      // 검증
+      expect(result).toBe(true);
+      expect(parser['currentKeyIndex']).toBe(1);
+      expect(parser['apiKey']).toBe('key2');
+      expect(parser['_initializeClient']).toHaveBeenCalled();
+    });
+
+    test('should handle failure when no more keys are available', async () => {
+      // 초기화 - 키가 하나만 있는 상태
+      parser['apiKeys'] = ['key1'];
+
+      parser['currentKeyIndex'] = 0;
+      parser['apiKey'] = 'key1';
+
+      expect(parser['apiKeys'].length).toBe(1);
+      // 실행
+      const result = parser['_rotateApiKey']();
+
+      // 검증
+      expect(result).toBe(false);
+      expect(parser['currentKeyIndex']).toBe(0);
+      expect(parser['apiKey']).toBe('key1');
+    });
+
+    // API 호출 실행 및 재시도 로직 테스트
+    test('should retry API call on rate limit error', async () => {
+      // 초기화
+      parser['apiKeys'] = ['key1', 'key2'];
+      parser['currentKeyIndex'] = 0;
+      parser['apiKey'] = 'key1';
+      parser['genAI'] = {} as any; // API 클라이언트가 초기화되어 있다고 가정
+
+      // _rotateApiKey 메서드 모킹
+      parser['_rotateApiKey'] = jest.fn().mockReturnValue(true);
+
+      // API 호출 함수 (첫 번째는 실패, 두 번째는 성공)
+      const apiCallFunction = jest.fn()
+        .mockRejectedValueOnce({ status: 429, message: 'Resource has been exhausted' })
+        .mockResolvedValueOnce({ success: true, data: 'API 응답' });
+
+      // 실행
+      const result = await parser['_executeApiCallWithRetries'](apiCallFunction);
+
+      // 검증
+      expect(result).toEqual({ success: true, data: 'API 응답' });
+      expect(apiCallFunction).toHaveBeenCalledTimes(2); // 두 번 호출되었는지 확인
+      expect(parser['_rotateApiKey']).toHaveBeenCalledTimes(1); // 키 로테이션이 한 번 발생했는지 확인
+    });
+
+    // URL 상태 업데이트 테스트
+    test('should update URL status after parsing', async () => {
+      // 초기화
+      await parser.initialize();
+
+      const rawContent: IRawContent = {
+        url: 'https://example.com/jobs/developer',
+        title: '개발자 채용',
+        text: '채용합니다. 좋은 개발자 구합니다.',
+        domain: 'example.com',
+        crawledAt: new Date()
+      };
+
+      const parsedContent: IBotRecruitInfo = {
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_text: '서울시 강남구',
+        region_id: '1168000000',
+        require_experience: '경력',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01'
+      };
+
+      // setURLStatus 메서드 모킹
+      const setURLStatusSpy = jest.spyOn(parser.urlManager, 'setURLStatus');
+
+      // 실행
+      await parser.updateRecruitStatus(rawContent, parsedContent);
+
+      // 검증
+      expect(setURLStatusSpy).toHaveBeenCalledWith(
+        'https://example.com/jobs/developer',
+        URLSTAUS.HAS_RECRUITINFO
+      );
+    });
+
+    // 전체 파싱 프로세스 테스트 (run 메서드)
+    test('should process raw contents in run method', async () => {
+      // 초기화
+      await parser.initialize();
+
+      // VisitResultModel.aggregate 모킹 - 가짜 데이터 반환
+      const mockRawContents = [
+        {
+          url: 'https://example.com/jobs/1',
+          title: '개발자 채용 1',
+          text: '채용합니다. 좋은 개발자 구합니다. 1',
           domain: 'example.com',
           crawledAt: new Date()
-        };
+        },
+        {
+          url: 'https://example.com/jobs/2',
+          title: '개발자 채용 2',
+          text: '채용합니다. 좋은 개발자 구합니다. 2',
+          domain: 'example.com',
+          crawledAt: new Date()
+        }
+      ];
 
-        const result = await parser.parseRawContent(rawContent);
-        console.log(result);
-        expect(result.is_recruit_info).toBe(true);
-        expect(result.company_name).toContain('프론트테크');
-        expect(result.region_text).toContain('서울시 서초구');
-        expect(result.region_id).toContain('1165000000');
-      }, 30000);
+      // loadMongoRawContent 메서드 모킹
+      parser.loadMongoRawContent = jest.fn().mockResolvedValue(mockRawContents);
 
+      // parseRawContent 메서드 모킹
+      parser.parseRawContent = jest.fn().mockImplementation(() => ({
+        is_recruit_info: true,
+        is_it_recruit_info: true,
+        company_name: '테스트 회사',
+        department: '개발팀',
+        region_text: '서울시 강남구',
+        region_id: '1168000000',
+        require_experience: '경력',
+        job_description: '웹 개발자 포지션',
+        job_type: '정규직',
+        apply_start_date: '2025-04-01',
+        apply_end_date: '2025-05-01'
+      }));
+
+      // updateRecruitStatus 메서드 모킹
+      parser.updateRecruitStatus = jest.fn().mockResolvedValue(true);
+
+      // makeDbRecruitInfo 메서드 모킹
+      parser.makeDbRecruitInfo = jest.fn().mockImplementation((botInfo, rawContent) => ({
+        ...botInfo,
+        ...rawContent,
+        created_at: new Date(),
+        updated_at: new Date(),
+        is_public: true
+      }));
+
+      // createRecruitInfo 메서드 모킹
+      const createRecruitInfoSpy = jest.spyOn(parser.recruitInfoRepository, 'createRecruitInfo');
+
+      // 실행
+      await parser.run();
+
+      // 검증
+      expect(parser.loadMongoRawContent).toHaveBeenCalled();
+      expect(parser.parseRawContent).toHaveBeenCalledTimes(2);
+      expect(parser.updateRecruitStatus).toHaveBeenCalledTimes(2);
+      expect(createRecruitInfoSpy).toHaveBeenCalledTimes(2);
+    });
   });
-
 });

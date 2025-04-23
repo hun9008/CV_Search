@@ -1,5 +1,5 @@
 import { MongoRecruitInfoRepository } from '../../src/database/MongoRecruitInfoRepository';
-import { RecruitInfoModel } from '../../src/models/MongoRecruitInfoModel';
+import { MongoRecruitInfoModel } from '../../src/models/MongoRecruitInfoModel';
 import { ICacheDbRecruitInfo } from '../../src/models/RecruitInfoModel';
 import mongoose from 'mongoose';
 
@@ -8,7 +8,7 @@ jest.mock('../../src/models/MongoRecruitInfoModel');
 
 describe('MongoRecruitInfoRepository', () => {
   let repository: MongoRecruitInfoRepository;
-  let mockRecruitInfoModel: jest.Mocked<typeof RecruitInfoModel>;
+  let mockRecruitInfoModel: jest.Mocked<typeof MongoRecruitInfoModel>;
 
   beforeEach(() => {
     // Reset all mocks
@@ -19,7 +19,7 @@ describe('MongoRecruitInfoRepository', () => {
       create: jest.fn(),
       findOne: jest.fn(),
       findByIdAndUpdate: jest.fn(),
-    } as unknown as jest.Mocked<typeof RecruitInfoModel>;
+    } as unknown as jest.Mocked<typeof MongoRecruitInfoModel>;
 
     // Create instance of repository with mocked model
     repository = new MongoRecruitInfoRepository(mockRecruitInfoModel);

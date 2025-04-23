@@ -1,5 +1,6 @@
 import amqp from 'amqplib';
 import RabbitMQManager from '../../src/message/rabbitMQManager';
+import { QueueNames } from '@message/messageService';
 // Mock amqplib
 
 jest.mock('amqplib', () => {
@@ -95,28 +96,28 @@ describe('RabbitMQManager', () => {
 
   describe('assertQueue', () => {
     it('should assert a queue with default options', async () => {
-      await rabbitMQManager.assertQueue('test-queue');
+      await rabbitMQManager.assertQueue(QueueNames.VISIT_RESULTS);
 
       // Get the channel from the mock
       const mockConnection = await (amqp.connect as jest.Mock).mock.results[0].value;
       const mockChannel = await mockConnection.createChannel.mock.results[0].value;
 
-      expect(mockChannel.assertQueue).toHaveBeenCalledWith('test-queue', { durable: true });
+      expect(mockChannel.assertQueue).toHaveBeenCalledWith(QueueNames.VISIT_RESULTS, { durable: true });
     });
 
     it('should assert a queue with custom options', async () => {
       const options = { durable: false, autoDelete: true };
-      await rabbitMQManager.assertQueue('test-queue', options as any);
+      await rabbitMQManager.assertQueue(QueueNames.VISIT_RESULTS, options as any);
 
       // Get the channel from the mock
       const mockConnection = await (amqp.connect as jest.Mock).mock.results[0].value;
       const mockChannel = await mockConnection.createChannel.mock.results[0].value;
 
-      expect(mockChannel.assertQueue).toHaveBeenCalledWith('test-queue', options);
+      expect(mockChannel.assertQueue).toHaveBeenCalledWith(QueueNames.VISIT_RESULTS, options);
     });
 
     it('should connect if not already connected', async () => {
-      await rabbitMQManager.assertQueue('test-queue');
+      await rabbitMQManager.assertQueue(QueueNames.VISIT_RESULTS);
 
       expect(amqp.connect).toHaveBeenCalledWith(testUri);
     });
@@ -127,25 +128,25 @@ describe('RabbitMQManager', () => {
       const message = { test: 'message' };
       const options = { persistent: true };
 
-      await rabbitMQManager.sendToQueue('test-queue', message, options);
+      await rabbitMQManager.sendToQueue(QueueNames.VISIT_RESULTS, message, options);
 
       // Get the channel from the mock
       const mockConnection = await (amqp.connect as jest.Mock).mock.results[0].value;
       const mockChannel = await mockConnection.createChannel.mock.results[0].value;
 
       // Check that assertQueue was called first
-      expect(mockChannel.assertQueue).toHaveBeenCalledWith('test-queue', { durable: true });
+      expect(mockChannel.assertQueue).toHaveBeenCalledWith(QueueNames.VISIT_RESULTS, { durable: true });
 
       // Check that sendToQueue was called with the right parameters
       expect(mockChannel.sendToQueue).toHaveBeenCalledWith(
-        'test-queue',
+        QueueNames.VISIT_RESULTS,
         Buffer.from(JSON.stringify(message)),
         options
       );
     });
 
     it('should connect if not already connected', async () => {
-      await rabbitMQManager.sendToQueue('test-queue', { test: 'message' });
+      await rabbitMQManager.sendToQueue(QueueNames.VISIT_RESULTS, { test: 'message' });
 
       expect(amqp.connect).toHaveBeenCalledWith(testUri);
     });
@@ -153,7 +154,7 @@ describe('RabbitMQManager', () => {
     it('should handle Buffer messages', async () => {
       const messageBuffer = Buffer.from('test message');
 
-      await rabbitMQManager.sendToQueue('test-queue', messageBuffer);
+      await rabbitMQManager.sendToQueue(QueueNames.VISIT_RESULTS, messageBuffer);
 
       // Get the channel from the mock
       const mockConnection = await (amqp.connect as jest.Mock).mock.results[0].value;
@@ -161,7 +162,7 @@ describe('RabbitMQManager', () => {
 
       // Check that sendToQueue was called with the buffer directly
       expect(mockChannel.sendToQueue).toHaveBeenCalledWith(
-        'test-queue',
+        QueueNames.VISIT_RESULTS,
         messageBuffer,
         {}
       );

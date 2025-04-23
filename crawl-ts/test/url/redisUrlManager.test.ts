@@ -1,6 +1,5 @@
 import { RedisUrlManager, UrlStatus, URLSTAUS } from '../../src/url/RedisUrlManager'
 import { redis } from '../../src/database/RedisConnector';
-
 // Redis 클라이언트 모킹
 jest.mock('../../src/database/RedisConnector', () => {
   const redisMock = {
@@ -184,6 +183,40 @@ describe('RedisUrlManager', () => {
 
     expect(redis.sRandMember).toHaveBeenCalledWith(`status:${notVisitedStatus}`);
     expect(result).toBe(testUrl);
+  });
+
+  test('should get next URL sequentially from available domains', async () => {
+    // Set up available domains
+    const availableDomains = ['domain1.com', 'domain2.com', 'domain3.com'];
+    (urlManager as any).availableDomains = availableDomains;
+    (urlManager as any).currentDomainIndex = 0;
+
+    // Mock first domain call - successful
+    (redis.sRandMember as jest.Mock).mockResolvedValueOnce('https://domain1.com/page1');
+
+    // First call should return URL from first domain
+    const result1 = await urlManager.getNextUrl();
+    expect(result1).toEqual({ url: 'https://domain1.com/page1', domain: 'domain1.com' });
+    expect((urlManager as any).currentDomainIndex).toBe(1); // Index should advance
+
+    // Mock second domain call - no URLs available
+    (redis.sRandMember as jest.Mock).mockResolvedValueOnce(null);
+
+    await urlManager.getNextUrl();
+    // Mock third domain call - successful
+    (redis.sRandMember as jest.Mock).mockResolvedValueOnce('https://domain3.com/page1');
+
+    // Second call should skip domain2 (no URLs) and return URL from domain3
+    const result2 = await urlManager.getNextUrl();
+    expect(result2).toEqual({ url: 'https://domain3.com/page1', domain: 'domain3.com' });
+    expect((urlManager as any).currentDomainIndex).toBe(0); // Should wrap around to beginning
+
+    // Test with no available URLs in any domain
+    (redis.sRandMember as jest.Mock).mockResolvedValue(null);
+
+    // Should return null after trying all domains
+    const result3 = await urlManager.getNextUrl();
+    expect(result3).toBeNull();
   });
 
   test('should handle domain error after too many errors', async () => {
