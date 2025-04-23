@@ -3,15 +3,6 @@
  * 브라우저 인스턴스의 생성, 제어, 종료를 담당
  */
 export interface IBrowserManager {
-  /**
-   * 브라우저 인스턴스
-   */
-  browser: any;
-
-  /**
-   * 브라우저 프로세스 ID
-   */
-  browserPID?: number;
 
   /**
    * 브라우저 초기화
