@@ -3,43 +3,26 @@ import {
   Schema,
   SchemaType,
 } from '@google/generative-ai';
-import { IParser, SaveParsedContentOptions } from './IParser';
-import { IBotRecruitInfo, IDbRecruitInfo, IRawContent, RecruitInfoModel } from '../models/recruitinfoModel';
-import { VisitResultModel } from '@models/visitResult';
-import { v4 as uuidv4 } from 'uuid';
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import { IParser } from './IParser';
+import {  IBotRecruitInfo, ICacheDbRecruitInfo, IDbRecruitInfo, IRawContent } from '../models/RecruitInfoModel';
+import { VisitResultModel } from '@models/VisitResult';
 import { URL } from 'url';
 import { IDbConnector } from '../database';
-import { MySqlRecruitInfoService } from '@database/MySqlRecruitInfoService';
-import { MessageService, QueueNames } from '@message/messageService';
-import { RedisUrlManager ,URLSTAUS} from '@url/RedisUrlManager';
+import { QueueNames } from '@message/messageService';
+import { IMessageService } from '@message/IMessageService';
+import { URLSTAUS } from '@url/RedisUrlManager';
+import { IUrlManager } from '@url/IUrlManager';
+import { IRecruitInfoRepository } from '@database/IRecruitInfoRepository';
+import { defaultLogger as logger } from '../utils/logger';
+import { MysqlRecruitInfoRepository } from '@database/MysqlRecruitInfoRepository';
 
-let logger: any;
-try {
-  // 기존 로거 가져오기 시도
-  const { defaultLogger } = require('../utils/logger');
-  logger = defaultLogger;
-} catch (error) {
-  // 기본 로거 생성
-  logger = {
-    info: (message: string, ...args: any[]) => console.log(`[INFO] ${message}`, ...args),
-    warn: (message: string, ...args: any[]) => console.warn(`[WARN] ${message}`, ...args),
-    error: (message: string, ...args: any[]) => console.error(`[ERROR] ${message}`, ...args),
-    debug: (message: string, ...args: any[]) => console.debug(`[DEBUG] ${message}`, ...args),
-    eventInfo: (message: string, ...args: any[]) => console.log(`[EVENT] ${message}`, ...args),
-    eventError: (message: string, ...args: any[]) => console.error(`[EVENT_ERROR] ${message}`, ...args)
-  };
-}
 
 // --- 상수 ---
 const DEFAULT_MODEL_NAME = 'gemini-2.0-flash-latest';
 const RATE_LIMIT_HTTP_STATUS = 429;
 const RATE_LIMIT_MESSAGE_FRAGMENT = 'Resource has been exhausted';
 const JSON_MIME_TYPE = 'application/json';
-const DEFAULT_CACHE_DIR = path.join(process.cwd(), 'cache');
-const RAW_CONTENT_DIR = 'raw_content';
-const PARSED_CONTENT_DIR = 'parsed_content';
+
 
 // GeminiParser 옵션 인터페이스
 export interface GeminiParserOptions {
@@ -63,25 +46,20 @@ export interface GeminiParserOptions {
    */
   dbConnector: IDbConnector;
 
+   /**
+   * cacheDB 커넥터
+   */
+  cacheDbConnector: IDbConnector;
   /**
    * DB 서비스
    */
-  mySqlService: MySqlRecruitInfoService;
+  recruitInfoRepository: MysqlRecruitInfoRepository;
 
-  /**
-   * URL Mannager
+
+   /**
+   * 캐쉬 DB 서비스
    */
-
-
-  /**
-   * 캐시 디렉토리 경로
-   */
-  cacheDir?: string;
-
-  /**
-   * 캐시 사용 여부
-   */
-  useCache?: boolean;
+  cacheRecruitInfoRepository: IRecruitInfoRepository;
 
   /**
    * 최대 재시도 횟수
@@ -93,12 +71,15 @@ export interface GeminiParserOptions {
    */
   timeout?: number;
 
+ /**
+   * URL Mannager
+   */
 
-  redisUrlManager: RedisUrlManager;
+  urlManager: IUrlManager;
   /**
    * Message Service
    */
-  messageService: MessageService;
+  messageService: IMessageService;
 
   /**
    * 기타 옵션
@@ -140,21 +121,19 @@ export class GeminiParser implements IParser {
   private apiKey: string | null = null;
   private readonly modelName: string;
   private genAI: GoogleGenerativeAI | null = null;
-  private readonly maxRetries: number;
-  private readonly timeout: number;
-  private readonly cacheDir: string;
-  private readonly rawContentDir: string;
-  private readonly parsedContentDir: string;
-  private readonly useCache: boolean;
   private initialized: boolean = false;
 
   dbConnector: IDbConnector;
 
-  mySqlService: MySqlRecruitInfoService;
+  cacheDbConnector?: IDbConnector;
 
-  redisUrlManager: RedisUrlManager;
+  recruitInfoRepository: MysqlRecruitInfoRepository;
 
-  messageService: MessageService;
+  cacheRecruitInfoRepository?: IRecruitInfoRepository;
+
+  urlManager: IUrlManager;
+
+  messageService: IMessageService;
 
   /**
    * GeminiParser 생성자
@@ -163,16 +142,12 @@ export class GeminiParser implements IParser {
   constructor(options: GeminiParserOptions) {
     // 기본 설정
     this.modelName = options.model || DEFAULT_MODEL_NAME;
-    this.maxRetries = options.maxRetries || 3;
-    this.timeout = options.timeout || 60000;
-    this.cacheDir = options.cacheDir || DEFAULT_CACHE_DIR;
-    this.rawContentDir = path.join(this.cacheDir, RAW_CONTENT_DIR);
-    this.parsedContentDir = path.join(this.cacheDir, PARSED_CONTENT_DIR);
-    this.useCache = options.useCache !== undefined ? options.useCache : true;
     this.dbConnector = options.dbConnector;
-    this.mySqlService = options.mySqlService;
+    this.cacheDbConnector = options.cacheDbConnector;
+    this.recruitInfoRepository = options.recruitInfoRepository;
+    this.cacheRecruitInfoRepository = options.cacheRecruitInfoRepository;
     this.messageService = options.messageService;
-    this.redisUrlManager = options.redisUrlManager;
+    this.urlManager = options.urlManager;
     // API 키 설정은 initialize 메서드에서 수행
   }
 
@@ -182,28 +157,23 @@ export class GeminiParser implements IParser {
    */
   async initialize(options: Record<string, any> = {}): Promise<boolean> {
     try {
-      // API 키 로드
-      this._loadApiKeys(
+
+      await this.dbConnector.connect();
+
+      if (this.cacheDbConnector) {
+        await this.cacheDbConnector.connect();
+      }
+      await this.urlManager.connect();
+
+      await this.messageService.connect();
+      // API 키 로드 및 초기화
+      const keyInitialized = this._initializeKey(
         options.apiKey || process.env.GEMINI_API_KEY,
-        options.apiKeys || process.env.GEMINI_API_KEYS?.split(',')
+        options.apiKeys || process.env.GEMINI_API_KEYS?.split(','),
+        options.keyIndex
       );
 
-      // 키 인덱스 검증 및 설정
-      const initialKeyIndex = options.keyIndex ?? 0;
-      if (this.apiKeys.length > 0) {
-        if (typeof initialKeyIndex !== 'number' || initialKeyIndex < 0 || initialKeyIndex >= this.apiKeys.length) {
-          this.currentKeyIndex = 0;
-          if (options.keyIndex !== undefined) {
-            logger.warn(`제공된 keyIndex (${options.keyIndex})가 유효하지 않습니다. 인덱스 0으로 시작합니다.`);
-          }
-        } else {
-          this.currentKeyIndex = initialKeyIndex;
-        }
-        this.apiKey = this.apiKeys[this.currentKeyIndex];
-      } else {
-        this.currentKeyIndex = -1;
-        this.apiKey = null;
-        logger.warn('API 키가 설정되지 않았습니다. Gemini API를 사용할 수 없습니다.');
+      if (!keyInitialized) {
         return false;
       }
 
@@ -214,19 +184,44 @@ export class GeminiParser implements IParser {
         return false;
       }
 
-      // 캐시 디렉토리 생성
-      if (this.useCache) {
-        await this._ensureCacheDirs();
-      }
-      await this.mySqlService.connect();
-      await this.dbConnector.connect();
-      await this.messageService.connect();
-
       this.initialized = true;
-      logger.info(`GeminiParser 초기화 완료 (모델: ${this.modelName}, 캐시: ${this.useCache ? '사용' : '미사용'})`);
+      logger.info(`GeminiParser 초기화 완료 (모델: ${this.modelName})`);
       return true;
     } catch (error) {
       logger.error(`GeminiParser 초기화 중 오류: ${(error as Error).message}`);
+      return false;
+    }
+  }
+
+  /**
+   * API 키 초기화
+   * @param singleKey 단일 API 키
+   * @param keyArray API 키 배열
+   * @param initialKeyIndex 시작할 키 인덱스
+   * @returns 초기화 성공 여부
+   * @private
+   */
+  private _initializeKey(singleKey?: string, keyArray?: string[], initialKeyIndex?: number): boolean {
+    // API 키 로드
+    this._loadApiKeys(singleKey, keyArray);
+
+    // 키 인덱스 검증 및 설정
+    const keyIndex = initialKeyIndex ?? 0;
+    if (this.apiKeys.length > 0) {
+      if (typeof keyIndex !== 'number' || keyIndex < 0 || keyIndex >= this.apiKeys.length) {
+        this.currentKeyIndex = 0;
+        if (initialKeyIndex !== undefined) {
+          logger.warn(`제공된 keyIndex (${initialKeyIndex})가 유효하지 않습니다. 인덱스 0으로 시작합니다.`);
+        }
+      } else {
+        this.currentKeyIndex = keyIndex;
+      }
+      this.apiKey = this.apiKeys[this.currentKeyIndex];
+      return true;
+    } else {
+      this.currentKeyIndex = -1;
+      this.apiKey = null;
+      logger.warn('API 키가 설정되지 않았습니다. Gemini API를 사용할 수 없습니다.');
       return false;
     }
   }
@@ -265,21 +260,7 @@ export class GeminiParser implements IParser {
     logger.info(`API 키 ${this.apiKeys.length}개 로드됨`);
   }
 
-  /**
-   * 캐시 디렉토리 확인 및 생성
-   * @private
-   */
-  private async _ensureCacheDirs(): Promise<void> {
-    try {
-      await fs.mkdir(this.cacheDir, { recursive: true });
-      await fs.mkdir(this.rawContentDir, { recursive: true });
-      await fs.mkdir(this.parsedContentDir, { recursive: true });
-      logger.debug('캐시 디렉토리 생성 완료');
-    } catch (error) {
-      logger.error(`캐시 디렉토리 생성 중 오류: ${(error as Error).message}`);
-      throw error;
-    }
-  }
+
 
   /**
    * Gemini API 클라이언트 초기화
@@ -394,7 +375,7 @@ export class GeminiParser implements IParser {
       }
 
       const rawContents: IRawContent[] = await this.messageService.consumeMessages<IRawContent>(
-        'visit_results',
+        QueueNames.VISIT_RESULTS,
         batchSize
       );
 
@@ -470,86 +451,8 @@ export class GeminiParser implements IParser {
     }
   }
 
-  /**
-   * 원본 콘텐츠를 캐시에서 로드
-   * @param id 콘텐츠 ID
-   * @private
-   */
-  private async _loadRawContentFromCache(id: string): Promise<IRawContent | null> {
-    try {
-      const filePath = path.join(this.rawContentDir, `${id}.json`);
-      const fileContent = await fs.readFile(filePath, 'utf-8');
-      return JSON.parse(fileContent) as IRawContent;
-    } catch (error) {
-      // 파일을 찾을 수 없는 경우는 정상적인 경우이므로 에러 로그 출력하지 않음
-      return null;
-    }
-  }
 
-  /**
-   * 원본 콘텐츠를 캐시에 저장
-   * @param id 콘텐츠 ID
-   * @param content 원본 콘텐츠
-   * @private
-   */
-  private async _saveRawContentToCache(id: string, content: IRawContent): Promise<void> {
-    try {
-      const filePath = path.join(this.rawContentDir, `${id}.json`);
-      await fs.writeFile(filePath, JSON.stringify(content, null, 2), 'utf-8');
-      logger.debug(`원본 콘텐츠 캐시에 저장됨 (ID: ${id})`);
-    } catch (error) {
-      logger.warn(`원본 콘텐츠 캐시 저장 실패: ${(error as Error).message}`);
-    }
-  }
 
-  /**
-   * 파싱 결과 저장
-   * @param rawContent 파싱전 콘탠츠
-   * @param parsedContent 파싱된 콘텐츠
-   * @param options 저장 옵션
-   */
-  async saveParsedContent(dbRecruitInfo : IDbRecruitInfo, options: SaveParsedContentOptions = {}): Promise<boolean> {
-    try {
-      // 초기화 확인
-      if (!this.initialized) {
-        await this.initialize();
-      }
-
-      const id = options.id || uuidv4();
-      const destination = options.destination || 'cache';
-
-     if (destination === 'db') {
-        // DB에 저장하는 로직
-        // 여기서는 미구현, 실제 구현시 DB 클라이언트가 필요
-        //
-        const newRecruit = new RecruitInfoModel(dbRecruitInfo);
-        await newRecruit.save();
-        return true;
-      }
-
-      logger.warn(`알 수 없는 저장 대상: ${destination}`);
-      return false;
-    } catch (error) {
-      logger.error(`파싱 결과 저장 중 오류: ${(error as Error).message}`);
-      return false;
-    }
-  }
-
-  /**
-   * 파싱 결과를 캐시에 저장
-   * @param id 결과 ID
-   * @param content 파싱 결과
-   * @private
-   */
-  private async _saveParsedContentToCache(id: string, content: IBotRecruitInfo): Promise<void> {
-    try {
-      const filePath = path.join(this.parsedContentDir, `${id}.json`);
-      await fs.writeFile(filePath, JSON.stringify(content, null, 2), 'utf-8');
-    } catch (error) {
-      logger.warn(`파싱 결과 캐시 저장 실패: ${(error as Error).message}`);
-      throw error;
-    }
-  }
 
   /**
    * 원본 콘텐츠 파싱
@@ -583,52 +486,20 @@ export class GeminiParser implements IParser {
    * @param botRecruitInfo 봇 파싱 결과
    * @param rawContent 원본 콘텐츠
    */
-  makeDbRecruitInfo(botRecruitInfo: IBotRecruitInfo, rawContent: IRawContent): IDbRecruitInfo {
+  makeDbRecruitInfo(botRecruitInfo: IBotRecruitInfo, rawContent: IRawContent): ICacheDbRecruitInfo {
     const now = new Date();
-
     return {
       ...botRecruitInfo,
       is_parse_success : true,
-      title: rawContent.title || '제목 없음',
-      url: rawContent.url,
-      raw_text: rawContent.text,
-      favicon : rawContent.favicon || undefined,
-      domain: rawContent.domain,
+      ...rawContent,
       created_at: now,
       updated_at: now,
       is_public: true, // 채용 정보인 경우에만 공개
     };
   }
 
-  /**
-   * 파싱 결과를 캐시에서 로드
-   * @param cacheKey 캐시 키
-   * @private
-   */
-  private async _loadParsedContentFromCache(cacheKey: string): Promise<IBotRecruitInfo | null> {
-    try {
-      const filePath = path.join(this.parsedContentDir, `${cacheKey}.json`);
-      const fileContent = await fs.readFile(filePath, 'utf-8');
-      return JSON.parse(fileContent) as IBotRecruitInfo;
-    } catch (error) {
-      // 파일을 찾을 수 없는 경우는 정상적인 경우이므로 에러 로그 출력하지 않음
-      return null;
-    }
-  }
 
-  /**
-   * 캐시 키 생성
-   * @param text 텍스트
-   * @private
-   */
-  private _generateCacheKey(text: string): string {
-    // 간단한 해시 생성
-    const crypto = require('crypto');
-    return crypto
-      .createHash('md5')
-      .update(text.slice(0, 1000)) // 첫 1000자만 해시
-      .digest('hex');
-  }
+
 
   /**
    * 컨텍스트 헤더 생성
@@ -852,9 +723,9 @@ ${content}
   async updateRecruitStatus(rawContent: IRawContent, parsedContent: IBotRecruitInfo): Promise<boolean> {
     try {
       if (parsedContent.is_recruit_info===true) {
-        await this.redisUrlManager.setURLStatus(rawContent.url, URLSTAUS.HAS_RECRUITINFO);
+        await this.urlManager.setURLStatus(rawContent.url, URLSTAUS.HAS_RECRUITINFO);
       } else {
-        await this.redisUrlManager.setURLStatus(rawContent.url, URLSTAUS.NO_RECRUITINFO);
+        await this.urlManager.setURLStatus(rawContent.url, URLSTAUS.NO_RECRUITINFO);
       }
       return true;
     } catch (error) {
@@ -901,17 +772,29 @@ ${content}
 
           // 파싱 수행
           const parsedContent = await this.parseRawContent(rawContent);
-          if (parsedContent.is_recruit_info && parsedContent.job_description) {
+          if (parsedContent.is_recruit_info===true && parsedContent.job_description) {
             // 파싱 결과 저장
-            const dbRecruitInfo = this.makeDbRecruitInfo( parsedContent,rawContent);
-            // const saved = await this.saveParsedContent(dbRecruitInfo, { destination: 'db' });
+            const dbRecruitInfo = this.makeDbRecruitInfo(parsedContent, rawContent);
+            if (dbRecruitInfo.region_id) {
+              const region_id = await this.recruitInfoRepository.getRegionIdByCode(dbRecruitInfo.region_id);
+              if (region_id) {
+                dbRecruitInfo.region_id = region_id.toString();
+              }
+            }
+            if (this.cacheRecruitInfoRepository) {
+              logger.debug(`캐쉬 DB 응용`);
+              const createCacheResult: ICacheDbRecruitInfo = await this.cacheRecruitInfoRepository?.createRecruitInfo(dbRecruitInfo) as ICacheDbRecruitInfo;
+              logger.debug(`캐쉬 DB 저장 성공 ${createCacheResult.url}`)
+            }
 
-            // if (saved) {
-              successCount++;
-              const result = await this.mySqlService.saveRecruitInfo(dbRecruitInfo);
-              console.log(result);
-              logger.info(`[${i + 1}/${rawContents.length}] 파싱 및 저장 성공: ${rawContent.url.substring(0, 50)}...`);
-            // }
+            const createResult: IDbRecruitInfo = await this.recruitInfoRepository.createRecruitInfo(dbRecruitInfo) as IDbRecruitInfo;
+            logger.debug(`파싱 성공 ${createResult.requirements}`);
+
+            logger.debug(`DB 저장 성공 ${createResult.url}`)
+
+            logger.info(`[${i + 1}/${rawContents.length}] 파싱 및 저장 성공: ${rawContent.url.substring(0, 50)}...`);
+            successCount++;
+
           }
 
           // isRecruit 상태 업데이트
@@ -921,7 +804,7 @@ ${content}
           }
 
         } catch (error) {
-        failureCount++;
+          failureCount++;
          const prefix = `[${i + 1}/${rawContents.length}]`;
         if (error instanceof ParseError) {
           logger.error(`${prefix} ParserError 발생: ${error.message}`);

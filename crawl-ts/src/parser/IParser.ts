@@ -1,6 +1,6 @@
 import { Page } from 'puppeteer';
-import { IDbConnector } from '../database';
-import { IBotRecruitInfo, IDbRecruitInfo, IRawContent } from '../models/recruitinfoModel';
+import { IDbConnector } from '@database/IDbConnector';
+import { IBotRecruitInfo, IDbRecruitInfo, IRawContent } from '@models/RecruitInfoModel';
 
 /**
  * 파싱 결과 저장 옵션
@@ -36,6 +36,9 @@ export interface IParser {
 
   dbConnector: IDbConnector;
 
+  cacheDbConner?: IDbConnector;
+
+
   initialize(options?: Record<string, any>): Promise<boolean>;
   /**
    * Parser 시작
@@ -52,13 +55,6 @@ export interface IParser {
    * @param options 로드 옵션
    */
   loadRawContent(batchSize : number ):Promise<IRawContent[]>;
-
-  /**
-   * 파싱 결과 저장
-   * @param parsedContent 파싱된 콘텐츠
-   * @param options 저장 옵션
-   */
-  saveParsedContent(dbRecruitInfo : IDbRecruitInfo, options?: SaveParsedContentOptions): Promise<boolean>;
 
   /**
    * 원본 콘텐츠를 파싱하여 채용 정보 추출
