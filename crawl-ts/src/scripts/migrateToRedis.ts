@@ -6,10 +6,10 @@
  * 모든 URL은 기본적으로 'not_visited' 상태로 설정됩니다.
  */
 
-import { MongoDbConnector } from '../database/MongoDbConnector';
-import { redis } from '../database/RedisConnector';
-import RedisUrlManager, { UrlStatus } from '../database/RedisUrlManager';
-import { VisitResultModel } from '../models/visitResult';
+import { MongoDbConnector } from '@database/MongoDbConnector';
+import { redis } from '@database/RedisConnector';
+import {RedisUrlManager, UrlStatus ,URLSTAUS } from '@url/RedisUrlManager';
+import { VisitResultModel } from '@models/VisitResult';
 import * as dotenv from 'dotenv';
 
 // 환경 변수 로드
@@ -58,7 +58,7 @@ async function migrateSubUrlsToRedis(): Promise<void> {
     console.log('Redis 연결 성공');
 
     // RedisUrlManager 인스턴스 가져오기
-    const redisUrlManager = RedisUrlManager.getInstance();
+    const redisUrlManager = new RedisUrlManager();
 
     // Redis 초기화 여부 확인
     const shouldReset = process.argv.includes('--reset');
@@ -116,7 +116,7 @@ async function migrateSubUrlsToRedis(): Promise<void> {
           await redisUrlManager.addUrl(
             subUrl.url,
             domainDoc.domain,
-            UrlStatus.NOT_VISITED
+            URLSTAUS.NOT_VISITED
           );
           stats.processedUrls++;
 
@@ -135,17 +135,6 @@ async function migrateSubUrlsToRedis(): Promise<void> {
     // 전체 도메인 목록 가져오기
     const allDomains = await redisUrlManager.getAllDomains();
     console.log(`\n총 ${allDomains.length}개 도메인이 Redis에 저장되었습니다.`);
-
-    // 도메인별 통계 출력
-    console.log('\n===== 도메인별 통계 =====');
-    for (const domain of allDomains) {
-      const domainStats = await redisUrlManager.getDomainStats(domain);
-      console.log(`${domain}: 총 ${await redis.sCard(`domain:${domain}:urls`)}개 URL`);
-      console.log(`  - ${UrlStatus.NOT_VISITED}: ${domainStats[UrlStatus.NOT_VISITED]}개`);
-      console.log(`  - ${UrlStatus.VISITING}: ${domainStats[UrlStatus.VISITING]}개`);
-      console.log(`  - ${UrlStatus.VISITED}: ${domainStats[UrlStatus.VISITED]}개`);
-      console.log(`  - ${UrlStatus.FAILED}: ${domainStats[UrlStatus.FAILED]}개`);
-    }
 
     // 전체 통계 출력
     console.log('\n===== 마이그레이션 결과 =====');

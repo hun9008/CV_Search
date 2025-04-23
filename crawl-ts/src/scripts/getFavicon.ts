@@ -1,10 +1,9 @@
-import { MongoDbConnector } from '../database/MongoDbConnector';
-import { VisitResultModel } from '../models/visitResult';
+import { MongoDbConnector } from '@database/MongoDbConnector';
+import { VisitResultModel } from '@models/VisitResult';
 import axios, { AxiosError } from 'axios';
 import * as cheerio from 'cheerio';
 import * as dotenv from 'dotenv';
 import { defaultLogger as logger } from '../utils/logger';
-import mongoose from 'mongoose';
 import { URL } from 'url'; // Import URL for reliable path resolution
 
 // 환경 변수 로드
