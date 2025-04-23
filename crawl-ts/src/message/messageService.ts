@@ -1,24 +1,25 @@
-import { Connection } from 'mysql2/typings/mysql/lib/Connection';
 import RabbitMQManager from './rabbitMQManager';
-import { Channel ,ConsumeMessage,Replies
-} from 'amqplib';
-import { VisitResult } from '../models/visitResult';
-
+import { Channel, ConsumeMessage } from 'amqplib';
+import { IMessageService } from './IMessageService';
 /**
  * Queue names used in the application
  */
-export type QueueNames = 'visit_results' | 'recruit_info';
-
+export enum QueueNames {
+  VISIT_RESULTS = 'visit_results',
+  RECRUIT_INFO = 'recruit_info',
+  URL_SEED = 'url_seed'
+}
 
 interface ConsumeOptions {
   prefetch?: number;
   noAck?: boolean;
 }
 
+
 /**
  * MessageService for handling RabbitMQ message operations
  */
-export class MessageService {
+export class MessageService implements IMessageService {
   private rabbitMQManager: RabbitMQManager;
   private static instance: MessageService;
 
@@ -41,8 +42,6 @@ export class MessageService {
     return MessageService.instance;
   }
 
-
-
   /**
    * Send visit result to RabbitMQ queue
    * @param visitResult Visit result data
@@ -51,7 +50,7 @@ export class MessageService {
   public async sendVisitResult(visitResult: any): Promise<boolean> {
     try {
       const result = await this.rabbitMQManager.sendToQueue(
-        'visit_results',
+        QueueNames.VISIT_RESULTS,
         visitResult,
         { persistent: true } // Make message persistent to survive broker restarts
       );
@@ -71,7 +70,7 @@ export class MessageService {
   public async sendRecruitInfo(recruitInfo: any): Promise<boolean> {
     try {
       const result = await this.rabbitMQManager.sendToQueue(
-        'visit_results' ,
+        QueueNames.RECRUIT_INFO,
         recruitInfo,
         { persistent: true } // Make message persistent to survive broker restarts
       );
@@ -91,7 +90,7 @@ export class MessageService {
   public async sendRawContent(rawContent: any): Promise<boolean> {
     try {
       const result = await this.rabbitMQManager.sendToQueue(
-        'visit_results',
+        QueueNames.VISIT_RESULTS,
         rawContent,
         { persistent: true } // Make message persistent to survive broker restarts
       );
@@ -172,51 +171,50 @@ export class MessageService {
     }
   }
 
-public async handleLiveMessage(
-  queueName: QueueNames,
-  onMessage: (msg: ConsumeMessage | null) => Promise<void>,
-  options: ConsumeOptions = {}
-): Promise<void> {
-  try {
+  public async handleLiveMessage(
+    queueName: QueueNames,
+    onMessage: (msg: ConsumeMessage | null) => Promise<void>,
+    options: ConsumeOptions = {}
+  ): Promise<void> {
+    try {
+      const channel = this.rabbitMQManager.getChannel();
+      // 큐가 존재하는지 확인
+      await channel.assertQueue(queueName, { durable: true });
+      // 프리패치 설정 (옵션으로 제공된 경우)
+      if (options.prefetch !== undefined) {
+        await channel.prefetch(options.prefetch);
+      }
 
-    const channel = this.rabbitMQManager.getChannel();
-    // 큐가 존재하는지 확인
-    await channel.assertQueue(queueName, { durable: true });
-    // 프리패치 설정 (옵션으로 제공된 경우)
-    if (options.prefetch !== undefined) {
-      await channel.prefetch(options.prefetch);
-    }
-
-    // 메시지 소비 설정
-    await channel.consume(
-      queueName,
-      async (msg: ConsumeMessage | null) => {
-        if (!msg) {
-          console.warn('Received null message');
-          return;
-        }
-
-        try {
-          await onMessage(msg);
-          // noAck가 false일 경우에만 메시지 확인(ack) 처리
-          if (!options.noAck) {
-            channel.ack(msg);
+      // 메시지 소비 설정
+      await channel.consume(
+        queueName,
+        async (msg: ConsumeMessage | null) => {
+          if (!msg) {
+            console.warn('Received null message');
+            return;
           }
-        } catch (error) {
-          console.error(`Error processing message from queue ${queueName}:`, error);
-          // 메시지 재큐잉 또는 DLQ(Dead Letter Queue)로 이동
-          channel.nack(msg, false, false); // 재큐잉하지 않음
-        }
-      },
-      { noAck: options.noAck ?? false }
-    );
 
-    console.log(`Started consuming messages from queue: ${queueName}`);
-  } catch (error) {
-    console.error(`Failed to consume messages from queue ${queueName}:`, error);
-    throw error; // 상위 호출자에게 에러 전파
+          try {
+            await onMessage(msg);
+            // noAck가 false일 경우에만 메시지 확인(ack) 처리
+            if (!options.noAck) {
+              channel.ack(msg);
+            }
+          } catch (error) {
+            console.error(`Error processing message from queue ${queueName}:`, error);
+            // 메시지 재큐잉 또는 DLQ(Dead Letter Queue)로 이동
+            channel.nack(msg, false, false); // 재큐잉하지 않음
+          }
+        },
+        { noAck: options.noAck ?? false }
+      );
+
+      console.log(`Started consuming messages from queue: ${queueName}`);
+    } catch (error) {
+      console.error(`Failed to consume messages from queue ${queueName}:`, error);
+      throw error; // 상위 호출자에게 에러 전파
+    }
   }
-}
 
   /**
    * Connect to RabbitMQ
@@ -231,16 +229,16 @@ public async handleLiveMessage(
   public async close(): Promise<void> {
     await this.rabbitMQManager.close();
   }
-   /**
-   * Send accknoledge
-   */
-   public async sendAck(msg : ConsumeMessage) : Promise<void> {
-     const channel : Channel = this.rabbitMQManager.getChannel();
-     if (!channel) {
-       throw new Error("channel이 존재하지 않습니다.");
-     }
-     await channel.ack(msg);
 
+  /**
+   * Send acknowledge
+   */
+  public async sendAck(msg: ConsumeMessage): Promise<void> {
+    const channel: Channel = this.rabbitMQManager.getChannel();
+    if (!channel) {
+      throw new Error("channel이 존재하지 않습니다.");
+    }
+    await channel.ack(msg);
   }
 }
 

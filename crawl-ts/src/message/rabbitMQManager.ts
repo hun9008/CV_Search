@@ -6,10 +6,10 @@ import { QueueNames } from './messageService';
  * Handles connections and operations with RabbitMQ message queue
  */
 export class RabbitMQManager {
-  private connection: ChannelModel | null = null;
-  private channel: Channel | null = null;
-  private uri: string;
-  private static instance: RabbitMQManager;
+  private connection?: ChannelModel | null = null;
+  private channel?: Channel | null = null;
+  private uri?: string;
+  private static instance?: RabbitMQManager;
 
   /**
    * Create a new RabbitMQ Manager instance
@@ -38,6 +38,10 @@ export class RabbitMQManager {
     try {
       if (!this.connection) {
         // Connect to RabbitMQ server - returns a Connection object
+        if (!this.uri) {
+          throw new Error("RabbitMQ uri가 존재하지 않습니다.");
+
+        }
         this.connection = await amqp.connect(this.uri);
 
         // Handle connection close event
