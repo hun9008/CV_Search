@@ -1,9 +1,7 @@
 import { IBrowserManager } from '../browser/IBrowserManager';
 import { IContentExtractor } from '../content/IContentExtractor';
 import { IUrlManager } from '../url/IUrlManager';
-import { IDbConnector } from '../database/IDbConnector';
 import { SubUrl } from '../models/VisitResult';
-import { RedisUrlManager } from '../url/RedisUrlManager';
 
 /**
  * 크롤러 인터페이스

@@ -1,16 +1,16 @@
 import * as dotenv from 'dotenv';
-import { GeminiParser } from '@parser/GeminiParser';
-import { MongoDbConnector } from '@database/MongoDbConnector';
-import { MysqlRecruitInfoRepository } from '@database/MysqlRecruitInfoRepository';
-import { MongoRecruitInfoRepository } from '@database/MongoRecruitInfoRepository';
-import MessageService, { QueueNames } from '@message/messageService';
-import { RedisUrlManager } from '@url/RedisUrlManager';
+import { GeminiParser } from '../parser/GeminiParser';
+import { MongoDbConnector } from '../database/MongoDbConnector';
+import { MysqlRecruitInfoRepository } from '../database/MysqlRecruitInfoRepository';
+import { MongoRecruitInfoRepository } from '../database/MongoRecruitInfoRepository';
+import MessageService, { QueueNames } from '../message/MessageService';
+import { RedisUrlManager } from '../url/RedisUrlManager';
 import { ConsumeMessage } from 'amqplib';
-import { defaultLogger as logger } from '@utils/logger';
-import { IRawContent } from '@models/RecruitInfoModel';
-import { MySqlConnector } from '@database/MySqlConnector';
-import { MongoRecruitInfoModel } from '@models/MongoRecruitInfoModel';
-import { mysqlRecruitInfoModel, mysqlRecruitInfoSequelize } from '@models/MysqlRecruitInfoModel';
+import { defaultLogger as logger } from '../utils/logger';
+import { IRawContent } from '../models/RecruitInfoModel';
+import { MySqlConnector } from '../database/MySqlConnector';
+import { MongoRecruitInfoModel } from '../models/MongoRecruitInfoModel';
+import { mysqlRecruitInfoModel, mysqlRecruitInfoSequelize } from '../models/MysqlRecruitInfoModel';
 
 // Load environment variables
 dotenv.config();
@@ -51,7 +51,6 @@ export async function startGeminiParserConsumer(): Promise<void> {
         if (parser.cacheRecruitInfoRepository) {
           await parser.cacheRecruitInfoRepository.createRecruitInfo(dbRecruitInfo);
         }
-        await parser.messageService.sendAck(msg);
       }
     });
 

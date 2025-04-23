@@ -1,7 +1,7 @@
   import { ICrawler } from './ICrawler';
   import { IBrowserManager } from '../browser/IBrowserManager';
   import { IContentExtractor } from '../content/IContentExtractor';
-  import { SubUrl, VisitResult } from '../models/VisitResult';
+  import { SubUrl } from '../models/VisitResult';
   import { defaultLogger as logger } from '../utils/logger';
   import { extractDomain } from '../url/urlUtils';
   import { Dialog } from 'puppeteer';
