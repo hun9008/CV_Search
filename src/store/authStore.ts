@@ -37,8 +37,11 @@ const useAuthStore = create<AuthStore>()(
                         headers: { Authorization: `Bearer ${accessToken}` },
                         withCredentials: true,
                     });
+                    console.log('탈퇴중');
                     if (res.status === 200) {
+                        console.log(res);
                         console.log(res.data);
+                        console.log('탈퇴완료');
                     }
                 } catch (error) {
                     console.log(error);
@@ -49,7 +52,7 @@ const useAuthStore = create<AuthStore>()(
             name: 'user-token',
             partialize: (state) => ({
                 accessToken: state.accessToken,
-                isLoggedIn: state.isLoggedIn, // 반드시 삭제해야함
+                // isLoggedIn: state.isLoggedIn, // 반드시 삭제해야함
             }),
         }
     )

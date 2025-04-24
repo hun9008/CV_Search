@@ -1,23 +1,30 @@
 import type React from 'react';
 
 import { useState } from 'react';
-import { Search, Bell, User, Menu } from 'lucide-react';
+import { Search, Bell, Menu } from 'lucide-react';
 import styles from './MainHeader.module.scss';
 import useAuthStore from '../../../store/authStore';
 import axios from 'axios';
 import ProfileDialog from '../dialog/ProfileDialog';
+import usePageStore from '../../../store/pageStore';
 
 const MainHeader = () => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const { setCompactMenu } = usePageStore();
+
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+    const isCompactMenu = usePageStore((state) => state.isCompactMenu);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
     };
 
     const toggleMobileMenu = () => {
-        setShowMobileMenu(!showMobileMenu);
+        if (isCompactMenu === true) {
+            setCompactMenu(false);
+        } else {
+            setCompactMenu(true);
+        }
     };
     const handleTestRecommend = async () => {
         const accessToken = useAuthStore.getState().accessToken;

@@ -3,6 +3,7 @@ import style from './Header.module.scss';
 import { Search, Bell, User, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../../store/authStore';
+import ProfileDialog from '../dialog/ProfileDialog';
 
 function Header() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -62,7 +63,8 @@ function Header() {
                                 aria-label="알림"
                                 size={38}
                             />
-                            <User className={style.header__profile} aria-label="프로필" size={38} />
+                            {/* <User className={style.header__profile} aria-label="프로필" size={38} /> */}
+                            <ProfileDialog />
                             {/* 테스트 버튼 */}
                             <button onClick={toggleLoginStatus}>로그인 상태 전환</button>
                         </>
