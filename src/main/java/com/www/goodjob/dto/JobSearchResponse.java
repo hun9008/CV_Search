@@ -1,5 +1,6 @@
 package com.www.goodjob.dto;
 
+import com.www.goodjob.domain.Job;
 import lombok.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

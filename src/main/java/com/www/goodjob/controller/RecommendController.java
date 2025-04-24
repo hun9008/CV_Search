@@ -1,11 +1,14 @@
 package com.www.goodjob.controller;
 
+import com.www.goodjob.dto.ScoredJobDto;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.RecommendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,12 +19,12 @@ public class RecommendController {
 
     // 추천 리스트 조회
     @PostMapping("/topk-list")
-    public ResponseEntity<String> recommendTopK(
+    public ResponseEntity<List<ScoredJobDto>> recommendTopK(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam int topk
     ) {
         Long userId = userDetails.getId();
-        String result = recommendService.requestRecommendation(userId, topk);
+        List<ScoredJobDto> result = recommendService.requestRecommendation(userId, topk);
         return ResponseEntity.ok(result);
     }
 

@@ -62,7 +62,7 @@ public class Job {
     private LocalDateTime lastUpdatedAt; // 마지막 수정 일자 (서버 입장)
 
     @Column(name = "expired_at")
-    private LocalDateTime expiresAt; // 공고 내려간 시간 (서버 입장)
+    private LocalDateTime expiredAt; // 공고 내려간 시간 (서버 입장)
 
     @Column(name = "archived_at")
     private LocalDateTime archivedAt; // 관리자 또는 배치에 의해 숨겨진 시간
@@ -72,4 +72,10 @@ public class Job {
 
     @Column(columnDefinition = "TEXT")
     private String url; // 공고 상세보기 링크 (공식 페이지)
+
+    @Column(columnDefinition = "TEXT")
+    private String favicon;
+
+    @Column(name = "region_text")
+    private String regionText;
 }

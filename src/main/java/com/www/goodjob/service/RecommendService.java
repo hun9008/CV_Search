@@ -1,8 +1,14 @@
 package com.www.goodjob.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.CvFeedback;
+import com.www.goodjob.domain.Job;
 import com.www.goodjob.domain.RecommendScore;
 import com.www.goodjob.domain.User;
+import com.www.goodjob.dto.JobDto;
+import com.www.goodjob.dto.ScoredJobDto;
+import com.www.goodjob.repository.JobRepository;
 import com.www.goodjob.repository.RecommendScoreRepository;
 import com.www.goodjob.repository.CvFeedbackRepository;
 import com.www.goodjob.security.CustomUserDetails;
@@ -16,6 +22,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +33,7 @@ public class RecommendService {
     private final RecommendScoreRepository recommendScoreRepository;
     private final CvFeedbackRepository cvFeedbackRepository;
     private final ClaudeClient claudeClient;
+    private final JobRepository jobRepository;
 
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
@@ -32,7 +41,7 @@ public class RecommendService {
     /**
      * FastAPI 서버로 추천 점수 요청
      */
-    public String requestRecommendation(Long userId, int topk) {
+    public List<ScoredJobDto> requestRecommendation(Long userId, int topk) {
         String url = fastapiHost + "/recommend-jobs";
 
         HttpHeaders headers = new HttpHeaders();
@@ -47,9 +56,34 @@ public class RecommendService {
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-            return response.getBody();
+            String responseBody = response.getBody();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode root = objectMapper.readTree(responseBody);
+            JsonNode recommendedJobsNode = root.get("recommended_jobs");
+
+            List<ScoredJobDto> result = new ArrayList<>();
+
+            for (JsonNode rec : recommendedJobsNode) {
+                Long jobId = rec.get("job_id").asLong();
+                Optional<Job> jobOpt = jobRepository.findById(jobId);
+
+                jobOpt.ifPresent(job -> {
+                    JobDto base = JobDto.from(job);
+                    ScoredJobDto scored = ScoredJobDto.from(
+                            base,
+                            rec.get("score").asDouble(),
+                            rec.get("cosine_score").asDouble(),
+                            rec.get("bm25_score").asDouble()
+                    );
+                    result.add(scored);
+                });
+            }
+
+            return result;
+
         } catch (Exception e) {
-            return "추천 요청 중 오류 발생: " + e.getMessage();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "추천 요청 실패", e);
         }
     }
 
