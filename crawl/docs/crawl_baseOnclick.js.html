@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>crawl/baseOnclick.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BaseWorkerManager.html">BaseWorkerManager</a><ul class='methods'><li data-type='method'><a href="BaseWorkerManager.html#closeBrowser">closeBrowser</a></li><li data-type='method'><a href="BaseWorkerManager.html#connect">connect</a></li><li data-type='method'><a href="BaseWorkerManager.html#disconnect">disconnect</a></li><li data-type='method'><a href="BaseWorkerManager.html#extractLinks">extractLinks</a></li><li data-type='method'><a href="BaseWorkerManager.html#extractPageContent">extractPageContent</a></li><li data-type='method'><a href="BaseWorkerManager.html#filterAllowedUrls">filterAllowedUrls</a></li><li data-type='method'><a href="BaseWorkerManager.html#getNextUrl">getNextUrl</a></li><li data-type='method'><a href="BaseWorkerManager.html#getUrlForDomain">getUrlForDomain</a></li><li data-type='method'><a href="BaseWorkerManager.html#groupUrlsByDomain">groupUrlsByDomain</a></li><li data-type='method'><a href="BaseWorkerManager.html#handleDomainError">handleDomainError</a></li><li data-type='method'><a href="BaseWorkerManager.html#initAvailableDomains">initAvailableDomains</a></li><li data-type='method'><a href="BaseWorkerManager.html#initBrowser">initBrowser</a></li><li data-type='method'><a href="BaseWorkerManager.html#processQueue">processQueue</a></li><li data-type='method'><a href="BaseWorkerManager.html#run">run</a></li><li data-type='method'><a href="BaseWorkerManager.html#saveErrorScreenshot">saveErrorScreenshot</a></li><li data-type='method'><a href="BaseWorkerManager.html#saveVisitResult">saveVisitResult</a></li><li data-type='method'><a href="BaseWorkerManager.html#selectTargetDomain">selectTargetDomain</a></li><li data-type='method'><a href="BaseWorkerManager.html#tryNextDomain">tryNextDomain</a></li><li data-type='method'><a href="BaseWorkerManager.html#visitUrl">visitUrl</a></li></ul></li><li><a href="ClaudeParser.html">ClaudeParser</a><ul class='methods'><li data-type='method'><a href="ClaudeParser.html#connect">connect</a></li><li data-type='method'><a href="ClaudeParser.html#convertToRecruitInfoSchema">convertToRecruitInfoSchema</a></li><li data-type='method'><a href="ClaudeParser.html#fetchRecruitUrls">fetchRecruitUrls</a></li><li data-type='method'><a href="ClaudeParser.html#processUrl">processUrl</a></li><li data-type='method'><a href="ClaudeParser.html#requestUrlParse">requestUrlParse</a></li><li data-type='method'><a href="ClaudeParser.html#run">run</a></li><li data-type='method'><a href="ClaudeParser.html#saveRecruitInfo">saveRecruitInfo</a></li><li data-type='method'><a href="ClaudeParser.html#wait">wait</a></li></ul></li><li><a href="ClaudeService.html">ClaudeService</a><ul class='methods'><li data-type='method'><a href="ClaudeService.html#generateContent">generateContent</a></li><li data-type='method'><a href="ClaudeService.html#getRecruitmentPrompt">getRecruitmentPrompt</a></li><li data-type='method'><a href="ClaudeService.html#getStatus">getStatus</a></li><li data-type='method'><a href="ClaudeService.html#initializeClient">initializeClient</a></li></ul></li><li><a href="GeminiService.html">GeminiService</a><ul class='methods'><li data-type='method'><a href="GeminiService.html#generateContent">generateContent</a></li><li data-type='method'><a href="GeminiService.html#getKeyStatus">getKeyStatus</a></li><li data-type='method'><a href="GeminiService.html#getRecruitmentPrompt">getRecruitmentPrompt</a></li><li data-type='method'><a href="GeminiService.html#getRecruitmentSchema">getRecruitmentSchema</a></li><li data-type='method'><a href="GeminiService.html#initializeClient">initializeClient</a></li><li data-type='method'><a href="GeminiService.html#parseRecruitment">parseRecruitment</a></li><li data-type='method'><a href="GeminiService.html#rotateApiKey">rotateApiKey</a></li></ul></li><li><a href="Logger.html">Logger</a><ul class='methods'><li data-type='method'><a href="Logger.html#checkLogFileDate">checkLogFileDate</a></li><li data-type='method'><a href="Logger.html#colorize">colorize</a></li><li data-type='method'><a href="Logger.html#formatJsonMessage">formatJsonMessage</a></li><li data-type='method'><a href="Logger.html#formatJsonMessage">formatJsonMessage</a></li><li data-type='method'><a href="Logger.html#formatTextMessage">formatTextMessage</a></li><li data-type='method'><a href="Logger.html#log">log</a></li><li data-type='method'><a href="Logger.html#logEvent">logEvent</a></li><li data-type='method'><a href="Logger.html#setupLogFiles">setupLogFiles</a></li><li data-type='method'><a href="Logger.html#setupLogRotation">setupLogRotation</a></li></ul></li><li><a href="MongoDBService.html">MongoDBService</a><ul class='methods'><li data-type='method'><a href="MongoDBService.html#connect">connect</a></li><li data-type='method'><a href="MongoDBService.html#disconnect">disconnect</a></li><li data-type='method'><a href="MongoDBService.html#getConnection">getConnection</a></li><li data-type='method'><a href="MongoDBService.html#getConnectionStatus">getConnectionStatus</a></li><li data-type='method'><a href="MongoDBService.html#getMongoose">getMongoose</a></li><li data-type='method'><a href="MongoDBService.html#setDbName">setDbName</a></li><li data-type='method'><a href="MongoDBService.html#setUri">setUri</a></li></ul></li><li><a href="OnClickWorker.html">OnClickWorker</a><ul class='methods'><li data-type='method'><a href="OnClickWorker.html#checkUrlChanges">checkUrlChanges</a></li><li data-type='method'><a href="OnClickWorker.html#cleanup">cleanup</a></li><li data-type='method'><a href="OnClickWorker.html#execute">execute</a></li><li data-type='method'><a href="OnClickWorker.html#formatResult">formatResult</a></li><li data-type='method'><a href="OnClickWorker.html#initialize">initialize</a></li><li data-type='method'><a href="OnClickWorker.html#scrollFullPage">scrollFullPage</a></li><li data-type='method'><a href="OnClickWorker.html#scrollPage">scrollPage</a></li><li data-type='method'><a href="OnClickWorker.html#setupPage">setupPage</a></li></ul></li><li><a href="ParseManager.html">ParseManager</a><ul class='methods'><li data-type='method'><a href="ParseManager.html#cancel">cancel</a></li><li data-type='method'><a href="ParseManager.html#connect">connect</a></li><li data-type='method'><a href="ParseManager.html#convertToRecruitInfoSchema">convertToRecruitInfoSchema</a></li><li data-type='method'><a href="ParseManager.html#fetchUnclassifiedUrls">fetchUnclassifiedUrls</a></li><li data-type='method'><a href="ParseManager.html#getStatus">getStatus</a></li><li data-type='method'><a href="ParseManager.html#processUrl">processUrl</a></li><li data-type='method'><a href="ParseManager.html#requestUrlParse">requestUrlParse</a></li><li data-type='method'><a href="ParseManager.html#run">run</a></li><li data-type='method'><a href="ParseManager.html#saveRecruitInfo">saveRecruitInfo</a></li><li data-type='method'><a href="ParseManager.html#wait">wait</a></li></ul></li><li><a href="RecruitInfoDbService.html">RecruitInfoDbService</a><ul class='methods'><li data-type='method'><a href="RecruitInfoDbService.html#bulkCreateOrUpdate">bulkCreateOrUpdate</a></li><li data-type='method'><a href="RecruitInfoDbService.html#bulkDelete">bulkDelete</a></li><li data-type='method'><a href="RecruitInfoDbService.html#createOrUpdate">createOrUpdate</a></li><li data-type='method'><a href="RecruitInfoDbService.html#deleteByUrl">deleteByUrl</a></li><li data-type='method'><a href="RecruitInfoDbService.html#deleteExpired">deleteExpired</a></li><li data-type='method'><a href="RecruitInfoDbService.html#getAll">getAll</a></li><li data-type='method'><a href="RecruitInfoDbService.html#getByUrl">getByUrl</a></li><li data-type='method'><a href="RecruitInfoDbService.html#getStats">getStats</a></li><li data-type='method'><a href="RecruitInfoDbService.html#search">search</a></li><li data-type='method'><a href="RecruitInfoDbService.html#searchByKeywords">searchByKeywords</a></li></ul></li><li><a href="WorkerPool.html">WorkerPool</a><ul class='methods'><li data-type='method'><a href="WorkerPool.html#enqueue">enqueue</a></li><li data-type='method'><a href="WorkerPool.html#processQueue">processQueue</a></li><li data-type='method'><a href="WorkerPool.html#processTasks">processTasks</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#RecruitInfo">RecruitInfo</a></li><li><a href="global.html#createTableIfNotExists">createTableIfNotExists</a></li><li><a href="global.html#extractAndExecuteScripts">extractAndExecuteScripts</a></li><li><a href="global.html#extractAndProcessOnClicks">extractAndProcessOnClicks</a></li><li><a href="global.html#extractDomain">extractDomain</a></li><li><a href="global.html#getClaudeJobById">getClaudeJobById</a></li><li><a href="global.html#getClaudeJobFilters">getClaudeJobFilters</a></li><li><a href="global.html#getClaudeJobStats">getClaudeJobStats</a></li><li><a href="global.html#getClaudeJobs">getClaudeJobs</a></li><li><a href="global.html#getCompleteClaudeJobs">getCompleteClaudeJobs</a></li><li><a href="global.html#getCompletionStats">getCompletionStats</a></li><li><a href="global.html#getDomainStats">getDomainStats</a></li><li><a href="global.html#getExperienceStats">getExperienceStats</a></li><li><a href="global.html#getFailedVisitStats">getFailedVisitStats</a></li><li><a href="global.html#getJobById">getJobById</a></li><li><a href="global.html#getJobTypeStats">getJobTypeStats</a></li><li><a href="global.html#getJobs">getJobs</a></li><li><a href="global.html#getMySqlJobFilters">getMySqlJobFilters</a></li><li><a href="global.html#getMySqlJobs">getMySqlJobs</a></li><li><a href="global.html#getResults">getResults</a></li><li><a href="global.html#getStats">getStats</a></li><li><a href="global.html#getUrlDetails">getUrlDetails</a></li><li><a href="global.html#getUrlSeed">getUrlSeed</a></li><li><a href="global.html#getUrlStats">getUrlStats</a></li><li><a href="global.html#handler">handler</a></li><li><a href="global.html#infiniteScroll">infiniteScroll</a></li><li><a href="global.html#isUrlAllowed">isUrlAllowed</a></li><li><a href="global.html#isUrlAllowedWithRobots">isUrlAllowedWithRobots</a></li><li><a href="global.html#logProgress">logProgress</a></li><li><a href="global.html#main">main</a></li><li><a href="global.html#parseRobotsTxt">parseRobotsTxt</a></li><li><a href="global.html#processOnClickEvents">processOnClickEvents</a></li><li><a href="global.html#processOnclick">processOnclick</a></li><li><a href="global.html#resetFailedVisitsForDomain">resetFailedVisitsForDomain</a></li><li><a href="global.html#resetVisitedStatus">resetVisitedStatus</a></li><li><a href="global.html#resetVisitedStatusForDomain">resetVisitedStatusForDomain</a></li><li><a href="global.html#runCrawler">runCrawler</a></li><li><a href="global.html#saveJobToMySql">saveJobToMySql</a></li><li><a href="global.html#saveSeedsToMongoDB">saveSeedsToMongoDB</a></li><li><a href="global.html#scrollToBottom">scrollToBottom</a></li><li><a href="global.html#updateVisitResultDomains">updateVisitResultDomains</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">crawl/baseOnclick.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { WorkerPool } = require('@crawl/worker-task');
+const baseWorker = require('@crawl/baseWorker');
+const { defaultLogger: logger } = require('@utils/logger');
+
+/**
+ * 페이지에서 onclick 속성을 가진 요소들을 찾아 이벤트를 실행
+ * @param {Object} options 옵션 객체
+ * @param {Browser} options.browser Puppeteer 브라우저 인스턴스
+ * @param {string} options.url 현재 URL
+ * @param {Array&lt;Object>} options.onclickElements 클릭 이벤트를 가진 요소 목록
+ * @param {boolean} options.headless 헤드리스 모드 사용 여부
+ * @param {number} options.maxConcurrency 최대 동시 실행 작업 수
+ * @param {number} options.timeout 각 작업의 제한 시간 (ms)
+ * @returns {Promise&lt;Object>} 실행 결과 및 발견된 URL들
+ */
+async function processOnClickEvents(options) {
+  const {
+    browser,
+    url,
+    onclickElements = [],
+    headless = true,
+    maxConcurrency = 3,
+    timeout = 5000
+  } = options;
+
+  // 결과 객체 초기화
+  const result = {
+    totalElements: onclickElements.length,
+    processed: 0,
+    successful: 0,
+    failed: 0,
+    discoveredUrls: new Set(),
+    results: []
+  };
+
+
+  // onclick 요소가 없으면 바로 반환
+  if (!onclickElements || onclickElements.length === 0) {
+   logger.debug("유효한 onclick 이벤트가 없습니다.");
+    return result;
+  }
+
+  try {
+    // 병렬 처리를 위한 작업 풀 생성
+    const workerPool = new WorkerPool(maxConcurrency);
+    const starTime = Date.now();
+    // 각 onclick 항목을 작업으로 변환
+    const tasks = onclickElements.map((item, idx) => ({
+      id: idx + 1,
+      currentUrl: url,
+      onclickItem: item,
+      index: idx + 1,
+      total: onclickElements.length,
+      headless: headless,
+      timeout: timeout,
+      urlDetectionTimeout: Math.floor(timeout * 0.5), // 감지 타임아웃은 실행 타임아웃의 절반으로 설정
+      browser: browser // 브라우저 인스턴스 재사용 (worker-task에서 이를 지원해야 함)
+    }));
+
+
+    // 모든 작업 병렬 실행
+    const onclickResults = await workerPool.processTasks(tasks);
+
+    // 결과 처리
+    onclickResults.forEach(onclickResult => {
+      // 결과를 배열에 추가
+      result.results.push(onclickResult);
+      result.processed++;
+
+      // 성공/실패 카운트
+      if (onclickResult.success) {
+        result.successful++;
+
+        // URL 변경이 감지된 경우
+        if (onclickResult.urlChanged &amp;&amp; onclickResult.detectedUrl) {
+          const detectedUrl = onclickResult.detectedUrl;
+          if (detectedUrl &amp;&amp; typeof detectedUrl === 'string' &amp;&amp; detectedUrl.startsWith('http')) {
+            result.discoveredUrls.add(detectedUrl);
+           logger.debug(`[OnClick ${onclickResult.index}] 새 URL 발견: ${detectedUrl}`);
+          }
+        }
+      } else {
+        result.failed++;
+      }
+    });
+
+   logger.debug(`=== onclick 이벤트 처리 완료 ===`);
+   logger.debug(`- 처리된 이벤트: ${result.processed}/${result.totalElements}개`);
+   logger.debug(`- 성공: ${result.successful}개`);
+   logger.debug(`- 실패: ${result.failed}개`);
+  logger.debug(`- 발견된 URL: ${result.discoveredUrls.size}개`);
+   const runtime = Date.now() - starTime;
+   logger.eventInfo('execute_onclick', {runtime});
+
+    return result;
+  } catch (error) {
+    logger.debug('onclick 실행 오류:', error);
+    result.error = error.toString();
+    return result;
+  }
+}
+
+/**
+ * 페이지에서 onclick 요소를 추출하고 처리
+ * @param {Object} options 옵션 객체
+ * @param {Browser} options.browser Puppeteer 브라우저 인스턴스
+ * @param {string} options.url 대상 URL
+ * @param {boolean} options.headless 헤드리스 모드 여부
+ * @param {number} options.maxConcurrency 최대 동시 실행 작업 수
+ * @param {number} options.timeout 제한 시간 (ms)
+ * @returns {Promise&lt;Object>} 실행 결과 및 발견된 URL들
+ */
+async function extractAndProcessOnClicks(options) {
+  const {
+    browser,
+    page,
+    url,
+    headless = true,
+    maxConcurrency = 3,
+    timeout = 5000
+  } = options;
+
+
+  try {
+
+    // 페이지 설정
+    page.on('dialog', async dialog => {
+     logger.debug(`[OnClick 모듈] 대화상자 감지: ${dialog.type()}, 메시지: ${dialog.message()}`);
+      await dialog.dismiss();
+    });
+
+    const startTime = Date.now();
+
+    // onclick 요소 추출
+    const onclickElements = await page.evaluate(() => {
+      // onclick 속성을 가진 모든 요소 수집
+      const elements = Array.from(document.querySelectorAll('[onclick]'));
+      return elements.map(element => {
+        return {
+          tagName: element.tagName,
+          id: element.id || null,
+          className: element.className || null,
+          onclick: element.getAttribute('onclick'),
+          text: (element.textContent || '').trim().substring(0, 100) // 텍스트 길이 제한
+        };
+      });
+    });
+
+    const runtime = Date.now() - startTime;
+
+
+   logger.eventInfo('extract_onclick', { runtime });
+
+
+   logger.debug(`[OnClick 모듈] ${onclickElements.length}개의 onclick 요소를 발견했습니다.`);
+
+    // 발견한 onclick 요소들 처리
+    if (onclickElements.length > 0) {
+      const result = await processOnClickEvents({
+        browser,
+        url: url,
+        onclickElements,
+        headless,
+        maxConcurrency,
+        timeout
+      });
+
+      return {
+        success: true,
+        url: url,
+        currentUrl: url,
+        discoveredUrls: Array.from(result.discoveredUrls),
+        totalElements: result.totalElements,
+        processed: result.processed,
+        successful: result.successful,
+        failed: result.failed,
+        results: result.results
+      };
+    } else {
+      return {
+        success: true,
+        url: url,
+        currentUrl: url,
+        discoveredUrls: [],
+        message: 'onclick 요소가 없습니다.'
+      };
+    }
+  } catch (error) {
+    logger.debug('onclick 실행 오류:', error);
+    return {
+      success: false,
+      url: url,
+      error: error.toString(),
+      discoveredUrls: []
+    };
+  }
+}
+
+module.exports = {
+  processOnClickEvents,
+  extractAndProcessOnClicks
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

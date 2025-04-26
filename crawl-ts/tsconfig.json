@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+     "types": ["@types/jest", "node"],
+    "target": "ES2020",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "tsoa": ["node_modules/tsoa/dist"],
+      "*": ["node_modules/*"],
+    "@models/*": ["src/models/*"],
+    "@database/*": ["src/database/*"],
+    "@parser/*": ["src/parser/*"],
+    "@utils/*": ["src/utils/*"],
+    "@message/*": ["src/message/*"],
+    "@scripts/*": ["src/scripts/*"],
+    "@crawl/*": ["src/crawl/*"],
+    "@config/*": ["src/config/*"],
+    "@tests/*": ["src/tests/*"],
+    "@url/*": ["src/url/*"],
+    "@browser/*": ["src/browser/*"],
+    "@interfaces/*": ["src/interfaces/*"],
+    "@services/*": ["src/services/*"]
+    }
+  },
+
+  "include": ["src/**/*",  "test/**/*"],
+  "exclude": ["node_modules",  "dist"],
+
+}
