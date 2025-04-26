@@ -236,7 +236,11 @@ BRF:13
 BRH:11
 end_of_record
 TN:
+<<<<<<< HEAD
 SF:src/message/MessageService.ts
+=======
+SF:src/message/messageService.ts
+>>>>>>> 7b3263fe198854bd6af9701b99ee498c3d812c35
 FN:7,(anonymous_1)
 FN:30,(anonymous_2)
 FN:38,(anonymous_3)
@@ -366,7 +370,11 @@ BRF:16
 BRH:5
 end_of_record
 TN:
+<<<<<<< HEAD
 SF:src/message/RabbitMQManager.ts
+=======
+SF:src/message/rabbitMQManager.ts
+>>>>>>> 7b3263fe198854bd6af9701b99ee498c3d812c35
 FN:18,(anonymous_1)
 FN:27,(anonymous_2)
 FN:37,(anonymous_3)
@@ -491,6 +499,7 @@ DA:51,1
 DA:52,1
 DA:142,1
 DA:145,1
+<<<<<<< HEAD
 DA:146,1
 DA:170,1
 DA:171,1
@@ -508,6 +517,24 @@ BRDA:152,4,0,0
 BRDA:152,4,1,1
 BRDA:154,5,0,0
 BRDA:154,5,1,1
+=======
+DA:169,1
+DA:170,1
+LF:8
+LH:8
+BRDA:146,0,0,1
+BRDA:146,0,1,1
+BRDA:147,1,0,1
+BRDA:147,1,1,1
+BRDA:148,2,0,1
+BRDA:148,2,1,1
+BRDA:150,3,0,1
+BRDA:150,3,1,1
+BRDA:151,4,0,0
+BRDA:151,4,1,1
+BRDA:153,5,0,0
+BRDA:153,5,1,1
+>>>>>>> 7b3263fe198854bd6af9701b99ee498c3d812c35
 BRF:12
 BRH:10
 end_of_record
@@ -516,11 +543,32 @@ SF:src/models/VisitResult.ts
 FN:110,(anonymous_9)
 FN:142,(anonymous_10)
 FN:222,(anonymous_11)
+<<<<<<< HEAD
 FNF:3
+=======
+FN:244,(anonymous_12)
+FN:254,(anonymous_13)
+FN:260,(anonymous_14)
+FN:271,(anonymous_15)
+FN:287,(anonymous_16)
+FN:290,(anonymous_17)
+FN:304,(anonymous_18)
+FNF:10
+>>>>>>> 7b3263fe198854bd6af9701b99ee498c3d812c35
 FNH:1
 FNDA:7,(anonymous_9)
 FNDA:0,(anonymous_10)
 FNDA:0,(anonymous_11)
+<<<<<<< HEAD
+=======
+FNDA:0,(anonymous_12)
+FNDA:0,(anonymous_13)
+FNDA:0,(anonymous_14)
+FNDA:0,(anonymous_15)
+FNDA:0,(anonymous_16)
+FNDA:0,(anonymous_17)
+FNDA:0,(anonymous_18)
+>>>>>>> 7b3263fe198854bd6af9701b99ee498c3d812c35
 DA:1,1
 DA:63,1
 DA:80,7
@@ -557,8 +605,27 @@ DA:222,1
 DA:223,0
 DA:224,0
 DA:228,1
+<<<<<<< HEAD
 LF:36
 LH:32
+=======
+DA:233,1
+DA:245,0
+DA:246,0
+DA:247,0
+DA:248,0
+DA:255,0
+DA:256,0
+DA:260,0
+DA:272,0
+DA:274,0
+DA:276,0
+DA:288,0
+DA:290,0
+DA:305,0
+LF:50
+LH:33
+>>>>>>> 7b3263fe198854bd6af9701b99ee498c3d812c35
 BRDA:110,0,0,0
 BRDA:111,1,0,7
 BRDA:111,1,1,0
@@ -583,7 +650,25 @@ BRDA:126,10,1,7
 BRDA:128,11,0,7
 BRDA:128,11,1,7
 BRDA:131,12,0,0
+<<<<<<< HEAD
 BRF:24
+=======
+BRDA:244,13,0,0
+BRDA:245,14,0,0
+BRDA:245,14,1,0
+BRDA:246,15,0,0
+BRDA:246,15,1,0
+BRDA:247,16,0,0
+BRDA:247,16,1,0
+BRDA:248,17,0,0
+BRDA:248,17,1,0
+BRDA:274,18,0,0
+BRDA:293,19,0,0
+BRDA:293,19,1,0
+BRDA:305,20,0,0
+BRDA:305,20,1,0
+BRF:38
+>>>>>>> 7b3263fe198854bd6af9701b99ee498c3d812c35
 BRH:17
 end_of_record
 TN:
