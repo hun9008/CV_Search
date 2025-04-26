@@ -1,93 +1,155 @@
-# CV_search
+# Crawl-TS
 
+TypeScript로 재작성된 웹 크롤링 및 채용정보 추출 시스템입니다.
 
-
-## Crwal 프로젝트 구조
-```
-crwal/
-├── LICENSE
-├── config
-├── node_modules
-├── package-lock.json
-├── package.json
-├── requirements.txt
-├── src
-└── test
+## 프로젝트 구조
 
 ```
+crawl-ts/
+├── src/               # 소스 코드
+│   ├── crawler/       # 웹 크롤링 관련 코드
+│   ├── database/      # 데이터베이스 연결 및 리포지토리
+│   ├── message/       # 메시지 서비스 (RabbitMQ 등)
+│   ├── models/        # 데이터 모델
+│   ├── parser/        # 콘텐츠 파싱 관련 코드
+│   ├── scripts/       # 유틸리티 스크립트
+│   ├── server/        # API 서버
+│   └── url/           # URL 관리
+├── test/              # 테스트 코드
+└── test-results/      # 테스트 결과 리포트
+```
 
+## 기술 스택
 
+- TypeScript
+- Node.js
+- Puppeteer
+- MongoDB
+- MySQL
+- Redis
+- RabbitMQ
+- Jest (테스트)
 
-## 설치 및 실행 방법
+## 주요 기능
 
-### 의존성 설치
+- 웹 페이지 크롤링
+- 채용 정보 추출 및 분류
+- 다양한 데이터베이스 지원 (MongoDB, MySQL)
+- 메시지 큐를 통한 비동기 처리
+- API 서버를 통한 데이터 제공
+
+## 설계 패턴
+
+이 프로젝트는 다음과 같은 설계 패턴을 활용합니다:
+
+- **리포지토리 패턴**: 데이터 액세스를 추상화하여 비즈니스 로직과 데이터 액세스를 분리
+- **전략 패턴**: 다양한 크롤링, 파싱 전략을 인터페이스로 추상화
+- **의존성 주입**: 컴포넌트 간의 결합도를 낮추고 테스트 용이성 향상
+
+## 테스트 커버리지
+
+현재 테스트 커버리지 현황은 다음과 같습니다:
+
+```
+----------------------------------------------|---------|----------|---------|---------|-------------------
+File                                          | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------------------------------------------|---------|----------|---------|---------|-------------------
+총 커버리지                                      | 66.20%  | 48.57%   | 70.47%  | 66.20%  |
+----------------------------------------------|---------|----------|---------|---------|-------------------
+```
+
+주요 모듈별 커버리지:
+- models/VisitResult.ts: 63.46% (함수 커버리지 10%)
+- database 관련 리포지토리: 68.33%
+- message 서비스: 57.25%
+- parser 모듈: 72.40%
+
+개선이 필요한 영역:
+- VisitResult 클래스의 데이터베이스 상호작용 메서드 (save, findOne, find 등)
+- 메시지 처리 관련 비동기 함수
+- 특정 예외 처리 경로
+
+## 설치 및 실행
+
+### 요구사항
+
+- Node.js 16+
+- Docker (선택사항)
+- MongoDB
+- MySQL
+- Redis
+- RabbitMQ
+
+### 설치
 
 ```bash
 npm install
-
 ```
 
+### 환경 설정
 
-### 사용 가능한 스크립트
+`.env` 파일을 생성하고 다음 변수들을 설정하세요:
 
-package.json에 정의된 다음 명령어로 다양한 작업을 실행할 수 있습니다:
+```
+# 데이터베이스
+MONGODB_ADMIN_URI=mongodb://localhost:27017
+MONGODB_DB_NAME=crawler
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=password
+MYSQL_DATABASE=crawler
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_USERNAME=default
+REDIS_PASSWORD=
+
+# RabbitMQ
+RABBITMQ_HOST=localhost
+RABBITMQ_PORT=5672
+RABBITMQ_USERNAME=guest
+RABBITMQ_PASSWORD=guest
+
+# API 키
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+### 실행
 
 ```bash
-# 크롤링 작업 시작
-npm run crawl
+# 개발 모드 실행
+npm run dev
 
-# Jest를 사용한 테스트 실행
+# 빌드
+npm run build
+
+# 프로덕션 모드 실행
+npm start
+```
+
+### 테스트
+
+```bash
+# 모든 테스트 실행
 npm test
 
-# 시드 데이터 생성
-npm run seed
+# 특정 테스트 실행
+npm test -- test/database/MySqlRecruitInfoRepository.test.ts
 
-# 서버 시작
-npm run server
-
-# Gemini API를 이용한 데이터 파싱
-npm run gemini-parse
-
-# Claude API를 이용한 데이터 파싱
-npm run claude-parse
+# 커버리지 보고서 생성
+npm test -- --coverage
 ```
 
-#### 스크립트 설명
+## 기여 방법
 
-- `crawl`: src/crawl/baseWorkerManager를 실행하여 크롤링 프로세스를 시작합니다.
-- `test`: Jest를 사용하여 모든 테스트를 실행합니다. 테스트 결과는 콘솔에 표시되며, HTML 리포트는 test/__tests__/html-report/report.html에 생성됩니다.
-- `seed`: src/seed/seedGenerator를 실행하여 초기 데이터를 생성합니다.
-- `server`: src/server/index를 실행하여 애플리케이션 서버를 시작합니다.
-- `gemini-parse`: Google의 Gemini AI를 사용하여 크롤링된 데이터를 파싱합니다.
-- `claude-parse`: Anthropic의 Claude AI를 사용하여 크롤링된 데이터를 파싱합니다.
+1. 이 저장소를 포크합니다.
+2. 새로운 기능 브랜치를 생성합니다: `git checkout -b feature/amazing-feature`
+3. 변경사항을 커밋합니다: `git commit -m 'FEAT: Add amazing feature'`
+4. 브랜치에 푸시합니다: `git push origin feature/amazing-feature`
+5. Pull Request를 제출합니다.
 
+## 라이선스
 
-## 환경설정
-
-프로젝트는 module-alias를 사용하여 경로 별칭을 지원합니다. 다음과 같은 별칭이 정의되어 있습니다:
-
-- @src - src 디렉토리
-- @crawl - src/crawl 디렉토리
-- @database - src/database/MongoDB 디렉토리
-- @test - test 디렉토리
-- @config - config 디렉토리
-
-이를 통해 다음과 같이 모듈을 가져올 수 있습니다:
-
-```js
-const { BaseWorkerManager } = require('@crawl/baseWorkerManager');
-const { checkMongoDBStatus } = require('@database/init-mongodb');
-```
-
-## DEVLOG
-
-- logger 개발 및 테스트 ✅ (d)
-- 도메인 직접 입력 및 테스트 (도메인 하나당 얼마나오는지 테스트)❌
-- 서버메모리 사용량 테스트 및 메모리 누수 체크 ✅
-- Page 닫아지는 닫아지는지 체크 및 테스트 ✅
-- 오래실행되면 visitUrl이 오래 걸리면서 protocolError 발생 ❌
-- url .pdf 등 제거 ❌
-- LLM 연동 채용공고 데이터 1차 파싱 ✅
-- LLM 연동 채용공고 데이터 2차 파싱 ✅
-
-
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
