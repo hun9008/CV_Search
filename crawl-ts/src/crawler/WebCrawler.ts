@@ -1,12 +1,12 @@
-  import { ICrawler } from './ICrawler';
-  import { IBrowserManager } from '../browser/IBrowserManager';
-  import { IContentExtractor } from '../content/IContentExtractor';
-  import { SubUrl } from '../models/VisitResult';
-  import { defaultLogger as logger } from '../utils/logger';
-  import { extractDomain } from '../url/urlUtils';
-  import { Dialog } from 'puppeteer';
-  import { IMessageService } from '../message/IMessageService';
-  import { IUrlManager } from '../url/IUrlManager';
+import { ICrawler } from './ICrawler';
+import { IBrowserManager } from '../browser/IBrowserManager';
+import { IContentExtractor } from '../content/IContentExtractor';
+import { SubUrl } from '../models/VisitResult';
+import { defaultLogger as logger } from '../utils/logger';
+import { extractDomain } from '../url/urlUtils';
+import { Dialog } from 'puppeteer';
+import { IMessageService } from '../message/IMessageService';
+import { IUrlManager } from '../url/IUrlManager';
 import { URLSTAUS } from '@url/RedisUrlManager';
 
   /**

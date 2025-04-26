@@ -1,5 +1,5 @@
-import { Sequelize ,QueryTypes ,Op ,DataTypes ,Optional ,Model} from 'sequelize'
-import { IBaseRecruitInfo, IDbRecruitInfo } from '../models/RecruitInfoModel';
+import { Sequelize ,DataTypes ,Model} from 'sequelize'
+import { IDbRecruitInfo } from '../models/RecruitInfoModel';
 
 
 

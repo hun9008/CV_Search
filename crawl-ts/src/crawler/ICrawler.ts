@@ -2,6 +2,7 @@ import { IBrowserManager } from '../browser/IBrowserManager';
 import { IContentExtractor } from '../content/IContentExtractor';
 import { IUrlManager } from '../url/IUrlManager';
 import { SubUrl } from '../models/VisitResult';
+import { IMessageService } from '@message/IMessageService';
 
 /**
  * 크롤러 인터페이스
@@ -16,6 +17,7 @@ export interface ICrawler {
   /**
    * 콘텐츠 추출기
    */
+  messageService: IMessageService;
   contentExtractor: IContentExtractor;
   /**
    *  Redis URL 관리자
