@@ -24,6 +24,11 @@ public class JwtAuthFilter extends GenericFilterBean {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
+    private static final List<String> WHITELIST = List.of(
+            "/auth/callback-endpoint",
+            "/actuator",
+            "/actuator/prometheus"
+    );
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -31,7 +36,7 @@ public class JwtAuthFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String path = httpRequest.getRequestURI();
 
-        if (path.equals("/auth/callback-endpoint")) {
+        if (WHITELIST.contains(path)) {
             chain.doFilter(request, response);
             return;
         }
