@@ -55,7 +55,8 @@ public class SecurityConfig {
                                 "/job-update/**",
                                 "/rec/**",
                                 "/jobs/**",
-                                "/error"
+                                "/error",
+                                "/actuator/prometheus"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
