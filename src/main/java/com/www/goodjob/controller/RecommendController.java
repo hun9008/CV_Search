@@ -23,6 +23,9 @@ public class RecommendController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam int topk
     ) {
+        if (userDetails == null) {
+            throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
+        }
         Long userId = userDetails.getId();
         List<ScoredJobDto> result = recommendService.requestRecommendation(userId, topk);
         return ResponseEntity.ok(result);

@@ -22,3 +22,14 @@ dev_spring branch에 push 하면 github Action이 자동으로 EC2 인스턴스�
 5. docker build & run
 
 Github action에 관한 파일은 ~/.github/workflows/deploy.yml 에 작성해서 수행할 작업을 정의.
+
+# Prometheus Metric 탐색
+
+상단 “Graph” 탭 → Expression에 아래 중 하나 입력 후 Execute.
+
+```
+http_server_requests_seconds_count
+jvm_memory_used_bytes
+hikaricp_connections_active
+process_cpu_usage
+```
