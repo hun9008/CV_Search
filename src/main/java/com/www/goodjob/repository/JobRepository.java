@@ -20,7 +20,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             "LOWER(j.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(j.department) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(j.experience) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(j.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(j.jobDescription) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(j.jobType) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(j.preferredQualifications) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(j.idealCandidate) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +

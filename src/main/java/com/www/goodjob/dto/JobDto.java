@@ -25,8 +25,8 @@ public class JobDto {
     private String preferredQualifications;
     private String idealCandidate;
     private String jobDescription;
-    private Date applyStartDate;
-    private Date applyEndDate;
+    private LocalDateTime applyStartDate;
+    private LocalDateTime applyEndDate;
     private Boolean isPublic;
     private LocalDateTime createdAt;
     private LocalDateTime lastUpdatedAt;
@@ -49,7 +49,7 @@ public class JobDto {
                 .requirements(job.getRequirements())
                 .preferredQualifications(job.getPreferredQualifications())
                 .idealCandidate(job.getIdealCandidate())
-                .jobDescription(job.getDescription())
+                .jobDescription(job.getJobDescription())
                 .applyStartDate(job.getApplyStartDate())
                 .applyEndDate(job.getApplyEndDate())
                 .isPublic(job.getIsPublic())
