@@ -26,14 +26,14 @@ function JobCard({ job, isSelected, onSelect, onToggleBookmark }: JobCardProps) 
             onClick={onSelect}>
             <div className={styles.jobCard__icon}>
                 {/* <Briefcase size={24} /> */}
-                <img src="https://static.toss.im/tds/favicon/favicon-48x48.png"></img>
+                <img src={job.favicon}></img>
             </div>
 
             <div className={styles.jobCard__content}>
                 <div className={styles.jobCard__header}>
                     <div className={styles.jobCard__header__title}>
                         <h3 className={styles.jobCard__title}>{job.title}</h3>
-                        <p className={styles.jobCard__company}>{job.company}</p>
+                        <p className={styles.jobCard__company}>{job.companyName}</p>
                     </div>
 
                     <div className={styles.jobCard__actions}>
@@ -51,12 +51,14 @@ function JobCard({ job, isSelected, onSelect, onToggleBookmark }: JobCardProps) 
 
                 <div className={styles.jobCard__tags}>
                     <>
-                        {job.tags.map((tag, index) => (
+                        {/* {job.tags.map((tag, index) => (
                             <p key={index} className={styles.jobCard__tags__tag}>
                                 {tag}
                             </p>
-                        ))}
-                        <p className={styles.jobCard__tags__location}>{job.location}</p>
+                        ))} */}
+                        <p className={styles.jobCard__tags__location}>
+                            {job.region ? job.region.sido + ' ' + job.region.sigungu : ''}
+                        </p>
                     </>
                 </div>
             </div>
