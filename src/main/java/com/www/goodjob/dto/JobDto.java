@@ -5,6 +5,7 @@ import com.www.goodjob.domain.Region;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -25,8 +26,8 @@ public class JobDto {
     private String preferredQualifications;
     private String idealCandidate;
     private String jobDescription;
-    private Date applyStartDate;
-    private Date applyEndDate;
+    private LocalDate applyStartDate;
+    private LocalDate applyEndDate;
     private Boolean isPublic;
     private LocalDateTime createdAt;
     private LocalDateTime lastUpdatedAt;
@@ -49,7 +50,7 @@ public class JobDto {
                 .requirements(job.getRequirements())
                 .preferredQualifications(job.getPreferredQualifications())
                 .idealCandidate(job.getIdealCandidate())
-                .jobDescription(job.getDescription())
+                .jobDescription(job.getJobDescription())
                 .applyStartDate(job.getApplyStartDate())
                 .applyEndDate(job.getApplyEndDate())
                 .isPublic(job.getIsPublic())
