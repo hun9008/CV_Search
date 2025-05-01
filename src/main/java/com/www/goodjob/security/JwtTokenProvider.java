@@ -9,7 +9,8 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 10;  // 10분
+    // private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 10;  // 10분
+    private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 30; // 1개월
     private final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 30 * 3; // 3개월
 
     private final String secretKey;
