@@ -22,13 +22,6 @@ public class RecommendController {
 
     private final RecommendService recommendService;
 
-    @Operation(
-            summary = "추천 공고 Top-K 리스트 반환",
-            description = """
-        사용자의 이력서를 기반으로 추천 점수 상위 K개의 공고 리스트를 반환함 /
-        FastAPI 서버와 연동하여 추천 결과를 가져옴
-        """
-    )
     // 추천 리스트 조회
     @PostMapping("/topk-list")
     @Operation(

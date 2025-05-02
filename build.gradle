@@ -89,10 +89,15 @@ dependencies {
 	// Claude API
 	implementation("com.anthropic:anthropic-java:1.2.0")
 
+	// Prometheus actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 
+	// redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//jackson-time
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {

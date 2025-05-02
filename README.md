@@ -53,5 +53,7 @@ docker run -d \
 --network redis-net \
 -p 9121:9121 \
 oliver006/redis_exporter \
---redis.addr=redis://redis:6379
+--redis.addr=redis://redis:6379 \
+--count-keys=db0:recommendation:* \
+--count-keys.db=0
 ```

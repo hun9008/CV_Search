@@ -16,6 +16,7 @@ import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.util.ClaudeClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -40,7 +41,8 @@ public class RecommendService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
@@ -80,51 +82,6 @@ public class RecommendService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "추천 결과 조회 실패", e);
         }
     }
-//    public List<ScoredJobDto> requestRecommendation(Long userId, int topk) {
-//        String url = fastapiHost + "/recommend-jobs";
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//        Map<String, Object> body = Map.of(
-//                "u_id", userId,
-//                "top_k", topk
-//        );
-//
-//        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-//
-//        try {
-//            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-//            String responseBody = response.getBody();
-//
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            JsonNode root = objectMapper.readTree(responseBody);
-//            JsonNode recommendedJobsNode = root.get("recommended_jobs");
-//
-//            List<ScoredJobDto> result = new ArrayList<>();
-//
-//            for (JsonNode rec : recommendedJobsNode) {
-//                Long jobId = rec.get("job_id").asLong();
-//                Optional<Job> jobOpt = jobRepository.findById(jobId);
-//
-//                jobOpt.ifPresent(job -> {
-//                    JobDto base = JobDto.from(job);
-//                    ScoredJobDto scored = ScoredJobDto.from(
-//                            base,
-//                            rec.get("score").asDouble(),
-//                            rec.get("cosine_score").asDouble(),
-//                            rec.get("bm25_score").asDouble()
-//                    );
-//                    result.add(scored);
-//                });
-//            }
-//
-//            return result;
-//
-//        } catch (Exception e) {
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "추천 요청 실패", e);
-//        }
-//    }
 
     /**
      * 추천 점수 기반 피드백 생성 또는 기존 피드백 조회
