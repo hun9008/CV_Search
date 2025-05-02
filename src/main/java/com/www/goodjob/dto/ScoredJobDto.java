@@ -13,10 +13,15 @@ public class ScoredJobDto extends JobDto {
     private double cosineScore;
     private double bm25Score;
 
+    @Override
+    public String getRawJobsText() {
+        return "HIDE";
+    }
+
     public static ScoredJobDto from(JobDto base, double score, double cosineScore, double bm25Score) {
         return ScoredJobDto.builder()
                 .id(base.getId())
-                .region(base.getRegion())
+//                .region(base.getRegion())
                 .companyName(base.getCompanyName())
                 .title(base.getTitle())
                 .department(base.getDepartment())
@@ -33,7 +38,8 @@ public class ScoredJobDto extends JobDto {
                 .lastUpdatedAt(base.getLastUpdatedAt())
                 .expiredAt(base.getExpiredAt())
                 .archivedAt(base.getArchivedAt())
-                .rawJobsText(base.getRawJobsText())
+//                .rawJobsText(null)
+//                .rawJobsText(base.getRawJobsText())
                 .url(base.getUrl())
                 .favicon(base.getFavicon())
                 .regionText(base.getRegionText())

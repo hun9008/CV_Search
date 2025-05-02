@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -39,9 +40,14 @@ public class JobDto {
     private String regionText;
 
     public static JobDto from(Job job) {
+        Region region = job.getRegion();
+        String regionText = (region != null)
+                ? String.join(" ", Optional.ofNullable(region.getSido()).orElse(""), Optional.ofNullable(region.getSigungu()).orElse(""))
+                : null;
+
         return JobDto.builder()
                 .id(job.getId())
-                .region(job.getRegion())
+//                .region(job.getRegion())
                 .companyName(job.getCompanyName())
                 .title(job.getTitle())
                 .department(job.getDepartment())
@@ -61,7 +67,7 @@ public class JobDto {
                 .rawJobsText(job.getRawJobsText())
                 .url(job.getUrl())
                 .favicon(job.getFavicon())
-                .regionText(job.getRegionText())
+                .regionText(regionText)
                 .build();
     }
 }

@@ -33,3 +33,25 @@ jvm_memory_used_bytes
 hikaricp_connections_active
 process_cpu_usage
 ```
+
+# Redis
+```
+# 1. 네트워크 생성
+docker network create redis-net
+
+# 2. Redis 실행 
+docker run -d \
+  --name redis \
+  --network redis-net \
+  -p 6379:6379 \
+  redis \
+  redis-server --bind 0.0.0.0 --protected-mode no
+
+# 3. Redis Exporter 실행 
+docker run -d \
+--name redis_exporter \
+--network redis-net \
+-p 9121:9121 \
+oliver006/redis_exporter \
+--redis.addr=redis://redis:6379
+```

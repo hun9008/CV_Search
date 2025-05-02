@@ -51,6 +51,16 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+  data:
+    redis:
+      host: ${EC2_HOST}
+      port: 6379
+      timeout: 6000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
 
 jwt:
   secretKey: ${JWT_SECRET_KEY}
@@ -91,3 +101,4 @@ management:
     export:
       prometheus:
         enabled: true
+
