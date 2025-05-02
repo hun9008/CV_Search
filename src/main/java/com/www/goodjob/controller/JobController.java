@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "job-controller", description = "채용 공고 관련 API")
+@Tag(name = "job-controller", description = "채용 공고 관련 API (채용 공고는 🔐 Authorization: Bearer <accessToken> 필요없음, 비회원도 가능하기 때문)")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/jobs")
