@@ -105,7 +105,9 @@ public class JobController {
     }
 
 
-    @Operation()
+    @Operation(summary = "특정 job 하나 삭제", description = "FastAPI 서버로 특정 job 하나 삭제 요청을 보냄." +
+            "해당 job에 대해 ES에서 vector 삭제 & RDB의 is_public을 0으로 설정" +
+            "실패 시, is_public은 다시 1로 롤백하는 로직 포함.")
     @DeleteMapping("/delete-one-job")
     public ResponseEntity<?> deleteJob(@RequestParam("jobId") Long jobId) {
         try {
