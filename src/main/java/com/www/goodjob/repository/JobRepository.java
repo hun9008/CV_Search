@@ -28,5 +28,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             "LOWER(j.requirements) LIKE LOWER(CONCAT('%', :keyword, '%')) )")
     List<Job> searchJobs(@Param("keyword") String keyword, Sort sort);
 
+    @Query("SELECT j FROM Job j LEFT JOIN FETCH j.region WHERE j.id = :id")
+    Optional<Job> findByIdWithRegion(@Param("id") Long id);
 }
 

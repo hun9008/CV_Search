@@ -21,12 +21,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -41,6 +43,8 @@ public class RecommendService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
+    private final AsyncService asyncService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -50,7 +54,52 @@ public class RecommendService {
     /**
      * FastAPI 서버로 추천 점수 요청
      */
-    public List<ScoredJobDto> requestRecommendation(Long userId, int topk) {
+    private List<ScoredJobDto> fetchRecommendationFromFastAPI(Long userId, int topk) {
+        String url = fastapiHost + "/recommend-jobs";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, Object> body = Map.of(
+                "u_id", userId,
+                "top_k", topk
+        );
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+            String responseBody = response.getBody();
+
+            JsonNode root = objectMapper.readTree(responseBody);
+            JsonNode recommendedJobsNode = root.get("recommended_jobs");
+
+            List<ScoredJobDto> result = new ArrayList<>();
+
+            for (JsonNode rec : recommendedJobsNode) {
+                Long jobId = rec.get("job_id").asLong();
+                Optional<Job> jobOpt = jobRepository.findById(jobId);
+
+                jobOpt.ifPresent(job -> {
+                    JobDto base = JobDto.from(job);
+                    ScoredJobDto scored = ScoredJobDto.from(
+                            base,
+                            rec.get("score").asDouble(),
+                            rec.get("cosine_score").asDouble(),
+                            rec.get("bm25_score").asDouble()
+                    );
+                    result.add(scored);
+                });
+            }
+
+            return result;
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "추천 요청 실패", e);
+        }
+    }
+
+    public List<ScoredJobDto> getScoredFromCache(Long userId, int topk) {
         String zsetKey = "recommendation:" + userId;
         String hashKey = "job_detail";
 
@@ -80,6 +129,26 @@ public class RecommendService {
             return result;
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "추천 결과 조회 실패", e);
+        }
+    }
+
+    public List<ScoredJobDto> requestRecommendation(Long userId, int topk) {
+        try {
+            List<ScoredJobDto> cachedResult = getScoredFromCache(userId, topk);
+            log.info("[Recommend] 캐시된 추천 결과 사용: userId={}, topK={}", userId, topk);
+            return cachedResult;
+        } catch (ResponseStatusException e) {
+            if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
+                throw e; // 다른 에러면 그대로 throw
+            }
+
+            // 2. 캐시 없음 → 캐싱 비동기 실행
+            log.info("[Recommend] 캐시 없음 → FastAPI 요청 후 캐시 비동기 처리 시작: userId={}, topK={}", userId, topk);
+            asyncService.cacheRecommendForUser(userId);
+
+            List<ScoredJobDto> apiResult = fetchRecommendationFromFastAPI(userId, topk);
+            log.info("[Recommend] FastAPI 결과 반환 완료: userId={}, 추천 수={}", userId, apiResult.size());
+            return apiResult;
         }
     }
 
@@ -121,68 +190,4 @@ public class RecommendService {
         return feedback;
     }
 
-    public void cacheRecommendForUser(Long userId) {
-        int totalJobCount = (int) jobRepository.count();
-
-        String url = fastapiHost + "/recommend-jobs";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        Map<String, Object> body = Map.of(
-                "u_id", userId,
-                "top_k", totalJobCount
-        );
-
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-
-        try {
-            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-            String responseBody = response.getBody();
-
-            JsonNode root = objectMapper.readTree(responseBody);
-            JsonNode recommendedJobsNode = root.get("recommended_jobs");
-
-            List<ScoredJobDto> result = new ArrayList<>();
-
-            for (JsonNode rec : recommendedJobsNode) {
-                Long jobId = rec.get("job_id").asLong();
-                Optional<Job> jobOpt = jobRepository.findById(jobId);
-
-                jobOpt.ifPresent(job -> {
-                    JobDto base = JobDto.from(job);
-                    ScoredJobDto scored = ScoredJobDto.from(
-                            base,
-                            rec.get("score").asDouble(),
-                            rec.get("cosine_score").asDouble(),
-                            rec.get("bm25_score").asDouble()
-                    );
-                    result.add(scored);
-                });
-            }
-
-            String zsetKey = "recommendation:" + userId;
-
-            for (ScoredJobDto job : result) {
-                String jobIdStr = job.getId().toString();
-
-                // ZSET에 점수 저장
-                redisTemplate.opsForZSet().add(zsetKey, jobIdStr, job.getScore());
-
-                // HASH에 상세 정보 저장
-                try {
-                    String jobJson = objectMapper.writeValueAsString(job);
-                    redisTemplate.opsForHash().put("job_detail", jobIdStr, jobJson);
-                } catch (JsonProcessingException e) {
-                    log.warn("JobDto 직렬화 실패: jobId=" + jobIdStr, e);
-                }
-            }
-
-            redisTemplate.expire(zsetKey, Duration.ofHours(6));
-            log.info("[Debug] 추천 점수 전체 캐싱 완료: userId=" + userId);
-
-        } catch (Exception e) {
-            log.error("[Debug] 추천 점수 캐싱 실패: userId=" + userId, e);
-        }
-    }
 }
