@@ -67,6 +67,7 @@ jobs:
             echo "AWS_S3_BUCKET=$AWS_S3_BUCKET" >> .env
             echo "FASTAPI_HOST=$FASTAPI_HOST" >> .env
             echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> .env
+            echo "EC2_HOST=$EC2_HOST" >> .env
           
             docker-compose down || true
             docker-compose up -d --build

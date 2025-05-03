@@ -28,6 +28,7 @@ services:
       - AWS_S3_BUCKET=${AWS_S3_BUCKET}
       - FASTAPI_HOST=${FASTAPI_HOST}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - EC2_HOST=${EC2_HOST}
     networks:
       - goodjob-net
 
