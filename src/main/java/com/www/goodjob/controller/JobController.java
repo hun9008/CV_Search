@@ -9,10 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "job-controller", description = "채용 공고 관련 API (채용 공고는 🔐 Authorization: Bearer <accessToken> 필요없음, 비회원도 가능하기 때문)")
 @RestController
@@ -100,5 +102,18 @@ public class JobController {
     @GetMapping("/experience-types")
     public ResponseEntity<List<String>> getExperienceTypes() {
         return ResponseEntity.ok(jobService.getAvailableExperienceTypes());
+    }
+
+
+    @Operation()
+    @DeleteMapping("/delete-one-job")
+    public ResponseEntity<?> deleteJob(@RequestParam("jobId") Long jobId) {
+        try {
+            String message = jobService.deleteJob(jobId);
+            return ResponseEntity.ok(Map.of("message", message));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 }

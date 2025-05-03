@@ -6,8 +6,10 @@ import com.www.goodjob.enums.ExperienceCategory;
 import com.www.goodjob.enums.JobTypeCategory;
 import com.www.goodjob.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -18,6 +20,10 @@ import java.util.stream.Collectors;
 public class JobService {
 
     private final JobRepository jobRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${FASTAPI_HOST}")
+    private String fastapiHost;
 
     public Page<JobSearchResponse> searchJobs(String keyword, List<String> jobTypes, List<String> experienceFilters, Pageable pageable) {
         //  정렬 기준만 추출하여 전체 정렬된 리스트 조회
@@ -121,4 +127,16 @@ public class JobService {
     public List<String> getAvailableExperienceTypes() {
         return ExperienceCategory.asList();
     }
+
+    public String deleteJob(Long jobId) {
+        String url = fastapiHost + "/delete-job?job_id=" + jobId;
+
+        try {
+            restTemplate.delete(url);
+            return "Job " + jobId + " deleted from Elasticsearch and updated in RDB.";
+        } catch (Exception e) {
+            throw new RuntimeException("FastAPI 요청 실패: " + e.getMessage(), e);
+        }
+    }
+
 }
