@@ -21,6 +21,7 @@ const useAuthStore = create<AuthStore>()(
             setIsLoggedIn: (isLoggedIn: boolean) => set({ isLoggedIn }),
             setTokens: (accessToken) => set({ accessToken, isLoggedIn: !!accessToken }), // !! 사용으로 불리언 값으로 변경
             clearTokens: () => set({ accessToken: null, isLoggedIn: false }),
+            // 수정 필요
             fetchAuthData: async () => {},
             setLogout: async (accessToken) => {
                 const res = await axios.post('https://be.goodjob.ai.kr/auth/logout', {

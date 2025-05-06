@@ -2,24 +2,19 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import JobCard from './JobCard';
 import styles from './styles/JobList.module.scss';
 import type Job from '../../types/job';
-
 import useJobStore from '../../../../store/jobStore';
+import useAuthStore from '../../../../store/authStore';
 
-interface JobListProps {
-    onJobSelect: (job: Job) => void;
-}
-
-function JobList({ onJobSelect }: JobListProps) {
+function JobList() {
     const [activeFilter, setActiveFilter] = useState('검색'); // 검색은 다른 필터와 다르게 구현
-    const filters = ['검색', '회사', '경력', '근무유형'];
+    const filters = ['경력', '근무유형'];
     const [bookmarkedJobs, setBookmarkedJobs] = useState<number[]>([]); // 북마크 처리
     const [isLoading, setIsLoading] = useState(false); // 공고 리스트 로딩
     const [jobs, setJobs] = useState<Job[]>([]); // 공고 리스트
     const [totalPages, setTotalPages] = useState(1); // 공고 리스트 페이지 수
     const jobListRef = useRef<HTMLDivElement>(null); //?
-    const { getJobList } = useJobStore();
-
-    const JOBS_PER_PAGE = 15;
+    const { getJobList, setSelectedJob } = useJobStore();
+    const JOBS_PER_PAGE = 75;
 
     // 다시 처리
     const toggleBookmark = (jobId: number) => {
@@ -36,46 +31,23 @@ function JobList({ onJobSelect }: JobListProps) {
         }
     };
 
-    const loadJobs = useCallback(
-        // 일단 임시로 세팅
-        async (page: number) => {
-            setIsLoading(true);
-            const jobList = await getJobList(page);
+    const loadJobs = useCallback(async (page: number) => {
+        setIsLoading(true);
 
-            setJobs(jobList);
+        const jobList = await getJobList(page);
 
-            setTotalPages(3); // 예시로 총 3페이지로 설정
-            setIsLoading(false);
+        setJobs(jobList);
 
-            console.log(Array.isArray(jobList));
+        setTotalPages(3); // 예시로 총 3페이지로 설정
+        setIsLoading(false);
 
-            // 첫 번째 작업 선택
-            if (jobList.length > 0 && page === 1) {
-                onJobSelect(jobList[0]);
-            }
-        },
-        [onJobSelect]
-    );
-
-    useEffect(() => {
-        loadJobs(1);
+        // 첫 번째 작업 선택
+        setSelectedJob(jobList[0].id);
     }, []);
 
-    // const loadJobDetail = useCallback(
-    //     // 일단 임시로 세팅
-    //     (page: number) => {
-    //         setIsLoading(true);
-    //         const mockJobs = generateMockJobs(JOBS_PER_PAGE, (page - 1) * JOBS_PER_PAGE);
-    //         setJobs(mockJobs);
-    //         setIsLoading(false);
-
-    //         // 첫 번째 작업 선택
-    //         if (mockJobs.length > 0 && page === 1) {
-    //             onJobSelect(mockJobs[0]);
-    //         }
-    //     },
-    //     [onJobSelect]
-    // );
+    useEffect(() => {
+        loadJobs(JOBS_PER_PAGE);
+    }, []);
 
     return (
         <div className={styles.jobList} ref={jobListRef}>
@@ -85,7 +57,8 @@ function JobList({ onJobSelect }: JobListProps) {
                         key={filter}
                         className={`${styles.jobList__filterButton} ${
                             activeFilter === filter ? styles.active : ''
-                        }`}>
+                        }`}
+                        onClick={() => setActiveFilter(filter)}>
                         {filter}
                     </button>
                 ))}
@@ -103,7 +76,7 @@ function JobList({ onJobSelect }: JobListProps) {
                             key={job.id}
                             job={job}
                             isSelected={false}
-                            onSelect={() => onJobSelect(job)}
+                            onSelect={() => setSelectedJob(job.id)}
                             onToggleBookmark={() => toggleBookmark(job.id)}
                         />
                     ))

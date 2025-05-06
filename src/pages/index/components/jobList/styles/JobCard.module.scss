@@ -83,6 +83,11 @@
             color: #03c75a;
             font-size: 0.75rem;
         }
+        &__container {
+            display: flex;
+            gap: 0.5rem;
+            flex-direction: row;
+        }
 
         &__location {
             font-size: 0.75rem;
@@ -91,8 +96,8 @@
             font-weight: 500;
             margin: 0;
             text-align: center;
+
             white-space: nowrap;
-            padding-right: 7px;
         }
     }
 
@@ -100,7 +105,7 @@
         display: flex;
         flex-direction: column;
 
-        align-items: center;
+        align-items: end;
         flex: none;
 
         flex-shrink: 0;
@@ -111,7 +116,7 @@
         border: none;
         color: #b1b5c3;
         cursor: pointer;
-        padding: 0.25rem;
+
         margin-bottom: 0.1rem;
 
         &.active {

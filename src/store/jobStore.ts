@@ -1,18 +1,30 @@
 import { create } from 'zustand';
 import axios from 'axios';
 import useAuthStore from './authStore';
+import Job from '../pages/index/types/job';
 
-interface jobStore {
-    jobList: [] | null;
-    count: number;
-    setJobList: (list: [] | null) => void;
-    getJobList: (count: number) => Promise<void>;
+interface JobStore {
+    jobList: Job[] | null;
+    selectedJob: number;
+    setSelectedJob: (jobId: number) => void;
+    getSelectedJob: () => Job | null;
+    setJobList: (list: Job[] | null) => void;
+    getJobList: (count: number) => Promise<Job[]>;
 }
 
-const useJobStore = create<jobStore>((set) => ({
+const useJobStore = create<JobStore>((set, get) => ({
     jobList: [],
-    count: 15,
-    setJobList: (jobList: [] | null) => set({ jobList }),
+    selectedJob: 0,
+
+    setSelectedJob: (jobId) => set({ selectedJob: jobId }),
+
+    getSelectedJob: () => {
+        const { jobList, selectedJob } = get();
+        return jobList?.find((job) => job.id === selectedJob) ?? null;
+    },
+
+    setJobList: (jobList) => set({ jobList }),
+
     getJobList: async (count) => {
         try {
             const accessToken = useAuthStore.getState().accessToken;
@@ -26,9 +38,13 @@ const useJobStore = create<jobStore>((set) => ({
                     withCredentials: true,
                 }
             );
-            return res.data;
+
+            const jobList: Job[] = res.data || [];
+            set({ jobList });
+            return jobList;
         } catch (error) {
-            console.log(error);
+            console.error(error);
+            return [];
         }
     },
 }));

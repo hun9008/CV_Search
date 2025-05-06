@@ -16,7 +16,7 @@ interface JobCardProps {
 function JobCard({ job, isSelected, onSelect, onToggleBookmark }: JobCardProps) {
     // 북마크 클릭 이벤트 처리
     const handleBookmarkClick = (e: React.MouseEvent) => {
-        e.stopPropagation(); // 카드 선택 이벤트 전파 방지
+        e.stopPropagation();
         onToggleBookmark();
     };
 
@@ -25,8 +25,7 @@ function JobCard({ job, isSelected, onSelect, onToggleBookmark }: JobCardProps) 
             className={`${styles.jobCard} ${isSelected ? styles.selected : ''}`}
             onClick={onSelect}>
             <div className={styles.jobCard__icon}>
-                {/* <Briefcase size={24} /> */}
-                <img src={job.favicon}></img>
+                <img rel="icon" src={`data:image/x-icon;base64,${job.favicon}`} />
             </div>
 
             <div className={styles.jobCard__content}>
@@ -51,14 +50,12 @@ function JobCard({ job, isSelected, onSelect, onToggleBookmark }: JobCardProps) 
 
                 <div className={styles.jobCard__tags}>
                     <>
-                        {/* {job.tags.map((tag, index) => (
-                            <p key={index} className={styles.jobCard__tags__tag}>
-                                {tag}
-                            </p>
-                        ))} */}
-                        <p className={styles.jobCard__tags__location}>
-                            {job.region ? job.region.sido + ' ' + job.region.sigungu : ''}
-                        </p>
+                        <div className={styles.jobCard__tags__container}>
+                            <p className={styles.jobCard__tags__tag}>{job.jobType}</p>
+                            <p className={styles.jobCard__tags__tag}>{job.requireExperience}</p>
+                        </div>
+
+                        <p className={styles.jobCard__tags__location}>{job.regionText}</p>
                     </>
                 </div>
             </div>

@@ -1,16 +1,29 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import style from './Header.module.scss';
-import { Search, Bell, User, Menu, X } from 'lucide-react';
+import { Search, Bell, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../../store/authStore';
 import ProfileDialog from '../dialog/ProfileDialog';
+import { debounce } from 'lodash';
+import axios from 'axios';
 
 function Header() {
+    // 검색 관련
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<
+        { id: number; title: string; type: string }[]
+    >([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [showResults, setShowResults] = useState(false);
+    const [isFocusing, setIsFocusing] = useState(false);
+
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
     // 테스트용
     const { setIsLoggedIn } = useAuthStore();
+
+    // 로그인
+    const accessToken = useAuthStore((state) => state.accessToken);
 
     const navigate = useNavigate();
 
@@ -25,10 +38,30 @@ function Header() {
         setMobileMenuOpen(!mobileMenuOpen);
     };
 
+    const debouncedSearch = useCallback(
+        debounce(async (query: string) => {
+            if (!query) return;
+            setIsSearching(true);
+
+            try {
+                const response = await axios.get(
+                    `https://be.goodjob.ai.kr/jobs/search?keyword=${query}&page=0&size=8&sort=string`,
+                    {
+                        headers: { Authorization: `Bearer ${accessToken}` },
+                        withCredentials: true,
+                    }
+                );
+                setSearchResults(response.data.content.slice(0, 8));
+            } catch (error) {
+                console.log(`검색 오류: ${error}`);
+            } finally {
+                setIsSearching(false);
+            }
+        }, 500),
+        [accessToken]
+    );
+
     //테스트용
-    const toggleLoginStatus = () => {
-        setIsLoggedIn(!isLoggedIn);
-    };
 
     return (
         <header className={style.header}>
@@ -66,7 +99,6 @@ function Header() {
                             {/* <User className={style.header__profile} aria-label="프로필" size={38} /> */}
                             <ProfileDialog />
                             {/* 테스트 버튼 */}
-                            <button onClick={toggleLoginStatus}>로그인 상태 전환</button>
                         </>
                     ) : (
                         <>
@@ -81,7 +113,6 @@ function Header() {
                                 로그인
                             </button>
                             {/* 테스트 버튼 */}
-                            <button onClick={toggleLoginStatus}>로그인 상태 전환</button>
                         </>
                     )}
                 </div>
