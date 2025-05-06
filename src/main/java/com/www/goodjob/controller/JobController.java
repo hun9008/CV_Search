@@ -1,7 +1,10 @@
 package com.www.goodjob.controller;
 
+import com.www.goodjob.domain.User;
 import com.www.goodjob.dto.JobSearchResponse;
+import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.JobService;
+import com.www.goodjob.service.SearchLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,7 +14,9 @@ import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.www.goodjob.dto.SearchLogDto;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +28,7 @@ import java.util.Map;
 public class JobController {
 
     private final JobService jobService;
+    private final SearchLogService searchLogService;
 
     @Operation(
             summary = "채용 공고 검색",
@@ -84,9 +90,11 @@ public class JobController {
                     sort = "createdAt",
                     direction = Sort.Direction.DESC
             )
-            Pageable pageable
+            Pageable pageable,
+            @AuthenticationPrincipal CustomUserDetails userDetails // ✅
     ) {
-        Page<JobSearchResponse> result = jobService.searchJobs(keyword, jobType, experience, pageable);
+        User user = userDetails != null ? userDetails.getUser() : null;
+        Page<JobSearchResponse> result = jobService.searchJobs(keyword, jobType, experience, pageable, user);
         return ResponseEntity.ok(result);
     }
 
@@ -102,6 +110,72 @@ public class JobController {
     @GetMapping("/experience-types")
     public ResponseEntity<List<String>> getExperienceTypes() {
         return ResponseEntity.ok(jobService.getAvailableExperienceTypes());
+    }
+
+    @Operation(
+            summary = "검색 기록 조회",
+            description = """
+    🔍 사용자가 검색창을 클릭하면 호출되는 API로,
+    로그인한 사용자의 최근 검색어 최대 10개를 반환함.
+    사용자가 /search api를 통해 검색 시 자동으로 키워드가 DB의 serach_log 엔티티에 저장됨
+
+    - 로그인 상태에서만 작동 (비회원은 기록 없음)
+    - 결과는 최신순 정렬되어 반환됨
+    - 프론트에서는 검색바 클릭 시 이 API를 호출하여 최근 검색어 리스트로 활용하면 됨
+
+    예시 응답:
+    [
+        { "keyword": "백엔드", "createdAt": "2025-05-06T13:20:00" },
+        { "keyword": "토스", "createdAt": "2025-05-06T12:50:00" }
+    ]
+    """
+    )
+    @GetMapping("/search/history")
+    public ResponseEntity<List<SearchLogDto>> getSearchHistory(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        User user = userDetails.getUser();
+        List<SearchLogDto> history = searchLogService.getSearchHistory(user);
+        return ResponseEntity.ok(history);
+    }
+
+
+    @Operation(
+            summary = "검색 기록 전체 삭제",
+            description = """
+    🗑️ 로그인한 사용자의 검색 기록 전체를 삭제
+
+    - 프론트에서는 '최근 검색어 지우기' 버튼 클릭 시 호출
+    - 비회원은 호출할 수 없음 (로그인 필요)
+    """
+    )
+    @DeleteMapping("/search/history/delete")
+    public ResponseEntity<Void> deleteSearchHistory(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        User user = userDetails.getUser();
+        searchLogService.deleteAllHistory(user);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "검색 기록 하나 삭제",
+            description = """
+    ❌ 로그인한 사용자의 특정 검색어 기록 1개를 삭제
+
+    - 프론트에서는 최근 검색어 옆 'X' 버튼 클릭 시 호출
+    - 쿼리 파라미터 `keyword`로 삭제 대상 검색어를 전달
+    - 동일 검색어가 중복 저장되지 않으므로 1건만 존재하며, 해당 검색어가 삭제됨
+    """
+    )
+    @DeleteMapping("/search/history/delete-one")
+    public ResponseEntity<Void> deleteSearchKeyword(
+            @RequestParam("keyword") String keyword,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        User user = userDetails.getUser();
+        searchLogService.deleteKeyword(user, keyword);
+        return ResponseEntity.noContent().build();
     }
 
 
