@@ -43,6 +43,11 @@ public class AsyncService {
 
     @Async
     public void cacheRecommendForUser(Long userId) {
+
+        long startTime = System.nanoTime();
+        long responseTime;
+        long endTime;
+        long durationMs;
         int totalJobCount = (int) jobRepository.count();
 
         String url = fastapiHost + "/recommend-jobs";
@@ -61,42 +66,22 @@ public class AsyncService {
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
             String responseBody = response.getBody();
 
-            JsonNode root = objectMapper.readTree(responseBody);
-            JsonNode recommendedJobsNode = root.get("recommended_jobs");
-
-            List<ScoredJobDto> result = new ArrayList<>();
-
-            for (JsonNode rec : recommendedJobsNode) {
-                Long jobId = rec.get("job_id").asLong();
-                Optional<Job> jobOpt = jobRepository.findByIdWithRegion(jobId);
-
-                jobOpt.ifPresent(job -> {
-                    JobDto base = JobDto.from(job);
-                    ScoredJobDto scored = ScoredJobDto.from(
-                            base,
-                            rec.get("score").asDouble(),
-                            rec.get("cosine_score").asDouble(),
-                            rec.get("bm25_score").asDouble()
-                    );
-                    result.add(scored);
-                });
-            }
+            responseTime = System.nanoTime();
+            durationMs = (responseTime - startTime) / 1_000_000;
+            log.info("[Debug] 추천 리스트 응답 시간: {}ms (userId={})", durationMs, userId);
 
             String zsetKey = "recommendation:" + userId;
 
-            for (ScoredJobDto job : result) {
-                String jobIdStr = job.getId().toString();
+            JsonNode root = objectMapper.readTree(responseBody);
+            JsonNode recommendedJobsNode = root.get("recommended_jobs");
 
+
+            for (JsonNode rec : recommendedJobsNode) {
+                String jobIdStr = rec.get("job_id").asText();
+                double score = rec.get("score").asDouble();
                 // ZSET에 점수 저장
-                redisTemplate.opsForZSet().add(zsetKey, jobIdStr, job.getScore());
+                redisTemplate.opsForZSet().add(zsetKey, jobIdStr, score);
 
-                // HASH에 상세 정보 저장
-                try {
-                    String jobJson = objectMapper.writeValueAsString(job);
-                    redisTemplate.opsForHash().put("job_detail", jobIdStr, jobJson);
-                } catch (JsonProcessingException e) {
-                    log.warn("JobDto 직렬화 실패: jobId=" + jobIdStr, e);
-                }
             }
 
             redisTemplate.expire(zsetKey, Duration.ofHours(6));
@@ -104,6 +89,10 @@ public class AsyncService {
 
         } catch (Exception e) {
             log.error("[Debug] 추천 점수 캐싱 실패: userId=" + userId, e);
+        } finally {
+            endTime = System.nanoTime();
+            durationMs = (endTime - startTime) / 1_000_000;
+            log.info("[Debug] 추천 캐싱 수행 시간: {}ms (userId={})", durationMs, userId);
         }
     }
 }

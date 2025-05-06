@@ -3,10 +3,7 @@ package com.www.goodjob.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.www.goodjob.domain.CvFeedback;
-import com.www.goodjob.domain.Job;
-import com.www.goodjob.domain.RecommendScore;
-import com.www.goodjob.domain.User;
+import com.www.goodjob.domain.*;
 import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.ScoredJobDto;
 import com.www.goodjob.repository.JobRepository;
@@ -14,6 +11,8 @@ import com.www.goodjob.repository.RecommendScoreRepository;
 import com.www.goodjob.repository.CvFeedbackRepository;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.util.ClaudeClient;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +22,15 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,6 +46,8 @@ public class RecommendService {
     private final RedisTemplate<String, String> redisTemplate;
 
     private final AsyncService asyncService;
+
+    private final EntityManager entityManager;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -85,8 +89,8 @@ public class RecommendService {
                     ScoredJobDto scored = ScoredJobDto.from(
                             base,
                             rec.get("score").asDouble(),
-                            rec.get("cosine_score").asDouble(),
-                            rec.get("bm25_score").asDouble()
+                            0.0,
+                            0.0
                     );
                     result.add(scored);
                 });
@@ -101,7 +105,6 @@ public class RecommendService {
 
     public List<ScoredJobDto> getScoredFromCache(Long userId, int topk) {
         String zsetKey = "recommendation:" + userId;
-        String hashKey = "job_detail";
 
         Set<ZSetOperations.TypedTuple<String>> topKJobIds = redisTemplate.opsForZSet()
                 .reverseRangeWithScores(zsetKey, 0, topk - 1);
@@ -111,16 +114,39 @@ public class RecommendService {
         }
 
         try {
+            // jobId 수집
+            List<Long> jobIds = topKJobIds.stream()
+                    .map(ZSetOperations.TypedTuple::getValue)
+                    .filter(Objects::nonNull)
+                    .map(Long::parseLong)
+                    .toList();
+
+            // RDB에서 일괄 조회
+            List<Job> jobs = jobRepository.findByIdInWithRegion(jobIds);
+
+            // JobId → Job 매핑
+            Map<Long, Job> jobMap = jobs.stream()
+                    .collect(Collectors.toMap(Job::getId, Function.identity()));
+
             List<ScoredJobDto> result = new ArrayList<>();
             for (ZSetOperations.TypedTuple<String> tuple : topKJobIds) {
                 try {
                     String jobIdStr = tuple.getValue();
                     if (jobIdStr == null) continue;
 
-                    String jobJson = (String) redisTemplate.opsForHash().get(hashKey, jobIdStr);
-                    if (jobJson == null) continue;
+                    Long jobId = Long.parseLong(jobIdStr);
+                    Job job = jobMap.get(jobId);
+                    if (job == null) continue;
 
-                    ScoredJobDto dto = objectMapper.readValue(jobJson, ScoredJobDto.class);
+                    double score = Optional.ofNullable(tuple.getScore()).orElse(0.0);
+
+                    JobDto base = JobDto.from(job);
+                    ScoredJobDto dto = ScoredJobDto.from(
+                            base,
+                            score, // ZSet에서 꺼낸 score
+                            0.0,
+                            0.0
+                    );
                     result.add(dto);
                 } catch (Exception ex) {
                     log.warn("[WARN] 캐시된 job 변환 실패: {}", tuple.getValue(), ex);
@@ -133,9 +159,13 @@ public class RecommendService {
     }
 
     public List<ScoredJobDto> requestRecommendation(Long userId, int topk) {
+        long startTime = System.nanoTime();
+        long endTime;
+        long durationMs;
         try {
             List<ScoredJobDto> cachedResult = getScoredFromCache(userId, topk);
             log.info("[Recommend] 캐시된 추천 결과 사용: userId={}, topK={}", userId, topk);
+            saveRecommendScores(userId, cachedResult);
             return cachedResult;
         } catch (ResponseStatusException e) {
             if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
@@ -148,7 +178,13 @@ public class RecommendService {
 
             List<ScoredJobDto> apiResult = fetchRecommendationFromFastAPI(userId, topk);
             log.info("[Recommend] FastAPI 결과 반환 완료: userId={}, 추천 수={}", userId, apiResult.size());
+            saveRecommendScores(userId, apiResult);
             return apiResult;
+        } finally {
+            endTime = System.nanoTime();
+            durationMs = (endTime - startTime) / 1_000_000;
+
+            log.info("[Recommend] 전체 추천 수행 시간: {}ms (userId={})", durationMs, userId);
         }
     }
 
@@ -188,6 +224,18 @@ public class RecommendService {
 
         cvFeedbackRepository.save(newFeedback);
         return feedback;
+    }
+
+    @Transactional
+    public void saveRecommendScores(Long userId, List<ScoredJobDto> recommendations) {
+        try {
+            for (ScoredJobDto dto : recommendations) {
+                recommendScoreRepository.upsertScore(userId, dto.getId(), (float) dto.getScore());
+            }
+        } catch (Exception e) {
+            log.error("[Recommend] 추천 점수 upsert 중 예외 발생: userId={}, error={}", userId, e.getMessage(), e);
+            throw new RuntimeException("추천 점수 저장 실패", e);
+        }
     }
 
 }
