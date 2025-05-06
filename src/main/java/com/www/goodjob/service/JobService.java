@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import com.www.goodjob.domain.User;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +22,16 @@ public class JobService {
 
     private final JobRepository jobRepository;
     private final RestTemplate restTemplate;
+    private final SearchLogService searchLogService;
 
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
 
-    public Page<JobSearchResponse> searchJobs(String keyword, List<String> jobTypes, List<String> experienceFilters, Pageable pageable) {
+    public Page<JobSearchResponse> searchJobs(String keyword, List<String> jobTypes, List<String> experienceFilters, Pageable pageable, User user) {
+        if (user != null && keyword != null && !keyword.isBlank()) {
+            searchLogService.saveSearchLog(keyword.trim(), user);
+        }
+
         //  정렬 기준만 추출하여 전체 정렬된 리스트 조회
         Sort sort = pageable.getSort();
         List<Job> allJobs = jobRepository.searchJobs(keyword, sort);
