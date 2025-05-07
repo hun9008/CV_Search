@@ -44,25 +44,6 @@ public class RecommendController {
     }
 
     @Operation(
-            summary = "추천 공고에 대한 이력서 피드백 생성 또는 조회",
-            description = """
-            특정 추천 항목(recommendScoreId)에 대한 이력서 피드백을 생성하거나, 
-            이미 생성된 피드백이 있으면 그대로 반환함
-            - Claude AI 기반으로 자동 생성됨  
-            - 이미 피드백이 있다면 새로 생성하지 않고 그대로 반환함
-            """
-    )
-    // 피드백 생성 or 조회
-    @PostMapping("/feedback")
-    public ResponseEntity<String> generateFeedback(
-            @RequestParam Long recommendScoreId,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        String feedback = recommendService.getOrGenerateFeedback(recommendScoreId, userDetails);
-        return ResponseEntity.ok(feedback);
-    }
-
-    @Operation(
             summary = "추천 캐시 생성",
             description = "[Not Used] 관리용으로 호출될 수 있습니다. FastAPI로부터 전체 추천 점수를 받아 Redis에 캐싱합니다. (Sync)"
     )
@@ -77,6 +58,26 @@ public class RecommendController {
         Long userId = userDetails.getId();
         asyncService.cacheRecommendForUser(userId);
         return ResponseEntity.ok("추천 캐시 생성 시작. log 확인 필요.");
+    }
+
+    @Operation(
+            summary = "추천 공고에 대한 이력서 피드백 생성 또는 조회",
+            description = """
+            특정 추천 항목(recommendScoreId)에 대한 이력서 피드백을 생성하거나, 
+            이미 생성된 피드백이 있으면 그대로 반환함
+            - Claude AI 기반으로 자동 생성됨  
+            - 이미 피드백이 있다면 새로 생성하지 않고 그대로 반환함
+            """
+    )
+
+    // 피드백 생성 or 조회
+    @PostMapping("/feedback")
+    public ResponseEntity<String> generateFeedback(
+            @RequestParam Long recommendScoreId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        String feedback = recommendService.getOrGenerateFeedback(recommendScoreId, userDetails);
+        return ResponseEntity.ok(feedback);
     }
 }
 
