@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.*;
 import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.ScoredJobDto;
+import com.www.goodjob.repository.CvRepository;
 import com.www.goodjob.repository.JobRepository;
 import com.www.goodjob.repository.RecommendScoreRepository;
 import com.www.goodjob.repository.CvFeedbackRepository;
@@ -42,6 +43,7 @@ public class RecommendService {
     private final CvFeedbackRepository cvFeedbackRepository;
     private final ClaudeClient claudeClient;
     private final JobRepository jobRepository;
+    private final CvRepository cvRepository;
 
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -82,6 +84,8 @@ public class RecommendService {
 
             for (JsonNode rec : recommendedJobsNode) {
                 Long jobId = rec.get("job_id").asLong();
+                // Long jobId = Long.parseLong(rec.get("job_id").asText());
+
                 Optional<Job> jobOpt = jobRepository.findById(jobId);
 
                 jobOpt.ifPresent(job -> {
@@ -188,8 +192,23 @@ public class RecommendService {
         }
     }
 
+    @Transactional
+    public void saveRecommendScores(Long userId, List<ScoredJobDto> recommendations) {
+        Cv cv = cvRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("[Error] CV not found for userId=" + userId));
+
+        try {
+            for (ScoredJobDto dto : recommendations) {
+                recommendScoreRepository.upsertScore(cv.getId(), dto.getId(), (float) dto.getScore()); // user_id -> cv_id 사용
+            }
+        } catch (Exception e) {
+            log.error("[Recommend] 추천 점수 upsert 중 예외 발생: userId={}, error={}", userId, e.getMessage(), e);
+            throw new RuntimeException("추천 점수 저장 실패", e);
+        }
+    }
+
     /**
-     * 추천 점수 기반 피드백 생성 또는 기존 피드백 조회
+     * 추천 점수 기반 피드백 무조건 새로 생성 (기존 피드백 덮어쓰기) -> 테스트용
      */
     public String getOrGenerateFeedback(Long recommendScoreId, CustomUserDetails userDetails) {
         User user = userDetails.getUser();
@@ -203,21 +222,19 @@ public class RecommendService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다");
         }
 
-        // 3. 기존 피드백 조회
-        Optional<CvFeedback> existing = cvFeedbackRepository.findByRecommendScore_Id(recommendScoreId);
-        if (existing.isPresent()) {
-            return existing.get().getFeedback();
-        }
-
-        // 4. Claude 호출 → 피드백 생성
+        // 3. Claude 호출 → 피드백 생성
         String feedback = claudeClient.generateFeedback(
                 score.getCv().getRawText(),
                 score.getJob().getRawJobsText()
         );
 
-        // 5. 저장
+        // 4. 기존 피드백 삭제 (있다면)
+        cvFeedbackRepository.findByRecommendScore_Id(recommendScoreId)
+                .ifPresent(cvFeedbackRepository::delete);
+
+        // 5. 새 피드백 저장
         CvFeedback newFeedback = CvFeedback.builder()
-                .recommendScore(score) // ← score 자체를 저장하는 게 아니라, recommendScore 엔티티를 참조
+                .recommendScore(score)
                 .feedback(feedback)
                 .confirmed(false)
                 .build();
@@ -226,16 +243,45 @@ public class RecommendService {
         return feedback;
     }
 
-    @Transactional
-    public void saveRecommendScores(Long userId, List<ScoredJobDto> recommendations) {
-        try {
-            for (ScoredJobDto dto : recommendations) {
-                recommendScoreRepository.upsertScore(userId, dto.getId(), (float) dto.getScore());
-            }
-        } catch (Exception e) {
-            log.error("[Recommend] 추천 점수 upsert 중 예외 발생: userId={}, error={}", userId, e.getMessage(), e);
-            throw new RuntimeException("추천 점수 저장 실패", e);
-        }
-    }
+
+    /**
+     * 추천 점수 기반 피드백 생성 또는 기존 피드백 조회
+     */
+//    public String getOrGenerateFeedback(Long recommendScoreId, CustomUserDetails userDetails) {
+//        User user = userDetails.getUser();
+//
+//        // 1. 추천 점수 조회
+//        RecommendScore score = recommendScoreRepository.findById(recommendScoreId)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "추천 점수가 존재하지 않습니다"));
+//
+//        // 2. 유저 검증
+//        if (!score.getCv().getUser().getId().equals(user.getId())) {
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다");
+//        }
+//
+//        // 3. 기존 피드백 조회
+//        Optional<CvFeedback> existing = cvFeedbackRepository.findByRecommendScore_Id(recommendScoreId);
+//        if (existing.isPresent()) {
+//            return existing.get().getFeedback();
+//        }
+//
+//        // 4. Claude 호출 → 피드백 생성
+//        String feedback = claudeClient.generateFeedback(
+//                score.getCv().getRawText(),
+//                score.getJob().getRawJobsText()
+//        );
+//
+//        // 5. 저장
+//        CvFeedback newFeedback = CvFeedback.builder()
+//                .recommendScore(score)
+//                .feedback(feedback)
+//                .confirmed(false)
+//                .build();
+//
+//        cvFeedbackRepository.save(newFeedback);
+//        return feedback;
+//    }
+
+
 
 }
