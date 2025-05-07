@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.*;
 import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.ScoredJobDto;
+import com.www.goodjob.repository.CvRepository;
 import com.www.goodjob.repository.JobRepository;
 import com.www.goodjob.repository.RecommendScoreRepository;
 import com.www.goodjob.repository.CvFeedbackRepository;
@@ -42,6 +43,7 @@ public class RecommendService {
     private final CvFeedbackRepository cvFeedbackRepository;
     private final ClaudeClient claudeClient;
     private final JobRepository jobRepository;
+    private final CvRepository cvRepository;
 
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -81,8 +83,8 @@ public class RecommendService {
             List<ScoredJobDto> result = new ArrayList<>();
 
             for (JsonNode rec : recommendedJobsNode) {
-                // Long jobId = rec.get("job_id").asLong();
-                Long jobId = Long.parseLong(rec.get("job_id").asText());
+                Long jobId = rec.get("job_id").asLong();
+                // Long jobId = Long.parseLong(rec.get("job_id").asText());
 
                 Optional<Job> jobOpt = jobRepository.findById(jobId);
 
@@ -230,14 +232,18 @@ public class RecommendService {
 
     @Transactional
     public void saveRecommendScores(Long userId, List<ScoredJobDto> recommendations) {
+        Cv cv = cvRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("⛔ CV not found for userId=" + userId));
+
         try {
             for (ScoredJobDto dto : recommendations) {
-                recommendScoreRepository.upsertScore(userId, dto.getId(), (float) dto.getScore());
+                recommendScoreRepository.upsertScore(cv.getId(), dto.getId(), (float) dto.getScore()); // ✅ cv_id 사용
             }
         } catch (Exception e) {
             log.error("[Recommend] 추천 점수 upsert 중 예외 발생: userId={}, error={}", userId, e.getMessage(), e);
             throw new RuntimeException("추천 점수 저장 실패", e);
         }
     }
+
 
 }
