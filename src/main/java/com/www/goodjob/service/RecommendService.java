@@ -169,7 +169,11 @@ public class RecommendService {
         try {
             List<ScoredJobDto> cachedResult = getScoredFromCache(userId, topk);
             log.info("[Recommend] 캐시된 추천 결과 사용: userId={}, topK={}", userId, topk);
+            long saveStart = System.nanoTime();
+            long saveEnd = 0;
             saveRecommendScores(userId, cachedResult);
+            saveEnd = System.nanoTime();
+            log.info("[Recommend] 스코어 저장 시간: {}ms (userId={})", (saveEnd - saveStart) / 1_000_000, userId);
             return cachedResult;
         } catch (ResponseStatusException e) {
             if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
@@ -182,7 +186,11 @@ public class RecommendService {
 
             List<ScoredJobDto> apiResult = fetchRecommendationFromFastAPI(userId, topk);
             log.info("[Recommend] FastAPI 결과 반환 완료: userId={}, 추천 수={}", userId, apiResult.size());
+            long saveStart = System.nanoTime();
+            long saveEnd = 0;
             saveRecommendScores(userId, apiResult);
+            saveEnd = System.nanoTime();
+            log.info("[Recommend] 스코어 저장 시간: {}ms (userId={})", (saveEnd - saveStart) / 1_000_000, userId);
             return apiResult;
         } finally {
             endTime = System.nanoTime();

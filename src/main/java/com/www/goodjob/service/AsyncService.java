@@ -45,7 +45,7 @@ public class AsyncService {
     public void cacheRecommendForUser(Long userId) {
 
         long startTime = System.nanoTime();
-        long responseTime;
+        long responseTime = 0;
         long endTime;
         long durationMs;
         int totalJobCount = (int) jobRepository.count();
@@ -91,7 +91,7 @@ public class AsyncService {
             log.error("[Debug] 추천 점수 캐싱 실패: userId=" + userId, e);
         } finally {
             endTime = System.nanoTime();
-            durationMs = (endTime - startTime) / 1_000_000;
+            durationMs = (endTime - responseTime) / 1_000_000;
             log.info("[Debug] 추천 캐싱 수행 시간: {}ms (userId={})", durationMs, userId);
         }
     }
