@@ -194,8 +194,8 @@ public class RecommendService {
 
     @Transactional
     public void saveRecommendScores(Long userId, List<ScoredJobDto> recommendations) {
-        Cv cv = cvRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("[Error] CV not found for userId=" + userId));
+        Cv cv = cvRepository.findTopByUserIdOrderByUploadedAtDesc(userId)
+                .orElseThrow(() -> new RuntimeException("CV not found for userId=" + userId));
 
         try {
             for (ScoredJobDto dto : recommendations) {
