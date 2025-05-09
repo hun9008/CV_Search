@@ -4,7 +4,8 @@ WORKDIR /app
 COPY . .
 
 # 필수 OS 패키지 설치
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y git \
     git \
     libgl1-mesa-glx \
     libglib2.0-0 \

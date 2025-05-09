@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 from routes import save_es, rec_es, delete_es
 from fastapi.middleware.cors import CORSMiddleware
+import logging
 
 app = FastAPI()
+
+logging.basicConfig(level=logging.DEBUG)
 
 app.add_middleware(
     CORSMiddleware,

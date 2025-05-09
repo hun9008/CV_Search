@@ -2,13 +2,15 @@ from fastapi import APIRouter, HTTPException, Body
 from schemas.schema import RecommendationRequest
 from src.es_query_module import recommandation  
 import traceback
+import time
 
 router = APIRouter()
 
 @router.post("/recommend-jobs")
-def recommend_jobs(body: RecommendationRequest = Body(...)):
+async def recommend_jobs(body: RecommendationRequest = Body(...)):
+    start_time = time.time()
     try:
-        results = recommandation(body.u_id, body.top_k)
+        results = await recommandation(body.u_id, body.top_k)
         if not results:
             raise HTTPException(status_code=404, detail="No CV data found for this user.")
         
@@ -28,3 +30,7 @@ def recommend_jobs(body: RecommendationRequest = Body(...)):
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
+
+    finally:
+        duration = round((time.time() - start_time) * 1000)
+        print(f"[Recommend] 추천 응답 시간 : {duration}ms")

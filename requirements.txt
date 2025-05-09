@@ -94,3 +94,4 @@ uvicorn
 # vila @ file:///Users/jeong-yonghun/Desktop/capstone/CV_Search/src/CV2DB/vila
 xxhash
 yarl
+httpx
