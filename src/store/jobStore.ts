@@ -5,19 +5,21 @@ import Job from '../pages/index/types/job';
 
 interface JobStore {
     jobList: Job[] | null;
+    filteredJobList: Job[] | null;
     selectedJob: number;
     setSelectedJob: (jobId: number) => void;
     getSelectedJob: () => Job | null;
     setJobList: (list: Job[] | null) => void;
+    setFilteredJobList: (list: Job[] | null) => void;
     getJobList: (count: number) => Promise<Job[]>;
 }
 
 const useJobStore = create<JobStore>((set, get) => ({
     jobList: [],
+    filteredJobList: [],
     selectedJob: 0,
-
     setSelectedJob: (jobId) => set({ selectedJob: jobId }),
-
+    setFilteredJobList: (filteredJobList) => set({ filteredJobList }),
     getSelectedJob: () => {
         const { jobList, selectedJob } = get();
         return jobList?.find((job) => job.id === selectedJob) ?? null;
