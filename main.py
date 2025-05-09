@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import save_es, rec_es
+from routes import save_es, rec_es, delete_es
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -13,5 +13,5 @@ app.add_middleware(
 )
 
 app.include_router(save_es.router)
+app.include_router(delete_es.router)
 app.include_router(rec_es.router)
-

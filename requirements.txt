@@ -17,8 +17,8 @@ cycler
 datasets
 dill
 effdet
-elastic-transport
-elasticsearch
+elasticsearch==8.17.2
+elastic-transport==8.17.1
 fastapi
 filelock
 fonttools

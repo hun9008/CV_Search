@@ -9,7 +9,7 @@ import matplotlib.patches as patches
 
 from collections import defaultdict
 
-from src.fetch_RDB_query import fetch_cv_data
+from src.fetch_RDB_query import fetch_cv_data, fetch_job_data_dict
 
 import os
 
@@ -40,14 +40,20 @@ JOBS_INDEX_NAME = "job_index"
 # print("ES_HOST:", ES_HOST)
 # print("RDB_HOST:", RDB_HOST)
 
-es = Elasticsearch(ES_HOST)
+es = Elasticsearch(
+    ES_HOST,
+    headers={
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    }
+)
 
 print(es.info())
 
 
 def search_cosine_similar_jobs(query_vector, top_k):
     query = {
-        "size": top_k,
+        "size": 10000,
         "query": {
             "script_score": {
                 "query": {
@@ -70,7 +76,7 @@ def search_cosine_similar_jobs(query_vector, top_k):
 
 def search_l2_norm_jobs(query_vector, top_k):
     query = {
-        "size": top_k,
+        "size": 10000,
         "query": {
             "script_score": {
                 "query": {
@@ -93,7 +99,7 @@ def search_l2_norm_jobs(query_vector, top_k):
 
 def search_bm25_jobs(query_text, top_k):
     query = {
-        "size": top_k,
+        "size": 10000,
         "query": {
             "match": {
                 "text": query_text
@@ -118,6 +124,9 @@ def search_combined_jobs(cv_vector, cv_text, top_k, cosine_weight=0.5, bm25_weig
 
     cosine_scores = {job['_id']: job['_score'] for job in cosine_results}
     bm25_scores = {job['_id']: job['_score'] for job in bm25_results}
+
+    raw_cosine_score = cosine_scores
+    raw_bm25_score = bm25_scores
     
     normalized_cosine_scores = normalize_scores(list(cosine_scores.values()))
     normalized_bm25_scores = normalize_scores(list(bm25_scores.values()))
@@ -131,7 +140,15 @@ def search_combined_jobs(cv_vector, cv_text, top_k, cosine_weight=0.5, bm25_weig
     
     top_jobs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]
     
-    return [(job_id, score, cosine_scores.get(job_id, 0), bm25_scores.get(job_id, 0)) for job_id, score in top_jobs]
+    return [(
+        job_id, 
+        score, 
+        cosine_scores.get(job_id, 0), 
+        bm25_scores.get(job_id, 0), 
+        raw_cosine_score.get(job_id, 0),
+        raw_bm25_score.get(job_id, 0),
+        es.get(index=JOBS_INDEX_NAME, id=job_id)["_source"]["job_id"]
+    ) for job_id, score in top_jobs]
 
 def recommandation(u_id, top_k=10):
     
@@ -143,10 +160,13 @@ def recommandation(u_id, top_k=10):
             }
         }
     }
+
     response = es.search(index=CV_INDEX_NAME, body=query)
+
     if not response["hits"]["hits"]:
         print("No CV found for the given u_id.")
         return []
+
     cv_vector = response["hits"]["hits"][0]["_source"]["vector"]
     cv_text = response["hits"]["hits"][0]["_source"]["text"]
     print("CV Text:", cv_text[:20])
@@ -155,14 +175,36 @@ def recommandation(u_id, top_k=10):
     # cv_vector와 cv_text를 이용하여 job을 추천함.
     recommended_jobs = search_combined_jobs(cv_vector, cv_text, top_k)
     
-    for job in recommended_jobs:
-        job_id, combined_score, cosine_score, bm25_score = job
-        src = es.get(index=JOBS_INDEX_NAME, id=job_id)
-        text = src["_source"]["text"]
-        lines = text.split('\n')
-        company_name = lines[0].split(': ')[1].strip('"') if len(lines) > 0 else "Unknown"
-        department = lines[1].split(': ')[1].strip('"') if len(lines) > 1 else "Unknown"
+    job_dict = fetch_job_data_dict()  # job_id(str) -> row(dict)
 
-        print(f"[{company_name}] {department} | Combined Score: {combined_score:.2f} | Cosine: {cosine_score:.2f} | BM25: {bm25_score:.2f}\n")
-        
-    return recommended_jobs
+    results = []
+    for es_id, combined_score, cosine_score, bm25_score, raw_cosine_score, raw_bm25_score, db_job_id in recommended_jobs:
+        job_info = job_dict.get(db_job_id)
+        if not job_info:
+            continue
+
+        result = {
+            "job_id": db_job_id,
+            "company_name": job_info.get("company_name"),
+            "title": job_info.get("title"),
+            "department": job_info.get("department"),
+            "require_experience": job_info.get("require_experience"),
+            "job_type": job_info.get("job_type"),
+            "region_id": job_info.get("region_id"),
+            "region_text": job_info.get("region_text"),
+            "apply_start_date": str(job_info.get("apply_start_date")),
+            "apply_end_date": str(job_info.get("apply_end_date")),
+            "is_public": job_info.get("is_public"),
+            "created_at": str(job_info.get("created_at")),
+            "last_updated_at": str(job_info.get("last_updated_at")),
+            "url": job_info.get("url"),
+            "favicon": job_info.get("favicon"),
+            "combined_score": round(combined_score, 4),
+            "cosine_score": round(cosine_score, 4),
+            "bm25_score": round(bm25_score, 4),
+            "raw_cosine_score": round(raw_cosine_score, 4),
+            "raw_bm25_score": round(raw_bm25_score, 4),
+        }
+        results.append(result)
+
+    return results

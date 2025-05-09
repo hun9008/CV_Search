@@ -14,12 +14,14 @@ def recommend_jobs(body: RecommendationRequest = Body(...)):
         
         response = [
             {
-                "job_id": job_id,
-                "score": round(combined_score, 2),
-                "cosine_score": round(cosine_score, 2),
-                "bm25_score": round(bm25_score, 2)
+                "job_id": item["job_id"],
+                "score": round(item["combined_score"], 2),
+                "cosine_score": round(item["cosine_score"], 2),
+                "bm25_score": round(item["bm25_score"], 2),
+                "raw_cosine_score": round(item["raw_cosine_score"], 2),
+                "raw_bm25_score": round(item["raw_bm25_score"], 2),
             }
-            for job_id, combined_score, cosine_score, bm25_score in results
+            for item in results
         ]
         return {"recommended_jobs": response}
     

@@ -4,9 +4,10 @@ from dotenv import load_dotenv
 
 import mysql.connector
 
+from datetime import datetime
+
 load_dotenv(dotenv_path="./.env")
 # load_dotenv(dotenv_path="../../.env")
-es_host_ip = os.getenv("ELASTIC_HOST")
 RDB_host_ip = os.getenv("DB_HOST_IP")
 AWS_ACCESS_KEY_ID=os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY=os.getenv("AWS_SECRET_ACCESS_KEY")
@@ -17,7 +18,28 @@ MYSQL_DB = os.getenv("MYSQL_DATABASE")
 MYSQL_USER = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 
-ES_HOST = es_host_ip
+def fetch_job_data_dict():
+    db_config = {
+        "host": RDB_HOST,
+        "port": 3306,
+        "user": MYSQL_USER,
+        "password": MYSQL_PASSWORD,
+        "database": MYSQL_DB
+    }
+
+    query = "SELECT * FROM jobs;"
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(query)
+        results = cursor.fetchall()
+        return {str(row["id"]): row for row in results}
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 def fetch_job_data():
     db_config = {
@@ -28,35 +50,7 @@ def fetch_job_data():
         "database": MYSQL_DB
     }
 
-    query = """
-    SELECT 
-        id, 
-        company_name, 
-        title,
-        region_id,
-        department, 
-        require_experience,
-        job_description,
-        job_type,
-        requirements,
-        preferred_qualifications,
-        ideal_candidate,
-        apply_start_date,
-        apply_end_date,
-        is_public,
-        created_at,
-        updated_at,
-        expired_at,
-        archived_at,
-        raw_jobs_text,
-        url,
-        description,
-        favicon,
-        domain,
-        region_text,
-        last_updated_at
-    FROM jobs;
-    """
+    query = "SELECT * FROM jobs;"
 
     try:
         conn = mysql.connector.connect(**db_config)
@@ -65,6 +59,8 @@ def fetch_job_data():
         results = cursor.fetchall()
 
         formatted_texts = []
+        job_ids = []
+
         for row in results:
             formatted_text = f'''
 "id": "{row['id']}"
@@ -82,20 +78,18 @@ def fetch_job_data():
 "apply_end_date": "{row['apply_end_date'] or ''}"
 "is_public": "{row['is_public'] or ''}"
 "created_at": "{row['created_at'] or ''}"
-"updated_at": "{row['updated_at'] or ''}"
 "expired_at": "{row['expired_at'] or ''}"
 "archived_at": "{row['archived_at'] or ''}"
 "raw_jobs_text": "{row['raw_jobs_text'] or ''}"
 "url": "{row['url'] or ''}"
-"description": "{row['description'] or ''}"
 "favicon": "{row['favicon'] or ''}"
-"domain": "{row['domain'] or ''}"
 "region_text": "{row['region_text'] or ''}"
 "last_updated_at": "{row['last_updated_at'] or ''}"
             '''.strip()
             formatted_texts.append(formatted_text)
+            job_ids.append(row['id'])
 
-        return formatted_texts
+        return formatted_texts, job_ids
 
     except mysql.connector.Error as err:
         print(f"MySQL 오류 발생: {err}")
@@ -149,4 +143,43 @@ def fetch_cv_data(user_id):
         if 'cursor' in locals():
             cursor.close()
         if 'conn' in locals():
+            conn.close()
+
+def fetch_cv_save_data(s3_url, user_id, raw_text):
+    db_config = {
+        "host": RDB_HOST,
+        "port": 3306,
+        "user": MYSQL_USER,
+        "password": MYSQL_PASSWORD,
+        "database": MYSQL_DB
+    }
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+
+        query = """
+        UPDATE cv
+        SET raw_text = %s,
+            last_updated = %s
+        WHERE user_id = %s
+        """
+
+        now = datetime.now()
+        values = (raw_text, now, user_id)
+
+        cursor.execute(query, values)
+        conn.commit()
+
+        if cursor.rowcount > 0:
+            print(f"[✓] CV 업데이트 완료: user_id={user_id}")
+        else:
+            print(f"[!] 업데이트된 행이 없습니다: user_id={user_id}")
+
+    except mysql.connector.Error as err:
+        print(f"[X] MySQL 오류: {err}")
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
             conn.close()

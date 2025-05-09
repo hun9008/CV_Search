@@ -10,3 +10,6 @@ class JobRequest(BaseModel):
 class RecommendationRequest(BaseModel):
     u_id: int
     top_k: int = 10
+
+class JobIDRequest(BaseModel):
+    job_id: int

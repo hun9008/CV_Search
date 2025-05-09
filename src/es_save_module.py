@@ -7,7 +7,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-from src.fetch_RDB_query import fetch_job_data
+from src.fetch_RDB_query import fetch_job_data, fetch_cv_save_data
 
 from collections import defaultdict
 
@@ -24,7 +24,12 @@ from dotenv import load_dotenv
 
 import mysql.connector
 from datetime import datetime
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
+
+from datetime import datetime, timedelta, timezone
+import hashlib
+
+KST = timezone(timedelta(hours=9))
 
 load_dotenv(dotenv_path="./.env")
 # load_dotenv(dotenv_path="../../.env")
@@ -42,22 +47,47 @@ JOBS_INDEX_NAME = "job_index"
 # print("ES_HOST:", ES_HOST)
 # print("RDB_HOST:", RDB_HOST)
 
-es = Elasticsearch(ES_HOST)
+es = Elasticsearch(
+    ES_HOST,
+    headers={
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    }
+)
 
 print(es.info())
 
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 def vila_predict(pdf_path, pdf_extractor, vision_model, layout_model):
+    print(f"[DEBUG] Loading tokens and images from: {pdf_path}")
     page_tokens, page_images = pdf_extractor.load_tokens_and_image(pdf_path)
+    print(f"[DEBUG] Total pages loaded: {len(page_tokens)}")
 
     pred_tokens = []
-    for page_token, page_image in tqdm(zip(page_tokens, page_images), total=len(page_tokens), desc="Processing Pages", unit="page"):
-        blocks = vision_model.detect(page_image)
-        page_token.annotate(blocks=blocks)
-        pdf_data = page_token.to_pagedata().to_dict()
-        pred_tokens += layout_model.predict(pdf_data, page_token.page_size)
+    for i, (page_token, page_image) in enumerate(tqdm(zip(page_tokens, page_images), total=len(page_tokens), desc="Processing Pages", unit="page")):
+        print(f"[DEBUG] Processing page {i + 1}/{len(page_tokens)}")
 
+        # Layout Detection
+        blocks = vision_model.detect(page_image)
+        print(f"[DEBUG] Detected {len(blocks)} layout blocks on page {i + 1}")
+
+        page_token.annotate(blocks=blocks)
+
+        # Convert to prediction input
+        pdf_data = page_token.to_pagedata().to_dict()
+        print(f"[DEBUG] PDF data keys for page {i + 1}: {pdf_data}")
+        if pdf_data is None:
+            print(f"[DEBUG] No PDF data found for page {i + 1}")
+            continue
+
+        # Prediction
+        predicted = layout_model.predict(pdf_data, page_token.page_size)
+        print(f"[DEBUG] Predicted {len(predicted)} tokens on page {i + 1}")
+
+        pred_tokens += predicted
+
+    print(f"[DEBUG] Total predicted tokens: {len(pred_tokens)}")
     return pred_tokens
 
 def construct_token_groups(pred_tokens):
@@ -199,8 +229,11 @@ def save_text(pred_tokens, txt_path):
 
 def load_vila_models():
     pdf_extractor = PDFExtractor(pdf_extractor_name="pdfplumber")
+    print("pdf_extractor loaded")
     vision_model = lp.EfficientDetLayoutModel("lp://PubLayNet")
+    print("vision_model loaded")
     pdf_predictor = HierarchicalPDFPredictor.from_pretrained("allenai/hvila-block-layoutlm-finetuned-docbank")
+    print("pdf_predictor loaded")
 
     return pdf_extractor, vision_model, pdf_predictor
 
@@ -218,13 +251,13 @@ def download_pdf_from_s3(s3_url, local_path):
     if s3_url.startswith("https://"):
         parts = s3_url.replace("https://", "").split("/", 1)
         domain = parts[0]  
-        key = parts[1]    
+        key = unquote(parts[1])
         bucket = domain.split('.')[0] 
 
     elif s3_url.startswith("s3://"):
         s3_url = s3_url[5:]
         bucket, *key_parts = s3_url.split('/')
-        key = '/'.join(key_parts)
+        key = unquote('/'.join(key_parts))
 
     else:
         raise ValueError("지원되지 않는 S3 URL 형식입니다.")
@@ -237,8 +270,9 @@ def extract_cv_info(pdf_path):
     pdf_extractor, vision_model, pdf_predictor = load_vila_models()
 
     pred_tokens = vila_predict(pdf_path, pdf_extractor, vision_model, pdf_predictor)
-
+    print("ViLA prediction completed")
     merge_tokens = merge_tokens_to_sentences(pred_tokens)
+    print("Token merging completed")
 
     return merge_tokens
 
@@ -274,44 +308,6 @@ def encode_long_text(text):
     avg_vector = np.mean(sentence_vectors, axis=0)  
     return avg_vector.tolist()
 
-def rdb_save_cv(s3_url, user_id):
-    with open("/tmp/temp_cv.txt", "r", encoding="utf-8") as f:
-        raw_text = f.read()
-
-    path = urlparse(s3_url).path 
-    file_name = os.path.basename(path)  
-
-    db_config = {
-        "host": RDB_HOST,
-        "port": 3306,
-        "user": "user",
-        "password": "ajoucapstone",
-        "database": "goodjob"
-    }
-
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
-
-        query = """
-        INSERT INTO cv (user_id, file_name, file_url, raw_text, uploaded_at, last_updated)
-        VALUES (%s, %s, %s, %s, %s, %s)
-        """
-
-        now = datetime.now()
-        values = (user_id, file_name, s3_url, raw_text, now, now)
-
-        cursor.execute(query, values)
-        conn.commit()
-        print(f"[✓] CV 저장 완료: user_id={user_id}, file_name={file_name}")
-
-    except mysql.connector.Error as err:
-        print(f"[X] MySQL 오류: {err}")
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
 def es_save_cv(s3_url, u_id):
 
@@ -322,8 +318,10 @@ def es_save_cv(s3_url, u_id):
                 "mappings": {
                     "properties": {
                         "text": {"type": "text"},
+                        "text_hash": {"type": "keyword"},
                         "vector": {"type": "dense_vector", "dims": 384},
-                        "u_id": {"type": "keyword"}
+                        "u_id": {"type": "keyword"},
+                        "created_at": {"type": "date"} 
                     }
                 }
             }
@@ -334,22 +332,57 @@ def es_save_cv(s3_url, u_id):
     raw_text = open("/tmp/temp_cv.txt", "r", encoding="utf-8").read()
     vector = encode_long_text(raw_text)
 
+    text_hash = hashlib.sha256(raw_text.encode('utf-8')).hexdigest()
+
     doc = {
         "text": raw_text,
+        "text_hash": text_hash,
         "vector": vector,
         "u_id": u_id,
+        "created_at": datetime.now(KST).isoformat()
     }
 
-    response = es.index(index=CV_INDEX_NAME, body=doc)
-    print(f"{u_id} CV Saved. Document ID: {response['_id']}")
+    # doc
+    print(f"Document to be indexed: {doc}")
 
     try:
-        rdb_save_cv(s3_url, u_id)
+        # 정확한 term match를 위해 .keyword 사용 (u_id가 keyword 매핑되었다면 생략 가능)
+        query = {
+            "query": {
+                "term": {
+                    "u_id.keyword": u_id
+                }
+            }
+        }
+
+        same_user_result = es.get(index=CV_INDEX_NAME, id=str(u_id), ignore=[404])
+
+        if same_user_result.get("found"):
+            # 이미 저장된 문서가 있을 경우
+            existing_hash = same_user_result["_source"].get("text_hash")
+
+            if existing_hash == text_hash:
+                print(f"[SKIP] u_id={u_id} 동일한 text_hash 존재 → ES 저장 생략")
+            else:
+                # 해시가 다르면 덮어쓰기
+                response = es.index(index=CV_INDEX_NAME, id=str(u_id), body=doc)
+                print(f"[UPDATE] u_id={u_id} CV Updated in ES. Document ID: {response['_id']}")
+        else:
+            # 문서가 없을 경우 신규 저장
+            response = es.index(index=CV_INDEX_NAME, id=str(u_id), body=doc)
+            print(f"[NEW] u_id={u_id} CV Saved in ES. Document ID: {response['_id']}")
+
+    except Exception as e:
+        print(f"[X] Elasticsearch 저장 실패: {e}")
+        raise
+
+    try:
+        fetch_cv_save_data(s3_url, u_id, raw_text)
+        print(f"[✓] CV RDB 저장 완료: user_id={u_id}")
     except mysql.connector.Error as err:
         print(f"[X] MySQL 오류: {err}")
     except Exception as e:
         print(f"[X] 오류 발생: {e}")
-    print(f"CV RDB 저장 완료: user_id={u_id}")
 
 ####################### ^ save cv function #######################
 
@@ -362,45 +395,69 @@ def es_save_jobs():
                 "mappings": {
                     "properties": {
                         "text": {"type": "text"},
-                        "vector": {"type": "dense_vector", "dims": 384}
+                        "text_hash": {"type": "keyword"},
+                        "vector": {"type": "dense_vector", "dims": 384},
+                        "job_id": {"type": "keyword"},
+                        "created_at": {"type": "date"} 
                     }
                 }
             }
         )
         
-    jobs = fetch_job_data()
+    jobs, job_ids = fetch_job_data()
+
+    print(f"[DEBUG] jobs: {len(jobs)}")
+    print(f"[DEBUG] job_ids: {len(job_ids)}")
 
     # jobs가 비어있을 경우 예외처리
     if not jobs:
         print("No jobs found.")
         return
 
-    texts = []
-    vectors = []
+    try:
+        for job_text, job_id in tqdm(zip(jobs, job_ids), total=len(jobs), desc="Indexing jobs to ES"):
+            text_hash = hashlib.sha256(job_text.encode('utf-8')).hexdigest()
 
-    for job in jobs:
-        texts.append(job)
-        print(f"Processing job: {len(job)} characters")
+            query = {
+                "query": {
+                    "term": {
+                        "job_id": str(job_id)
+                    }
+                }
+            }
 
-        vector = encode_long_text(job)
-        vectors.append(vector)
+            same_job_result = es.get(index=JOBS_INDEX_NAME, id=str(job_id), ignore=[404])
 
-    # all_equal = all(v == vectors[0] for v in vectors)
-    # print("All vectors are the same:", all_equal)
+            if same_job_result.get("found"):
+                # 이미 저장된 문서가 있을 경우
+                existing_hash = same_job_result["_source"].get("text_hash")
 
-    # if all_equal:
-    #     for i, vector in enumerate(vectors):
-    #         print(f"Vector {i} first 3 values: {vector[:3]}")
+                if existing_hash == text_hash:
+                    # print(f"[SKIP] job  _id={job_id} 동일한 text_hash 존재 → ES 저장 생략")
+                    continue
+                else:
+                    # 해시가 다르면 덮어쓰기
+                    response = es.index(index=JOBS_INDEX_NAME, id=str(job_id), body=doc)
+                    print(f"[UPDATE] job_id={job_id} Job Updated in ES. Document ID: {response['_id']}")
+                    continue
+            else:
+                # 문서가 없을 경우 신규 저장
+                # print(f"Processing job_id={job_id}, {len(job_text)} characters")
+                vector = encode_long_text(job_text)
 
-    for text, vector in zip(texts, vectors):
-        doc = {
-            "text": text,
-            "vector": vector,
-            # "u_id": u_id,
-        }
+                doc = {
+                    "text": job_text,
+                    "text_hash": text_hash,
+                    "vector": vector,
+                    "job_id": str(job_id),
+                    "created_at": datetime.now(KST).isoformat()
+                }
 
-        response = es.index(index=JOBS_INDEX_NAME, body=doc)
-        print(f"Saved. Document ID: {response['_id']}")
+                response = es.index(index=JOBS_INDEX_NAME, id=str(job_id), body=doc)
+                print(f"[NEW] job_id={job_id} Job Saved in ES. Document ID: {response['_id']}")
+    except Exception as e:
+        print(f"[X] Elasticsearch 저장 실패: {e}")
+        raise
 
 # es_save_cv("https://goodjobucket.s3.ap-northeast-2.amazonaws.com/cv/cv_example.pdf", 1)
 # es_save_jobs(1)
