@@ -5,6 +5,7 @@ import com.www.goodjob.domain.User;
 import com.www.goodjob.repository.CvRepository;
 import com.www.goodjob.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -16,9 +17,12 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class S3Service {
@@ -51,7 +55,7 @@ public class S3Service {
         return presignedRequest.url().toString();
     }
 
-    public boolean fileExists(String key) {
+    public boolean fileExistsOnS3(String key) {
         try {
             HeadObjectRequest request = HeadObjectRequest.builder()
                     .bucket(bucketName)
@@ -64,6 +68,13 @@ public class S3Service {
         }
     }
 
+    public boolean fileExists(Long userId, String fileName) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return cvRepository.findByUserAndFileName(user, fileName).isEmpty();
+    }
+
     public URL getFileUrl(String key) {
         return s3Client.utilities().getUrl(GetUrlRequest.builder()
                 .bucket(bucketName)
@@ -73,20 +84,34 @@ public class S3Service {
 
     public boolean saveCvIfUploaded(Long userId, String fileName) {
         String key = "cv/" + fileName;
-        if (!fileExists(key)) return false;
+        if (!fileExistsOnS3(key)) return false;
 
         URL fileUrl = getFileUrl(key);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Cv cv = Cv.builder()
-                .user(user)
-                .fileName(fileName)
-                .fileUrl(fileUrl.toString())
-                .rawText("Ready")
-                .build();
+        Optional<Cv> existingCvOpt = cvRepository.findByUser(user);
 
-        cvRepository.save(cv);
+        // DB에 없으면 저장
+        if (existingCvOpt.isEmpty()) {
+            Cv newCv = Cv.builder()
+                    .user(user)
+                    .fileName(fileName)
+                    .fileUrl(fileUrl.toString())
+                    .rawText("Ready")
+                    .uploadedAt(LocalDateTime.now())
+                    .build();
+            cvRepository.save(newCv);
+            log.info("새로운 cv 저장 {}", userId);
+        } else {
+            // 기존 CV 업데이트
+            Cv existingCv = existingCvOpt.get();
+            existingCv.setFileName(fileName);
+            existingCv.setFileUrl(fileUrl.toString());
+            existingCv.setUploadedAt(LocalDateTime.now());
+            cvRepository.save(existingCv);  // save는 merge를 수행
+            log.info("기존 CV 업데이트: userId={}, fileName={}", userId, fileName);
+        }
 
         try {
             String url = fastapiHost + "/save-es-cv";
@@ -103,7 +128,4 @@ public class S3Service {
         return true;
     }
 
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
-    }
 }

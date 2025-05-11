@@ -10,4 +10,5 @@ public interface CvRepository extends JpaRepository<Cv, Long> {
     Optional<Cv> findByUserId(Long userId);
     Optional<Cv> findTopByUserIdOrderByUploadedAtDesc(Long userId);
     Optional<Cv> findByUser(User user);
+    Optional<Cv> findByUserAndFileName(User user, String fileName);
 }
