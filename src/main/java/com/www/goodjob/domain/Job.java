@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "jobs")
@@ -17,9 +19,8 @@ public class Job {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 공고 고유 ID
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "region_id")
-    private Region region;
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<JobRegion> jobRegions = new ArrayList<>();
 
     @Column(name = "company_name")
     private String companyName;
