@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "recommend_score", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "job_id"})
+        @UniqueConstraint(columnNames = {"cv_id", "job_id"})
 })
 @Getter
 @Setter

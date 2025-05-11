@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -25,4 +26,10 @@ public interface RecommendScoreRepository extends JpaRepository<RecommendScore, 
         score = :score
     """, nativeQuery = true)
     void upsertScore(@Param("cvId") Long cvId, @Param("jobId") Long jobId, @Param("score") float score);
+
+    @Query("""
+    SELECT r FROM RecommendScore r
+    WHERE r.cv.id = :cvId AND r.job.id IN :jobIds
+""")
+    List<RecommendScore> findByCvIdAndJobIdIn(@Param("cvId") Long cvId, @Param("jobIds") List<Long> jobIds);
 }
