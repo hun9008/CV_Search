@@ -28,10 +28,23 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             "LOWER(j.requirements) LIKE LOWER(CONCAT('%', :keyword, '%')) )")
     List<Job> searchJobs(@Param("keyword") String keyword, Sort sort);
 
-    @Query("SELECT j FROM Job j LEFT JOIN FETCH j.region WHERE j.id = :id")
+//    @Query("SELECT j FROM Job j LEFT JOIN FETCH j.region WHERE j.id = :id")
+//    Optional<Job> findByIdWithRegion(@Param("id") Long id);
+//
+//    @Query("SELECT DISTINCT j FROM Job j LEFT JOIN FETCH j.region WHERE j.id IN :ids")
+//    List<Job> findByIdInWithRegion(@Param("ids") List<Long> ids);
+
+    // job_region 테이블 추가로 인해 쿼리 수정
+    @Query("SELECT DISTINCT j FROM Job j " +
+            "LEFT JOIN FETCH j.jobRegions jr " +
+            "LEFT JOIN FETCH jr.region " +
+            "WHERE j.id = :id")
     Optional<Job> findByIdWithRegion(@Param("id") Long id);
 
-    @Query("SELECT DISTINCT j FROM Job j LEFT JOIN FETCH j.region WHERE j.id IN :ids")
+    @Query("SELECT DISTINCT j FROM Job j " +
+            "LEFT JOIN FETCH j.jobRegions jr " +
+            "LEFT JOIN FETCH jr.region " +
+            "WHERE j.id IN :ids")
     List<Job> findByIdInWithRegion(@Param("ids") List<Long> ids);
 }
 
