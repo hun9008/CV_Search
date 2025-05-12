@@ -204,11 +204,11 @@ public class RecommendService {
     /**
      * 추천 점수 기반 피드백 무조건 새로 생성 (기존 피드백 덮어쓰기) -> 테스트용
      */
-    public String getOrGenerateFeedback(Long recommendScoreId, CustomUserDetails userDetails) {
+    public String getOrGenerateFeedback(Long jobId, CustomUserDetails userDetails) {
         User user = userDetails.getUser();
 
         // 1. 추천 점수 조회
-        RecommendScore score = recommendScoreRepository.findById(recommendScoreId)
+        RecommendScore score = recommendScoreRepository.findById(jobId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "추천 점수가 존재하지 않습니다"));
 
         // 2. 유저 검증
@@ -236,46 +236,4 @@ public class RecommendService {
         cvFeedbackRepository.save(newFeedback);
         return feedback;
     }
-
-
-    /**
-     * 추천 점수 기반 피드백 생성 또는 기존 피드백 조회
-     */
-//    public String getOrGenerateFeedback(Long recommendScoreId, CustomUserDetails userDetails) {
-//        User user = userDetails.getUser();
-//
-//        // 1. 추천 점수 조회
-//        RecommendScore score = recommendScoreRepository.findById(recommendScoreId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "추천 점수가 존재하지 않습니다"));
-//
-//        // 2. 유저 검증
-//        if (!score.getCv().getUser().getId().equals(user.getId())) {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다");
-//        }
-//
-//        // 3. 기존 피드백 조회
-//        Optional<CvFeedback> existing = cvFeedbackRepository.findByRecommendScore_Id(recommendScoreId);
-//        if (existing.isPresent()) {
-//            return existing.get().getFeedback();
-//        }
-//
-//        // 4. Claude 호출 → 피드백 생성
-//        String feedback = claudeClient.generateFeedback(
-//                score.getCv().getRawText(),
-//                score.getJob().getRawJobsText()
-//        );
-//
-//        // 5. 저장
-//        CvFeedback newFeedback = CvFeedback.builder()
-//                .recommendScore(score)
-//                .feedback(feedback)
-//                .confirmed(false)
-//                .build();
-//
-//        cvFeedbackRepository.save(newFeedback);
-//        return feedback;
-//    }
-
-
-
 }
