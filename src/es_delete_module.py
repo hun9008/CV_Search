@@ -119,6 +119,43 @@ def update_is_public(job_id, is_public=0):
             conn.close()
         return True
 
+def delete_cv_RDB(user_id):
+    db_config = {
+        "host": RDB_HOST,
+        "port": 3306,
+        "user": MYSQL_USER,
+        "password": MYSQL_PASSWORD,
+        "database": MYSQL_DB
+    }
+
+    query = "DELETE FROM cv WHERE user_id = %s"
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        cursor.execute(query, (user_id,))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            print(f"[!] user_id={user_id} 에 해당하는 레코드가 존재하지 않음.")
+            return False
+        print(f"[✓] MySQL CV 삭제 완료: user_id={user_id}")
+        return True
+
+    except mysql.connector.Error as err:
+        print(f"[X] MySQL 에러 발생: {err}")
+        return False
+    except Exception as e:
+        print(f"[X] 기타 에러 발생: {e}")
+        return False
+
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals() and conn.is_connected():
+            conn.close()
+        return True
+
 def delete_job(job_id):
     try:
         rdb_result = update_is_public(job_id, 0)
@@ -133,5 +170,22 @@ def delete_job(job_id):
     except Exception as es_error:
         print(f"[X] ES 삭제 실패: {es_error}")
         update_is_public(job_id, 1)
+        print("is_public rollback to 1")
+        return False
+
+def delete_cv(user_id):
+    try:
+        rdb_result = delete_cv_RDB(user_id)
+    except Exception as e:
+        print(f"[!] RDB CV 삭제 실패: {e}")
+        return False
+
+    try:
+        response = es.delete(index=CV_INDEX_NAME, id=str(user_id))
+        print(f"[✓] ES CV 삭제 완료: user_id={user_id}")
+        return response
+    except Exception as es_error:
+        print(f"[X] ES CV 삭제 실패: {es_error}")
+        update_is_public(user_id, 1)
         print("is_public rollback to 1")
         return False
