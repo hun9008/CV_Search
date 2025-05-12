@@ -15,8 +15,11 @@ import java.util.Optional;
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
 
-    @Query("SELECT j FROM Job j WHERE j.isPublic = true " +
-            "AND (:keyword IS NULL OR " +
+    @Query("SELECT DISTINCT j FROM Job j " +
+            "LEFT JOIN FETCH j.jobRegions jr " +
+            "LEFT JOIN FETCH jr.region r " +
+            "WHERE j.isPublic = true AND (" +
+            "(:keyword IS NULL OR " +
             "LOWER(j.companyName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(j.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(j.department) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
@@ -25,8 +28,8 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             "LOWER(j.jobType) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(j.preferredQualifications) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(j.idealCandidate) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(j.requirements) LIKE LOWER(CONCAT('%', :keyword, '%')) )")
-    List<Job> searchJobs(@Param("keyword") String keyword, Sort sort);
+            "LOWER(j.requirements) LIKE LOWER(CONCAT('%', :keyword, '%'))))")
+    List<Job> searchJobsWithRegion(@Param("keyword") String keyword, Sort sort);
 
 //    @Query("SELECT j FROM Job j LEFT JOIN FETCH j.region WHERE j.id = :id")
 //    Optional<Job> findByIdWithRegion(@Param("id") Long id);

@@ -84,7 +84,6 @@ public class RecommendService {
 
             for (JsonNode rec : recommendedJobsNode) {
                 Long jobId = rec.get("job_id").asLong();
-                // Long jobId = Long.parseLong(rec.get("job_id").asText());
 
                 Optional<Job> jobOpt = jobRepository.findById(jobId);
 
