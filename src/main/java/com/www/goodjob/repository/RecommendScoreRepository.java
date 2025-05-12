@@ -37,5 +37,5 @@ public interface RecommendScoreRepository extends JpaRepository<RecommendScore, 
             SELECT r FROM RecommendScore r
             WHERE r.cv.id = :cvId AND r.job.id = :jobId
             """)
-    RecommendScore findByCvIdAndJobId(@Param("cvId") Long cvId, @Param("jobIds") Long jobId);
+    RecommendScore findByCvIdAndJobId(@Param("cvId") Long cvId, @Param("jobId") Long jobId);
 }

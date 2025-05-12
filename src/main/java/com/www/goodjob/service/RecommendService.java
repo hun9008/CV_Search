@@ -204,28 +204,50 @@ public class RecommendService {
      * 추천 점수 기반 피드백 무조건 새로 생성 (기존 피드백 덮어쓰기) -> 테스트용
      */
     public String getOrGenerateFeedback(Long jobId, CustomUserDetails userDetails) {
+        long totalStart = System.nanoTime();
+
         User user = userDetails.getUser();
 
-        // 1. 추천 점수 조회
-        RecommendScore score = recommendScoreRepository.findById(jobId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "추천 점수가 존재하지 않습니다"));
+        long startCvFetch = System.nanoTime();
+        Cv cv = cvRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("CV not found"));
+        long endCvFetch = System.nanoTime();
+        log.info("[Feedback] CV fetch 시간: {}ms", (endCvFetch - startCvFetch) / 1_000_000);
 
-        // 2. 유저 검증
-        if (!score.getCv().getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다");
+        Long cvId = cv.getId();
+
+        long startScoreFetch = System.nanoTime();
+        RecommendScore score = recommendScoreRepository.findByCvIdAndJobId(cvId, jobId);
+        long endScoreFetch = System.nanoTime();
+        log.info("[Feedback] RecommendScore fetch 시간: {}ms", (endScoreFetch - startScoreFetch) / 1_000_000);
+
+        Long recommendScoreId = score.getId();
+
+        long startFeedbackCheck = System.nanoTime();
+        Optional<CvFeedback> existing = cvFeedbackRepository.findByRecommendScore_Id(recommendScoreId);
+        long endFeedbackCheck = System.nanoTime();
+        log.info("[Feedback] 피드백 존재 여부 확인 시간: {}ms", (endFeedbackCheck - startFeedbackCheck) / 1_000_000);
+
+        if (existing.isPresent()) {
+            log.info("[Feedback] 기존 피드백 반환 (cached)");
+            return existing.get().getFeedback();
         }
 
-        // 3. Claude 호출 → 피드백 생성
+        long startClaude = System.nanoTime();
         String feedback = claudeClient.generateFeedback(
                 score.getCv().getRawText(),
                 score.getJob().getRawJobsText()
         );
+        long endClaude = System.nanoTime();
+        log.info("[Feedback] Claude 피드백 생성 시간: {}ms", (endClaude - startClaude) / 1_000_000);
 
-        // 4. 기존 피드백 삭제 (있다면)
+        long startDelete = System.nanoTime();
         cvFeedbackRepository.findByRecommendScore_Id(recommendScoreId)
                 .ifPresent(cvFeedbackRepository::delete);
+        long endDelete = System.nanoTime();
+        log.info("[Feedback] 기존 피드백 삭제 시간: {}ms", (endDelete - startDelete) / 1_000_000);
 
-        // 5. 새 피드백 저장
+        long startSave = System.nanoTime();
         CvFeedback newFeedback = CvFeedback.builder()
                 .recommendScore(score)
                 .feedback(feedback)
@@ -233,6 +255,12 @@ public class RecommendService {
                 .build();
 
         cvFeedbackRepository.save(newFeedback);
+        long endSave = System.nanoTime();
+        log.info("[Feedback] 새 피드백 저장 시간: {}ms", (endSave - startSave) / 1_000_000);
+
+        long totalEnd = System.nanoTime();
+        log.info("[Feedback] 전체 수행 시간: {}ms", (totalEnd - totalStart) / 1_000_000);
+
         return feedback;
     }
 }

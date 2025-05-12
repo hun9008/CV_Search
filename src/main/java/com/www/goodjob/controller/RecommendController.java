@@ -73,10 +73,10 @@ public class RecommendController {
     // 피드백 생성 or 조회
     @PostMapping("/feedback")
     public ResponseEntity<String> generateFeedback(
-            @RequestParam Long recommendScoreId,
+            @RequestParam Long jobId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        String feedback = recommendService.getOrGenerateFeedback(recommendScoreId, userDetails);
+        String feedback = recommendService.getOrGenerateFeedback(jobId, userDetails);
         return ResponseEntity.ok(feedback);
     }
 }
