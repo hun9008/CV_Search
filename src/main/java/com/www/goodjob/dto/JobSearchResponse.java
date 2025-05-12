@@ -2,8 +2,8 @@ package com.www.goodjob.dto;
 
 import com.www.goodjob.domain.Job;
 import lombok.*;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,4 +19,5 @@ public class JobSearchResponse {
     private String experience;
     private String url;
     private LocalDateTime createdAt;
+    private List<RegionDto> regions; // 지역 반환 추가
 }

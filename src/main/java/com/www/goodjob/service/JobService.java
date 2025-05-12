@@ -1,7 +1,9 @@
 package com.www.goodjob.service;
 
 import com.www.goodjob.domain.Job;
+import com.www.goodjob.domain.User;
 import com.www.goodjob.dto.JobSearchResponse;
+import com.www.goodjob.dto.RegionDto;
 import com.www.goodjob.enums.ExperienceCategory;
 import com.www.goodjob.enums.JobTypeCategory;
 import com.www.goodjob.repository.JobRepository;
@@ -14,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import com.www.goodjob.domain.User;
 
 @Service
 @RequiredArgsConstructor
@@ -32,11 +33,9 @@ public class JobService {
             searchLogService.saveSearchLog(keyword.trim(), user);
         }
 
-        //  정렬 기준만 추출하여 전체 정렬된 리스트 조회
         Sort sort = pageable.getSort();
         List<Job> allJobs = jobRepository.searchJobs(keyword, sort);
 
-        // Java 단에서 필터링 적용
         List<JobSearchResponse> filtered = allJobs.stream()
                 .filter(job -> {
                     Set<String> expMatched = getMatchingExperienceCategories(job.getExperience());
@@ -64,10 +63,17 @@ public class JobService {
                         .experience(job.getExperience())
                         .url(job.getUrl())
                         .createdAt(job.getCreatedAt())
+                        .regions(
+                                job.getJobRegions().stream()
+                                        .map(jr -> RegionDto.builder()
+                                                .sido(jr.getRegion().getSido())
+                                                .sigungu(jr.getRegion().getSigungu())
+                                                .build())
+                                        .collect(Collectors.toList())
+                        )
                         .build())
                 .collect(Collectors.toList());
 
-        // 페이징 적용
         int total = filtered.size();
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), total);
@@ -144,5 +150,4 @@ public class JobService {
             throw new RuntimeException("FastAPI 요청 실패: " + e.getMessage(), e);
         }
     }
-
 }
