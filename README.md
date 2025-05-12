@@ -57,3 +57,23 @@ oliver006/redis_exporter \
 --count-keys=db0:recommendation:* \
 --count-keys.db=0
 ```
+
+# Test (Jacoco)
+
+Jacoco Test 수행
+
+```
+./gradlew clean test jacocoTestReport
+```
+
+Web View로 Jacoco 결과 확인 (Test Coverage)
+
+```
+open build/reports/jacoco/test/html/index.html
+```
+
+기본 JUnit Test결과도 테스트 커버리지는 없지만 Web View로 확인 가능
+
+```
+open build/reports/tests/test/index.html
+```

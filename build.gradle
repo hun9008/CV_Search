@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.www.goodjob'
@@ -100,10 +101,45 @@ dependencies {
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
+//tasks.named('test') {
+//	useJUnitPlatform()
+//}
+//
+//test {
+//	jvmArgs += ["-javaagent:${classpath.find { it.name.contains("byte-buddy-agent") }}"]
+//}
+
 tasks.named('test') {
 	useJUnitPlatform()
+	systemProperty "spring.profiles.active", "test"
+	jvmArgs += ["-javaagent:${classpath.find { it.name.contains("byte-buddy-agent") }}"]
+
 }
 
-test {
-	jvmArgs += ["-javaagent:${classpath.find { it.name.contains("byte-buddy-agent") }}"]
+jacoco {
+	toolVersion = "0.8.11"
 }
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+		csv.required.set(false)
+		html.outputLocation = layout.buildDirectory.dir("reports/jacoco/test/html")
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				counter = 'INSTRUCTION'
+				value = 'COVEREDRATIO'
+				minimum = 0.30
+			}
+		}
+	}
+}
+
+check.dependsOn jacocoTestCoverageVerification
