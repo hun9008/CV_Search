@@ -34,7 +34,8 @@ public class JobService {
         }
 
         Sort sort = pageable.getSort();
-        List<Job> allJobs = jobRepository.searchJobs(keyword, sort);
+        // List<Job> allJobs = jobRepository.searchJobs(keyword, sort);
+        List<Job> allJobs = jobRepository.searchJobsWithRegion(keyword, sort);
 
         List<JobSearchResponse> filtered = allJobs.stream()
                 .filter(job -> {
@@ -63,14 +64,7 @@ public class JobService {
                         .experience(job.getExperience())
                         .url(job.getUrl())
                         .createdAt(job.getCreatedAt())
-                        .regions(
-                                job.getJobRegions().stream()
-                                        .map(jr -> RegionDto.builder()
-                                                .sido(jr.getRegion().getSido())
-                                                .sigungu(jr.getRegion().getSigungu())
-                                                .build())
-                                        .collect(Collectors.toList())
-                        )
+                        .regions(RegionDto.fromJob(job))
                         .build())
                 .collect(Collectors.toList());
 

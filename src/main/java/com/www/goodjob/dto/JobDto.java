@@ -8,7 +8,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,8 +18,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @SuperBuilder
 public class JobDto {
+
     private Long id;
-    private List<Region> regions;  // 여러 지역 포함
+    private List<RegionDto> regions;
     private String companyName;
     private String title;
     private String department;
@@ -43,17 +43,7 @@ public class JobDto {
     private String regionText;
 
     public static JobDto from(Job job) {
-        // 연결된 모든 지역 가져오기
-        List<Region> regions = job.getJobRegions().stream()
-                .map(JobRegion::getRegion)
-                .toList();
-
-        // 전체 지역 텍스트 생성 (예: "서울 중구")
-        String regionText = regions.stream()
-                .map(r -> String.join(" ",
-                        Optional.ofNullable(r.getSido()).orElse(""),
-                        Optional.ofNullable(r.getSigungu()).orElse("")))
-                .collect(Collectors.joining(", "));
+        List<RegionDto> regions = RegionDto.fromJob(job);
 
         return JobDto.builder()
                 .id(job.getId())
@@ -77,7 +67,7 @@ public class JobDto {
                 .rawJobsText(job.getRawJobsText())
                 .url(job.getUrl())
                 .favicon(job.getFavicon())
-                .regionText(regionText)
+                .regionText(job.getRegionText())
                 .build();
     }
 }

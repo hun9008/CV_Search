@@ -21,7 +21,7 @@ public class ScoredJobDto extends JobDto {
     public static ScoredJobDto from(JobDto base, double score, double cosineScore, double bm25Score) {
         return ScoredJobDto.builder()
                 .id(base.getId())
-//                .region(base.getRegion())
+                .regions(base.getRegions())
                 .companyName(base.getCompanyName())
                 .title(base.getTitle())
                 .department(base.getDepartment())
