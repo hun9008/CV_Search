@@ -14,7 +14,7 @@ public class JobSearchResponse {
     private Long id;
     private String companyName;
     private String title;
-    private String description;
+    private String jobDescription;
     private String jobType;
     private String experience;
     private String url;

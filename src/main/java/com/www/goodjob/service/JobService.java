@@ -59,7 +59,7 @@ public class JobService {
                         .id(job.getId())
                         .companyName(job.getCompanyName())
                         .title(job.getTitle())
-                        .description(job.getJobDescription())
+                        .jobDescription(job.getJobDescription())
                         .jobType(job.getJobType())
                         .experience(job.getExperience())
                         .url(job.getUrl())
