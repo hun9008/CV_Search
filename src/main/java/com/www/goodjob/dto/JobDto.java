@@ -1,16 +1,12 @@
 package com.www.goodjob.dto;
 
 import com.www.goodjob.domain.Job;
-import com.www.goodjob.domain.JobRegion;
-import com.www.goodjob.domain.Region;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
