@@ -1,12 +1,15 @@
 package com.www.goodjob.service;
 
 import com.www.goodjob.domain.Job;
+import com.www.goodjob.domain.Region;
 import com.www.goodjob.domain.User;
 import com.www.goodjob.dto.JobSearchResponse;
 import com.www.goodjob.dto.RegionDto;
+import com.www.goodjob.dto.RegionGroupDto;
 import com.www.goodjob.enums.ExperienceCategory;
 import com.www.goodjob.enums.JobTypeCategory;
 import com.www.goodjob.repository.JobRepository;
+import com.www.goodjob.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
@@ -22,19 +25,21 @@ import java.util.stream.Collectors;
 public class JobService {
 
     private final JobRepository jobRepository;
+    private final RegionRepository regionRepository;
     private final RestTemplate restTemplate;
     private final SearchLogService searchLogService;
 
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
 
-    public Page<JobSearchResponse> searchJobs(String keyword, List<String> jobTypes, List<String> experienceFilters, Pageable pageable, User user) {
+    public Page<JobSearchResponse> searchJobs(String keyword, List<String> jobTypes, List<String> experienceFilters,
+                                              List<String> sidoFilters, List<String> sigunguFilters,
+                                              Pageable pageable, User user) {
         if (user != null && keyword != null && !keyword.isBlank()) {
             searchLogService.saveSearchLog(keyword.trim(), user);
         }
 
         Sort sort = pageable.getSort();
-        // List<Job> allJobs = jobRepository.searchJobs(keyword, sort);
         List<Job> allJobs = jobRepository.searchJobsWithRegion(keyword, sort);
 
         List<JobSearchResponse> filtered = allJobs.stream()
@@ -46,6 +51,10 @@ public class JobService {
                             experienceFilters.stream().map(String::trim).collect(Collectors.toSet());
                     Set<String> normTypeFilter = jobTypes == null ? Set.of() :
                             jobTypes.stream().map(String::trim).collect(Collectors.toSet());
+                    Set<String> normSido = sidoFilters == null ? Set.of() :
+                            sidoFilters.stream().map(String::trim).collect(Collectors.toSet());
+                    Set<String> normSigungu = sigunguFilters == null ? Set.of() :
+                            sigunguFilters.stream().map(String::trim).collect(Collectors.toSet());
 
                     boolean experienceMatches = experienceFilters == null || experienceFilters.isEmpty()
                             || !Collections.disjoint(expMatched, normExpFilter);
@@ -53,7 +62,17 @@ public class JobService {
                     boolean jobTypeMatches = jobTypes == null || jobTypes.isEmpty()
                             || !Collections.disjoint(typeMatched, normTypeFilter);
 
-                    return experienceMatches && jobTypeMatches;
+                    boolean regionMatches = (sidoFilters == null || sidoFilters.isEmpty())
+                            && (sigunguFilters == null || sigunguFilters.isEmpty())
+                            || job.getJobRegions().stream().anyMatch(jr -> {
+                        String s = jr.getRegion().getSido();
+                        String g = jr.getRegion().getSigungu();
+                        boolean sidoOk = normSido.isEmpty() || normSido.contains(s);
+                        boolean sigunguOk = normSigungu.isEmpty() || normSigungu.contains(g);
+                        return sidoOk && sigunguOk;
+                    });
+
+                    return experienceMatches && jobTypeMatches && regionMatches;
                 })
                 .map(job -> JobSearchResponse.builder()
                         .id(job.getId())
@@ -134,9 +153,33 @@ public class JobService {
         return ExperienceCategory.asList();
     }
 
+    public List<RegionGroupDto> getGroupedRegions() {
+        List<Region> allRegions = regionRepository.findAllRegions();
+        Map<String, Set<String>> grouped = new HashMap<>();
+
+        for (Region region : allRegions) {
+            // 시군구가 null이면 시도 단위만 나타내는 행이므로 제외
+            if (region.getSido() == null || region.getSigungu() == null) continue;
+
+            grouped
+                    .computeIfAbsent(region.getSido(), k -> new HashSet<>())
+                    .add(region.getSigungu());
+        }
+
+        return grouped.entrySet().stream()
+                .map(entry -> RegionGroupDto.builder()
+                        .sido(entry.getKey())
+                        .sigunguList(entry.getValue().stream()
+                                .sorted()
+                                .collect(Collectors.toList()))
+                        .build())
+                .sorted(Comparator.comparing(RegionGroupDto::getSido))
+                .collect(Collectors.toList());
+    }
+
+
     public String deleteJob(Long jobId) {
         String url = fastapiHost + "/delete-job?job_id=" + jobId;
-
         try {
             restTemplate.delete(url);
             return "Job " + jobId + " deleted from Elasticsearch and updated in RDB.";
