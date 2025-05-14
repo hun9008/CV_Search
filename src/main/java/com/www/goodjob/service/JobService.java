@@ -3,6 +3,7 @@ package com.www.goodjob.service;
 import com.www.goodjob.domain.Job;
 import com.www.goodjob.domain.Region;
 import com.www.goodjob.domain.User;
+import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.JobSearchResponse;
 import com.www.goodjob.dto.RegionDto;
 import com.www.goodjob.dto.RegionGroupDto;
@@ -32,9 +33,9 @@ public class JobService {
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
 
-    public Page<JobSearchResponse> searchJobs(String keyword, List<String> jobTypes, List<String> experienceFilters,
-                                              List<String> sidoFilters, List<String> sigunguFilters,
-                                              Pageable pageable, User user) {
+    public Page<JobDto> searchJobs(String keyword, List<String> jobTypes, List<String> experienceFilters,
+                                   List<String> sidoFilters, List<String> sigunguFilters,
+                                   Pageable pageable, User user) {
         if (user != null && keyword != null && !keyword.isBlank()) {
             searchLogService.saveSearchLog(keyword.trim(), user);
         }
@@ -42,7 +43,7 @@ public class JobService {
         Sort sort = pageable.getSort();
         List<Job> allJobs = jobRepository.searchJobsWithRegion(keyword, sort);
 
-        List<JobSearchResponse> filtered = allJobs.stream()
+        List<JobDto> filtered = allJobs.stream()
                 .filter(job -> {
                     Set<String> expMatched = getMatchingExperienceCategories(job.getExperience());
                     Set<String> typeMatched = getMatchingJobTypes(job.getJobType());
@@ -74,26 +75,17 @@ public class JobService {
 
                     return experienceMatches && jobTypeMatches && regionMatches;
                 })
-                .map(job -> JobSearchResponse.builder()
-                        .id(job.getId())
-                        .companyName(job.getCompanyName())
-                        .title(job.getTitle())
-                        .jobDescription(job.getJobDescription())
-                        .jobType(job.getJobType())
-                        .experience(job.getExperience())
-                        .url(job.getUrl())
-                        .createdAt(job.getCreatedAt())
-                        .regions(RegionDto.fromJob(job))
-                        .build())
+                .map(JobDto::from)
                 .collect(Collectors.toList());
 
         int total = filtered.size();
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), total);
-        List<JobSearchResponse> paged = start >= total ? List.of() : filtered.subList(start, end);
+        List<JobDto> paged = start >= total ? List.of() : filtered.subList(start, end);
 
         return new PageImpl<>(paged, pageable, total);
     }
+
 
     public Set<String> getMatchingExperienceCategories(String rawText) {
         Set<String> matched = new HashSet<>();
