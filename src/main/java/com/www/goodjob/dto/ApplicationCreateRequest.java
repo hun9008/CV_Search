@@ -7,8 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplicationDto {
+public class ApplicationCreateRequest {
     private Long jobId;
-    private ApplicationStatus applyStatus;
+    private ApplicationStatus applyStatus; // 선택, 없으면 "준비중"
 }
-
