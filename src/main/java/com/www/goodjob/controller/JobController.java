@@ -1,6 +1,7 @@
 package com.www.goodjob.controller;
 
 import com.www.goodjob.domain.User;
+import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.JobSearchResponse;
 import com.www.goodjob.dto.RegionGroupDto;
 import com.www.goodjob.security.CustomUserDetails;
@@ -81,7 +82,7 @@ public class JobController {
                     """
     )
     @GetMapping("/search")
-    public ResponseEntity<Page<JobSearchResponse>> searchJobs(
+    public ResponseEntity<Page<JobDto>> searchJobs(
             @Parameter(description = "키워드 검색. 회사명, 공고 제목, 부서, 직무 설명, 조건 등에서 부분 일치로 검색됨")
             @RequestParam(required = false) String keyword,
 
@@ -108,7 +109,7 @@ public class JobController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         User user = userDetails != null ? userDetails.getUser() : null;
-        Page<JobSearchResponse> result = jobService.searchJobs(keyword, jobType, experience, sido, sigungu, pageable, user);
+        Page<JobDto> result = jobService.searchJobs(keyword, jobType, experience, sido, sigungu, pageable, user);
         return ResponseEntity.ok(result);
     }
 
