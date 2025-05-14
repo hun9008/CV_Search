@@ -38,6 +38,8 @@ RDB_host_ip = os.getenv("DB_HOST_IP")
 AWS_ACCESS_KEY_ID=os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY=os.getenv("AWS_SECRET_ACCESS_KEY")
 REGION=os.getenv("AWS_REGION")
+es_username = os.getenv("ELASTIC_USER")        
+es_password = os.getenv("ELASTIC_PASSWORD")
 
 ES_HOST = es_host_ip
 RDB_HOST = RDB_host_ip
@@ -49,6 +51,7 @@ JOBS_INDEX_NAME = "job_index"
 
 es = Elasticsearch(
     ES_HOST,
+    basic_auth=(es_username, es_password),
     headers={
         "Accept": "application/json",
         "Content-Type": "application/json"

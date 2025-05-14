@@ -15,6 +15,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    return {"status": "ok"}
+
 app.include_router(save_es.router)
 app.include_router(delete_es.router)
 app.include_router(rec_es.router)

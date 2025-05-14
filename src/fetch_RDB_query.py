@@ -66,7 +66,6 @@ def fetch_job_data():
 "id": "{row['id']}"
 "company_name": "{row['company_name'] or ''}"
 "title": "{row['title'] or ''}"
-"region_id": "{row['region_id'] or ''}"
 "department": "{row['department'] or ''}"
 "require_experience": "{row['require_experience'] or ''}"
 "job_description": "{row['job_description'] or ''}"
@@ -74,17 +73,8 @@ def fetch_job_data():
 "requirements": "{row['requirements'] or ''}"
 "preferred_qualifications": "{row['preferred_qualifications'] or ''}"
 "ideal_candidate": "{row['ideal_candidate'] or ''}"
-"apply_start_date": "{row['apply_start_date'] or ''}"
-"apply_end_date": "{row['apply_end_date'] or ''}"
-"is_public": "{row['is_public'] or ''}"
-"created_at": "{row['created_at'] or ''}"
-"expired_at": "{row['expired_at'] or ''}"
-"archived_at": "{row['archived_at'] or ''}"
 "raw_jobs_text": "{row['raw_jobs_text'] or ''}"
-"url": "{row['url'] or ''}"
-"favicon": "{row['favicon'] or ''}"
 "region_text": "{row['region_text'] or ''}"
-"last_updated_at": "{row['last_updated_at'] or ''}"
             '''.strip()
             formatted_texts.append(formatted_text)
             job_ids.append(row['id'])

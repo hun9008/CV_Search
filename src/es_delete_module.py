@@ -33,6 +33,8 @@ RDB_HOST = os.getenv("DB_HOST_IP")
 MYSQL_DB = os.getenv("MYSQL_DATABASE")
 MYSQL_USER = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+es_username = os.getenv("ELASTIC_USER")        
+es_password = os.getenv("ELASTIC_PASSWORD")
 
 ES_HOST = es_host_ip
 CV_INDEX_NAME = "cv_index"
@@ -43,6 +45,7 @@ JOBS_INDEX_NAME = "job_index"
 
 es = Elasticsearch(
     ES_HOST,
+    basic_auth=(es_username, es_password),
     headers={
         "Accept": "application/json",
         "Content-Type": "application/json"
