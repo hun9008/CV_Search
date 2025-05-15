@@ -1,5 +1,6 @@
 package com.www.goodjob.controller;
 
+import com.www.goodjob.domain.Cv;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.CvService;
 import com.www.goodjob.service.S3Service;
