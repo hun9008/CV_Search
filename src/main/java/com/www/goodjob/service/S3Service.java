@@ -73,6 +73,17 @@ public class S3Service {
         return presignedRequest.url().toString();
     }
 
+    public void deleteFile(String fileName) {
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key("cv/" + fileName)
+                .build();
+
+        s3Client.deleteObject(deleteRequest);
+        System.out.println("파일 삭제 완료: " + fileName);
+    }
+
+
     public boolean fileExistsOnS3(String key) {
         try {
             HeadObjectRequest request = HeadObjectRequest.builder()
