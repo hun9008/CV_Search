@@ -12,6 +12,8 @@ import org.springframework.web.client.RestTemplate;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
@@ -39,7 +41,7 @@ public class S3Service {
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
 
-    public String generatePresignedUrl(String fileName) {
+    public String generatePresignedPutUrl(String fileName) {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key("cv/" + fileName)
@@ -49,6 +51,22 @@ public class S3Service {
                 PutObjectPresignRequest.builder()
                         .signatureDuration(Duration.ofMinutes(10))
                         .putObjectRequest(objectRequest)
+                        .build()
+        );
+
+        return presignedRequest.url().toString();
+    }
+
+    public String generatePresignedGetUrl(String fileName) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key("cv/" + fileName)
+                .build();
+
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(
+                GetObjectPresignRequest.builder()
+                        .signatureDuration(Duration.ofMinutes(10))  // 유효 시간 설정
+                        .getObjectRequest(getObjectRequest)
                         .build()
         );
 

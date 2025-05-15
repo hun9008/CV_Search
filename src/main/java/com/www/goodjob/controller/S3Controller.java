@@ -14,9 +14,15 @@ public class S3Controller {
 
     private final S3Service s3Service;
 
-    @GetMapping("/presigned-url")
-    public ResponseEntity<String> getPresignedUrl(@RequestParam String fileName) {
-        String url = s3Service.generatePresignedUrl(fileName);
+    @GetMapping("/presigned-url/upload")
+    public ResponseEntity<String> getPresignedPutUrl(@RequestParam String fileName) {
+        String url = s3Service.generatePresignedPutUrl(fileName);
+        return ResponseEntity.ok(url);
+    }
+
+    @GetMapping("/presigned-url/download")
+    public ResponseEntity<String> getPresignedGetUrl(@RequestParam String fileName) {
+        String url = s3Service.generatePresignedGetUrl(fileName);
         return ResponseEntity.ok(url);
     }
 
