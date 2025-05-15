@@ -3,6 +3,7 @@ package com.www.goodjob.service;
 import com.www.goodjob.domain.Cv;
 import com.www.goodjob.repository.CvRepository;
 import com.www.goodjob.repository.RecommendScoreRepository;
+import com.www.goodjob.util.ClaudeClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ public class CvService {
     private final RestTemplate restTemplate;
     private final CvRepository cvRepository;
     private final RecommendScoreRepository recommendScoreRepository;
+    private final ClaudeClient claudeClient;
 
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
@@ -37,5 +39,13 @@ public class CvService {
             log.error("삭제 실패", e);
             throw new RuntimeException("FastAPI 요청 실패: " + e.getMessage(), e);
         }
+    }
+
+    public String summaryCv(Long userId) {
+        Cv cv = cvRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("CV not found for userId: " + userId));
+
+        String cvText = cv.getRawText();
+        return claudeClient.generateCvSummary(cvText);
     }
 }

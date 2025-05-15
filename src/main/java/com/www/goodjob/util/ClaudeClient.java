@@ -58,4 +58,50 @@ public class ClaudeClient {
                 .map(TextBlock::text)
                 .reduce("", (a, b) -> a + b);
     }
+
+    public String generateCvSummary(String cvText) {
+        MessageCreateParams params = MessageCreateParams.builder()
+                .model(Model.CLAUDE_3_7_SONNET_20250219)
+                .maxTokens(1000)
+                .temperature(0.5)
+                .system("""
+                        당신은 이력서 요약 전문가입니다.
+                        아래에 제공된 이력서(CV)를 바탕으로, 해당 인재의 핵심 정보를 한글로 요약해주세요. 
+                        총 분량은 1000자 이내로 제한하며, 간결하면서도 핵심이 잘 드러나도록 작성해야 합니다.
+                        
+                        아래의 다섯 개 항목을 반드시 포함하여 작성하세요:
+                        
+                        직무 지향성과 핵심 역량: 
+                           - 사용자가 어떤 분야나 직무를 지향하는지, 그리고 이를 뒷받침하는 핵심 역량을 요약합니다.
+                        
+                        Skills:
+                           - CV에 기재된 기술 스택, 언어, 프레임워크, 툴 등을 항목별로 구체적으로 정리합니다. 
+                           - 단순 나열이 아닌, 해당 기술의 활용 경험이 간략히 드러나도록 서술합니다.
+                        
+                        Education:
+                           - 이수한 전공, 학교, 학위, 연도 등 주요 학력 정보를 정리합니다. 
+                           - 복수 전공, 우수 성적, 관련 과목 이수 여부 등이 있다면 함께 반영합니다.
+                        
+                        Experience:
+                           - 실무 경험, 인턴십, 팀 프로젝트, 개인 프로젝트 모두 목표, 역할, 기술 활용, 성과 등을 간결히 정리합니다.
+                        
+                        Awards:
+                           - 수상 이력이나 인증서가 있다면 반드시 포함하여 해당 인재의 경쟁력을 부각시켜주세요.
+                        
+                        각 항목은 '직무 지향성과 핵심 역량:', 'Skills:', 'Education:', 'Experience', 'Awards' 로 제목을 명확히 작성하며, 그 아래에 `-` 기호로 문장 단위의 항목을 구분해주세요.
+                        모든 문장은 존댓말을 사용하며, 군더더기 없는 자연스러운 서술문 형식으로 작성합니다. 
+                        Skills, Education, Experience, Awards는 해당사항이 없다면 생략해야 합니다.
+                    """)
+                .addUserMessage("이력서:\n" + cvText)
+                .build();
+
+        Message message = client.messages().create(params);
+
+        return message.content().stream()
+                .map(ContentBlock::text)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(TextBlock::text)
+                .reduce("", (a, b) -> a + b);
+    }
 }

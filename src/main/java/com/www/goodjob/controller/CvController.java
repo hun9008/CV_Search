@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -27,7 +24,7 @@ public class CvController {
     @Operation(summary = "특정 cv 하나 삭제", description = "FastAPI 서버로 특정 cv 하나 삭제 요청을 보냄." +
             "해당 cv에 대해 ES에서 vector & RDB삭제")
     @DeleteMapping("/delete-cv")
-    public ResponseEntity<?> deleteJob(
+    public ResponseEntity<?> deleteCv(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam String fileName
     ) {
@@ -42,6 +39,26 @@ public class CvController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "cv를 요약합니다.", description = "claude API를 이용해 요약을 진행해 반환합니다.")
+    @GetMapping("/summary-cv")
+    public ResponseEntity<?> summaryCv(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
+        }
+
+        Long userId = userDetails.getUser().getId();
+
+        try {
+            String summary = cvService.summaryCv(userId);
+            return ResponseEntity.ok(Map.of("summary", summary));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "CV 요약 중 오류 발생: " + e.getMessage()));
         }
     }
 }
