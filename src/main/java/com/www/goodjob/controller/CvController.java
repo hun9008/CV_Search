@@ -40,7 +40,4 @@ public class CvController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
-
-
-
 }

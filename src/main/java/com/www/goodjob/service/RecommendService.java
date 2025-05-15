@@ -80,23 +80,34 @@ public class RecommendService {
             JsonNode root = objectMapper.readTree(responseBody);
             JsonNode recommendedJobsNode = root.get("recommended_jobs");
 
-            List<ScoredJobDto> result = new ArrayList<>();
+            List<Long> jobIds = new ArrayList<>();
+            Map<Long, Double> scoreMap = new HashMap<>();
 
             for (JsonNode rec : recommendedJobsNode) {
                 Long jobId = rec.get("job_id").asLong();
+                jobIds.add(jobId);
+                scoreMap.put(jobId, rec.get("score").asDouble()); // 점수 저장
+            }
 
-                Optional<Job> jobOpt = jobRepository.findById(jobId);
+            List<Job> jobs = jobRepository.findByIdInWithRegion(jobIds);
 
-                jobOpt.ifPresent(job -> {
+            Map<Long, Job> jobMap = jobs.stream()
+                    .collect(Collectors.toMap(Job::getId, Function.identity()));
+
+            List<ScoredJobDto> result = new ArrayList<>();
+
+            for (Long jobId : jobIds) {
+                Job job = jobMap.get(jobId);
+                if (job != null) {
                     JobDto base = JobDto.from(job);
                     ScoredJobDto scored = ScoredJobDto.from(
                             base,
-                            rec.get("score").asDouble(),
+                            scoreMap.get(jobId),
                             0.0,
                             0.0
                     );
                     result.add(scored);
-                });
+                }
             }
 
             return result;
