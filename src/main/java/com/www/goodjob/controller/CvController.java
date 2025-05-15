@@ -30,6 +30,9 @@ public class CvController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam String fileName
     ) {
+        if (userDetails == null) {
+            throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
+        }
         Long userId = userDetails.getId();
         try {
             String message = cvService.deleteCv(userId);

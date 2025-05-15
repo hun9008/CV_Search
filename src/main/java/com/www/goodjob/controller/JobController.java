@@ -240,7 +240,13 @@ public class JobController {
             "해당 job에 대해 ES에서 vector 삭제 & RDB의 is_public을 0으로 설정" +
             "실패 시, is_public은 다시 1로 롤백하는 로직 포함.")
     @DeleteMapping("/delete-one-job")
-    public ResponseEntity<?> deleteJob(@RequestParam("jobId") Long jobId) {
+    public ResponseEntity<?> deleteJob(
+            @RequestParam("jobId") Long jobId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
+        }
         try {
             String message = jobService.deleteJob(jobId);
             return ResponseEntity.ok(Map.of("message", message));
