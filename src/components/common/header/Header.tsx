@@ -19,8 +19,6 @@ function Header() {
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-    // 테스트용
-    const { setIsLoggedIn } = useAuthStore();
 
     // 로그인
     const accessToken = useAuthStore((state) => state.accessToken);

@@ -53,8 +53,14 @@ const useAuthStore = create<AuthStore>()(
             name: 'user-token',
             partialize: (state) => ({
                 accessToken: state.accessToken,
-                // isLoggedIn: state.isLoggedIn, // 반드시 삭제해야함
             }),
+            onRehydrateStorage: () => {
+                return (state) => {
+                    if (state && state.accessToken) {
+                        state.isLoggedIn = true;
+                    }
+                };
+            },
         }
     )
 );
