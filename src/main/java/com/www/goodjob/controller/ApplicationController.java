@@ -43,7 +43,7 @@ public class ApplicationController {
                     @ApiResponse(responseCode = "401", description = "인증 실패 (로그인 필요)")
             }
     )
-    @PostMapping
+    @PostMapping("/apply")
     public ResponseEntity<Void> add(@AuthenticationPrincipal CustomUserDetails user,
                                     @RequestParam Long jobId) {
         applicationService.addApplication(user.getUser(), jobId);
