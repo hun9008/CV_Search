@@ -1,11 +1,11 @@
 package com.www.goodjob.controller;
 
-import com.www.goodjob.dto.ApplicationCreateRequest;
 import com.www.goodjob.dto.ApplicationResponse;
 import com.www.goodjob.dto.ApplicationUpdateRequest;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.ApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -89,18 +89,21 @@ public class ApplicationController {
                     - 사용자 입력에 따라 지원 상태 드롭다운 또는 메모 입력 후 저장 시 호출됩니다.
                     
                     ✅ 요청 예시:
+                    PUT /applications/{id}
                     {
                       "applyStatus": "면접",
                       "note": "1차 면접 완료, 분위기 좋았음"
                     }
                     
                     📌 상태(applyStatus)와 메모(note)는 각각 선택적으로 수정 가능합니다.
+                    📌 🔐 PathVariable의 id는 지원 이력(application)의 고유 ID입니다.
                     """
     )
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id,
-                                       @AuthenticationPrincipal CustomUserDetails user,
-                                       @RequestBody ApplicationUpdateRequest dto) {
+    public ResponseEntity<Void> update(
+            @Parameter(description = "지원 이력(application)의 고유 ID") @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody ApplicationUpdateRequest dto) {
         applicationService.updateApplication(user.getUser(), id, dto);
         return ResponseEntity.noContent().build();
     }
@@ -113,14 +116,20 @@ public class ApplicationController {
                     ✅ 프론트 흐름:
                     - 지원 관리 페이지에서 특정 공고의 이력 삭제 버튼 클릭 시 호출됩니다.
                     
+                    ✅ 요청 예시:
+                    DELETE /applications/{id}
+                    
                     ✅ 결과:
                     - 해당 사용자의 이력만 삭제 가능하며, 삭제 후 목록에서 제거됩니다.
+                    📌 🔐 PathVariable의 id는 지원 이력(application)의 고유 ID입니다.
                     """
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id,
-                                       @AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "지원 이력(application)의 고유 ID") @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails user) {
         applicationService.deleteApplication(user.getUser(), id);
         return ResponseEntity.noContent().build();
     }
+
 }
