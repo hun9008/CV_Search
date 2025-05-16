@@ -20,16 +20,17 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final JobRepository jobRepository;
 
-    public void addApplication(User user, ApplicationCreateRequest dto) {
-        Job job = jobRepository.findById(dto.getJobId())
+    public void addApplication(User user, Long jobId) {
+        Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공고입니다"));
 
-        Application.ApplicationBuilder builder = Application.builder()
+        Application application = Application.builder()
                 .user(user)
                 .job(job)
-                .applyStatus(dto.getApplyStatus() != null ? dto.getApplyStatus() : ApplicationStatus.준비중);
+                .applyStatus(ApplicationStatus.준비중) // 기본값
+                .build();
 
-        applicationRepository.save(builder.build());
+        applicationRepository.save(application);
     }
 
     public List<ApplicationResponse> getApplications(User user) {
