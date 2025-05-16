@@ -18,4 +18,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     List<Application> findByUser(@Param("user") User user);
 
     Optional<Application> findById(Long id);
+
+    boolean existsByUserIdAndJobId(Long userId, Long jobId);
 }

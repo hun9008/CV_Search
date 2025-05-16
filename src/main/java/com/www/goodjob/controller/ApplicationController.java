@@ -1,6 +1,5 @@
 package com.www.goodjob.controller;
 
-import com.www.goodjob.dto.ApplicationCreateRequest;
 import com.www.goodjob.dto.ApplicationResponse;
 import com.www.goodjob.dto.ApplicationUpdateRequest;
 import com.www.goodjob.security.CustomUserDetails;
