@@ -1,4 +1,3 @@
-import type React from 'react';
 import styles from './styles/Feedback.module.scss';
 import { parseMarkdown } from '../../utils/markdown';
 import { X } from 'lucide-react';

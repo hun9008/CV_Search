@@ -1,13 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useJobStore from '../../../../store/jobStore';
 import style from './styles/JobDetail.module.scss';
 import { Bookmark, Share2, ExternalLink, MapPin, Calendar, Clock, Briefcase } from 'lucide-react';
 import Feedback from './Feedback';
+import useApplyStore from '../../../../store/applyStore';
 
 function JobDetail() {
+    const { getSelectedJob } = useJobStore();
+    const applications = useApplyStore((state) => state.applications);
+    const { setApplications, deleteApplications } = useApplyStore();
+    const selectedJob = useJobStore((state) => state.selectedJob);
     const job = useJobStore((state) => state.getSelectedJob());
     const [isBookmarked, setIsBookmarked] = useState(job?.isBookmarked || false);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [showManageModal, setShowManageModal] = useState(false);
+    const [manageButtonClicked, setManageButtonClicked] = useState(false);
+
+    useEffect(() => {
+        getSelectedJob();
+    }, [selectedJob]);
 
     if (!job) {
         return <JobDetailSkeleton />;
@@ -69,8 +80,24 @@ function JobDetail() {
         setShowFeedbackModal(true);
     };
 
-    const handleManagement = () => {
+    const handleManagement = async (jobId: number) => {
+        if (manageButtonClicked === true) {
+            setManageButtonClicked(false);
+
+            return;
+        }
+        setManageButtonClicked(true);
+        setShowManageModal(true);
+        setApplications(jobId);
+        // 모달창에서 관리 여부 최종 확정
         // 관리 시작 기능 구현
+    };
+
+    const isManaged = (jobId: number) => {
+        if (applications?.some((data) => data.applicationId === jobId)) {
+            return true;
+        }
+        return false;
     };
 
     return (
@@ -137,7 +164,7 @@ function JobDetail() {
                     <div className={style.scoreContainer}>
                         <div className={style.score}>
                             <span className={style.score__label}>매칭 점수</span>
-                            <span className={style.score__value}>{job.score}</span>
+                            <span className={style.score__value}>{job.score.toFixed(2)}</span>
                         </div>
                     </div>
                 )}
@@ -151,8 +178,13 @@ function JobDetail() {
                 <button className={style.actionButtons__feedback} onClick={handleFeedback}>
                     피드백
                 </button>
-                <button className={style.actionButtons__manage} onClick={handleManagement}>
-                    관리 시작
+                <button
+                    className={`${style.actionButtons__manage} ${
+                        manageButtonClicked ? '' : style.clicked
+                    }`}
+                    onClick={() => handleManagement(selectedJob)}>
+                    {/* 버튼 렌더링 여부는 applications 리스트에 해당 id가 있는 경우에 변경 */}
+                    {isManaged(selectedJob) ? '관리중' : '관리 시작'}
                 </button>
             </div>
 

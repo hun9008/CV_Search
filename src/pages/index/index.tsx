@@ -6,7 +6,7 @@ import MyCv from './components/myCv/MyCv';
 import Manage from './components/manage/Manage';
 import Bookmark from './components/bookmark/BookMark';
 import { useState } from 'react';
-import type Job from './types/job';
+import type Job from '../../../types/job';
 import JobDetail from './components/jobList/JobDetail';
 import usePageStore from '../../store/pageStore';
 import useJobStore from '../../store/jobStore';
@@ -26,7 +26,7 @@ function Index() {
                     {activeContent === '추천 공고' && (
                         <div className={styles.mainContent__jobSection}>
                             <div className={styles.mainContent__jobList}>
-                                <JobList />
+                                <JobList bookmarked={false} />
                             </div>
 
                             <div className={styles.mainContent__jobDetail}>
@@ -35,7 +35,15 @@ function Index() {
                         </div>
                     )}
                     {activeContent === '지원 관리' && <Manage />}
-                    {activeContent === '북마크' && <Bookmark />}
+                    {activeContent === '북마크' && (
+                        <div className={styles.mainContent__bookmarkList}>
+                            <Bookmark />
+
+                            {/* <div className={styles.mainContent__jobDetail}>
+                                <JobDetail />
+                            </div> */}
+                        </div>
+                    )}
                     {activeContent === '나의 CV' && <MyCv />}
                 </div>
             </div>
