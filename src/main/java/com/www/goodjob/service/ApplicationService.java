@@ -53,10 +53,9 @@ public class ApplicationService {
                 }).toList();
     }
 
-    public void updateApplication(User user, Long applicationId, ApplicationUpdateRequest dto) {
-        Application app = applicationRepository.findById(applicationId)
-                .filter(a -> a.getUser().getId().equals(user.getId()))
-                .orElseThrow(() -> new NoSuchElementException("해당 지원 이력을 찾을 수 없습니다."));
+    public void updateApplicationByJobId(User user, Long jobId, ApplicationUpdateRequest dto) {
+        Application app = applicationRepository.findByUserIdAndJobId(user.getId(), jobId)
+                .orElseThrow(() -> new NoSuchElementException("해당 공고에 대한 지원 이력이 없습니다."));
 
         if (dto.getApplyStatus() != null) {
             app.setApplyStatus(dto.getApplyStatus());
@@ -68,11 +67,11 @@ public class ApplicationService {
         applicationRepository.save(app);
     }
 
-    public void deleteApplication(User user, Long applicationId) {
-        Application app = applicationRepository.findById(applicationId)
-                .filter(a -> a.getUser().getId().equals(user.getId()))
-                .orElseThrow(() -> new NoSuchElementException("삭제할 수 없습니다."));
+    public void deleteApplicationByJobId(User user, Long jobId) {
+        Application app = applicationRepository.findByUserIdAndJobId(user.getId(), jobId)
+                .orElseThrow(() -> new NoSuchElementException("해당 공고에 대한 지원 이력이 없습니다."));
 
         applicationRepository.delete(app);
     }
+
 }
