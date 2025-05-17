@@ -83,53 +83,52 @@ public class ApplicationController {
     @Operation(
             summary = "지원 이력 수정",
             description = """
-                    ✏️ 지원 상태 및 메모를 수정합니다.
+                    ✏️ 특정 공고(jobId)에 대한 지원 상태 및 메모를 수정합니다.
                     
                     ✅ 프론트 흐름:
-                    - 사용자 입력에 따라 지원 상태 드롭다운 또는 메모 입력 후 저장 시 호출됩니다.
+                    - 지원 상태 드롭다운 또는 메모 입력 후 저장 시 호출됩니다.
                     
                     ✅ 요청 예시:
-                    PUT /applications/{id}
+                    PUT /applications?jobId=1769
                     {
                       "applyStatus": "면접",
                       "note": "1차 면접 완료, 분위기 좋았음"
                     }
                     
                     📌 상태(applyStatus)와 메모(note)는 각각 선택적으로 수정 가능합니다.
-                    📌 🔐 PathVariable의 id는 지원 이력(application)의 고유 ID입니다.
+                    📌 jobId 기준으로 수정할 이력을 식별합니다.
                     """
     )
-    @PutMapping("/{id}")
+    @PutMapping
     public ResponseEntity<Void> update(
-            @Parameter(description = "지원 이력(application)의 고유 ID") @PathVariable Long id,
+            @Parameter(description = "지원한 공고의 ID (jobId)") @RequestParam Long jobId,
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody ApplicationUpdateRequest dto) {
-        applicationService.updateApplication(user.getUser(), id, dto);
+        applicationService.updateApplicationByJobId(user.getUser(), jobId, dto);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(
-            summary = "지원 이력 삭제",
+            summary = "지원 이력 삭제 (jobId 기반)",
             description = """
-                    🗑️ 지원 이력을 삭제합니다.
+                    🗑️ 특정 공고(jobId)에 대한 지원 이력을 삭제합니다.
                     
                     ✅ 프론트 흐름:
-                    - 지원 관리 페이지에서 특정 공고의 이력 삭제 버튼 클릭 시 호출됩니다.
+                    - 지원 관리 페이지에서 삭제 버튼 클릭 시 호출됩니다.
                     
                     ✅ 요청 예시:
-                    DELETE /applications/{id}
+                    DELETE /applications?jobId=1769
                     
-                    ✅ 결과:
-                    - 해당 사용자의 이력만 삭제 가능하며, 삭제 후 목록에서 제거됩니다.
-                    📌 🔐 PathVariable의 id는 지원 이력(application)의 고유 ID입니다.
+                    📌 jobId 기준으로 사용자의 지원 이력을 삭제합니다.
                     """
     )
-    @DeleteMapping("/{id}")
+    @DeleteMapping
     public ResponseEntity<Void> delete(
-            @Parameter(description = "지원 이력(application)의 고유 ID") @PathVariable Long id,
+            @Parameter(description = "지원한 공고의 ID (jobId)") @RequestParam Long jobId,
             @AuthenticationPrincipal CustomUserDetails user) {
-        applicationService.deleteApplication(user.getUser(), id);
+        applicationService.deleteApplicationByJobId(user.getUser(), jobId);
         return ResponseEntity.noContent().build();
     }
+
 
 }
