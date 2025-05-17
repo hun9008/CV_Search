@@ -50,7 +50,7 @@ class SearchLogApiTest {
         User fakeUser = new User();
         fakeUser.setId(1L);
         fakeUser.setEmail("testuser@example.com");
-        fakeUser.setName("테스트유저");  // ✅ 필드명에 맞게 수정
+        fakeUser.setName("테스트유저");
 
         CustomUserDetails userDetails = new CustomUserDetails(fakeUser);
         SecurityContextHolder.getContext().setAuthentication(
@@ -94,7 +94,7 @@ class SearchLogApiTest {
     @Test
     void 검색_기록_전체_삭제_API_테스트() throws Exception {
         mockMvc.perform(delete("/jobs/search/history/delete")
-                        .with(csrf()))  // ✅ 여기에 넣어야 함
+                        .with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(searchLogService).deleteAllHistory(any(User.class));
@@ -104,7 +104,7 @@ class SearchLogApiTest {
     void 검색_기록_하나_삭제_API_테스트() throws Exception {
         mockMvc.perform(delete("/jobs/search/history/delete-one")
                         .param("keyword", "토스")
-                        .with(csrf()))  // ✅ 여기도
+                        .with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(searchLogService).deleteKeyword(any(User.class), eq("토스"));
