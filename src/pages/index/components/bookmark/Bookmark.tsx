@@ -3,12 +3,15 @@ import style from './styles/Bookmark.module.scss';
 import useBookmarkStore from '../../../../store/bookmarkStore';
 import BookmarkCard from './BookmarkCard';
 import { BookmarkIcon } from 'lucide-react';
-import JobDetail from '../jobList/JobDetail';
+import JobDetailDialog from './JobDetailDialog';
+import useJobStore from '../../../../store/jobStore';
 
 function Bookmark() {
     const { getBookmark, removeBookmark } = useBookmarkStore();
-    const [hidden, setHidden] = useState(true);
-    const jobList = useBookmarkStore((state) => state.bookmarkList);
+    const { setSelectedJob } = useJobStore();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
+    const bookmarkList = useBookmarkStore((state) => state.bookmarkList);
     const [isLoading, setIsLoading] = useState(true);
 
     const toggleBookmark = async (jobId: number) => {
@@ -19,7 +22,10 @@ function Bookmark() {
     useEffect(() => {
         const fetchBookmarks = async () => {
             setIsLoading(true);
-            await getBookmark();
+            if (!bookmarkList || bookmarkList.length === 0) {
+                await getBookmark();
+            }
+
             setIsLoading(false);
         };
 
@@ -39,18 +45,19 @@ function Bookmark() {
                         <div className={style.loading__spinner}></div>
                         <p>북마크를 불러오는 중...</p>
                     </div>
-                ) : jobList && jobList.length > 0 ? (
+                ) : bookmarkList && bookmarkList.length > 0 ? (
                     <div className={style.grid}>
-                        {jobList.map((job) => (
+                        {bookmarkList.map((job) => (
                             <BookmarkCard
                                 key={job.id}
                                 job={{
                                     ...job,
                                     isBookmarked: true,
                                 }}
-                                isSelected={false}
+                                isSelected={selectedJobId === job.id}
                                 onToggleBookmark={() => toggleBookmark(job.id)}
-                                setHidden={() => setHidden(!hidden)}
+                                setSelectedJobId={setSelectedJobId}
+                                setIsDialogOpen={setIsDialogOpen}
                             />
                         ))}
                     </div>
@@ -64,7 +71,14 @@ function Bookmark() {
                     </div>
                 )}
             </div>
-            {hidden ? '' : <JobDetail />}
+
+            {isDialogOpen && selectedJobId && (
+                <JobDetailDialog
+                    isOpen={isDialogOpen}
+                    onClose={() => setIsDialogOpen(false)}
+                    jobId={selectedJobId}
+                />
+            )}
         </>
     );
 }

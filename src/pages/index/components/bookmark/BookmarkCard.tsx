@@ -1,21 +1,26 @@
 import type React from 'react';
-
 import { Bookmark, ExternalLink } from 'lucide-react';
 import type Job from '../../../../../types/job';
 import style from './styles/BookmarkCard.module.scss';
-import JobDetail from '../jobList/JobDetail';
 import useJobStore from '../../../../store/jobStore';
-import { useState } from 'react';
 
 interface BookmarkCardProp {
     job: Job;
     onToggleBookmark: () => void;
     isSelected: boolean;
-    setHidden: () => void;
+    setSelectedJobId: (id: number) => void;
+    setIsDialogOpen: (isOpen: boolean) => void;
 }
 
-function BookmarkCard({ job, onToggleBookmark, isSelected, setHidden }: BookmarkCardProp) {
+function BookmarkCard({
+    job,
+    onToggleBookmark,
+    isSelected,
+    setSelectedJobId,
+    setIsDialogOpen,
+}: BookmarkCardProp) {
     const { setSelectedJob } = useJobStore();
+
     const handleBookmarkClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         onToggleBookmark();
@@ -23,7 +28,8 @@ function BookmarkCard({ job, onToggleBookmark, isSelected, setHidden }: Bookmark
 
     const handleCardClick = () => {
         setSelectedJob(job.id);
-        setHidden();
+        setSelectedJobId(job.id);
+        setIsDialogOpen(true);
     };
 
     return (
@@ -61,7 +67,6 @@ function BookmarkCard({ job, onToggleBookmark, isSelected, setHidden }: Bookmark
                         {job.score && (
                             <div className={style.jobCard__score}>{job.score.toFixed(1)}</div>
                         )}
-
                         <div className={style.jobCard__tags}>
                             <div className={style.jobCard__tags__container}>
                                 {job.jobType && (
@@ -83,9 +88,9 @@ function BookmarkCard({ job, onToggleBookmark, isSelected, setHidden }: Bookmark
                         {job.regionText && (
                             <p className={style.jobCard__location}>{job.regionText}</p>
                         )}
-                        <button className={style.jobCard__viewButton} onClick={() => {}}>
+                        <button className={style.jobCard__viewButton} onClick={handleCardClick}>
                             <ExternalLink size={16} />
-                            <span>관리하기</span>
+                            <span>상세보기</span>
                         </button>
                     </div>
                 </div>

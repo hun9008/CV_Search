@@ -26,16 +26,6 @@
         }
     }
 
-    &.selected {
-        border-color: #1877f2;
-        box-shadow: 0 0 0 1px #1877f2;
-
-        &::before {
-            background-color: #1877f2;
-            opacity: 1;
-        }
-    }
-
     &__header {
         display: flex;
         justify-content: space-between;

@@ -5,11 +5,8 @@ import JobList from './components/jobList/JobList';
 import MyCv from './components/myCv/MyCv';
 import Manage from './components/manage/Manage';
 import Bookmark from './components/bookmark/BookMark';
-import { useState } from 'react';
-import type Job from '../../../types/job';
 import JobDetail from './components/jobList/JobDetail';
 import usePageStore from '../../store/pageStore';
-import useJobStore from '../../store/jobStore';
 
 function Index() {
     const activeContent = usePageStore((state) => state.activeContent);
