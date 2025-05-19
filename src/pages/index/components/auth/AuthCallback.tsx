@@ -23,6 +23,7 @@ function AuthCallback() {
                     return;
                 }
                 console.log('AuthCallback');
+                console.log(firstLogin);
 
                 setTokens(accessToken); // 토큰 저장
                 setIsLoggedIn(true); // 로그인 처리

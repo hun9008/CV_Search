@@ -36,8 +36,8 @@ function ProfileDialog() {
         navigate('/', { replace: true });
     };
 
-    const handleWithdrawal = () => {
-        withdraw(accessToken);
+    const handleWithdrawal = async () => {
+        const res = await withdraw(accessToken);
 
         clearTokens();
         navigate('/', { replace: true });
