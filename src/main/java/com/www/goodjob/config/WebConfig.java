@@ -10,8 +10,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://localhost:5173") // 프론트 도메인
-                // .allowedOrigins("https://goodjob.ai.kr") // 프론트 도메인
+                .allowedOrigins(
+                        // "https://localhost:5173",
+                        "https://www.goodjob.ai.kr"
+                )
                 .allowedMethods("*")
                 .allowCredentials(true); // refreshToken 쿠키 전송 허용
     }

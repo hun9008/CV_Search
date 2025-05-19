@@ -76,13 +76,34 @@ public class AuthController {
         """)
     // callback-endpoint에서 accessToken과 firstLogin 여부 반환
     @GetMapping("/callback-endpoint")
-    public ResponseEntity<?> handleCallback(@CookieValue(value = "refresh_token", required = false) String refreshToken) {
-        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+    public ResponseEntity<?> handleCallback(
+            @CookieValue(value = "refresh_token", required = false) String refreshToken) {
+
+        if (refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "유효하지 않은 refresh token"));
+                    .body(Map.of("message", "로그인 정보가 없습니다. 다시 로그인해 주세요."));
         }
 
+        JwtTokenProvider.TokenValidationResult result = jwtTokenProvider.validateTokenDetailed(refreshToken);
+
+        if (result == JwtTokenProvider.TokenValidationResult.EXPIRED) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "로그인 세션이 만료되었습니다. 다시 로그인해 주세요."));
+        }
+
+        if (result == JwtTokenProvider.TokenValidationResult.INVALID) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "잘못된 로그인 정보입니다."));
+        }
+
+        // VALID한 경우
         String email = jwtTokenProvider.getEmail(refreshToken);
+
+        if (!userRepository.existsByEmail(email)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "회원 탈퇴된 계정입니다. 다시 가입해 주세요."));
+        }
+
         String newAccessToken = jwtTokenProvider.generateAccessToken(email);
         boolean isFirstLogin = !userRepository.existsByEmail(email);
 

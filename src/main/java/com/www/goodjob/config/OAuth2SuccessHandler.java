@@ -72,7 +72,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
         // 이제 accessToken과 firstLogin은 session에 저장하지 않고, callback-endpoint에서 처리
-        response.sendRedirect("https://localhost:5173/auth/callback");
+        response.sendRedirect("https://www.goodjob.ai.kr/auth/callback");
     }
 
     private OAuthProvider extractProvider(CustomOAuth2User user) {
