@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import style from './styles/CVReupload.module.scss';
-import { UploadCloud, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface CVReuploadDialog {
     isOpen: boolean;
@@ -15,7 +15,7 @@ function CVReuploadDialog({ isOpen, onClose }: CVReuploadDialog) {
             onClose();
         }
     };
-    const handleButtonClick = () => {};
+    // const handleButtonClick = () => {};
 
     useEffect(() => {
         if (isOpen) {
