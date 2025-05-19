@@ -27,8 +27,8 @@ jobs:
 
             git pull origin dev_front
 
-            npm install
             npm run build
+            npm install -g serve
             pm2 delete goodjob || true
             pm2 start serve --name "goodjob" -- -s dist -l 3013
           EOF
