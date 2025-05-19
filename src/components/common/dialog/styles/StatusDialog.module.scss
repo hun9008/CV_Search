@@ -1,0 +1,15 @@
+.container {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 0.5rem;
+    z-index: 1001;
+    top: 30px;
+    left: 75%;
+}
+
+.statusButton {
+    display: flex;
+    flex-direction: row;
+}

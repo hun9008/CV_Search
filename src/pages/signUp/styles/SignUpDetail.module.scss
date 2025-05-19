@@ -1,0 +1,302 @@
+.pageWrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3rem 1rem;
+    background: linear-gradient(135deg, #e6f0ff 0%, #f5f9fd 100%);
+    position: relative;
+    overflow: hidden;
+
+    // Blurred background circle
+    &::before {
+        content: '';
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        flex-shrink: 0;
+        border-radius: 600px;
+        background: rgba(24, 119, 242, 0.2);
+        filter: blur(100px);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 0;
+        pointer-events: none;
+
+        @media (max-width: 1200px) {
+            width: 500px;
+            height: 500px;
+        }
+
+        @media (max-width: 992px) {
+            width: 400px;
+            height: 400px;
+            filter: blur(80px);
+        }
+
+        @media (max-width: 768px) {
+            width: 300px;
+            height: 300px;
+            filter: blur(60px);
+        }
+
+        @media (max-width: 480px) {
+            width: 250px;
+            height: 250px;
+            filter: blur(50px);
+        }
+    }
+}
+
+.progressIndicator {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 1;
+
+    &__dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #ccc;
+
+        &Active {
+            background-color: #333;
+        }
+    }
+}
+
+.content {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    flex-grow: 1;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 2rem;
+    text-align: center;
+
+    @media (max-width: 768px) {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+}
+
+.searchContainer {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.inputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background-color: white;
+
+    &:focus {
+        outline: none;
+        border-color: #1877f2;
+        box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+    }
+
+    &Error {
+        border-color: #e53935;
+
+        &:focus {
+            border-color: #e53935;
+            box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.2);
+        }
+    }
+}
+
+.suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    margin-top: 0.25rem;
+    padding: 0.5rem 0;
+    list-style: none;
+}
+
+.suggestionItem {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.95rem;
+
+    &:hover {
+        background-color: #f5f9fd;
+    }
+
+    &Active {
+        background-color: #f5f9fd;
+    }
+}
+
+.errorMessage {
+    color: #e53935;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.selectedLocations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    justify-content: center;
+}
+
+.locationTag {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.75rem;
+    background-color: #f0f0f0;
+    border-radius: 100px;
+    font-size: 0.9rem;
+}
+
+.removeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0 0.25rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        color: #333;
+    }
+}
+
+.buttonContainer {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.backButton {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #333;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+}
+
+.continueButton {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    background-color: #000000; // Dark green color
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #3b3b3b; // Darker green on hover
+    }
+}
+
+// 스크롤바 스타일링
+.suggestions::-webkit-scrollbar {
+    width: 6px;
+}
+
+.suggestions::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.suggestions::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.suggestions::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+// Add specific styles for iOS devices to handle safe areas
+@supports (-webkit-touch-callout: none) {
+    .pageWrapper {
+        padding-top: calc(3rem + env(safe-area-inset-top));
+        padding-bottom: calc(3rem + env(safe-area-inset-bottom));
+        padding-left: calc(1rem + env(safe-area-inset-left));
+        padding-right: calc(1rem + env(safe-area-inset-right));
+    }
+}
+
+// Add specific styles for landscape orientation on mobile
+@media (max-height: 480px) and (orientation: landscape) {
+    .pageWrapper {
+        padding: 1.5rem 1rem;
+    }
+
+    .progressIndicator {
+        margin-bottom: 1.5rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .buttonContainer {
+        margin-top: 1.5rem;
+    }
+}

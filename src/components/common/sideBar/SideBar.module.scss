@@ -1,0 +1,253 @@
+.sidebar {
+    max-width: 220px;
+    width: 220px;
+    display: flex;
+    font-family: 'Noto Sans CJK KR';
+
+    justify-content: center;
+    background-color: #ffffff;
+    border-radius: 24px;
+    transition: all 0.3s ease;
+
+    &__container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        padding: 1.5rem 0;
+        width: 100%;
+    }
+
+    &__hidden {
+        max-width: 0;
+        width: 0;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+        opacity: 0;
+    }
+
+    &__logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 1.5rem 1.5rem;
+        color: #1877f2;
+        font-size: 40px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 20px;
+        letter-spacing: 0.1px;
+        cursor: pointer;
+
+        transition: all 0.3s ease; // 로고에도 전환 효과 추가
+        white-space: nowrap; // 텍스트가 줄바꿈되지 않도록 설정
+        opacity: 1;
+        width: auto;
+    }
+
+    &__navigation {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        margin-top: 2rem;
+        transition: all 0.3s ease; // 네비게이션에도 전환 효과 추가
+        justify-content: space-between;
+    }
+
+    &__menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__menuItem {
+        margin-bottom: 0.5rem;
+    }
+
+    &__menuLink {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: #666666;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 20px;
+
+        overflow: hidden; // 내부 요소가 넘치지 않도록 설정
+
+        &:hover {
+            background-color: #f2f3fe;
+            color: #0060c6;
+        }
+
+        &.active {
+            background-color: #f2f3fe;
+            color: #0060c6;
+            border-left: 3px solid #0060c6;
+        }
+    }
+
+    &__menuIcon {
+        margin-right: 1rem;
+
+        transition: margin 0.3s ease; // 아이콘 마진에 전환 효과 추가
+        flex-shrink: 0; // 아이콘이 축소되지 않도록 설정
+    }
+
+    &__menuText {
+        font-size: 1rem;
+        font-weight: 500;
+
+        transition: all 0.3s ease; // 텍스트에 전환 효과 추가
+        white-space: nowrap; // 텍스트가 줄바꿈되지 않도록 설정
+        opacity: 1;
+        width: auto;
+        overflow: hidden; // 텍스트가 넘치지 않도록 설정
+    }
+
+    &__profile {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 0.3rem;
+        cursor: pointer;
+
+        &__icon {
+            padding: 4px;
+            width: 40px;
+            height: 40px;
+            stroke-width: 1px;
+            border-radius: 50%;
+            color: #333333;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background-color: rgba(24, 119, 242, 0.1);
+            }
+        }
+        &__logoutIcon {
+            color: #e53935;
+            padding: 4px;
+            width: 30px;
+            height: 30px;
+            border-radius: 40%;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            &:hover {
+                background-color: rgba(229, 57, 53, 0.1);
+            }
+        }
+
+        &__textArea {
+            text-align: start;
+        }
+    }
+
+    @media (max-width: 768px) {
+        width: 70px;
+
+        &__logo {
+            display: none;
+        }
+
+        &__menuText {
+            display: none;
+        }
+
+        &__menuLink {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+
+        &__menuIcon {
+            margin-right: 0;
+        }
+
+        &__profile {
+            display: none;
+        }
+        .plan {
+            display: none;
+        }
+
+        .divider {
+            display: none;
+        }
+    }
+}
+
+.userName {
+    font-size: small;
+    font-weight: 600;
+}
+
+.userEmail {
+    font-size: x-small;
+    font-weight: 300;
+    color: #666666;
+}
+.divider {
+    display: block;
+    height: 1px;
+    background: #f0f0f0;
+    margin: 12px 0;
+}
+
+.plan {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    padding: 1rem;
+
+    &__textContainer {
+        h3 {
+            font-family: 'Noto Sans KR', 'Noto Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333333;
+            margin: 0;
+        }
+
+        p {
+            font-family: 'Noto Sans', sans-serif;
+            font-size: 13px;
+            color: #666666;
+            margin: 4px 0 0;
+        }
+    }
+
+    &__upgrade {
+        margin-top: 0.5rem;
+        display: flex;
+        width: 100%;
+        background-color: #1877f2;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-family: 'Noto Sans KR', 'Noto Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #1464d8;
+        }
+    }
+}
+
+.planIcon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+    color: #1877f2;
+}

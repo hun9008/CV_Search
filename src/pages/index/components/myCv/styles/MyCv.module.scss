@@ -1,0 +1,117 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    gap: 1.5rem;
+    background-color: #f5f9fd;
+    border-radius: 20px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    justify-content: start;
+    gap: 1.5rem;
+
+    &__content {
+        border-radius: 16px;
+        background-color: white;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        overflow-y: scroll;
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 1rem 0;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+
+            &::before {
+                content: '';
+                display: inline-block;
+                width: 4px;
+                height: 1rem;
+                background-color: #1877f2;
+                margin-right: 0.75rem;
+                border-radius: 2px;
+            }
+        }
+
+        white-space: pre-line;
+        line-height: 1.6;
+        color: #444;
+    }
+}
+
+.buttons {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.button {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border: none;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 500;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+        background-color: #f5f9fd;
+        color: #1877f2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    &:first-child {
+        color: #e53935;
+
+        &:hover {
+            background-color: rgba(229, 57, 53, 0.05);
+            color: #d32f2f;
+        }
+    }
+}
+
+.hiddenInput {
+    display: none;
+}
+
+.cvviewer {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 992px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .info,
+    .cvviewer {
+        width: 100%;
+    }
+}

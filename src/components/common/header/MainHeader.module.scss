@@ -1,0 +1,384 @@
+.header {
+    display: flex;
+    flex-direction: row;
+    height: 80px;
+
+    padding: 20px; // 수정 필요
+    background-color: #ffffff;
+
+    z-index: 5;
+    transition: all 0.3s ease;
+    border-radius: 20px;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+
+    &__overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 4;
+        animation: fadeIn 0.2s ease;
+    }
+
+    &__container {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        height: 100%;
+        width: 100%;
+        padding: 0 1.5rem;
+    }
+
+    &__menuButton {
+        // display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333333;
+        padding: 0.5rem;
+        margin-right: 0.5rem;
+    }
+
+    &__search {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        max-width: 280px;
+        z-index: 10;
+        transition: max-width 0.3s ease;
+
+        &--extend {
+            max-width: 360px;
+        }
+
+        &__overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 3;
+            animation: fadeIn 0.2s ease;
+        }
+
+        &Input Wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        &Icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #969696;
+            z-index: 2;
+        }
+
+        &Input {
+            width: 100%;
+            height: 40px;
+            padding: 0 1rem 0 2.5rem;
+            border-radius: 20px;
+            border: none;
+            background-color: #f4f5f6;
+            font-size: 0.9rem;
+
+            &:focus {
+                outline: none;
+                border-color: #0060c6;
+                background-color: #ffffff;
+                box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.1);
+            }
+
+            &::placeholder {
+                color: #969696;
+            }
+        }
+
+        // 검색 결과 드롭다운
+        &Results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            min-width: 300px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-top: 8px;
+            z-index: 10;
+
+            transition: width 0.3s ease;
+            animation: slideDown 0.2s ease;
+        }
+
+        &ResultContent {
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &ResultsList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 350px;
+            overflow-y: auto;
+
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: #d8edff;
+                border-radius: 4px;
+            }
+        }
+
+        &HistoryItem {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            justify-content: space-between;
+
+            &:hover {
+                background-color: #f5f9fd;
+            }
+        }
+        &ResultText {
+            flex: 1;
+        }
+
+        &ResultItem {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+            color: #333;
+            display: block;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            overflow: hidden;
+
+            &:hover {
+                background-color: #f5f9fd;
+            }
+        }
+
+        &ResultIcon {
+            color: #969696;
+            margin-right: 0.5rem;
+
+            width: 20px;
+            height: 20px;
+            overflow: hidden;
+
+            border-radius: 2px;
+            padding: 0;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        &ResultIcon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        // &HistoryDelete {
+        //     color: #969696;
+        //     cursor: pointer;
+        //     flex-shrink: 0;
+        //     :hover {
+        //         background-color: #f4f5f6;
+        //     }
+        // }
+        &HistoryDelete {
+            color: #969696;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background-color: #f4f5f6;
+                color: #e53935;
+                transform: scale(1.1);
+            }
+
+            &:active {
+                background-color: rgba(229, 57, 53, 0.1);
+                transform: scale(0.95);
+            }
+        }
+
+        &Loading {
+            padding: 16px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        &NoResults {
+            padding: 16px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    }
+
+    &__viewMoreButton {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 12px 16px;
+        background-color: #f5f9fd;
+        border: none;
+        border-top: 1px solid #f0f0f0;
+        color: #1877f2;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #e6f0ff;
+        }
+
+        svg {
+            margin-left: 6px;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: end;
+        width: 100%;
+        align-items: center;
+        gap: 1rem;
+        z-index: 5; // 오버레이 위에 표시
+    }
+
+    &__actionButton {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333333;
+        padding: 0.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #f4f5f6;
+        }
+    }
+
+    &__authButtons {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    &__signUpButton,
+    &__signInButton {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: normal;
+        font-family: 'Noto Sans CJK KR';
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    &__signInButton {
+        background-color: #f4f5f6;
+        color: #333333;
+        border: none;
+        &:hover {
+            background-color: #f4f5f6;
+        }
+    }
+
+    &__signUpButton {
+        background-color: #1877f2;
+        color: #ffffff;
+        border: 1px solid #1877f2;
+
+        &:hover {
+            background-color: #1464d8;
+        }
+    }
+
+    @media (max-width: 768px) {
+        left: 70px;
+
+        &__search {
+            max-width: 300px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        left: 0;
+        bottom: 60px;
+
+        &__menuButton {
+            display: block;
+        }
+
+        &__search {
+            max-width: 200px;
+        }
+
+        &__authButtons {
+            display: none;
+        }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

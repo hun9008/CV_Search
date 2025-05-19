@@ -1,28 +1,49 @@
+import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSearchParams } from 'react-router-dom';
+import useAuthStore from '../../../../store/authStore';
+import useUserStore from '../../../../store/userStore';
 
 function AuthCallback() {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    const { setTokens, setIsLoggedIn } = useAuthStore();
+    const { fetchUserData } = useUserStore();
 
     useEffect(() => {
-        const accessToken = searchParams.get('accessToken');
-        const refreshToken = searchParams.get('refreshToken');
+        axios
+            .get('https://be.goodjob.ai.kr/auth/callback-endpoint', {
+                withCredentials: true,
+            })
+            .then((res) => {
+                const { accessToken, firstLogin } = res.data;
 
-        console.log('Received JWT Token:', accessToken, refreshToken);
-        if (accessToken && refreshToken) {
-            console.log('Received JWT Token:', accessToken, refreshToken);
-            localStorage.setItem('jwt-token:access', accessToken);
-            localStorage.setItem('jwt-token:refresh', refreshToken);
-            navigate('/tempPage');
-        } else {
-            console.log('No token received');
-            navigate('/'); // 다시 로그인 페이지로 보내기
-        }
-    }, [searchParams, navigate]);
+                if (!accessToken) {
+                    console.error('Access token이 없습니다');
+                    navigate('/signIn');
+                    return;
+                }
+                console.log('AuthCallback');
+                console.log(firstLogin);
 
-    return <div>인증 중입니다</div>; // pending 될 경우를 대비해 페이지 만들기
+                setTokens(accessToken); // 토큰 저장
+                setIsLoggedIn(true); // 로그인 처리
+                fetchUserData(accessToken); // 유저 데이터 불러오기
+
+                if (firstLogin) {
+                    // +이력서를 올리지 않았다면
+                    navigate('/signUp/detail', { replace: true });
+                } else {
+                    // navigate('/main', { replace: true });
+                    navigate('/main');
+                }
+            })
+            .catch((err) => {
+                console.error('콜백 처리 중 오류', err);
+                navigate('/signIn');
+            });
+    }, [navigate, setTokens]);
+
+    return <div>로그인 처리 중입니다...</div>; // pending UI 만들기
 }
 
 export default AuthCallback;
