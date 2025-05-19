@@ -27,8 +27,15 @@ jobs:
 
             git pull origin dev_front
 
+            echo "🏗️ Building project..."
             npm run build
-            npm install -g serve
+
+            echo "⚙️ Installing serve globally (with sudo)..."
+            sudo npm install -g serve
+
+            echo "🧹 Cleaning old process..."
             pm2 delete goodjob || true
+
+            echo "🚀 Starting static server on port 3013..."
             pm2 start serve --name "goodjob" -- -s dist -l 3013
           EOF
