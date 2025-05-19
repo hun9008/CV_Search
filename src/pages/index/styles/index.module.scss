@@ -20,6 +20,8 @@
 
     &__container {
         // max-width: 1400px;
+        flex: 1;
+        display: flex;
         height: 100%;
         overflow: hidden;
     }
@@ -33,13 +35,13 @@
 
     &__jobSection {
         display: flex;
+        flex: 1;
         gap: 1.5rem;
         height: 100%;
     }
 
     &__jobList {
-        flex: 1;
-        min-width: 0; // 필요한 경우 축소 허용
+        min-width: 550px; // 필요한 경우 축소 허용
         max-width: 550px;
         overflow-y: auto;
         border-radius: 20px;
@@ -49,9 +51,7 @@
 
     &__jobDetail {
         display: flex;
-
         flex: 1;
-        min-width: 0; // 필요한 경우 축소 허용
         overflow-y: auto;
         border-radius: 12px;
         background-color: #ffffff;

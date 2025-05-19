@@ -1,11 +1,13 @@
 interface Job {
     id: number;
-    region: {
-        id: number | null;
-        cd: string | null;
-        sido: string | null;
-        sigungu: string | null;
-    } | null;
+    regions:
+        | {
+              id: number | null;
+              cd: string | null;
+              sido: string | null;
+              sigungu: string | null;
+          }[]
+        | null;
     companyName: string;
     title: string;
     department: string | null;
@@ -29,7 +31,7 @@ interface Job {
     score: number | null;
     cosineScore: number | null;
     bm25Score: number | null;
-    isBookmarked: false;
+    isBookmarked?: boolean;
 }
 
 export default Job;

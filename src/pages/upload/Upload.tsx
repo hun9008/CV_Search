@@ -12,7 +12,7 @@ function Upload() {
     const [uploadSuccess, setUploadSuccess] = useState(false);
     const { setFile, uploadFile } = useFileStore();
     const file = useFileStore((state) => state.file);
-    const { getPresignedURL } = useS3Store();
+    const { getUploadPresignedURL } = useS3Store();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
@@ -43,7 +43,7 @@ function Upload() {
         }
         setFile(selectedFile); // 파일 세팅
         try {
-            const presignedURL = await getPresignedURL(selectedFile.name); // 서버로부터 S3 업로드 URL을 받아옴
+            const presignedURL = await getUploadPresignedURL(); // 서버로부터 S3 업로드 URL을 받아옴
             if (typeof presignedURL === 'string' && presignedURL) {
                 fileUpload(selectedFile, presignedURL);
             } else {

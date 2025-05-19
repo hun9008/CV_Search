@@ -14,7 +14,7 @@ function Index() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { setFile, uploadFile } = useFileStore();
     const file = useFileStore((state) => state.file);
-    const { getPresignedURL } = useS3Store();
+    const { getUploadPresignedURL } = useS3Store();
 
     const navigate = useNavigate();
 
@@ -46,7 +46,7 @@ function Index() {
         setFile(selectedFile);
 
         try {
-            const presignedURL = await getPresignedURL(selectedFile.name); // 서버로부터 S3 업로드 URL을 받아옴
+            const presignedURL = await getUploadPresignedURL(); // 서버로부터 S3 업로드 URL을 받아옴
             if (typeof presignedURL === 'string' && presignedURL) {
                 fileUpload(selectedFile, presignedURL);
             } else {

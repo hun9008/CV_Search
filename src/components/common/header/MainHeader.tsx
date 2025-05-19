@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Search, Bell, Menu, ChevronRight, FileUser, X } from 'lucide-react';
+import { Search, Bell, Menu, ChevronRight, X } from 'lucide-react';
 import styles from './MainHeader.module.scss';
 import useAuthStore from '../../../store/authStore';
 import axios from 'axios';
@@ -7,7 +7,7 @@ import { debounce } from 'lodash';
 import ProfileDialog from '../dialog/ProfileDialog';
 import usePageStore from '../../../store/pageStore';
 import { useNavigate } from 'react-router-dom';
-import type Job from '../../../pages/index/types/job';
+import type Job from '../../../../types/job';
 
 const MainHeader = () => {
     const [searchQuery, setSearchQuery] = useState(''); // 검색어
@@ -17,7 +17,7 @@ const MainHeader = () => {
     const [showHistory, setShowHistory] = useState(false); // 검색 기록 출력 여부, 서치바에 텍스트를 입력하지 않아도 출력되어야 함
     const [isFocusing, setIsFocusing] = useState(false);
     const [history, setHistory] = useState<string[]>([]);
-    const searchContainerRef = useRef<HTMLDivElement>(null); // 왜 쓰는거지?
+    const searchContainerRef = useRef<HTMLDivElement>(null);
     const { setCompactMenu } = usePageStore();
     const accessToken = useAuthStore((state) => state.accessToken);
     const isCompactMenu = usePageStore((state) => state.isCompactMenu);
@@ -245,14 +245,21 @@ const MainHeader = () => {
                                                             className={
                                                                 styles.header__searchResultItem
                                                             }>
-                                                            {/* 아래의 Search 아이콘을 favicon으로 대체 */}
-                                                            <FileUser
-                                                                size={16}
+                                                            <div
                                                                 className={
-                                                                    styles.header__searchResultIcon
-                                                                }
-                                                            />
-                                                            <span>{result.title}</span>
+                                                                    styles.header__searchResultContent
+                                                                }>
+                                                                <div
+                                                                    className={
+                                                                        styles.header__searchResultIcon
+                                                                    }>
+                                                                    <img
+                                                                        rel="icon"
+                                                                        src={`data:image/x-icon;base64,${result.favicon}`}
+                                                                    />
+                                                                </div>
+                                                                <span>{result.title}</span>
+                                                            </div>
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -280,7 +287,7 @@ const MainHeader = () => {
                             <button className={styles.header__actionButton} aria-label="알림">
                                 <Bell size={24} />
                             </button>
-                            <ProfileDialog />
+                            {/* <ProfileDialog /> */}
                         </>
                     ) : (
                         <div className={styles.header__authButtons}>

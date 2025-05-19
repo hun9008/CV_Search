@@ -2,46 +2,44 @@ import { useEffect, useState } from 'react';
 import useJobStore from '../../../../store/jobStore';
 import style from './styles/JobDetail.module.scss';
 import { Bookmark, Share2, ExternalLink, MapPin, Calendar, Clock, Briefcase } from 'lucide-react';
-import Feedback from './Feedback';
+import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
 
 function JobDetail() {
-    const { getSelectedJob } = useJobStore();
+    const { getSelectedJob, getFeedback } = useJobStore();
     const applications = useApplyStore((state) => state.applications);
-    const { setApplications, deleteApplications } = useApplyStore();
+    const { setApplications, deleteApplications, getApplications } = useApplyStore();
     const selectedJob = useJobStore((state) => state.selectedJob);
+    const feedbackText = useJobStore((state) => state.feedback);
     const job = useJobStore((state) => state.getSelectedJob());
     const [isBookmarked, setIsBookmarked] = useState(job?.isBookmarked || false);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [isManaging, setIsManaging] = useState(false);
     const [showManageModal, setShowManageModal] = useState(false);
     const [manageButtonClicked, setManageButtonClicked] = useState(false);
 
     useEffect(() => {
         getSelectedJob();
+        const initializeApplications = async () => {
+            await getApplications();
+            console.log('관리 목록 가져오기: ', applications);
+
+            if (selectedJob && applications) {
+                const isCurrentJobManaged = applications.some((app) => app.jobId === selectedJob);
+                console.log('isCurrentJobManaged: ', isCurrentJobManaged);
+                setIsManaging(isCurrentJobManaged);
+                console.log('리스트 로딩 후 결과: ', isManaging);
+            }
+        };
+
+        initializeApplications();
     }, [selectedJob]);
+
+    useEffect(() => {}, [applications]);
 
     if (!job) {
         return <JobDetailSkeleton />;
     }
-
-    const testText = `## 좋은 점:
-- React, TypeScript, Next.js 등 토스뱅크에서 사용하는 코어 기술들을 모두 보유하고 계시며, 특히 Zustand와 같은 상태관리 라이브러리도 사용 경험이 있어 기술적 적합성이 높습니다.
-- 'goodJob' 프로젝트에서 React와 TypeScript 기반의 컴포넌트 설계 및 페이지 개발 경험은 토스뱅크의 웹 기반 은행 서비스 개발에 직접적으로 활용할 수 있는 역량입니다.
-- GitHub Actions와 Vercel을 활용한 CI/CD 자동 배포 구성 경험은 토스뱅크의 개발 환경과 유사하여 실무 적응에 도움이 될 것입니다.
-- "사용자 경험(UX)을 고려한 UI 구현"이라는 자기소개는 토스뱅크가 요구하는 "사용자 경험을 최우선으로 생각하는" 가치와 일치합니다.
-- WebSocket을 이용한 실시간 기능 개발 경험은 금융 서비스에서 필요한 실시간 데이터 처리 역량을 보여줍니다.
-
-## 부족한 점:
-- 토스뱅크는 Frontend Developer Lead 포지션을 모집하고 있으나, 이력서에서 리더십 경험이나 팀 관리 경험이 명확히 드러나지 않습니다.
-- 채용 공고에서는 "기술적 논의를 이끌 수 있는 능력"을 중요시하지만, 이력서에서 기술적 의사결정이나 아키텍처 설계 경험이 구체적으로 드러나지 않습니다.
-- 토스뱅크에서 사용하는 React-Query, Emotion, Jotai 등의 기술 스택 경험이 이력서에 명시되어 있지 않습니다.
-- 대규모 프로젝트나 복잡한 애플리케이션 개발 경험이 부족해 보이며, 금융 서비스 관련 도메인 지식이나 경험이 드러나지 않습니다.
-- "동료 개발자들의 역량 성장, 커리어 개발 및 동기부여"와 관련된 경험이 이력서에 포함되어 있지 않습니다.
-
-## 추가 팁:
-- 프로젝트 경험에서 팀 내 역할이나 협업 과정에서의 리더십 경험을 구체적으로 추가하시면 좋겠습니다. 예를 들어, 프로젝트에서 기술적 의사결정을 주도했거나 다른 개발자들과 협업한 경험을 강조하세요.
-- 토스뱅크에서 사용하는 React-Query, Emotion과 같은 기술에 대한 학습 경험이나 관심을 이력서에 추가하는 것이 좋겠습니다.
-- 서비스 성능 최적화나 접근성 향상 경험을 구체적인 수치나 사례와 `;
 
     const handleApply = () => {
         window.open(`${job?.url}`, '_blank');
@@ -49,7 +47,7 @@ function JobDetail() {
 
     const handleBookmark = () => {
         setIsBookmarked(!isBookmarked);
-        // 여기에 북마크 상태를 저장하는 로직 추가
+        //  북마크 상태를 저장하는 로직 추가
     };
 
     const handleShare = () => {
@@ -76,28 +74,37 @@ function JobDetail() {
         }
     };
 
-    const handleFeedback = () => {
-        setShowFeedbackModal(true);
+    const handleFeedback = async (jobId: number) => {
+        if ((await getFeedback(jobId)) === 200) {
+            setShowFeedbackModal(true);
+        }
     };
 
     const handleManagement = async (jobId: number) => {
-        if (manageButtonClicked === true) {
-            setManageButtonClicked(false);
+        try {
+            if (isManaging) {
+                console.log('관리 이력 삭제 시도');
+                const res = await deleteApplications(jobId);
+                if (res === 200) {
+                    setIsManaging(false);
+                    console.log('관리 해제 완료:', res);
+                    // 지원 목록 다시 가져오기
 
-            return;
+                    await useApplyStore.getState().getApplications();
+                }
+            } else {
+                console.log('관리 이력 추가 시도');
+                const res = await setApplications(jobId);
+                if (res === 200) {
+                    setIsManaging(true);
+                    console.log('관리 등록 완료:', res);
+                    // 지원 목록 다시 가져오기
+                    await useApplyStore.getState().getApplications();
+                }
+            }
+        } catch (error) {
+            console.log('관리 상태 변경 에러:', error);
         }
-        setManageButtonClicked(true);
-        setShowManageModal(true);
-        setApplications(jobId);
-        // 모달창에서 관리 여부 최종 확정
-        // 관리 시작 기능 구현
-    };
-
-    const isManaged = (jobId: number) => {
-        if (applications?.some((data) => data.applicationId === jobId)) {
-            return true;
-        }
-        return false;
     };
 
     return (
@@ -175,7 +182,9 @@ function JobDetail() {
                     지원하기
                     <ExternalLink size={16} className={style.actionButtons__icon} />
                 </button>
-                <button className={style.actionButtons__feedback} onClick={handleFeedback}>
+                <button
+                    className={style.actionButtons__feedback}
+                    onClick={() => handleFeedback(job.id)}>
                     피드백
                 </button>
                 <button
@@ -183,8 +192,7 @@ function JobDetail() {
                         manageButtonClicked ? '' : style.clicked
                     }`}
                     onClick={() => handleManagement(selectedJob)}>
-                    {/* 버튼 렌더링 여부는 applications 리스트에 해당 id가 있는 경우에 변경 */}
-                    {isManaged(selectedJob) ? '관리중' : '관리 시작'}
+                    {isManaging ? '관리중' : '관리 시작'}
                 </button>
             </div>
 
@@ -219,7 +227,7 @@ function JobDetail() {
             </div>
             {job && (
                 <Feedback
-                    feedback={testText}
+                    feedback={feedbackText}
                     isOpen={showFeedbackModal}
                     onClose={() => setShowFeedbackModal(false)}
                 />

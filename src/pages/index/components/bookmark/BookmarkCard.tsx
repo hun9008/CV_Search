@@ -85,8 +85,12 @@ function BookmarkCard({
                     </div>
 
                     <div className={style.jobCard__footer}>
-                        {job.regionText && (
-                            <p className={style.jobCard__location}>{job.regionText}</p>
+                        {job.regions?.[0].sido && (
+                            <p className={style.jobCard__location}>
+                                {`${job.regions?.[0].sido ? job.regions?.[0].sido : ''} ${
+                                    job.regions?.[0].sigungu ? job.regions?.[0].sigungu : ''
+                                }`}
+                            </p>
                         )}
                         <button className={style.jobCard__viewButton} onClick={handleCardClick}>
                             <ExternalLink size={16} />

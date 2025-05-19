@@ -3,9 +3,9 @@ import { persist } from 'zustand/middleware';
 import axios from 'axios';
 
 interface UserStore {
-    id: string | null;
-    email: string | null;
-    name: string | null;
+    id: string;
+    email: string;
+    name: string;
     setId: (id: string) => void;
     setEmail: (email: string) => void;
     setName: (name: string) => void;
@@ -15,9 +15,9 @@ interface UserStore {
 const useUserStore = create<UserStore>()(
     persist(
         (set) => ({
-            id: null,
-            email: null,
-            name: null,
+            id: '',
+            email: '',
+            name: '',
             setId: (id: string) => set({ id }),
             setEmail: (email: string) => set({ email }),
             setName: (name: string) => set({ name }),

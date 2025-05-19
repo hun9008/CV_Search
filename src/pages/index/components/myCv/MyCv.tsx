@@ -6,15 +6,17 @@ import { Trash, CloudUpload } from 'lucide-react';
 import CVDeleteDialog from '../../../../components/common/dialog/CVDeleteDialog';
 import CVReuploadDialog from '../../../../components/common/dialog/CVReuploadDialog';
 import useS3Store from '../../../../store/s3Store';
+import { parseMarkdown } from '../../utils/markdown';
 
 function MyCv() {
-    const { removeFile, uploadFile } = useFileStore();
+    const { removeFile, uploadFile, getSummary } = useFileStore();
     const { getUploadPresignedURL } = useS3Store();
     const [error, setError] = useState<string | null>('');
     const [file, setFile] = useState<File | null>();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [reuploadDialogHidden, setReuploadDialogHidden] = useState(false);
     const [deleteDialogHidden, setDeleteDialogHidden] = useState(false);
+    const mockSummary = useFileStore((state) => state.summary);
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = event.target.files?.[0];
         validateAndSetFile(selectedFile);
@@ -53,16 +55,6 @@ function MyCv() {
         fileInputRef.current?.click();
     };
 
-    const mockSummary = `이름: Ruby Gibson (루비 깁슨)
-직함: Senior Software Developer | FinTech Enthusiast | Client Solutions (시니어 소프트웨어 개발자 | 핀테크 전문가 | 클라이언트 솔루션)
-연락처: +44 20 7123 4567
-이메일: help@enhancv.com
-위치: Edinburgh, UK (에든버러, 영국)
-LinkedIn: linkedin.com (링크드인 프로필 있음)
-    8년 이상의 소프트웨어 개발 경험, 핀테크 및 클라이언트 솔루션에 특화.
-다양한 프로그래밍 언어로 고성능 금융 애플리케이션 개발.
-데이터베이스 로드 시간 단축 및 다중 통화 교환 기능 통합에 강점.`;
-
     const handleDeleteCV = async () => {
         setDeleteDialogHidden((prev) => !prev);
     };
@@ -72,6 +64,15 @@ LinkedIn: linkedin.com (링크드인 프로필 있음)
         // if (res === 200) {
         // }
     };
+
+    useEffect(() => {
+        const fetchCVSummary = async () => {
+            if (!mockSummary || mockSummary.length === 0) {
+                await getSummary();
+            }
+        };
+        fetchCVSummary();
+    }, []);
 
     return (
         <>
