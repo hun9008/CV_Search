@@ -4,7 +4,6 @@ import styles from './MainHeader.module.scss';
 import useAuthStore from '../../../store/authStore';
 import axios from 'axios';
 import { debounce } from 'lodash';
-import ProfileDialog from '../dialog/ProfileDialog';
 import usePageStore from '../../../store/pageStore';
 import { useNavigate } from 'react-router-dom';
 import type Job from '../../../../types/job';

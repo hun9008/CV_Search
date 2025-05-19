@@ -4,7 +4,6 @@ import {
     Star,
     Bookmark,
     User,
-    CircleUser,
     CircleHelp,
     Settings,
     LogOut,
