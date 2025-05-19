@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef } from 'react';
 import style from './styles/JobDetailDialog.module.scss';
 import JobDetail from '../jobList/JobDetail';
@@ -36,6 +34,7 @@ function JobDetailDialog({ isOpen, onClose, jobId }: JobDetailDialogProps) {
         const handleEscKey = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onClose();
+                console.log(jobId); // 지우기
             }
         };
 

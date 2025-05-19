@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import type application from '../../../../../types/application';
 import style from './styles/ManageItem.module.scss';
-import { Trash, Edit, Check, X, MoreHorizontal } from 'lucide-react';
+import { Trash, Check, X, MoreHorizontal } from 'lucide-react';
 
 interface ManageItemProps {
     job: application;

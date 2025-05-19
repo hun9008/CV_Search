@@ -15,7 +15,7 @@ function JobDetail() {
     const [isBookmarked, setIsBookmarked] = useState(job?.isBookmarked || false);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     const [isManaging, setIsManaging] = useState(false);
-    const [showManageModal, setShowManageModal] = useState(false);
+    // const [showManageModal, setShowManageModal] = useState(false);
     const [manageButtonClicked, setManageButtonClicked] = useState(false);
 
     useEffect(() => {
@@ -88,6 +88,7 @@ function JobDetail() {
                 if (res === 200) {
                     setIsManaging(false);
                     console.log('관리 해제 완료:', res);
+                    setManageButtonClicked(false); // 지우기
                     // 지원 목록 다시 가져오기
 
                     await useApplyStore.getState().getApplications();
@@ -97,6 +98,7 @@ function JobDetail() {
                 const res = await setApplications(jobId);
                 if (res === 200) {
                     setIsManaging(true);
+                    setManageButtonClicked(true);
                     console.log('관리 등록 완료:', res);
                     // 지원 목록 다시 가져오기
                     await useApplyStore.getState().getApplications();

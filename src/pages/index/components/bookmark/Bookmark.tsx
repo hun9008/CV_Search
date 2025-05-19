@@ -4,11 +4,11 @@ import useBookmarkStore from '../../../../store/bookmarkStore';
 import BookmarkCard from './BookmarkCard';
 import { BookmarkIcon } from 'lucide-react';
 import JobDetailDialog from './JobDetailDialog';
-import useJobStore from '../../../../store/jobStore';
+// import useJobStore from '../../../../store/jobStore';
 
 function Bookmark() {
     const { getBookmark, removeBookmark } = useBookmarkStore();
-    const { setSelectedJob } = useJobStore();
+    // const { setSelectedJob } = useJobStore();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
     const bookmarkList = useBookmarkStore((state) => state.bookmarkList);

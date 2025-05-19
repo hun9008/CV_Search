@@ -6,13 +6,13 @@ import { Trash, CloudUpload } from 'lucide-react';
 import CVDeleteDialog from '../../../../components/common/dialog/CVDeleteDialog';
 import CVReuploadDialog from '../../../../components/common/dialog/CVReuploadDialog';
 import useS3Store from '../../../../store/s3Store';
-import { parseMarkdown } from '../../utils/markdown';
+// import { parseMarkdown } from '../../utils/markdown';
 
 function MyCv() {
-    const { removeFile, uploadFile, getSummary } = useFileStore();
+    const { uploadFile, getSummary } = useFileStore();
     const { getUploadPresignedURL } = useS3Store();
-    const [error, setError] = useState<string | null>('');
-    const [file, setFile] = useState<File | null>();
+    const [error, setError] = useState<string | null>(null);
+    const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [reuploadDialogHidden, setReuploadDialogHidden] = useState(false);
     const [deleteDialogHidden, setDeleteDialogHidden] = useState(false);
@@ -34,10 +34,11 @@ function MyCv() {
         const fileSize = selectedFile.size / (1024 * 1024);
 
         if (fileSize > maxFileSize) {
-            setError('파일 크기는 5MB 이하여야 합니다.');
+            setError(`파일 크기는 5MB 이하여야 합니다. ${error}`);
             return;
         }
         setFile(selectedFile);
+        console.log(file); // 나중에 삭제
 
         try {
             const presignedURL = await getUploadPresignedURL(); // 서버로부터 S3 업로드 URL을 받아옴
@@ -59,11 +60,11 @@ function MyCv() {
         setDeleteDialogHidden((prev) => !prev);
     };
 
-    const handleReUploadCV = async () => {
-        setReuploadDialogHidden((prev) => !prev);
-        // if (res === 200) {
-        // }
-    };
+    // const handleReUploadCV = async () => {
+    //     setReuploadDialogHidden((prev) => !prev);
+    //     // if (res === 200) {
+    //     // }
+    // };
 
     useEffect(() => {
         const fetchCVSummary = async () => {
