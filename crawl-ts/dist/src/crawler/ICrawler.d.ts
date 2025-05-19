@@ -2,6 +2,7 @@ import { IBrowserManager } from '../browser/IBrowserManager';
 import { IContentExtractor } from '../content/IContentExtractor';
 import { IUrlManager } from '../url/IUrlManager';
 import { SubUrl } from '../models/VisitResult';
+import { Producer } from '@message/Producer';
 /**
  * 크롤러 인터페이스
  * 웹 크롤링 기능의 핵심 제어를 담당
@@ -14,6 +15,7 @@ export interface ICrawler {
     /**
      * 콘텐츠 추출기
      */
+    rawContentProducer: Producer;
     contentExtractor: IContentExtractor;
     /**
      *  Redis URL 관리자
@@ -24,18 +26,12 @@ export interface ICrawler {
      */
     initialize(): Promise<void>;
     /**
-     * 크롤로 결과 저장
-     */
-    saveVisitResult(result: SubUrl): Promise<boolean>;
-    /**
      * URL 방문
-     * @param urlInfo 방문할 URL 정보
+     * @param url 방문할 URL 정보
+     * @param domain 도메인 정보
      * @returns 방문 결과
      */
-    visitUrl(urlInfo: {
-        url: string;
-        domain: string;
-    }): Promise<SubUrl>;
+    visitUrl(url: string, domain: string): Promise<SubUrl>;
     /**
      * URL 큐 처리
      */

@@ -11,6 +11,7 @@ jest.mock('../../src/database/RedisConnector', () => {
         hSet: jest.fn().mockResolvedValue(undefined),
         sAdd: jest.fn().mockResolvedValue(undefined),
         sRem: jest.fn().mockResolvedValue(undefined),
+        sPop: jest.fn(),
         sMembers: jest.fn(),
         sRandMember: jest.fn(),
         exists: jest.fn(),
@@ -100,15 +101,13 @@ describe('RedisUrlManager', () => {
         expect(urlManager.availableDomains).toContain(testDomain);
     });
     test('should get next URL from domain', async () => {
-        RedisConnector_1.redis.sRandMember.mockResolvedValue(testUrl);
+        RedisConnector_1.redis.sPop.mockResolvedValue([testUrl]);
         const result = await urlManager.getNextUrlFromDomain(testDomain);
-        expect(RedisConnector_1.redis.sRandMember).toHaveBeenCalledWith(`urls:${testDomain}:${notVisitedStatus}`);
-        expect(RedisConnector_1.redis.sRem).toHaveBeenCalledWith(`urls:${testDomain}:${notVisitedStatus}`, testUrl);
-        expect(RedisConnector_1.redis.sAdd).toHaveBeenCalledWith(`urls:${testDomain}:${visitedStatus}`, testUrl);
+        expect(RedisConnector_1.redis.sPop).toHaveBeenCalledWith(`urls:${testDomain}:${notVisitedStatus}`, 1);
         expect(result).toEqual({ url: testUrl, domain: testDomain });
     });
     test('should return null when no next URL is available from domain', async () => {
-        RedisConnector_1.redis.sRandMember.mockResolvedValue(null);
+        RedisConnector_1.redis.sPop.mockResolvedValue(null);
         const result = await urlManager.getNextUrlFromDomain(testDomain);
         expect(result).toBeNull();
     });
@@ -144,16 +143,16 @@ describe('RedisUrlManager', () => {
         urlManager.availableDomains = availableDomains;
         urlManager.currentDomainIndex = 0;
         // Mock first domain call - successful
-        RedisConnector_1.redis.sRandMember.mockResolvedValueOnce('https://domain1.com/page1');
+        RedisConnector_1.redis.sPop.mockResolvedValueOnce(['https://domain1.com/page1']);
         // First call should return URL from first domain
         const result1 = await urlManager.getNextUrl();
         expect(result1).toEqual({ url: 'https://domain1.com/page1', domain: 'domain1.com' });
         expect(urlManager.currentDomainIndex).toBe(1); // Index should advance
         // Mock second domain call - no URLs available
-        RedisConnector_1.redis.sRandMember.mockResolvedValueOnce(null);
+        RedisConnector_1.redis.sPop.mockResolvedValueOnce(null);
         await urlManager.getNextUrl();
         // Mock third domain call - successful
-        RedisConnector_1.redis.sRandMember.mockResolvedValueOnce('https://domain3.com/page1');
+        RedisConnector_1.redis.sPop.mockResolvedValueOnce(['https://domain3.com/page1']);
         // Second call should skip domain2 (no URLs) and return URL from domain3
         const result2 = await urlManager.getNextUrl();
         expect(result2).toEqual({ url: 'https://domain3.com/page1', domain: 'domain3.com' });

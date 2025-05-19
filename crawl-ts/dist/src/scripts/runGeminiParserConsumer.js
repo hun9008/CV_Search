@@ -23,76 +23,54 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.startGeminiParserConsumer = startGeminiParserConsumer;
 const dotenv = __importStar(require("dotenv"));
 const GeminiParser_1 = require("../parser/GeminiParser");
-const MongoDbConnector_1 = require("../database/MongoDbConnector");
-const MysqlRecruitInfoRepository_1 = require("../database/MysqlRecruitInfoRepository");
-const MongoRecruitInfoRepository_1 = require("../database/MongoRecruitInfoRepository");
-const MessageService_1 = __importStar(require("../message/MessageService"));
-const RedisUrlManager_1 = require("../url/RedisUrlManager");
+const Consumer_1 = require("../message/Consumer");
 const logger_1 = require("../utils/logger");
-const MySqlConnector_1 = require("../database/MySqlConnector");
-const MongoRecruitInfoModel_1 = require("../models/MongoRecruitInfoModel");
-const MysqlRecruitInfoModel_1 = require("../models/MysqlRecruitInfoModel");
+const enums_1 = require("@message/enums");
+const RedisUrlManager_1 = require("../url/RedisUrlManager");
+const RecruitInfoRepository_1 = require("@database/RecruitInfoRepository");
 // Load environment variables
 dotenv.config();
+(async () => {
+    const parser = new GeminiParser_1.GeminiParser();
+    const consumer = new Consumer_1.Consumer(enums_1.QueueNames.VISIT_RESULTS);
+    const urlManager = new RedisUrlManager_1.RedisUrlManager();
+    const recruitInfoRepository = new RecruitInfoRepository_1.RecruitInfoRepository();
+    recruitInfoRepository.initialize();
+    await consumer.connect();
+    await urlManager.connect();
+    consumer.handleLiveMessage(async (msg) => {
+        if (msg) {
+            const rawContent = JSON.parse(msg.content.toString());
+            // verify
+            await parser.parseRawContentRetry(rawContent, 100, 2000)
+                .then((parseContent) => {
+                if (!parseContent) {
+                    throw new GeminiParser_1.ParseError("parsesContent가 존재하지 않습니다.");
+                }
+                return urlManager.getFavicon(rawContent.url).then((favicon) => ({ favicon, parseContent }));
+            })
+                .then((context) => parser.makeDbRecruitInfo(context.parseContent, rawContent, context.favicon))
+                .then((recruitInfo) => {
+                if (!recruitInfo) {
+                    throw new GeminiParser_1.ParseError("RecruitInfo가 존재하지 않습니다.");
+                }
+                return recruitInfoRepository.createRecruitInfo(recruitInfo);
+            })
+                .catch((error) => {
+                if (error instanceof GeminiParser_1.ParseError) {
+                    logger_1.defaultLogger.error(`[consumer] Parse  중 에러 : ${error.message}`);
+                }
+                else {
+                    logger_1.defaultLogger.error(`[consumer] 저장 중 에러 ${error}`);
+                }
+                throw error;
+            });
+        }
+    }, 1000);
+})();
 /**
  * Initialize and start the GeminiParser as a RabbitMQ consumer
  */
-async function startGeminiParserConsumer() {
-    try {
-        const parser = new GeminiParser_1.GeminiParser({
-            apiKey: process.env.GEMINI_API_KEY,
-            apiKeys: process.env.GEMINI_API_KEYS?.split(','),
-            model: process.env.GEMINI_MODEL || 'gemini-1.5-flash-latest',
-            dbConnector: new MySqlConnector_1.MySqlConnector(),
-            cacheDbConnector: new MongoDbConnector_1.MongoDbConnector(),
-            cacheRecruitInfoRepository: new MongoRecruitInfoRepository_1.MongoRecruitInfoRepository(MongoRecruitInfoModel_1.MongoRecruitInfoModel),
-            recruitInfoRepository: new MysqlRecruitInfoRepository_1.MysqlRecruitInfoRepository(MysqlRecruitInfoModel_1.mysqlRecruitInfoModel, MysqlRecruitInfoModel_1.mysqlRecruitInfoSequelize),
-            urlManager: new RedisUrlManager_1.RedisUrlManager(),
-            messageService: new MessageService_1.default(),
-            useCache: true
-        });
-        const initialized = await parser.initialize();
-        if (!initialized) {
-            console.error('Failed to initialize GeminiParser');
-            process.exit(1);
-        }
-        parser.messageService.handleLiveMessage(MessageService_1.QueueNames.VISIT_RESULTS, async (msg) => {
-            if (msg) {
-                const result = JSON.parse(msg.content.toString());
-                logger_1.defaultLogger.debug(result.url);
-                const parsedContent = await parser.parseRawContent(result);
-                const dbRecruitInfo = parser.makeDbRecruitInfo(parsedContent, result);
-                // const saved = await this.saveParsedContent(dbRecruitInfo, { destination: 'db' });
-                await parser.recruitInfoRepository.createRecruitInfo(dbRecruitInfo);
-                if (parser.cacheRecruitInfoRepository) {
-                    await parser.cacheRecruitInfoRepository.createRecruitInfo(dbRecruitInfo);
-                }
-            }
-        });
-        console.log('Starting GeminiParser as consumer...');
-        console.log('GeminiParser consumer is now active and listening for messages');
-        // Setup graceful shutdown
-    }
-    catch (error) {
-        console.error('Error in startGeminiParserConsumer function:', error);
-        // Ensure connections are closed even if there's an error
-        try {
-            console.log('Disconnected from services due to error');
-        }
-        catch (disconnectError) {
-            console.error('Error disconnecting from services:', disconnectError);
-        }
-        process.exit(1);
-    }
-}
-// Run the script if this file is executed directly
-if (require.main === module) {
-    startGeminiParserConsumer().catch(error => {
-        console.error('Uncaught error:', error);
-        process.exit(1);
-    });
-}
 //# sourceMappingURL=runGeminiParserConsumer.js.map

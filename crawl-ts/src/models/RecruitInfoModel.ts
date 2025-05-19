@@ -1,45 +1,12 @@
-/**
- * 원본 콘텐츠 인터페이스
- * 크롤링된 원본 데이터를 나타냅니다.
- */
-export interface IRawContent {
-  /**
-   * 페이지 제목
-   */
-  title?: string;
-  /**
-   * 페이지 텍스트 내용
-   */
-  text: string;
+
+
+export interface BaseRecruitInfoDTO{
 
   /**
-   * 페이지 URL
+   * 공고 제목 :
    */
-  url: string;
-
+  title: string;
   /**
-   * 페이지 도메인
-   */
-  domain?: string;
-
-  /**
-  *
-  */
-  favicon?: String;
-  /**
-   * 크롤링 시간
-   */
-  crawledAt?: Date;
-
-  /**
-   * 추가 메타데이터
-   */
-  metadata?: Record<string, any>;
-}
-
-export interface IBaseRecruitInfo{
-
- /**
    * 회사명
    */
   company_name?: string;
@@ -57,7 +24,7 @@ export interface IBaseRecruitInfo{
   /**
    * 지역번호
    */
-  region_id?: string;
+  region_id?: number[];
 
   /**
    * 경력 요구 사항
@@ -77,12 +44,12 @@ export interface IBaseRecruitInfo{
   /**
    * 지원 시작일
    */
-  apply_start_date?: string;
+  apply_start_date?: Date;
 
   /**
    * 지원 마감일
    */
-  apply_end_date?: string;
+  apply_end_date?: Date;
 
   /**
    * 필수 요건
@@ -100,11 +67,9 @@ export interface IBaseRecruitInfo{
   ideal_candidate?: string;
 
 }
-/**
- * Gemini API 응답 인터페이스
- * Gemini API가 반환하는 파싱 결과를 나타냅니다.
- */
-export interface IGeminiResponseRecruitInfo extends IBaseRecruitInfo {
+
+
+export interface GeminiResponseResult  {
   /**
    * 채용 공고인지 여부
    */
@@ -115,35 +80,47 @@ export interface IGeminiResponseRecruitInfo extends IBaseRecruitInfo {
    */
   is_it_recruit_info: boolean;
 
-
 }
 
 /**
- * 봇이 파싱한 채용 정보 인터페이스
- * (Gemini 응답을 확장)
+ * Gemini API 응답 인터페이스
+ * Gemini API가 반환하는 파싱 결과를 나타냅니다.
  */
-export interface IBotRecruitInfo extends IGeminiResponseRecruitInfo {
-  // IGeminiResponse의 모든 필드를 상속받음
-  // 추가 필드가 필요하면 여기에 정의
+export interface GeminiResponseRecruitInfoDTO extends BaseRecruitInfoDTO ,GeminiResponseResult {
+
 }
 
+
+/**
+ * MySQL DB용 채용 정보 인터페이스
+ * IDbRecruitInfo에서 일부 필드를 제외하고 상속받음
+ */
+export interface CreateDBRecruitInfoDTO extends BaseRecruitInfoDTO {
+  // 특정 필드 재정의 (필요시)
+  id?: number;
+
+  url: string;
+
+  text: string;
+
+  title: string;
+
+  created_at?: Date;
+
+  updated_at?: Date;
+
+  is_public: boolean;
+
+  favicon?: string;
+
+}
 /**
  * DB에 저장되는 채용 정보 인터페이스
  */
-export interface ICacheDbRecruitInfo extends IBotRecruitInfo , IRawContent{
+export interface CreateCacheDBRecruitInfoDTO extends CreateDBRecruitInfoDTO, GeminiResponseResult {
   _id?: string;
 
   is_parse_success: boolean;
-  /**
-   * 생성 시간
-   */
-  created_at: Date;
-
-  /**
-   * 수정 시간
-   */
-  updated_at: Date;
-
   /**
    * 공개 여부
    */
@@ -152,11 +129,21 @@ export interface ICacheDbRecruitInfo extends IBotRecruitInfo , IRawContent{
 
 
 
-/**
- * MySQL DB용 채용 정보 인터페이스
- * IDbRecruitInfo에서 일부 필드를 제외하고 상속받음
- */
-export interface IDbRecruitInfo extends Omit<ICacheDbRecruitInfo, 'is_parse_success' | 'is_recruit_info' | 'is_it_recruit_info'> {
-  // 특정 필드 재정의 (필요시)
-  id? : string
+export interface RegionResult{
+  id? : number
+}
+
+
+
+export interface RecruitInfoUrlDto {
+  id: number;
+  url: string;
+}
+
+export interface RecruitInfoVaildDto {
+  id: number;
+
+  url: string;
+
+  is_public: boolean;
 }

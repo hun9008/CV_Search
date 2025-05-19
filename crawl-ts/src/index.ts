@@ -28,7 +28,7 @@ function createCrawler(options = {}) {
   const browserManager = new ChromeBrowserManager();
   const contentExtractor = new WebContentExtractor();
   const messageService = new MessageService();
-  const urlManager = new RedisUrlManager();
+  const urlManager = new RedisUrlManager(["www.asml.com"]);
 
   // 크롤러 인스턴스 생성
   return new WebCrawler({
@@ -49,9 +49,7 @@ async function main() {
     // 크롤러 생성 및 실행
     const crawler = createCrawler();
     await crawler.run();
-
     logger.debug('===== 크롤링 요약 =====');
-
     // 종료 처리
     process.exit(0);
   } catch (error) {

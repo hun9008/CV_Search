@@ -1,0 +1,6275 @@
+{
+  "summary": {
+    "total": 1185,
+    "korean_count": 300,
+    "english_count": 885,
+    "korean_with_region_ids": 146
+  },
+  "details": [
+    {
+      "region_text": "세종",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "세종",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "세종",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "세종",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "세종",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "울산",
+      "region_ids": [
+        77
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울 경기/인천",
+      "region_ids": [
+        1,
+        54,
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "현장, 본사",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "세종",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "수도권/영남권",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "수도권/영남권",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "세종",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "가산",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "베트남 법인",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "인도네시아 법인",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강동구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "분당",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "분당",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Bundang",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "분당",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Bundang",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "분당",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "분당, 서울, 춘천, 세종",
+      "region_ids": [
+        1,
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Bundang",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bundang",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "분당",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "분당",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기 군포시, 경기 안양시",
+      "region_ids": [
+        84,
+        95,
+        117
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기 군포시",
+      "region_ids": [
+        84,
+        117
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Seoul",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "서초",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "인천/경기, 안산/안양/시화/군포/광명, 평택/ 안성 / 안중, 동해/강릉, 안동, 천안/청주, 군산/익산/목포/광주",
+      "region_ids": [
+        54,
+        65,
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "김포공항 → 서울시 강서구 소재 / 강원랜드 → 강원도 정선군 소재",
+      "region_ids": [
+        1,
+        245
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "100개 이상의 국가",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Cheonan, Ch´ungch´ong-namdo, Corea del Sud",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cheonan, Ch´ungch´ong-namdo, République de Corée",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Pudong, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shimada, Shizuoka, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taipei City, T´ai-pei, Taïwan/Taipei chinois",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taipei City, T´ai-pei, Taïwan/Taipei chinois",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cracow, Małopolskie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Brno, Jihomoravsky, République tchèque",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Global",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Vadodara, Gujarat, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "TBD, Global",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Global",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Toyota, Aichi, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Apodaca, Nuevo Leon, Mexique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Apodaca, Nuevo Leon, Mexique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Apodaca, Nuevo Leon, Mexique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cary, North Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Luis Potosí, San Luis Potosi, Mexique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Parañaque City, Philippines",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bartlesville, Oklahoma, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Sant Quirze del Valles, Barcelona, Espagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Turgi, Aargau, Suisse",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shinagawa, Tokyo, Giappone / Wenzhou, Zhejiang, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shinagawa, Tokyo, Giappone",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Rotterdam, Zuid-Holland, Paesi Bassi",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "TBD, Global",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Warrington, Cheshire, Regno Unito",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Istanbul, Istanbul, Turchia",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Ciudad de Mexico, Estado de Mexico, Messico",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Allentown, Pennsylvania, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Diegem, Brabant, Belgique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Quebec, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taipei City, T´ai-pei, Taïwan/Taipei chinois",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shimada, Shizuoka, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Yokohama, Kanagawa, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shinagawa, Tokyo, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shinagawa, Tokyo, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taipei City, T´ai-pei, Taïwan/Taipei chinois",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taipei City, T´ai-pei, Taïwan/Taipei chinois",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chongqing, Chong Qing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Jiangmen, Guangdong, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bartlesville, Oklahoma, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Nashik, Maharashtra, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mebane, North Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bartlesville, Oklahoma, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Oiartzun, Guipuzcoa, Espagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Turgi, Aargau, Suisse",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Vadodara, Gujarat, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Pune, Maharashtra, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Västerås, Vaestmanland County, Suède",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Västerås, Vaestmanland County, Suède",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mebane, North Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Napier, Hawke´s Bay, Nouvelle Zélande",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Brno, Jihomoravsky, République tchèque",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Ostrava, Moravskoslezsky, République tchèque",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Frosinone, Frosinone, Italie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Luis Potosi, San Luis Potosi, Mexique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Heidelberg, Baden-Wurttemberg, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Brno, Jihomoravsky, République tchèque",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Plzen, Plzensky, République tchèque",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Selmer, Tennessee, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beynost, Auvergne, France",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Saint-Laurent, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Brno, Jihomoravsky, République tchèque",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Brno, Jihomoravsky, République tchèque",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Brno, Jihomoravsky, République tchèque",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mebane, North Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Sant Quirze del Valles, Barcelona, Espagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Madrigalejo del Monte, Burgos, Espagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Auburn Hills, Michigan, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Saint-Laurent, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mebane, North Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mebane, North Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mannheim, Baden-Wurttemberg, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Quebec, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cheonan, Ch´ungch´ong-namdo, République de Corée",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Faridabad, Haryana, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chongqing, Chong Qing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hohhot, Nei Mongol, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Nanjing, Jiangsu, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Nanjing, Jiangsu, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Toyota, Aichi, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Toyota, Aichi, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Toyota, Aichi, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Utsunomiya, Tochigi, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shinagawa, Tokyo, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kao-hsiung, Taïwan/Taipei chinois",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kao-hsiung, Taïwan/Taipei chinois",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kowloon Bay, Kowloon, Hong Kong",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bac Ninh, République socialiste du Viêt Nam",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Rotterdam, Zuid-Holland, Pays-Bas",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Baden-Dattwil, Aargau, Suisse",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Warrington, Cheshire, Royaume-Uni de Grande-Bretagne et d'Irl. du Nord",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Madrid, Espagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chicago, Illinois, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Portland, Tennessee, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Houston, Texas, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Minden, North Rhine-Westphalia, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Sacramento, California, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Aleksandrow Lodzki, Łódzkie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Antonio, Texas, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Jacksonville, Florida, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cary, North Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Quebec, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Portland, Oregon, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hyderabad, Andra Pradesh, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Diegem, Brabant, Belgique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Columbus, Mississippi, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore North, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Santiago, Región Metropolitana, Chili",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Moorebank, New South Wales, Australie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Rotterdam, Zuid-Holland, Pays-Bas",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Fort Smith, Arkansas, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Westerville, Ohio, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Faridabad, Haryana, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Portland, Tennessee, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Dallas, Texas, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Diegem, Brabant, Belgique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Vilnius, Lituanie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Pune, Maharashtra, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chesterfield, Missouri, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Vancouver, WA, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Charleston, South Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Phoenix, Arizona, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Edmonton, Alberta, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Stevens Point, Wisconsin, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chicago, Illinois, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Doha, Etat du Qatar",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Notting Hill, Victoria, Australie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hangzhou, Zhejiang, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hangzhou, Zhejiang, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Jiangmen, Guangdong, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Jiangmen, Guangdong, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Jiangmen, Guangdong, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Jiangmen, Guangdong, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Greenville, South Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Turgi, Aargau, Suisse",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Quebec, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bergamo, Bergamo, Italie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Heidelberg, Baden-Wurttemberg, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Jüri, Harjumaa, Estonie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mannheim, Baden-Wurttemberg, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Quebec, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Jüri, Harjumaa, Estonie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "New Berlin, Wisconsin, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eggelsberg, Salzburg, Linz, Graz",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Vittuone, Milan, Italie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Fort Smith, Arkansas, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mannheim, Baden-Wurttemberg, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Nashik, Maharashtra, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Nashik, Maharashtra, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Quebec, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eggelsberg AT, Autriche",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cracow, Małopolskie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Vittuone, Milan, Italie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mannheim, Baden-Wurttemberg, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Quebec, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Quebec, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eggelsberg AT, Autriche",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Salzburg, Salzburg, Autriche",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eggelsberg AT, Autriche",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Nashik, Maharashtra, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Dorval, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mannheim, Baden-Wurttemberg, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eggelsberg AT, Autriche",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bartlesville, Oklahoma, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mebane, North Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mannheim, Baden-Wurttemberg, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Memphis, Tennessee, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mebane, North Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "New Berlin, Wisconsin, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Pudong, Shanghai, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shimada, Shizuoka, Japon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taipei City, T´ai-pei, Taïwan/Taipei chinois",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cracow, Małopolskie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cracow, Małopolskie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Zürich, Generic, Global (HQ)",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Istanbul, Istanbul, Turquie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cracow, Małopolskie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "São Paulo, Sao Paulo, Brésil",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Quebec, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Vittuone, Milan, Italie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Europe (excluding Switzerland)",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Warsaw, Mazowieckie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Luis Potosi, San Luis Potosi, Mexique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Pedro Garza Garcia, Nuevo Leon, Mexique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Lodz, Łódzkie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "İstanbul, Istanbul, Turquie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cracow, Małopolskie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Madrid, Espagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Miramar, Florida, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Memphis, Tennessee, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Milton Keynes, Buckinghamshire, Royaume-Uni de Grande-Bretagne et d'Irl. du Nord",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Rotterdam, Zuid-Holland, Pays-Bas",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hamburg, Hamburg, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Istanbul, Istanbul, Turquie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Saint-Jean-sur-Richelieu, Quebec, Canada",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Houston, Texas, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Panama City, Panama",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Lodz, Łódzkie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Petaling Jaya, Selangor, Malaisie",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Global",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Global",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore(India)",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Saint-Priest, France",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cary, North Carolina, Etats-Unis",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mannheim, Baden-Wurttemberg, Allemagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Graz, Autriche",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Luis Potosi, San Luis Potosi, Mexique",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, Chine",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hyderabad, Andra Pradesh, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "TBD, Global",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Vadodara, Gujarat, Inde / Bangalore",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Vadodara, Gujarat, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "TBD, Global",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cracow, Małopolskie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "TBD, Global",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Global",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Cracow, Małopolskie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "São Paulo, Sao Paulo, Brésil",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Aleksandrow Lodzki, Łódzkie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Utrecht, Utrecht, Pays-Bas",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "서울특별시 중구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Seoul, KR",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "영주",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "세종",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경상북도 경주시",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "국내 및 Global 사업장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "송도",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "제주",
+      "region_ids": [
+        242
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울 경기 및 수도권 고객사",
+      "region_ids": [
+        1,
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경북 칠곡군 가산면",
+      "region_ids": [
+        193,
+        213
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "원주시",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "충청북도 청주시 흥덕구 옥산면",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대구/경북",
+      "region_ids": [
+        44,
+        193
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경남 양산",
+      "region_ids": [
+        218
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경남 양산",
+      "region_ids": [
+        218
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "파주/의왕/광주/울산",
+      "region_ids": [
+        65,
+        77
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "충청남도 청양군",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "카카오페이 전체",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "칠곡경북대학교병원",
+      "region_ids": [
+        193
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "칠곡",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "김해국제공항",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "JEJU",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Darmstadt, Hessen, Germany",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mollet del Valles, Barcelona, Spain",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mollet del Valles, Barcelona, Spain",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Madrid, Madrid, Spain",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mollet del Valles, Barcelona, Spain",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mollet del Valles, Barcelona, Spain",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Madrid, Madrid, Spain",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Montbonnot Saint-Martin, France",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mollet del Valles, Barcelona, Spain",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Alges, Alges, Portugal",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mumbai, Maharashtra, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Suzhou, Jiangsu, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bonifacio Global City, Metro Manila, Philippines",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Gernsheim, Hessen, Germany",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bratislava, Bratislava, Slovakia",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Darmstadt, Hessen, Germany",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Allentown, Pennsylvania, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kaohsiung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Darmstadt, Hessen, Germany",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shizuoka, Shizuoka, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Nantong, Jiangsu, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bonifacio Global City, Metro Manila, Philippines",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bonifacio Global City, Metro Manila, Philippines",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Burlington, Massachusetts, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Burlington, Massachusetts, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Burlington, Massachusetts, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bedford, Massachusetts, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Burlington, Massachusetts, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bellefonte, Pennsylvania, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tamaqua, Pennsylvania, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Spokane, WA the state of Idaho, Montana, Northern, WY and parts of E. WA",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kaohsiung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kaohsiung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kaohsiung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kaohsiung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kaohsiung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kaohsiung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kaohsiung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kaohsiung, Kaohsiung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Darmstadt, Hessen, Germany",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Darmstadt, Hessen, Germany",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Burlington, Massachusetts, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Burlington, Massachusetts, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Burlington, Massachusetts, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Allentown, Pennsylvania, United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "서산 / 평택",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "멕시코 하네스",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "강서구 화곡동, 금천구 가산동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "해운대백병원점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "기흥구 고매동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "가평군/남양주시/춘천시/강원/원주시",
+      "region_ids": [
+        245
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "평택시 팽성읍/종로구 세종로/분당구 백현동/서초구 잠원동/송파구 신천동/강남구 도곡동/용산구 이태원동/강남구 신사동",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서초동, 상암점, 반곡동, 구미동, 대동, 천연동, 이문동, 번동, 마포점, 제주이도점, 수내정자점, 노형점, 달동점, 공릉점, 계룡점, 고잔점, 과천점, 서방배점, 야탑점, 경주시, 일원점",
+      "region_ids": [
+        242
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "장안구 율전동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기 평택시",
+      "region_ids": [
+        84,
+        103
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "가평읍/우두동/다산동/춘천시/강원 원주시",
+      "region_ids": [
+        245,
+        247
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기 파주시",
+      "region_ids": [
+        84,
+        124
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "가산디지털단지역점, 당산역점, 화곡역점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "마포구 서교동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대연",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기 이천시",
+      "region_ids": [
+        84,
+        125
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "의정부시 녹양동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "평택시 팽성읍",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "영등포역점, 영통본점, 수원영통본점, 수지구청점, 향남1지구점, 한양대점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "은평구",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "금천구 가산동/영등포구 양평동/강서구 화곡동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "고양시 덕양구",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "탄방동, 잠실동, 평내점, 아현동, 창전동, 동탄역점, 단구점, 청라점, 봉천동, 신정동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전체",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "군산시",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대구, 울산, 광주, 화곡동, 분당, 안성, 기흥, 이천, 세종, 파주, 해운대, 기장, 영등포, 강남",
+      "region_ids": [
+        44,
+        65,
+        77,
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "시흥시 은행동, 전북 전체, 서울 동대문구",
+      "region_ids": [
+        1,
+        7,
+        264
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기 남양주시/강원 춘천시/강원 원주시",
+      "region_ids": [
+        84,
+        114,
+        245,
+        246,
+        247
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기 광명시, 오산시 원동, 파주시 야당동, 세종, 하남시 망월동",
+      "region_ids": [
+        83,
+        84,
+        102
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "중구 남산동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전 서구 도마동",
+      "region_ids": [
+        71,
+        74
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "수정구 수진동, 일산동구 지영동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "여러 지역",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울 성동구, 경기 의정부시, 서울 동대문구, 영주시 휴천동, 안산시 단원구",
+      "region_ids": [
+        1,
+        5,
+        7,
+        84,
+        94
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "세종로/신천동/팽성읍/이태원동/도곡동/백현동",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기 남양주시/경기 가평군/강원 춘천시/강원 원주시/강원 전체",
+      "region_ids": [
+        84,
+        114,
+        134,
+        245,
+        246,
+        247
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "홍대",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "건대점, 하남점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "동천점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "중동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "광주, 마포, 인천, 해운대",
+      "region_ids": [
+        54,
+        65
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "장안구 율전동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안 2공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안 1/2공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안1공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안 1/2공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안1공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "동탄",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안 1/2공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "수도권(서울·경기·인천)",
+      "region_ids": [
+        1,
+        54,
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국, 청주, 부산",
+      "region_ids": [
+        27
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 마포구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국/서울",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "구미병원",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전라남도, 광주광역시",
+      "region_ids": [
+        65
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "수도권/영남권",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "토스 사무실",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "태국 방콕",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 강남구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Wilton, Connecticut, USA",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, Connecticut to San Diego, California",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "신주",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "미국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "The Netherlands, United States, Germany, Taiwan, South Korea, Chinese mainland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Deutschland, Berlin",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, Connecticut",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "미국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Berlin",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "the Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shenzhen, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "네덜란드 벨트호벤",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hillsboro, Oregon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hiroshima, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Leuven, Belgium",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hwasung, Korea",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chitose, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hiroshima, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "the Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Kulim, Malaysia",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hiroshima, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, San Jose, California, Wilton, Connecticut, Chandler, Arizona, Hillsboro, Oregon, Austin, Texas and Manassas, Virginia",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taichung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Yokkaichi, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wuxi, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "신주, 린커우, 타이중, 타이난 (대만)",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Hiroshima, Japan / Chandler, US + Hillsboro, US + Hwasung, South Korea + Kiryat-Gat and Migdal Ha’Emek, Israel + Linkou, Taiwan + Hsinchu, Taiwan + Veldhoven, the Netherlands + Maynooth, Ireland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, Connecticut",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hiroshima, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Jose, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shenzhen, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Berlin",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "worldwide",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Jose, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taichung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taichung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Jose, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wuxi, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wuxi, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wuxi, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Linkou, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Berlin, Deutschland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shenzhen, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Jose, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taichung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wuxi, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taichung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Berlin, Deutschland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Berlin, Deutschland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hefei, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Jose, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chitose, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai / Beijing / Shenzhen / Hangzhou / Wuhan / Xiamen / Jinjiang",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tokyo, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shenzhen, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taichung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tokyo, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hiroshima, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tokyo, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Jose, California / Wilton, Connecticut / San Diego, California",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Berlin, Deutschland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Berlin, Deutschland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tokyo, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hefei, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Yokkaichi, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "The Netherlands, United States, Germany, Taiwan, South Korea, Chinese mainland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tokyo, Japan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Berlin",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taichung, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Linkou, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Linkou, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Linkou, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "worldwide",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, Connecticut / San Diego, California",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hwasung, South Korea / Linkou, Taiwan / Hsinchu, Taiwan / Veldhoven, the Netherlands / Maynooth, Ireland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hefei, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Linkou, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shenzhen, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hefei, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Linkou, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Leuven, Belgium",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Berlin, Deutschland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Jose, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Berlin, Deutschland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hillsboro, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taichung, Taiwan / Linkou",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, CT",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, CA",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Linkou, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wuxi, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Jose, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Berlin",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Linkou, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Beijing, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Jose, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "United States",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hillsboro, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Jose, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hillsboro, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shenzhen, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hsinchu, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hillsboro, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shenzhen, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shenzhen, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chandler, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shenzhen, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, CT",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Wilton, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chandler, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chandler, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Linkou, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chandler, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Chandler, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "San Diego, US",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hwasung, Korea",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Hangzhou, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Eindhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Veldhoven, Netherlands",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Tainan, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Shanghai, China",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "null",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "경기도 과천시",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "충남 내포신도시",
+      "region_ids": [
+        152
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "부산광역시 강서구",
+      "region_ids": [
+        27
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "스타필드 하남점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Taipei",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전주특별자치도/서울특별시/용인시/청주시",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "인천광역시 서구",
+      "region_ids": [
+        54
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "한강/파주",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "수도권",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "강원특별자치도 원주시",
+      "region_ids": [
+        245
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "스타필드 하남점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "김해국제공항",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대한민국 경기도 성남시 분당구 판교역로 235",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전남북부권",
+      "region_ids": [
+        170
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안1공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Jeolla",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "경기도 과천시",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "낙동강/영주",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Taipei, Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "경기 이천",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 과천시",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "본사/대전",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "스타필드 하남점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구, 경기도 화성시",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안 1공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울시 마포구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Taipei / Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "(주)에스엠컬처앤콘텐츠",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "LF 스퀘어몰 광양점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "R&D Center(Namyang)",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "서울",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "부산",
+      "region_ids": [
+        27
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "과천시",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전북 정읍시",
+      "region_ids": [
+        264,
+        270
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 성북구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Cracow, Małopolskie, Pologne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "경기도 성남시 분당구 판교로 255, 판교 이노밸리 F동, 경기도 화성시 향남읍 제약공단2길 46",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "광주",
+      "region_ids": [
+        65
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "동탄",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "[한강/경기]",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "롯데 라이프스타일몰 기흥점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Taipei / Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "경기도 성남시 분당구 판교로 344",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "부천시",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Seoul, Seoul, Korea (the Republic of)",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "창원 또는 의왕",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "충남 내포신도시",
+      "region_ids": [
+        152
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울/수도권",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Seoul",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "전주 지역",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Bangkok",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "(주)에스엠컬처앤콘텐츠",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Mumbai/ Delhi",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "서울",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "인천",
+      "region_ids": [
+        54
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "[영섬/나주]",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 안성시",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "부산",
+      "region_ids": [
+        27
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경남 양산",
+      "region_ids": [
+        218
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안 1/2공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Xiamen, Fujian, Cina",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "서울",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전광역시 유성구",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "중부지사",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안 1/2공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "오산",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 과천시",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서산",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Wroclaw, Dolnoslaskie, Poland",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "강원특별자치도 원주시",
+      "region_ids": [
+        245
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전광역시 유성구",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기 외, 부산 외",
+      "region_ids": [
+        27,
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "둔산",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "인도",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "강원도 춘천시 동면",
+      "region_ids": [
+        245
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안2공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전광역시 유성구",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 서초구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "판교",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "세종",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Szombathely, HU, 9700",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "양주",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "청양",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "R&D Center(Namyang)",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Brasov, RO",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangkok",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "인천광역시 서구",
+      "region_ids": [
+        54
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "해외",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "마산",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울/수도권",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대한민국 경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "제주",
+      "region_ids": [
+        242
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안 1/2공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "R&D Center(Mabuk)",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "현대백화점 신촌 U-PLEX점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전북 정읍시",
+      "region_ids": [
+        264,
+        270
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "인천광역시 미추홀구 관교동",
+      "region_ids": [
+        54
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 과천시",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "해외 (말레이시아)",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "낙동강/거제",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기(분당), 서울, 경남(진주), 경남(창원)",
+      "region_ids": [
+        1,
+        84,
+        218
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Philippines",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "판교",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "무안",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Taicang, CN",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "용산점/신세계본점/도곡점/AK분당점/서면점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "국내 현장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, India",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "서울특별시 성북구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "국내 현장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경상북도 영주시",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "[낙동강/영주]",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경상북도 영주시",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "세종",
+      "region_ids": [
+        83
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Herzogenaurach, DE",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Gunzenhausen, DE, 91710",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "충청북도 청주시",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "분당",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Seoul",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "울산광역시 남구",
+      "region_ids": [
+        77
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Herzogenaurach, DE",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "충청북도 청주시 흥덕구 옥산면 과학산업4로 79-44",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "중국 상해시",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Lahr, DE, 77933",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "대전",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "판교",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "상대동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Seoul",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Mérida, Yucatan, 멕시코",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안1공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대구 대천점",
+      "region_ids": [
+        44
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Höchstadt, DE",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "부산경남센터지사",
+      "region_ids": [
+        27,
+        218
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Bangalore, Karnataka, Inde",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Taipei",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "동성로점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전광역시",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 서대문구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "울산 남구",
+      "region_ids": [
+        77,
+        79
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "영섬/광주",
+      "region_ids": [
+        65
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "천안 1/2공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "남양연구소",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Naucalpan de Juarez, Estado de Mexico, Mexico",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 의정부시",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "고덕점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "강원도 원주시",
+      "region_ids": [
+        245
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Hosur, IN, 635109",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "현대백화점 목동점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Bühl, DE, 77815",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "순천 지역",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "서울특별시 성북구",
+      "region_ids": [
+        1
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "부산신항",
+      "region_ids": [
+        27
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Pangyo",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "정읍",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Mumbai/ Delhi",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "동탄",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "현대백화점 신촌 U-PLEX점",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경남 양산",
+      "region_ids": [
+        218
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Taipei / Taiwan",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "강원특별자치도 원주시",
+      "region_ids": [
+        245
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "충청북도 청주시 흥덕구 옥산면 과학산업4로 79-44",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "원주",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "강원도 원주시",
+      "region_ids": [
+        245
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "경기도 성남시 분당구",
+      "region_ids": [
+        84
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Taipei",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Seoul",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "분당",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Pangyo",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "천안 1공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전북특별자치도 전주시 덕진구",
+      "region_ids": [
+        264
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "울산",
+      "region_ids": [
+        77
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "대전",
+      "region_ids": [
+        71
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Bangkok, Thailand",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Sant Quirze del Valles, Barcelona, Espagne",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "Bangkok, Thailand",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "금강/보령",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "신세계백화점 대구점",
+      "region_ids": [
+        44
+      ],
+      "lang": "ko"
+    },
+    {
+      "region_text": "Daejeon",
+      "region_ids": [],
+      "lang": "en"
+    },
+    {
+      "region_text": "천안 1공장",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "분당구 이매동",
+      "region_ids": [],
+      "lang": "ko"
+    },
+    {
+      "region_text": "전국",
+      "region_ids": [],
+      "lang": "ko"
+    }
+  ]
+}

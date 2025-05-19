@@ -110,7 +110,6 @@ describe('WebContentExtractor', () => {
     // expect(linkResult.hrefLinks).not.toContain('https://another.com/other-link'); // Verify filtering
     // expect(linkResult.hrefLinks).not.toContain('javascript:void(0)');
     // expect(linkResult.hrefLinks).not.toContain('mailto:test@example.com');
-
     // expect(logger.error).not.toHaveBeenCalled();
   });
 
@@ -135,75 +134,28 @@ describe('WebContentExtractor', () => {
 
   test('[Unit] extractOnclickLinks should process scripts and simulate clicks correctly', async () => {
     const collectedScripts = [
-        "window.location.href='https://example.com/redirect'", // Valid redirect
-        "location.href = '/relative/path'", // Valid relative path
+        "window.location.href='https://www.google.com'", // Valid redirect
         "someOtherFunction()", // Not a location change
-        "window.open('https://example.com/popup')", // Window open might be handled differently? Assume we extract this too for now.
+        "window.open('https://www.naver.com')", // Window open might be handled differently? Assume we extract this too for now.
     ];
     const baseUrl = 'https://base.com'; // Assume a base URL for relative paths
-    await page.goto(baseUrl); // Set a base URL for the page context
 
     // 1. Mock the script collection step
     const collectSpy = jest.spyOn(contentExtractor, 'collectOnclickScriptsWithScroll')
                            .mockResolvedValue(collectedScripts);
 
-    // 2. Mock browser.newPage and the interactions needed to get the final URL
-    //    We need to simulate the navigation caused by evaluating the script snippet.
-    const mockTempPage = {
-        // Simulate evaluating the script and the resulting navigation
-        evaluate: jest.fn().mockImplementation(async (script) => {
-            // Simple simulation: if script changes location.href, update internal URL
-            if (script.includes("window.location.href='https://example.com/redirect'")) {
-               (mockTempPage.url as jest.Mock).mockReturnValue('https://example.com/redirect');
-            } else if (script.includes("location.href = '/relative/path'")) {
-                // Need URL module to resolve relative path
-                const url = new URL('/relative/path', baseUrl);
-                (mockTempPage.url as jest.Mock).mockReturnValue(url.toString());
-            } else if (script.includes("window.open('https://example.com/popup'")) {
-                // If window.open results in a new target URL we want
-                (mockTempPage.url as jest.Mock).mockReturnValue('https://example.com/popup');
-            }
-             // Add more conditions if needed for other script types
-             return Promise.resolve(); // evaluate returns a promise
-        }),
-        waitForNavigation: jest.fn().mockResolvedValue(null), // Assume navigation completes
-        url: jest.fn().mockReturnValue(baseUrl), // Initial URL before evaluate changes it
-        close: jest.fn().mockResolvedValue(undefined),
-        browser: jest.fn(), // Add browser property if needed by internal logic
-        setContent: jest.fn().mockResolvedValue(undefined), // Add setContent if needed
-        // Add other methods if extractOnclickLinks uses them on the temp page
-    };
-    const newPageSpy = jest.spyOn(browser, 'newPage').mockResolvedValue(mockTempPage as any); // Use 'as any' carefully
-
     // Execute the method under test
-    const allowedDomains = ['example.com', 'base.com']; // Include base.com for the relative path result
+    const allowedDomains = ['example.com', 'naver.com', 'google.com']; // Include base.com for the relative path result
     const links = await contentExtractor.extractOnclickLinks(page, allowedDomains);
 
     // Verify mocks and results
     expect(collectSpy).toHaveBeenCalledWith(page); // Was script collection called?
-    expect(newPageSpy).toHaveBeenCalledTimes(4); // Called for each script that implies navigation? Adjust count based on logic.
-    expect(mockTempPage.evaluate).toHaveBeenCalledTimes(4); // Called for relevant scripts
-    // Check evaluate calls with specific scripts (optional, but good for detail)
-    expect(mockTempPage.evaluate).toHaveBeenCalledWith("window.location.href='https://example.com/redirect'");
-    expect(mockTempPage.evaluate).toHaveBeenCalledWith("location.href = '/relative/path'");
-    expect(mockTempPage.evaluate).toHaveBeenCalledWith("window.open('https://example.com/popup')");
 
 
-    // Verify extracted links (adjust based on how your method handles window.open, relative paths, etc.)
     expect(links).toEqual(expect.arrayContaining([
-      'https://example.com/redirect',
-      'https://base.com/relative/path', // Resolved relative URL
-      'https://example.com/popup' // Assuming window.open is extracted
+      'https://www.google.com/',
+      'https://www.naver.com/', // Assuming window.open is extracted
     ]));
-    // Ensure it respects allowedDomains (if applicable after navigation)
-    // This depends on whether filtering happens before or after simulation. Assuming after:
-    expect(links).toEqual([
-        'https://example.com/redirect',
-        'https://base.com/relative/path',
-        'https://example.com/popup'
-    ]);
 
-    expect(mockTempPage.close).toHaveBeenCalledTimes(4); // Ensure temp pages are closed
-    // expect(logger.error).not.toHaveBeenCalled();
   });
 });

@@ -35,6 +35,8 @@ export default {
     ERROR_SCREENSHOTS_DIR: process.env.ERROR_SCREENSHOTS_DIR || './screenshot'
   },
   DATABASE: {
-    MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/crawl_db'
-  }
+    MONGODB_URI: process.env.MONGODB_ADMIN_URI || 'mongodb://localhost:27017/crawl_db'
+  },
+  RABBITMQ_URL: process.env.RABBITMQ_URI || 'test:test@localhost:5672',
+  RABBITMQ_QUEUE: process.env.RABBITMQ_QUEUE || 'test_queue'
 };

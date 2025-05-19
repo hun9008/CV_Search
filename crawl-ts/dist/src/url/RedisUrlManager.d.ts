@@ -39,7 +39,7 @@ export declare class RedisUrlManager implements IUrlManager {
      * RedisUrlManager 생성자
      * @param redisClient Redis 커넥터 인스턴스
      */
-    constructor();
+    constructor(availableDomains?: string[]);
     /**
       * Connects to the Redis server.
       * Attempts to establish a connection to the Redis server and checks the connection by sending a ping.
@@ -57,6 +57,12 @@ export declare class RedisUrlManager implements IUrlManager {
      * @returns URL 상태 또는 null
      */
     getUrlStatus(url: string): Promise<UrlStatus | null>;
+    /**
+   * favicon 가져오기
+   * @param domain URL
+   * @returns URL 상태 또는 null
+   */
+    getFavicon(domain: string): Promise<string | null>;
     /**
      * URL에서 도메인 추출
      * @param url URL 문자열
@@ -94,8 +100,8 @@ export declare class RedisUrlManager implements IUrlManager {
      */
     addDomain(domain: string): Promise<void>;
     /**
-    * Redis Lua 스크립트를 사용하여 특정 도메인에서 'not_visited' 상태인 URL을 가져오고
-    * 상태를 'in_queue'로 원자적으로 업데이트합니다.
+    * Redis transection을 사용해서 원자적으로 업데이트함
+    *
     * @param domain 검색할 도메인
     * @returns URL과 도메인 정보가 포함된 객체 또는 URL이 없을 경우 null
     */

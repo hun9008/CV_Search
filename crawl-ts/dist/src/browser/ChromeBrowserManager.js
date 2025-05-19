@@ -32,71 +32,97 @@ const config_1 = __importDefault(require("../config/config"));
 const child_process_1 = require("child_process");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const puppeteer_1 = __importDefault(require("puppeteer"));
 /**
  * Chrome 브라우저 관리 구현체
  * Puppeteer를 사용하여 Chrome 브라우저를 관리합니다.
  */
 class ChromeBrowserManager {
-    /**
-     * 브라우저 초기화
-     * @returns 브라우저 인스턴스
-     */
-    async initBrowser() {
-        if (!this.browser) {
-            logger_1.defaultLogger.debug(`ChromeBrowserManager 초기화...`);
-            // Puppeteer 동적 임포트 (필요할 때만 로드)
-            const puppeteer = await Promise.resolve().then(() => __importStar(require('puppeteer')));
-            this.browser = await puppeteer.launch({
-                headless: config_1.default.BROWSER.HEADLESS ? true : false,
-                args: config_1.default.BROWSER.LAUNCH_ARGS,
-                timeout: 10000, // 10 seconds
-                protocolTimeout: 20000, // 20 seconds
-            });
-            // 브라우저 PID 저장
-            this.browserPID = this.browser.process() ? this.browser.process().pid : null;
-            if (this.browserPID) {
-                logger_1.defaultLogger.debug(`브라우저 프로세스 ID: ${this.browserPID}`);
+    constructor() {
+        /**
+         * 브라우저 초기화
+         * @returns 브라우저 인스턴스
+         */ this.isLaunching = false;
+    }
+    async initBrowser(retries = 3, delay = 2000) {
+        for (let i = 0; i < retries; i++) {
+            if (this.isLaunching) {
+                logger_1.defaultLogger.debug('[BrowserManager] 브라우저가 이미 초기화 중입니다. 대기 중...');
+                await new Promise(res => setTimeout(res, delay));
+                continue;
             }
-            // 프로세스 종료 신호 처리
-            const processExit = async () => {
-                logger_1.defaultLogger.debug('프로세스 종료 감지, 브라우저 정리 중...');
-                await this.closeBrowser();
-                process.exit(0);
-            };
-            // 프로세스 종료 이벤트 리스너 등록
-            process.once('SIGINT', processExit);
-            process.once('SIGTERM', processExit);
+            if (this.browser) {
+                logger_1.defaultLogger.debug('[BrowserManager][initBrowser] 이미 초기화된 브라우저가 있습니다. 재사용 중...');
+                return this.browser;
+            }
+            try {
+                logger_1.defaultLogger.debug('[BrowserManager][initBrowser] 브라우저 초기화 중...');
+                this.isLaunching = true;
+                this.browser = await puppeteer_1.default.launch({
+                    headless: config_1.default.BROWSER.HEADLESS,
+                    args: config_1.default.BROWSER.LAUNCH_ARGS,
+                    timeout: 30000,
+                });
+                const browserProcess = this.browser.process();
+                if (browserProcess) {
+                    const pid = browserProcess.pid;
+                    logger_1.defaultLogger.info(`[BrowserManager][initBrowser] Puppeteer browser launched with PID: ${pid}`);
+                    this.browserPid = pid; // 원하면 클래스 멤버로 저장 가능
+                }
+                this.isLaunching = false;
+                logger_1.defaultLogger.debug('[BrowserManager][initBrowser] 브라우저 초기화 완료');
+                return this.browser;
+            }
+            catch (err) {
+                if (err instanceof Error) {
+                    logger_1.defaultLogger.error(`puppeteer.launch() 실패 [시도 ${i + 1}/${retries}]: ${err.message}`);
+                    if (i === retries - 1)
+                        throw new Error("브라우저 재시도 실패");
+                    await new Promise(res => setTimeout(res, delay));
+                }
+            }
         }
-        return this.browser;
+    }
+    /**
+     * 새로운 페이지 생성 후 반환
+     */
+    async getNewPage() {
+        if (!this.browser) {
+            throw new Error("No broswer inialized");
+        }
+        return await this.browser.newPage();
     }
     /**
      * 브라우저 종료
      */
     async closeBrowser() {
         if (this.browser) {
-            logger_1.defaultLogger.debug('브라우저 정리 중...');
+            logger_1.defaultLogger.debug('[BrowserManager] 브라우저 정리 중...');
             try {
-                // 모든 페이지 닫기 시도
-                const pages = await this.browser.pages();
-                await Promise.all(pages.map((page) => {
-                    try {
-                        return page.close();
-                    }
-                    catch (e) {
-                        return Promise.resolve();
-                    }
-                }));
-                // 브라우저 닫기
-                await this.browser.close();
-                this.browser = null;
-                logger_1.defaultLogger.debug('브라우저가 정상적으로 종료되었습니다.');
+                await this.browser.close().catch((err) => {
+                    logger_1.defaultLogger.error('[BrowserManager] 브라우저 종료 중 오류:', err);
+                });
+                this.browser = undefined;
+                logger_1.defaultLogger.debug('[BrowserManager] 브라우저가 정상적으로 종료되었습니다.');
             }
             catch (err) {
                 logger_1.defaultLogger.error('브라우저 종료 중 오류:', err);
             }
             finally {
                 // Google Chrome for Testing 프로세스 강제 종료
-                this.killChromeProcesses();
+                this.browser = undefined;
+                if (this.browserPid) {
+                    try {
+                        process.kill(this.browserPid, 'SIGKILL'); // 강제 종료
+                        logger_1.defaultLogger.debug(`[BrowserManager] 브라우저 PID(${this.browserPid}) 강제 종료 성공`);
+                    }
+                    catch (err) {
+                        logger_1.defaultLogger.warn(`[BrowserManager] 브라우저 PID(${this.browserPid}) 강제 종료 실패: ${err}`);
+                    }
+                    finally {
+                        this.browserPid = undefined;
+                    }
+                }
             }
         }
     }

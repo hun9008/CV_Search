@@ -34,6 +34,7 @@ class SubUrl {
      * @param data 초기 데이터
      */
     constructor(data = {}) {
+        this.visited = true;
         this.herfUrls = [];
         this.onclickUrls = [];
         this.crawledUrls = [];

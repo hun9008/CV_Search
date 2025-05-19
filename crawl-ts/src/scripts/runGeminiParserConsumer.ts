@@ -1,79 +1,72 @@
 import * as dotenv from 'dotenv';
-import { GeminiParser } from '../parser/GeminiParser';
-import { MongoDbConnector } from '../database/MongoDbConnector';
-import { MysqlRecruitInfoRepository } from '../database/MysqlRecruitInfoRepository';
-import { MongoRecruitInfoRepository } from '../database/MongoRecruitInfoRepository';
-import MessageService, { QueueNames } from '../message/MessageService';
-import { RedisUrlManager } from '../url/RedisUrlManager';
-import { ConsumeMessage } from 'amqplib';
+import { GeminiParser, ParseError } from '../parser/GeminiParser';
+import { Consumer } from '../message/Consumer';
 import { defaultLogger as logger } from '../utils/logger';
-import { IRawContent } from '../models/RecruitInfoModel';
-import { MySqlConnector } from '../database/MySqlConnector';
-import { MongoRecruitInfoModel } from '../models/MongoRecruitInfoModel';
-import { mysqlRecruitInfoModel, mysqlRecruitInfoSequelize } from '../models/MysqlRecruitInfoModel';
+import { IRawContent } from '../models/RawContentModel';
+import { QueueNames } from '../message/enums';
+import { RedisUrlManager } from '../url/RedisUrlManager';
+import { RecruitInfoRepository } from '../database/RecruitInfoRepository';
+
+
 
 // Load environment variables
 dotenv.config();
 
+
+(async () => {
+
+  const parser = new GeminiParser();
+  const consumer = new Consumer(QueueNames.VISIT_RESULTS);
+  const urlManager = new RedisUrlManager();
+  const recruitInfoRepository = new RecruitInfoRepository();
+  // recruitInfoRepository.initialize();
+  await consumer.connect();
+  await urlManager.connect();
+  consumer.handleLiveMessage(
+    async (msg) => {
+      if (msg) {
+        const rawContent = JSON.parse(msg.content.toString()) as IRawContent;
+        // verify
+        await parser.parseRawContentRetry(rawContent, 100, 2000)
+          .then(
+            (parseContent) => {
+              if (!parseContent) {
+                throw new ParseError(" ParseContent가 존재하지 않습니다.");
+              }
+              if (parser.verifyRecruitInfo(parseContent) === false) {
+                throw new ParseError("ParseContent가 RecruitInfo가 아닙니다.");
+              }
+              return urlManager.getFavicon(rawContent.url).then((favicon) => ({ favicon, parseContent }))
+            }
+          )
+          .then(
+            (context) => parser.makeDbRecruitInfo(context.parseContent, rawContent, context.favicon)
+          )
+          .then(
+            (recruitInfo) => {
+              if (!recruitInfo) { throw new ParseError("RecruitInfo가 존재하지 않습니다.") }
+              return recruitInfoRepository.createRecruitInfo(recruitInfo)
+            }
+        )
+          .then(() => {
+            logger.info('[consumer] 채용 공고 저장 성공');
+          })
+          .catch(
+            (error) => {
+              if (error instanceof ParseError) {
+                logger.error(`[consumer] Parse  중 에러 : ${error.message}`);
+              } else {
+                logger.error(`[consumer] 저장 중 에러 ${error}`);
+                throw error;
+              }
+            }
+          )
+      }
+    }
+  ,1000)
+})()
 /**
  * Initialize and start the GeminiParser as a RabbitMQ consumer
  */
-export async function startGeminiParserConsumer(): Promise<void> {
 
-  try {
 
-       const parser = new GeminiParser({
-          apiKey: process.env.GEMINI_API_KEY,
-          apiKeys: process.env.GEMINI_API_KEYS?.split(','),
-          model: process.env.GEMINI_MODEL || 'gemini-1.5-flash-latest',
-          dbConnector: new MySqlConnector(),
-          cacheDbConnector: new MongoDbConnector(),
-          cacheRecruitInfoRepository: new MongoRecruitInfoRepository(MongoRecruitInfoModel),
-          recruitInfoRepository: new MysqlRecruitInfoRepository(mysqlRecruitInfoModel ,mysqlRecruitInfoSequelize),
-          urlManager: new RedisUrlManager(),
-          messageService: new MessageService(),
-          useCache: true
-        });
-     const initialized = await parser.initialize();
-    if (!initialized) {
-      console.error('Failed to initialize GeminiParser');
-      process.exit(1);
-    }
-
-    parser.messageService.handleLiveMessage(QueueNames.VISIT_RESULTS, async (msg : ConsumeMessage | null) => {
-      if (msg) {
-        const result = JSON.parse(msg.content.toString()) as IRawContent;
-        logger.debug(result.url);
-        const parsedContent = await parser.parseRawContent(result);
-        const dbRecruitInfo = parser.makeDbRecruitInfo( parsedContent,result);
-        // const saved = await this.saveParsedContent(dbRecruitInfo, { destination: 'db' });
-        await parser.recruitInfoRepository.createRecruitInfo(dbRecruitInfo);
-        if (parser.cacheRecruitInfoRepository) {
-          await parser.cacheRecruitInfoRepository.createRecruitInfo(dbRecruitInfo);
-        }
-      }
-    });
-
-    console.log('Starting GeminiParser as consumer...');
-    console.log('GeminiParser consumer is now active and listening for messages');
-    // Setup graceful shutdown
-
-  } catch (error) {
-    console.error('Error in startGeminiParserConsumer function:', error);
-    // Ensure connections are closed even if there's an error
-    try {
-      console.log('Disconnected from services due to error');
-    } catch (disconnectError) {
-      console.error('Error disconnecting from services:', disconnectError);
-    }
-    process.exit(1);
-  }
-}
-
-// Run the script if this file is executed directly
-if (require.main === module) {
-  startGeminiParserConsumer().catch(error => {
-    console.error('Uncaught error:', error);
-    process.exit(1);
-  });
-}

@@ -103,7 +103,7 @@ class WebContentExtractor {
             const pageUrl = page.url();
             const baseUrl = new URL(pageUrl).origin;
             const currentPath = new URL(pageUrl).pathname;
-            logger_1.defaultLogger.debug(`링크 추출 중... 기준 URL: ${pageUrl}, 허용 도메인: ${allowedDomains.join(', ')}`);
+            logger_1.defaultLogger.debug(`[extract links] 링크 추출 중... 기준 URL: ${pageUrl}, 허용 도메인: ${allowedDomains.join(', ')}`);
             // 페이지 내 모든 링크 추출 (절대 경로와 상대 경로 모두)
             const links = await page.evaluate((baseUrl, currentPath) => {
                 // 상대 경로를 절대 경로로 변환하는 함수
@@ -173,7 +173,7 @@ class WebContentExtractor {
                     return false;
                 }
             });
-            logger_1.defaultLogger.debug(`${uniqueLinks.length}개의 고유 URL 중 ${allowedLinks.length}개 URL이 도메인 필터를 통과했습니다.`);
+            logger_1.defaultLogger.debug(`[extract links] ${uniqueLinks.length}개의 고유 URL 중 ${allowedLinks.length}개 URL이 도메인 필터를 통과했습니다.`);
             return allowedLinks;
         }
         catch (error) {
@@ -187,21 +187,26 @@ class WebContentExtractor {
         console.debug(onclickScripts);
         // 2. 각 onclick 스크립트를 병렬로 실행해 redirect된 URL 수집
         const redirectedUrls = await Promise.all(onclickScripts.map(async (script) => {
-            const tempPage = await page.browser().newPage();
+            let tempPage = undefined;
             try {
-                const html = await page.content();
-                await tempPage.setContent(html);
-                await tempPage.evaluate(script);
-                await tempPage.waitForNavigation({ waitUntil: 'load', timeout: 3000 }).catch(() => { });
-                console.log(tempPage.url());
+                tempPage = await page.browser().newPage();
+                await tempPage.goto(page.url(), { waitUntil: 'load', timeout: 10000 });
+                await Promise.all([tempPage.evaluate(script).catch((err) => {
+                        logger_1.defaultLogger.debug(`[extract onclick link] 스크립트 실행 중 에러가 발생했습니다. ${script}`);
+                    }),
+                    tempPage.waitForNavigation({ waitUntil: 'load', timeout: 3000 }).catch(() => { })
+                ]);
+                logger_1.defaultLogger.debug(`[extract onclick link] 스크립트 실행 완료: ${tempPage.url()}`);
                 return tempPage.url();
             }
             catch (err) {
-                console.error(`Error executing onclick script: ${script}`, err);
-                return null;
+                logger_1.defaultLogger.error('[extract onclick link] 스크립트 url 수집 증 오류가 발생 했습니다.', err);
+                throw err;
             }
             finally {
-                await tempPage.close();
+                if (tempPage) {
+                    await tempPage.close();
+                }
             }
         }));
         return Array.from(new Set(redirectedUrls.filter((url) => !!url && allowedDomains.some(domain => url.includes(domain)))));

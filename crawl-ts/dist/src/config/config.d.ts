@@ -20,5 +20,7 @@ declare const _default: {
     DATABASE: {
         MONGODB_URI: string;
     };
+    RABBITMQ_URL: string;
+    RABBITMQ_QUEUE: string;
 };
 export default _default;

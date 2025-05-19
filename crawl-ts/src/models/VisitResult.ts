@@ -63,7 +63,7 @@ export interface IVisitResult extends Document {
 export class SubUrl implements ISubUrl {
   url: string;
   domain: string;
-  visited: boolean;
+  visited: boolean = true;
   visitedAt?: Date;
   discoveredAt?: Date;
   created_at: Date;

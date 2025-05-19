@@ -1,57 +1,71 @@
 import { Sequelize ,DataTypes ,Model} from 'sequelize'
-import { IDbRecruitInfo } from '../models/RecruitInfoModel';
+import { CreateDBRecruitInfoDTO } from '../models/RecruitInfoModel';
+import { z } from 'zod';
 
 
+export const mysqlRecruitInfoSequelize = new Sequelize(
+    process.env.MYSQL_DATABASE ?? 'localhost',
+    process.env.MYSQL_USER ?? 'root' ,
+    process.env.MYSQL_PASSWORD ?? '',
+    {
+      host: process.env.MYSQL_HOST ?? 'localhost',
+      port: (process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306),
+      dialect: 'mysql',
+      logging: process.env.NODE_ENV === 'development' ? console.log : false,
+      pool:  {
+      max: 10,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    },
+      define: {
+        underscored: true, // 컬럼명을 스네이크 케이스로 유지
+        freezeTableName: false, // 기본 테이블명 규칙 사용 (복수형)
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_unicode_ci',
+        timestamps: true // createdAt, updatedAt 자동 관리
+      }
+    }
+);
 
-
-
-/**
- * Sequelize 모델 정의를 위한 인터페이스
- * (creationAttributes에 사용됨)
- */
-
-/**
- * Sequelize용 RecruitInfo 모델 클래스
- *
- *
- *
- */
-
-export class MysqlRecruitInfoSequelize extends Model<IDbRecruitInfo > implements IDbRecruitInfo {
+export class MysqlRecruitInfoSequelize extends Model<CreateDBRecruitInfoDTO, CreateDBRecruitInfoDTO> {
+  public id!: number;
   public title!: string;
   public url!: string;
   public text!: string;
-  public domain?: string;
   public created_at!: Date;
   public updated_at!: Date;
   public is_public!: boolean;
   public favicon?: string;
-
-  // IGeminiResponse에서 상속받은 필드들
   public company_name?: string;
   public department?: string;
   public region_text?: string;
-  public region_id?: string;
   public require_experience?: string;
   public job_description?: string;
   public job_type?: string;
-  public apply_start_date?: string;
-  public apply_end_date?: string;
+  public apply_start_date?: Date;
+  public apply_end_date?: Date;
   public requirements?: string;
   public preferred_qualifications?: string;
   public ideal_candidate?: string;
-
 }
 
-/**
- * Sequelize 모델 초기화 함수
- * @param sequelize Sequelize 인스턴스
- * @returns 초기화된 RecruitInfo 모델
- */
-export function initRecruitInfoModel(sequelize: Sequelize): typeof MysqlRecruitInfoSequelize {
-  MysqlRecruitInfoSequelize.init(
-    {
+export class MysqlJobRegionSequelize extends Model {
+  public id!: number;
+  public job_id!: number;
+  public region_id!: number;
+}
 
+
+
+MysqlRecruitInfoSequelize.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false,
+      },
       title: {
         type: DataTypes.STRING(512),
         allowNull: false,
@@ -93,13 +107,11 @@ export function initRecruitInfoModel(sequelize: Sequelize): typeof MysqlRecruitI
       region_text: {
         type: DataTypes.STRING(255),
       },
-      region_id: {
-        type: DataTypes.INTEGER,
-      },
       require_experience: {
         type: DataTypes.STRING(255),
       },
       job_description: {
+        allowNull: false,
         type: DataTypes.TEXT,
       },
       job_type: {
@@ -107,9 +119,29 @@ export function initRecruitInfoModel(sequelize: Sequelize): typeof MysqlRecruitI
       },
       apply_start_date: {
         type: DataTypes.DATE,
+        validate: {
+          isAfter: {
+            args: '2000-01-01',
+            msg: "유효한 날짜 형식이어야 합니다"
+          },
+          isBefore: {
+            args: '2100-12-31',
+            msg: "종료일은 2030년 12월 31일 이전이어야 합니다"
+          }
+        }
       },
       apply_end_date: {
         type: DataTypes.DATE,
+           validate: {
+          isAfter: {
+            args: '2000-01-01',
+            msg: "유효한 날짜 형식이어야 합니다"
+          },
+          isBefore: {
+            args: '2100-12-31',
+            msg: "종료일은 2030년 12월 31일 이전이어야 합니다"
+          }
+        }
       },
       requirements: {
         type: DataTypes.TEXT,
@@ -122,7 +154,7 @@ export function initRecruitInfoModel(sequelize: Sequelize): typeof MysqlRecruitI
       }
     },
     {
-      sequelize,
+      sequelize: mysqlRecruitInfoSequelize,
       tableName: process.env.MYSQL_RECRUIT_TABLE,
       timestamps: true,
       createdAt: 'created_at',
@@ -130,42 +162,43 @@ export function initRecruitInfoModel(sequelize: Sequelize): typeof MysqlRecruitI
       underscored: true, // 스네이크_케이스 컬럼명 사용
       indexes: [
         {
-          fields: ['company_name'],
-        },
-        {
-          fields: ['is_public'],
-        },
-      ],
-    }
-  );
+          unique: true,
+          fields: ['url'  ],
+          name: 'idx_url_prefix',
+          using: 'BTREE',
 
-  return MysqlRecruitInfoSequelize;
-}
-
-console.log(process.env.MYSQL_HOST);
-  export const mysqlRecruitInfoSequelize = new Sequelize(
-      process.env.MYSQL_DATABASE ?? 'localhost',
-      process.env.MYSQL_USER ?? 'root' ,
-      process.env.MYSQL_PASSWORD ?? '',
-      {
-        host: process.env.MYSQL_HOST ?? 'localhost',
-        port: (process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306),
-        dialect: 'mysql',
-        logging: process.env.NODE_ENV === 'development' ? console.log : false,
-        pool:  {
-        max: 10,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-      },
-        define: {
-          underscored: true, // 컬럼명을 스네이크 케이스로 유지
-          freezeTableName: false, // 기본 테이블명 규칙 사용 (복수형)
-          charset: 'utf8mb4',
-          collate: 'utf8mb4_unicode_ci',
-          timestamps: true // createdAt, updatedAt 자동 관리
         }
-      }
-  );
-export const MysqlRecruitInfoModel = initRecruitInfoModel(mysqlRecruitInfoSequelize);
-export const mysqlRecruitInfoModel = new MysqlRecruitInfoModel();
+      ]
+    }
+
+);
+
+
+
+MysqlJobRegionSequelize.init({
+  job_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  region_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  }
+
+}, {
+  sequelize: mysqlRecruitInfoSequelize,
+  tableName: process.env.MYSQL_JOB_REGION_TABLE,
+  timestamps: false,
+  indexes: [
+    {
+      unique: true,
+      fields: ['job_id', 'region_id']
+    }
+  ]
+})
+
+
+
+
+
+

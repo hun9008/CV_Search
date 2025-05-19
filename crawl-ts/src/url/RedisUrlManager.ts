@@ -1,10 +1,13 @@
   // RedisUrlManager.ts
   import { IUrlManager } from './IUrlManager';
-  import { RobotsParsingResult } from './urlUtils';
+  import { isUrlAllowedWithRobots, RobotsParsingResult } from './urlUtils';
   import { defaultLogger as logger } from '../utils/logger';
   import { URL } from 'url';
-  import { RedisClientType } from 'redis';
-  import { redis } from '../database/RedisConnector';
+  import { RedisClientType ,createClient} from 'redis';
+  const redis :RedisClientType = createClient({
+   url: `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
+   legacyMode: false, // 반드시 설정 !!
+  });
 
 export type UrlStatus = 'visited' | 'notvisited' | 'hasRecruitInfo' | 'noRecruitInfo';
 
@@ -52,8 +55,11 @@ export const enum URLSTAUS
      * RedisUrlManager 생성자
      * @param redisClient Redis 커넥터 인스턴스
      */
-    constructor() {
+    constructor(availableDomains? : string[] ) {
       this.redisClient = redis;
+      if (availableDomains) {
+        this.availableDomains=availableDomains
+      }
     }
    /**
      * Connects to the Redis server.
@@ -79,25 +85,42 @@ export const enum URLSTAUS
      * @param newStatus 새 상태
      */
     async setURLStatus(url: string, newStatus: UrlStatus): Promise<void> {
-      const urlStatusKey = `status:${this.extractDomain(url)}`;
-      const doaminUrlSetKey= `urls:${this.extractDomain(url)}:`
-
+      const domian = this.extractDomain(url);
       try {
-
-        const oldStatus = await this.redisClient.hGet(urlStatusKey, url);
+        const oldStatus : UrlStatus = await this.redisClient.hGet(`status:${domian}`, url) as UrlStatus;
+        const multi = this.redisClient.multi();
         if (oldStatus) {
-          await this.redisClient.sRem(`urls:${this.extractDomain(url)}:${oldStatus}`, url);
-          await this.redisClient.sRem(`${oldStatus}`, url);
+          multi.sRem(`urls:${this.extractDomain(url)}:${oldStatus}`, url);
+          multi.sRem(`${oldStatus}`, url);
         }
-        await this.redisClient.hSet(urlStatusKey, url, newStatus);
-        await this.redisClient.sAdd(`urls:${this.extractDomain(url)}:${newStatus}`, url);
-        await this.redisClient.sAdd(newStatus, url);
+
+        multi.hSet(`status:${domian}`, url, newStatus);
+        multi.sAdd(`urls:${this.extractDomain(url)}:${newStatus}`, url);
+        multi.sAdd(newStatus, url);
+
+        await multi.exec();
       } catch (error) {
-        logger.error(`URL 상태 설정 중 오류 (${url}):`, error);
+        logger.error(`[RedisUrlManager][setUrlStatus] URL 상태 설정 중 오류 (${url}):`, error);
         throw error;
       }
     }
 
+    async setURLStatusByOldStatus(url: string, oldStatus : UrlStatus ,newStatus: UrlStatus): Promise<void> {
+      const domian = this.extractDomain(url);
+      try {
+        const multi = this.redisClient.multi();
+        multi.sRem(`urls:${this.extractDomain(url)}:${oldStatus}`, url);
+        multi.sRem(`${oldStatus}`, url);
+        multi.hSet(`status:${domian}`, url, newStatus);
+        multi.sAdd(`urls:${this.extractDomain(url)}:${newStatus}`, url);
+        multi.sAdd(newStatus, url);
+        await multi.exec();
+
+      } catch (error) {
+        logger.error(`[RedisUrlManager][setUrlStatus] URL 상태 설정 중 오류 (${url}):`, error);
+        throw error;
+      }
+    }
     /**
      * URL 상태 가져오기
      * @param url URL
@@ -117,6 +140,24 @@ export const enum URLSTAUS
         return null;
       }
     }
+
+
+      /**
+     * favicon 가져오기
+     * @param domain URL
+     * @returns URL 상태 또는 null
+     */
+      async getFavicon(domain: string): Promise<string | null> {
+        const redisKey = `favicon:${domain}`;
+
+        try {
+          const favicon = await this.redisClient.get(redisKey);
+          return favicon;
+        } catch (error) {
+          logger.error(`[RedisUrlManager][getFavicon] URL 상태 가져오기 중 오류 (${domain}):`, error);
+          return null;
+        }
+      }
 
     /**
      * URL에서 도메인 추출
@@ -139,11 +180,14 @@ export const enum URLSTAUS
      * @param limit 최대 개수
      * @returns URL 배열
      */
-    async getURLsByStatus(status: UrlStatus, limit: number = 10): Promise<string[]> {
+    async getURLsByStatus(status: UrlStatus):  Promise<string[]> {
       try {
         return await this.redisClient.sMembers(status);
+
       } catch (error) {
-        logger.error(`상태별 URL 가져오기 중 오류 (${status}):`, error);
+        if (error instanceof Error) {
+          logger.error(`상태별 URL 가져오기 중 오류 (${status}):`, error.message);
+        }
         return [];
       }
     }
@@ -159,6 +203,7 @@ export const enum URLSTAUS
       try {
         return await this.redisClient.sMembers(`urls:${domain}:${status}`);
       } catch (error) {
+
         logger.error(`도메인별 URL 가져오기 중 오류 (${domain}, ${status}):`, error);
         return [];
       }
@@ -172,8 +217,7 @@ export const enum URLSTAUS
      */
     async getAllDomains(): Promise<string[]> {
       try {
-        const domains = await this.redisClient.sMembers('domains');
-        return domains;
+        return await this.redisClient.sMembers('domains');
       } catch (error) {
         logger.error('도메인 목록 가져오기 중 오류:', error);
         throw error;
@@ -219,26 +263,23 @@ export const enum URLSTAUS
       }
     }
     /**
-    * Redis Lua 스크립트를 사용하여 특정 도메인에서 'not_visited' 상태인 URL을 가져오고
-    * 상태를 'in_queue'로 원자적으로 업데이트합니다.
+    * Redis transection을 사용해서 원자적으로 업데이트함
+    *
     * @param domain 검색할 도메인
     * @returns URL과 도메인 정보가 포함된 객체 또는 URL이 없을 경우 null
     */
-      async getNextUrlFromDomain(domain: string): Promise<{ url: string; domain: string } | null> {
-      // Lua 스크립트: URL 조회 및 상태 원자적 업데이트
+    async getNextUrlFromDomain(domain: string): Promise<{ url: string; domain: string } | null> {
+      const result = await this.redisClient.sPop(`urls:${domain}:${URLSTAUS.NOT_VISITED}`,1);
       try {
-        // node-redis v4+ 방식으로 스크립트 실행
-        const result = await this.redisClient.sRandMember(`urls:${domain}:${URLSTAUS.NOT_VISITED}`);
-        // await this.redisClient.hSet('url:status',result,'')
-        if (result) {
-          await this.redisClient.sRem(`urls:${domain}:${URLSTAUS.NOT_VISITED}`, result);
-          await this.redisClient.sAdd(`urls:${domain}:${URLSTAUS.VISITED}`,result)
-          logger.info(`다음 URL: ${result}, 도메인: ${domain}`);
-          return { url: result as string, domain };
+
+        if (result.length > 0) {
+          this.setURLStatus(result[0], URLSTAUS.VISITED)
+          return { url: result[0] as string, domain };
         }
         return null;
       } catch (error) {
-        throw error;
+        await this.redisClient.sAdd(`urls:${domain}:${URLSTAUS.VISITED}`, result);
+        return null;
       }
     }
     /**
@@ -264,8 +305,13 @@ export const enum URLSTAUS
         this.currentDomainIndex = (this.currentDomainIndex + 1) % this.availableDomains.length;
 
         const result = await this.getNextUrlFromDomain(domain);
+        if (result && await isUrlAllowedWithRobots(result.url, [domain]) === false) {
+          logger.debug(`[getNextUrl] 사용할 수 없는 url 입니다. ${result?.url}`);
+          // robots.txt에 의해 차단된 경우, 해당 URL을 visited 상태로 변경
+          await this.setURLStatus(result.url, URLSTAUS.NO_RECRUITINFO);
+          return null;
+        }
 
-        logger.debug(result?.url ?? '');
         return result;
       } catch (error) {
         const err = error as any;
@@ -336,14 +382,19 @@ export const enum URLSTAUS
      */
     public async addUrl(url: string, domain: string, urlStatus: UrlStatus ): Promise<void> {
       try {
-        // URL을 도메인 세트에 추가
-        await redis.sAdd(`urls:${domain}:${urlStatus}`, url);
-        // status set에 추가
-        await redis.sAdd(URLSTAUS.NOT_VISITED, url);
-        // URL 상태 설정
-        await redis.hSet(`status:${domain}`, url, urlStatus);
-        // 도메인을 전체 도메인 세트에 추가
-        await redis.sAdd('domains', domain);
+        const urlOriginStatus = await redis.hGet(`status:${domain}`, url)
+        // logger.debug(`add URL ${urlOriginStatus}`);
+        if (!urlOriginStatus) {
+          logger.debug(`[RedisUrlManger] add URL ${url}`);
+          // URL을 도메인 세트에 추가
+          await redis.sAdd(`urls:${domain}:${urlStatus}`, url);
+          // status set에 추가
+          await redis.sAdd(URLSTAUS.NOT_VISITED, url);
+          // URL 상태 설정
+          await redis.hSet(`status:${domain}`, url, urlStatus);
+          // 도메인을 전체 도메인 세트에 추가
+          await redis.sAdd('domains', domain);
+        }
       } catch (error) {
         console.error(`Error adding URL ${url} to Redis:`, error);
         throw error;

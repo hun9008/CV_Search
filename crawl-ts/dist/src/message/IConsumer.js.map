@@ -1,0 +1,1 @@
+{"version":3,"file":"IConsumer.js","sourceRoot":"","sources":["../../../src/message/IConsumer.ts"],"names":[],"mappings":";;AAOA,MAAM,QAAQ;IAEZ,KAAK,CAAC,OAAO,CAAC,GAAmB;QAC7B,OAAO,CAAC,GAAG,CAAC,GAAG,CAAC,CAAC;IACrB,CAAC;CAEF;AAGD,MAAM,IAAI,GAAG,IAAI,QAAQ,EAAE,CAAC"}

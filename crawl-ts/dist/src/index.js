@@ -30,7 +30,7 @@ function createCrawler(options = {}) {
     const browserManager = new ChromeBrowserManager_1.ChromeBrowserManager();
     const contentExtractor = new WebContentExtractor_1.WebContentExtractor();
     const messageService = new MessageService_1.default();
-    const urlManager = new RedisUrlManager_1.RedisUrlManager();
+    const urlManager = new RedisUrlManager_1.RedisUrlManager(["www.asml.com"]);
     // 크롤러 인스턴스 생성
     return new WebCrawler_1.WebCrawler({
         browserManager,
