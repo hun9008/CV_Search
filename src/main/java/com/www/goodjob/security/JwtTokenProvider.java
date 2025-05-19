@@ -51,21 +51,30 @@ public class JwtTokenProvider {
     }
 
     /**
-     * 토큰 유효성 검증
+     * 간단한 유효성 검사 (기존 방식)
      */
     public boolean validateToken(String token) {
+        return validateTokenDetailed(token) == TokenValidationResult.VALID;
+    }
+
+    /**
+     * 상세 유효성 검사 결과 반환
+     */
+    public TokenValidationResult validateTokenDetailed(String token) {
         try {
             Jwts.parser()
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token);
-            return true;
+            return TokenValidationResult.VALID;
+        } catch (ExpiredJwtException e) {
+            return TokenValidationResult.EXPIRED;
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            return TokenValidationResult.INVALID;
         }
     }
 
     /**
-     * 토큰에서 email 추출
+     * 토큰에서 이메일 추출
      */
     public String getEmail(String token) {
         return Jwts.parser()
@@ -73,6 +82,15 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    /**
+     * 토큰 검증 결과 Enum
+     */
+    public enum TokenValidationResult {
+        VALID,
+        EXPIRED,
+        INVALID
     }
 
 }
