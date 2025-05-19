@@ -30,9 +30,6 @@ jobs:
             echo "🏗️ Building project..."
             npm run build
 
-            echo "⚙️ Installing serve globally (with sudo)..."
-            sudo npm install -g serve
-
             echo "🧹 Cleaning old process..."
             pm2 delete goodjob || true
 
