@@ -2,10 +2,14 @@ package com.www.goodjob.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.www.goodjob.domain.Job;
+import com.www.goodjob.domain.*;
 import com.www.goodjob.dto.ScoredJobDto;
+import com.www.goodjob.repository.CvFeedbackRepository;
+import com.www.goodjob.repository.CvRepository;
 import com.www.goodjob.repository.JobRepository;
 import com.www.goodjob.repository.RecommendScoreRepository;
+import com.www.goodjob.security.CustomUserDetails;
+import com.www.goodjob.util.ClaudeClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,6 +55,18 @@ class RecommendServiceTest {
 
     @Mock
     private JobRepository jobRepository;
+
+    @Mock
+    private CustomUserDetails userDetails;
+
+    @Mock
+    private CvRepository cvRepository;
+
+    @Mock
+    private CvFeedbackRepository cvFeedbackRepository;
+
+    @Mock
+    private ClaudeClient claudeClient;
 
     private ObjectMapper realObjectMapper = new ObjectMapper(); // 실제 인스턴스
 
@@ -166,8 +183,71 @@ class RecommendServiceTest {
         verify(asyncService, never()).saveRecommendScores(any(), any());
     }
 
+
     @Test
-    void getOrGenerateFeedback() {
+    void getOrGenerateFeedback_existingFeedbackReturned() {
+        // given
+        Long jobId = 1L;
+        User mockUser = new User();
+        mockUser.setId(10L);
+
+        Cv cv = Cv.builder().id(100L).rawText("cv text").user(mockUser).build();
+        Job job = new Job();
+        job.setId(jobId);
+        job.setRawJobsText("job text");
+
+        RecommendScore score = RecommendScore.builder()
+                .id(200L)
+                .cv(cv)
+                .job(job)
+                .build();
+        CvFeedback feedback = CvFeedback.builder().id(300L).feedback("기존 피드백").recommendScore(score).confirmed(false).build();
+
+        when(userDetails.getUser()).thenReturn(mockUser);
+        when(cvRepository.findByUser(mockUser)).thenReturn(Optional.of(cv));
+        when(recommendScoreRepository.findByCvIdAndJobId(100L, jobId)).thenReturn(score);
+        when(cvFeedbackRepository.findByRecommendScore_Id(200L)).thenReturn(Optional.of(feedback));
+
+        // when
+        String result = recommendService.getOrGenerateFeedback(jobId, userDetails);
+
+        // then
+        assertEquals("기존 피드백", result);
+        verify(claudeClient, never()).generateFeedback(any(), any());
+        verify(cvFeedbackRepository, never()).save(any());
+    }
+
+    @Test
+    void getOrGenerateFeedback_generateNewFeedback() {
+        // given
+        Long jobId = 1L;
+        User mockUser = new User();
+        mockUser.setId(10L);
+
+        Cv cv = Cv.builder().id(100L).rawText("cv raw text").user(mockUser).build();
+
+        Job job = new Job();
+        job.setId(jobId);
+        job.setRawJobsText("job raw text");
+
+        RecommendScore score = RecommendScore.builder()
+                .id(200L)
+                .cv(cv)
+                .job(job)
+                .build();
+
+        when(userDetails.getUser()).thenReturn(mockUser);
+        when(cvRepository.findByUser(mockUser)).thenReturn(Optional.of(cv));
+        when(recommendScoreRepository.findByCvIdAndJobId(100L, jobId)).thenReturn(score);
+        when(cvFeedbackRepository.findByRecommendScore_Id(200L)).thenReturn(Optional.empty());
+        when(claudeClient.generateFeedback("cv raw text", "job raw text")).thenReturn("새 피드백");
+
+        // when
+        String result = recommendService.getOrGenerateFeedback(jobId, userDetails);
+
+        // then
+        assertEquals("새 피드백", result);
+        verify(cvFeedbackRepository).save(any(CvFeedback.class));
     }
 
     @Test

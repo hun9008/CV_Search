@@ -45,7 +45,16 @@ public class CvService {
         Cv cv = cvRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("CV not found for userId: " + userId));
 
+        if (cv.getSummary() != null && !cv.getSummary().isBlank()) {
+            return cv.getSummary();
+        }
+
         String cvText = cv.getRawText();
-        return claudeClient.generateCvSummary(cvText);
+        String summary = claudeClient.generateCvSummary(cvText);
+
+        cv.setSummary(summary);
+        cvRepository.save(cv);
+
+        return summary;
     }
 }

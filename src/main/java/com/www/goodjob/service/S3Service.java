@@ -97,12 +97,12 @@ public class S3Service {
         }
     }
 
-    public boolean fileExists(Long userId, String fileName) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return cvRepository.findByUserAndFileName(user, fileName).isEmpty();
-    }
+//    public boolean fileExists(Long userId, String fileName) {
+//
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//        return cvRepository.findByUserAndFileName(user, fileName).isEmpty();
+//    }
 
     public URL getFileUrl(String key) {
         return s3Client.utilities().getUrl(GetUrlRequest.builder()

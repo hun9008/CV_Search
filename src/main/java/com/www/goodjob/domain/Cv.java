@@ -32,6 +32,9 @@ public class Cv {
     private String rawText;
 
     @Column(columnDefinition = "TEXT")
+    private String summary;
+
+    @Column(columnDefinition = "TEXT")
     private String skills;
 
     @Column(columnDefinition = "TEXT")
