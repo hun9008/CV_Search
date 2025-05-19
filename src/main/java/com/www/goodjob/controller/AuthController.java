@@ -5,6 +5,7 @@ import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.security.JwtTokenProvider;
+import com.www.goodjob.service.AuthService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
-    private final UserOAuthRepository userOAuthRepository;
+    private final AuthService authService;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -124,8 +125,7 @@ public class AuthController {
                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
         User user = userDetails.getUser();
 
-        userOAuthRepository.deleteAllByUser(user);
-        userRepository.delete(user);
+        authService.withdraw(user); // 서비스 계층에서 트랜잭션 내 삭제
 
         // 쿠키 제거
         ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
@@ -139,6 +139,7 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("message", "회원 탈퇴가 완료되었고, 로그아웃 처리되었습니다."));
     }
+
 
     @Operation(summary = "마스터 accessToken 발급 (관리자용)", description = """
         테스트용 masterKey 입력 시 관리자용 accessToken을 반환함 /
