@@ -3,7 +3,7 @@ name: Deploy goodJob_Client to S3
 on:
     push:
         branches:
-            - dev_wei
+            - dev_front
 
 jobs:
     deploy:
