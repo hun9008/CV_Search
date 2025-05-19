@@ -4,7 +4,7 @@ import MainHeader from '../../components/common/header/MainHeader';
 import JobList from './components/jobList/JobList';
 import MyCv from './components/myCv/MyCv';
 import Manage from './components/manage/Manage';
-import Bookmark from './components/bookmark/BookMark';
+import Bookmark from './components/bookmark/Bookmark';
 import JobDetail from './components/jobList/JobDetail';
 import usePageStore from '../../store/pageStore';
 

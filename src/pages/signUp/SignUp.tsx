@@ -5,9 +5,9 @@ import style from './styles/SignUp.module.scss';
 
 function SignUp() {
     const navigate = useNavigate();
-    const navigateToSignUp = () => {
-        navigate('/signUp/detail');
-    };
+    // const navigateToSignUp = () => {
+    //     navigate('/signUp/detail');
+    // };
     const navigateToLandingpage = () => {
         navigate('/');
     };
