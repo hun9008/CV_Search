@@ -72,13 +72,19 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-        // accessToken과 firstLogin은 프론트에서 처리
+        // 리디렉션 URI 설정
         String encodedState = request.getParameter("state");
-        String redirectUri;
+        String redirectUri = null;
 
         try {
             if (encodedState != null) {
-                redirectUri = new String(Base64.getDecoder().decode(encodedState));
+                String decoded = new String(Base64.getDecoder().decode(encodedState));
+                // 로컬환경 여부 판단
+                if (decoded.contains("localhost")) {
+                    redirectUri = "http://localhost:5173/auth/callback";
+                } else {
+                    redirectUri = "https://www.goodjob.ai.kr/auth/callback";
+                }
                 log.info("✅ decoded redirect_uri from state: {}", redirectUri);
             } else {
                 redirectUri = "https://www.goodjob.ai.kr/auth/callback";
@@ -89,6 +95,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         response.sendRedirect(redirectUri);
+    }
+
+    // CRLF 방지용 유효성 검사 함수
+    private boolean isValidRedirectUri(String uri) {
+        return uri != null && !uri.contains("\n") && !uri.contains("\r");
     }
 
     private OAuthProvider extractProvider(CustomOAuth2User user) {
