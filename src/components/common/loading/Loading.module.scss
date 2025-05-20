@@ -1,0 +1,18 @@
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    color: #666666;
+    gap: 1rem;
+
+    &Spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #d8edff;
+        border-top: 3px solid #1877f2;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+}

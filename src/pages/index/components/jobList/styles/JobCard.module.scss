@@ -56,7 +56,6 @@
     }
 
     &__title {
-        font-family: 'Noto Sans CJK KR';
         font-size: 1rem;
         font-weight: 700;
         line-height: 24px;
@@ -66,7 +65,6 @@
     }
 
     &__company {
-        font-family: 'Noto Sans CJK KR';
         font-size: 0.9rem;
         font-weight: 500;
         font-style: normal;
@@ -75,7 +73,6 @@
     }
 
     &__tags {
-        font-family: 'Noto Sans CJK KR';
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -160,7 +157,6 @@
     }
 
     &__score {
-        font-family: 'Noto Sans';
         font-size: 1.25rem;
         font-weight: 700;
         color: #333333;

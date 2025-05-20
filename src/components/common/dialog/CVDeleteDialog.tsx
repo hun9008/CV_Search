@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import style from './styles/CVDeleteDialog.module.scss';
 import { AlertTriangle, Clock } from 'lucide-react';
 import useFileStore from '../../../store/fileStore';
+import LoadingSpinner from '../loading/LoadingSpinner';
 
 interface CVDeleteDialogProps {
     isOpen: boolean;
@@ -11,6 +12,7 @@ interface CVDeleteDialogProps {
 function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
     const dialogRef = useRef<HTMLDivElement>(null);
     const [isChecked, setIsChecked] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [countdown, setCountdown] = useState(5);
     const [showCountdown, setShowCountdown] = useState(false);
     const { removeFile } = useFileStore();
@@ -26,10 +28,12 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
             setShowCountdown(true);
             return;
         }
+        setIsDeleting(true);
         const res = await removeFile();
 
         if (res === 200) {
             onClose();
+            setIsDeleting(false);
             console.log('CV delete Success!!!');
         } else {
             console.log('CV delete Error!!!');
@@ -57,6 +61,7 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
         }
     }, [showCountdown, countdown]);
 
+    useEffect(() => {}, [isDeleting]);
     useEffect(() => {
         if (isOpen) {
             setIsChecked(false);
@@ -108,6 +113,8 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
                             <span className={style.countdown}>
                                 <Clock size={14} /> {countdown}초 후 활성화
                             </span>
+                        ) : isDeleting ? (
+                            <LoadingSpinner />
                         ) : (
                             '삭제하기'
                         )}

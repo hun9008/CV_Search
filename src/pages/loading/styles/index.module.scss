@@ -7,7 +7,6 @@
     align-items: center;
     height: 100vh;
     background-color: #eef0fc;
-    font-family: 'Noto Sans';
 
     &__loadingIndicator {
         display: flex;
@@ -53,7 +52,6 @@
         flex-shrink: 0;
 
         color: #333333;
-        font-family: 'Noto Sans HK';
         font-size: 20px;
         font-style: normal;
         font-weight: 400;

@@ -319,6 +319,7 @@
         color: #666;
         cursor: pointer;
         transition: all 0.2s ease;
+        overflow: hidden;
 
         &:hover {
             background-color: #e6f0ff;
@@ -405,11 +406,13 @@
         border-radius: 8px;
         font-size: 0.95rem;
         font-weight: 500;
+        max-height: 45px;
         cursor: pointer;
         transition: all 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
     }
 
     &__apply {

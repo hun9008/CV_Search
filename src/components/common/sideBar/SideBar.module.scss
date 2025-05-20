@@ -2,8 +2,6 @@
     max-width: 220px;
     width: 220px;
     display: flex;
-    font-family: 'Noto Sans CJK KR';
-
     justify-content: center;
     background-color: #ffffff;
     border-radius: 24px;
@@ -209,7 +207,6 @@
 
     &__textContainer {
         h3 {
-            font-family: 'Noto Sans KR', 'Noto Sans', sans-serif;
             font-size: 15px;
             font-weight: 600;
             color: #333333;
@@ -217,7 +214,6 @@
         }
 
         p {
-            font-family: 'Noto Sans', sans-serif;
             font-size: 13px;
             color: #666666;
             margin: 4px 0 0;
@@ -233,7 +229,6 @@
         border: none;
         padding: 8px 12px;
         border-radius: 8px;
-        font-family: 'Noto Sans KR', 'Noto Sans', sans-serif;
         font-size: 13px;
         font-weight: 500;
         cursor: pointer;

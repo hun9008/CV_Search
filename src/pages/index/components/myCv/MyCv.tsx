@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import useFileStore from '../../../../store/fileStore';
 import CvViewer from './CvViewer';
 import style from './styles/MyCv.module.scss';
@@ -6,17 +7,23 @@ import { Trash, CloudUpload } from 'lucide-react';
 import CVDeleteDialog from '../../../../components/common/dialog/CVDeleteDialog';
 import CVReuploadDialog from '../../../../components/common/dialog/CVReuploadDialog';
 import useS3Store from '../../../../store/s3Store';
+import Loading from '../../../../components/common/loading/Loading';
+import ErrorFallback from '../../../../components/common/error/ErrorFallback';
+import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
+import { parseMarkdown } from '../../utils/markdown';
 // import { parseMarkdown } from '../../utils/markdown';
 
 function MyCv() {
     const { uploadFile, getSummary } = useFileStore();
     const { getUploadPresignedURL } = useS3Store();
     const [error, setError] = useState<string | null>(null);
+    const [hasError, setHasError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [reuploadDialogHidden, setReuploadDialogHidden] = useState(false);
     const [deleteDialogHidden, setDeleteDialogHidden] = useState(false);
-    const mockSummary = useFileStore((state) => state.summary);
+    const summaryText = useFileStore((state) => state.summary);
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = event.target.files?.[0];
         validateAndSetFile(selectedFile);
@@ -68,8 +75,16 @@ function MyCv() {
 
     useEffect(() => {
         const fetchCVSummary = async () => {
-            if (!mockSummary || mockSummary.length === 0) {
-                await getSummary();
+            try {
+                if (!summaryText || summaryText.length === 0) {
+                    setIsLoading(true);
+                    await getSummary();
+                }
+            } catch (error) {
+                console.error('데이터 가져오기 에러:', error);
+                setHasError(true);
+            } finally {
+                setIsLoading(false);
             }
         };
         fetchCVSummary();
@@ -91,10 +106,27 @@ function MyCv() {
             )}
             <div className={style.container}>
                 <div className={style.info}>
-                    <div className={style.info__content}>
-                        <h2>요약</h2>
-                        {mockSummary}
-                    </div>
+                    <ErrorBoundary FallbackComponent={ErrorFallback}>
+                        {hasError ? (
+                            <div className={style.info__content__error}>
+                                <ErrorFallback />
+                            </div>
+                        ) : isLoading ? (
+                            <LoadingSpinner />
+                        ) : (
+                            <Suspense fallback={<Loading content="Summary" />}>
+                                <div className={style.info__content}>
+                                    <h2>요약</h2>
+                                    <div
+                                        className={style.feedbackText}
+                                        dangerouslySetInnerHTML={{
+                                            __html: parseMarkdown(summaryText ?? ''),
+                                        }}></div>
+                                </div>
+                            </Suspense>
+                        )}
+                    </ErrorBoundary>
+
                     <div className={style.buttons}>
                         <button className={style.button} onClick={handleDeleteCV}>
                             <Trash size={18} />

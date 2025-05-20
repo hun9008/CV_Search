@@ -4,6 +4,7 @@ import style from './styles/JobDetail.module.scss';
 import { Bookmark, Share2, ExternalLink, MapPin, Calendar, Clock, Briefcase } from 'lucide-react';
 import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
+import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
 
 function JobDetail() {
     const { getSelectedJob, getFeedback } = useJobStore();
@@ -12,6 +13,7 @@ function JobDetail() {
     const selectedJob = useJobStore((state) => state.selectedJob);
     const feedbackText = useJobStore((state) => state.feedback);
     const job = useJobStore((state) => state.getSelectedJob());
+    const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(job?.isBookmarked || false);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     const [isManaging, setIsManaging] = useState(false);
@@ -19,23 +21,20 @@ function JobDetail() {
     const [manageButtonClicked, setManageButtonClicked] = useState(false);
 
     useEffect(() => {
-        getSelectedJob();
         const initializeApplications = async () => {
             await getApplications();
-            console.log('관리 목록 가져오기: ', applications);
-
-            if (selectedJob && applications) {
-                const isCurrentJobManaged = applications.some((app) => app.jobId === selectedJob);
-                console.log('isCurrentJobManaged: ', isCurrentJobManaged);
-                setIsManaging(isCurrentJobManaged);
-                console.log('리스트 로딩 후 결과: ', isManaging);
-            }
         };
-
+        getSelectedJob();
         initializeApplications();
     }, [selectedJob]);
 
-    useEffect(() => {}, [applications]);
+    useEffect(() => {
+        if (selectedJob && applications) {
+            const isCurrentJobManaged = applications.some((app) => app.jobId === selectedJob);
+            setIsManaging(isCurrentJobManaged);
+            console.log(isCurrentJobManaged);
+        }
+    }, [applications, selectedJob]);
 
     if (!job) {
         return <JobDetailSkeleton />;
@@ -75,8 +74,15 @@ function JobDetail() {
     };
 
     const handleFeedback = async (jobId: number) => {
-        if ((await getFeedback(jobId)) === 200) {
-            setShowFeedbackModal(true);
+        try {
+            setIsFeedbackLoading(true);
+            if ((await getFeedback(jobId)) === 200) {
+                setIsFeedbackLoading(false);
+                setShowFeedbackModal(true);
+            }
+        } catch (error) {
+            console.error('피드백 요청 에러: ', error);
+            throw error;
         }
     };
 
@@ -85,18 +91,18 @@ function JobDetail() {
             if (isManaging) {
                 console.log('관리 이력 삭제 시도');
                 const res = await deleteApplications(jobId);
-                if (res === 200) {
+                if (res === 204) {
                     setIsManaging(false);
+                    setManageButtonClicked(false);
                     console.log('관리 해제 완료:', res);
                     setManageButtonClicked(false); // 지우기
                     // 지원 목록 다시 가져오기
-
                     await useApplyStore.getState().getApplications();
                 }
             } else {
                 console.log('관리 이력 추가 시도');
                 const res = await setApplications(jobId);
-                if (res === 200) {
+                if (res === 201) {
                     setIsManaging(true);
                     setManageButtonClicked(true);
                     console.log('관리 등록 완료:', res);
@@ -187,7 +193,7 @@ function JobDetail() {
                 <button
                     className={style.actionButtons__feedback}
                     onClick={() => handleFeedback(job.id)}>
-                    피드백
+                    {isFeedbackLoading ? <LoadingSpinner /> : '피드백'}
                 </button>
                 <button
                     className={`${style.actionButtons__manage} ${

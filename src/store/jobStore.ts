@@ -11,7 +11,7 @@ interface JobStore {
     feedback: string;
     setSelectedJob: (jobId: number) => void;
     getSelectedJob: () => Job | null;
-    getFeedback: (jobId: number) => Promise<number | undefined>;
+    getFeedback: (jobId: number) => Promise<number>;
     setJobList: (list: Job[] | null) => void;
     setFilteredJobList: (list: Job[] | null) => void;
     getJobList: (count: number) => Promise<Job[]>;
@@ -23,12 +23,15 @@ const useJobStore = create<JobStore>((set, get) => ({
     filteredJobList: [],
     selectedJob: 0,
     feedback: '',
+
     setSelectedJob: (jobId) => set({ selectedJob: jobId }),
     setFilteredJobList: (filteredJobList) => set({ filteredJobList }),
+
     getSelectedJob: () => {
         const { jobList, selectedJob } = get();
         return jobList?.find((job) => job.id === selectedJob) ?? null;
     },
+
     getFeedback: async (jobId) => {
         try {
             const accessToken = useAuthStore.getState().accessToken;
@@ -43,10 +46,10 @@ const useJobStore = create<JobStore>((set, get) => ({
                 }
             );
             set({ feedback: res.data });
-
             return res.status;
         } catch (error) {
             console.error('피드백 에러: ', error);
+            throw error;
         }
     },
 
@@ -65,32 +68,37 @@ const useJobStore = create<JobStore>((set, get) => ({
                     withCredentials: true,
                 }
             );
-
             const jobList: Job[] = res.data || [];
             set({ jobList });
             return jobList;
         } catch (error) {
-            console.error(error);
-            return [];
+            console.error('잡 리스트 에러: ', error);
+            throw error;
         }
     },
+
     getJobListwithBookmark: async (count) => {
-        const { getJobList } = get();
-        const getBookmark = useBookmarkStore.getState().getBookmark;
-        const [topkRes, bookmarkRes] = await Promise.all([
-            getJobList(count),
-            getBookmark?.() || Promise.resolve([]),
-        ]);
+        try {
+            const { getJobList } = get();
+            const getBookmark = useBookmarkStore.getState().getBookmark;
 
-        const topkJob = topkRes;
-        const bookmarkedJob = Array.isArray(bookmarkRes) ? bookmarkRes : []; // Ensure bookmarkRes is an array
-        const bookmarkedIds = new Set<number>(bookmarkedJob.map((job: Job) => job.id));
-        const bookmarkedJobs: Job[] = topkJob.map((job: Job) => ({
-            ...job,
-            isBookmarked: bookmarkedIds.has(job.id),
-        }));
+            const [topkRes, bookmarkRes] = await Promise.all([
+                getJobList(count),
+                getBookmark?.() || Promise.resolve([]),
+            ]);
 
-        return bookmarkedJobs;
+            const bookmarkedJob = Array.isArray(bookmarkRes) ? bookmarkRes : [];
+            const bookmarkedIds = new Set<number>(bookmarkedJob.map((job: Job) => job.id));
+            const bookmarkedJobs: Job[] = topkRes.map((job: Job) => ({
+                ...job,
+                isBookmarked: bookmarkedIds.has(job.id),
+            }));
+
+            return bookmarkedJobs;
+        } catch (error) {
+            console.error('북마크 포함 잡 리스트 에러: ', error);
+            throw error;
+        }
     },
 }));
 

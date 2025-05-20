@@ -1,0 +1,28 @@
+.loading {
+    display: flex;
+    flex-direction: row;
+    // overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    height: 100%;
+
+    &__spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #d8edff;
+        border-top: 3px solid #1877f2;
+        border-radius: 50%;
+
+        // margin-bottom: 1rem;
+        animation: spin 1s linear infinite;
+    }
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

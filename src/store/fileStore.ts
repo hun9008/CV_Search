@@ -43,6 +43,7 @@ const useFileStore = create<fileStore>((set) => ({
             set({ summary: res.data.summary });
         } catch (error) {
             console.error('CV 요약 가져오기 에러: ', error);
+            throw error;
         }
     },
     uploadFile: async (file: File | null, url: string) => {
@@ -76,6 +77,7 @@ const useFileStore = create<fileStore>((set) => ({
             }
         } catch (error) {
             console.log(error);
+            throw error;
         }
     },
 }));

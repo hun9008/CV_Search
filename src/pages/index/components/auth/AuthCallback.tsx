@@ -34,7 +34,7 @@ function AuthCallback() {
                     navigate('/signUp/detail', { replace: true });
                 } else {
                     // navigate('/main', { replace: true });
-                    navigate('/main');
+                    navigate('/main', { replace: true });
                 }
             })
             .catch((err) => {

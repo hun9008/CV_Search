@@ -20,10 +20,16 @@ function CvViewer() {
                 </button>
             )}
 
-            {url && !hidden && (
+            {url && !hidden ? (
                 <div className={style.cvContainer}>
                     <iframe src={url} className={style.cvContainer__cv} title="CV Preview"></iframe>
                 </div>
+            ) : (
+                !hidden && (
+                    <div className={style.cvContainer}>
+                        <p>CV가 존재하지 않습니다</p>
+                    </div>
+                )
             )}
         </div>
     );

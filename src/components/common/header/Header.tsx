@@ -72,7 +72,7 @@ function Header() {
 
                 <div className={style.header__container__subContainer}>
                     <p className={style.header__logo}>goodJob</p>
-                    <div className={style.header__searchBar}>
+                    {/* <div className={style.header__searchBar}>
                         <Search className={style.header__searchBar__icon} size={20} />
                         <input
                             type="text"
@@ -81,7 +81,7 @@ function Header() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className={style.header__searchBar__input}
                         />
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className={style.header__actions}>

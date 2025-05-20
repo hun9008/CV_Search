@@ -2,7 +2,10 @@ import style from './styles/GoogleSignIn.module.scss';
 
 function SignIn() {
     const handleGoogleLogin = () => {
-        window.location.href = `https://be.goodjob.ai.kr/auth/login?provider=google`; // AuthCallBack으로 리다이렉트
+        // window.location.href = `https://be.goodjob.ai.kr/auth/login?provider=google`; // AuthCallBack으로 리다이렉트
+        const redirectUri = 'http://localhost:5173/auth/callback';
+        const state = btoa(encodeURIComponent(redirectUri));
+        window.location.href = `https://be.goodjob.ai.kr/oauth2/authorization/google?state=${state}`;
     };
 
     return (

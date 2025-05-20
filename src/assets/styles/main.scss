@@ -1,10 +1,10 @@
-@use '@assets/styles/font.scss';
+@use './font.scss';
 * {
     padding: 0;
     margin: 0;
 
     box-sizing: border-box;
-    font-family: 'Noto Sans', 'Noto Sans KR';
+    font-family: 'Noto Sans KR', 'Noto Sans';
 
     font-weight: 400;
 

@@ -4,6 +4,7 @@ import { User, UserCircle, Settings, HelpCircle, Crown, LogOut, ChevronRight } f
 import useAuthStore from '../../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import AccountDialog from './AccountDialog';
+import useUserStore from '../../../store/userStore';
 
 function ProfileDialog() {
     const [hidden, setHidden] = useState(true);
@@ -13,6 +14,7 @@ function ProfileDialog() {
     const profileRef = useRef<HTMLButtonElement>(null);
     const navigate = useNavigate();
     const accessToken = useAuthStore.getState().accessToken;
+    const { name, email } = useUserStore();
 
     const handleDropDownMenu = () => {
         setHidden((state) => !state);
@@ -70,8 +72,8 @@ function ProfileDialog() {
                 ref={dropDownRef}>
                 <nav>
                     <div className={style.profile}>
-                        <h2 className={style.profile__name}>Uijong Wei</h2>
-                        <p className={style.profile__email}>dnldmlwhd@ajou.ac.kr</p>
+                        <h2 className={style.profile__name}>{name}</h2>
+                        <p className={style.profile__email}>{email}</p>
                     </div>
                     <span className={style.divider}></span>
                     <ul>

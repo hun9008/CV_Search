@@ -67,6 +67,14 @@
             color: #5d4037;
         }
     }
+    &__delete {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem 1.5rem 1rem;
+        color: #e53935;
+        overflow: hidden;
+    }
 
     &__content {
         display: flex;
@@ -76,12 +84,42 @@
         gap: 1rem;
     }
 }
+.deletingText {
+    text-align: center;
+    position: relative;
+    font-weight: 500;
+    font-size: 1.2rem;
+
+    ::after {
+        content: '.';
+        animation: dots 1.2s steps(3, end) infinite;
+        display: inline-block;
+        width: 1ch;
+        overflow: hidden;
+        vertical-align: bottom;
+    }
+}
+@keyframes dots {
+    0% {
+        content: '.';
+    }
+    33% {
+        content: '..';
+    }
+    66% {
+        content: '...';
+    }
+    100% {
+        content: '.';
+    }
+}
 
 .button {
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 500;
+    height: 48px;
     cursor: pointer;
     transition: all 0.2s ease;
     flex: 1;
