@@ -12,6 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -36,6 +40,7 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final UserRepository userRepository;
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Bean
     public SecurityFilterChain filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
@@ -55,6 +60,9 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthFilter(jwtTokenProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/auth/login")
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .authorizationRequestResolver(customAuthorizationRequestResolver(clientRegistrationRepository))
+                        )
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler((HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -71,6 +79,39 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public OAuth2AuthorizationRequestResolver customAuthorizationRequestResolver(ClientRegistrationRepository repo) {
+        DefaultOAuth2AuthorizationRequestResolver defaultResolver =
+                new DefaultOAuth2AuthorizationRequestResolver(repo, "/oauth2/authorization");
+
+        return new OAuth2AuthorizationRequestResolver() {
+
+            @Override
+            public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
+                return customizeState(request, defaultResolver.resolve(request));
+            }
+
+            @Override
+            public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
+                return customizeState(request, defaultResolver.resolve(request, clientRegistrationId));
+            }
+
+            private OAuth2AuthorizationRequest customizeState(HttpServletRequest request, OAuth2AuthorizationRequest resolved) {
+                if (resolved == null) return null;
+
+                String stateParam = request.getParameter("state");
+                if (stateParam != null) {
+                    logger.debug("✅ Using custom state from front: {}", stateParam);
+                    return OAuth2AuthorizationRequest.from(resolved)
+                            .state(stateParam)
+                            .build();
+                }
+
+                return resolved;
+            }
+        };
     }
 
     @Bean
