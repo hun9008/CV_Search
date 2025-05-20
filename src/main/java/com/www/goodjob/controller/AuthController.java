@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,31 +72,67 @@ public class AuthController {
         return ResponseEntity.ok(Collections.singletonMap("accessToken", newAccessToken));
     }
 
-    @Operation(summary = "accessToken + firstLogin 여부 반환", description = """
-            소셜 로그인 완료 후 프론트가 호출하는 엔드포인트 /
-            쿠키에서 refresh_token을 읽고 email, accessToken과 최초 로그인 여부 반환
-            """)
-    // callback-endpoint에서 accessToken과 firstLogin 여부 반환
+    @Operation(
+            summary = "accessToken + firstLogin 여부 반환",
+            description = """
+            ✅ 소셜 로그인 완료 후 프론트가 호출하는 엔드포인트
+
+            - 쿠키에서 refresh_token을 읽고 email, accessToken, firstLogin 여부를 반환함
+            - firstLogin은 유저가 DB에 존재하지 않을 경우 true로 설정됨
+              (예: 탈퇴 후 재로그인한 경우에도 true로 간주)
+            - refresh_token이 만료되었거나 유효하지 않으면 401 반환
+
+            🔁 프론트 처리 예시:
+              1. firstLogin = true → /signUp 페이지로 이동
+              2. firstLogin = false → /main 페이지로 이동
+            """
+    )
     @GetMapping("/callback-endpoint")
-    public ResponseEntity<?> handleCallback(@CookieValue(value = "refresh_token", required = false) String refreshToken) {
-        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+    public ResponseEntity<?> handleCallback(
+            @CookieValue(value = "refresh_token", required = false) String refreshToken,
+            HttpServletResponse response
+    ) {
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "refresh token 누락"));
+        }
+
+        String email;
+        try {
+            email = jwtTokenProvider.getEmail(refreshToken);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "유효하지 않은 refresh token"));
         }
 
-        String email = jwtTokenProvider.getEmail(refreshToken);
+        Optional<User> userOpt = userRepository.findByEmail(email);
 
-        // 단순히 DB에 유저가 없으면 새 유저로 간주 (에러 아님)
-        String newAccessToken = jwtTokenProvider.generateAccessToken(email);
-        boolean isFirstLogin = !userRepository.existsByEmail(email);
+        // 유저가 존재하지 않으면 firstLogin: true 반환
+        if (userOpt.isEmpty()) {
+            // refresh_token 삭제
+            ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(0)
+                    .sameSite("None")
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
+            return ResponseEntity.ok(Map.of(
+                    "email", email,
+                    "accessToken", jwtTokenProvider.generateAccessToken(email),
+                    "firstLogin", true
+            ));
+        }
+
+        // ✅ 유저가 존재하는 경우
         return ResponseEntity.ok(Map.of(
                 "email", email,
-                "accessToken", newAccessToken,
-                "firstLogin", isFirstLogin
+                "accessToken", jwtTokenProvider.generateAccessToken(email),
+                "firstLogin", false
         ));
     }
-
 
     @Operation(summary = "로그아웃 (refresh_token 쿠키 제거)", description = """
             refresh_token 삭제하여 로그아웃 처리함 /
@@ -119,10 +156,16 @@ public class AuthController {
     @Operation(
             summary = "회원 탈퇴 (refresh_token + 사용자 정보 삭제)",
             description = """
-                    사용자 계정을 삭제하고 refresh_token 쿠키도 제거함 /
-                    프론트는 localStorage의 accessToken도 제거해야 함 /
-                    req = 🔐 Authorization: Bearer <accessToken> 필요
-                    """
+            사용자 계정을 삭제하고 refresh_token 쿠키도 제거함
+            프론트는 localStorage의 accessToken도 함께 제거해야 하며, 이후 로그인 페이지나 메인 페이지로 강제 이동 처리 권장
+                        
+            🔐 Authorization: Bearer <accessToken> 헤더 필요
+                        
+            🔁 프론트 처리 예시:
+              1. 응답에서 `loggedOut: true` 확인
+              2. localStorage.clear() 또는 accessToken 제거
+              3. 로그인 페이지나 메인 페이지 등으로 이동
+            """
     )
     @DeleteMapping("/withdraw")
     public ResponseEntity<?> withdraw(HttpServletResponse response,
@@ -141,8 +184,12 @@ public class AuthController {
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
-        return ResponseEntity.ok(Map.of("message", "회원 탈퇴가 완료되었고, 로그아웃 처리되었습니다."));
+        return ResponseEntity.ok(Map.of(
+                "message", "회원 탈퇴가 완료되었고, 로그아웃 처리되었습니다.",
+                "loggedOut", true
+        ));
     }
+
 
 
     @Operation(summary = "마스터 accessToken 발급 (관리자용)", description = """
