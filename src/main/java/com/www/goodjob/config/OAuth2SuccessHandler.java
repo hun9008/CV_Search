@@ -72,12 +72,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
         // accessToken과 firstLogin은 프론트에서 처리
-        String serverName = request.getServerName();
-        String redirectUri = ("localhost".equals(serverName) || "127.0.0.1".equals(serverName))
-                ? "http://localhost:5173/auth/callback"
+        String redirectParam = request.getParameter("redirect_uri");
+        String redirectUri = (redirectParam != null && !redirectParam.isBlank())
+                ? redirectParam
                 : "https://www.goodjob.ai.kr/auth/callback";
 
         response.sendRedirect(redirectUri);
+
     }
 
     private OAuthProvider extractProvider(CustomOAuth2User user) {
