@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 
@@ -74,25 +75,35 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // 리디렉션 URI 설정
         String encodedState = request.getParameter("state");
-        String redirectUri = null;
+        String redirectUri;
 
         try {
             if (encodedState != null) {
-                String decoded = new String(Base64.getDecoder().decode(encodedState));
-                // 로컬환경 여부 판단
+                // Base64가 아닐 수 있으므로 안전하게 디코딩
+                byte[] decodedBytes = Base64.getDecoder().decode(encodedState);
+                String decoded = new String(decodedBytes, StandardCharsets.UTF_8);
+
+                // 줄바꿈 문자 제거
+                decoded = decoded.replaceAll("[\\r\\n]", "");
+
+                // 로컬/배포 환경 구분
                 if (decoded.contains("localhost")) {
                     redirectUri = "http://localhost:5173/auth/callback";
                 } else {
                     redirectUri = "https://www.goodjob.ai.kr/auth/callback";
                 }
+
                 log.info("✅ decoded redirect_uri from state: {}", redirectUri);
             } else {
                 redirectUri = "https://www.goodjob.ai.kr/auth/callback";
             }
-        } catch (Exception e) {
-            log.warn("❌ failed to decode state, fallback to default");
+        } catch (IllegalArgumentException e) {
+            log.warn("❌ invalid Base64 state: {}, fallback to default", encodedState);
             redirectUri = "https://www.goodjob.ai.kr/auth/callback";
         }
+
+        response.sendRedirect(redirectUri);
+
 
         response.sendRedirect(redirectUri);
     }
