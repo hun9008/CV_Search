@@ -79,33 +79,33 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         try {
             if (encodedState != null) {
-                byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedState); // URL-safe decoder
+                byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedState);
                 String decoded = new String(decodedBytes, StandardCharsets.UTF_8).replaceAll("[\\r\\n]", "");
 
                 if (isValidRedirectUri(decoded)) {
-                    redirectUri = decoded.contains("localhost")
-                            ? "http://localhost:5173/auth/callback"
-                            : "https://www.goodjob.ai.kr/auth/callback";
+                    redirectUri = decoded;
                     log.info("✅ decoded redirect_uri from state: {}", redirectUri);
                 } else {
-                    throw new IllegalArgumentException("CRLF detected in redirect URI");
+                    throw new IllegalArgumentException("Invalid redirect URI");
                 }
             } else {
                 redirectUri = "https://www.goodjob.ai.kr/auth/callback";
             }
         } catch (IllegalArgumentException e) {
-            log.warn("❌ invalid Base64 state or unsafe URI: {}, fallback to default", encodedState);
+            log.warn("❌ failed to decode or validate state, fallback to default. state: {}", encodedState);
             redirectUri = "https://www.goodjob.ai.kr/auth/callback";
         }
 
-        // 중복 방지 + 응답 커밋 여부 확인 후 리디렉트
         if (!response.isCommitted()) {
             response.sendRedirect(redirectUri);
         }
     }
 
     private boolean isValidRedirectUri(String uri) {
-        return uri != null && !uri.contains("\n") && !uri.contains("\r");
+        return uri != null &&
+                !uri.contains("\r") &&
+                !uri.contains("\n") &&
+                (uri.startsWith("http://localhost:5173") || uri.startsWith("https://www.goodjob.ai.kr"));
     }
 
     private OAuthProvider extractProvider(CustomOAuth2User user) {
