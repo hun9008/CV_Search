@@ -12,11 +12,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -45,19 +47,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/",
-                                "/auth/**",
-                                "/oauth2/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/s3/**",
-                                "/job-update/**",
-                                "/rec/**",
-                                "/jobs/**",
-                                "/error",
-                                "/actuator",
-                                "/actuator/prometheus"
+                                "/", "/auth/**", "/oauth2/**", "/swagger-ui/**", "/swagger-ui.html",
+                                "/v3/api-docs/**", "/s3/**", "/job-update/**", "/rec/**",
+                                "/jobs/**", "/error", "/actuator", "/actuator/prometheus"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -66,8 +58,20 @@ public class SecurityConfig {
                         .loginPage("/auth/login")
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler((HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) -> {
-                            logger.error("OAuth2 로그인 실패: {}", exception.getMessage(), exception);
-                            response.sendRedirect("/auth/login?error");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.setCharacterEncoding("UTF-8");
+
+                            String errorCode = "UNKNOWN_ERROR";
+                            String message = "로그인에 실패했습니다.";
+
+                            if (exception instanceof OAuth2AuthenticationException ex) {
+                                errorCode = ex.getError().getErrorCode();       // 예: WITHDRAWN_USER
+                                message = ex.getError().getDescription();      // 예: 회원 탈퇴된 계정입니다.
+                            }
+
+                            String json = String.format("{\"errorCode\": \"%s\", \"message\": \"%s\"}", errorCode, message);
+                            response.getWriter().write(json);
                         })
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                 );
