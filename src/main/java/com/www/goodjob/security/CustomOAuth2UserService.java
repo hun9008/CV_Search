@@ -29,33 +29,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User user = super.loadUser(userRequest);
         Map<String, Object> attributes = new HashMap<>(user.getAttributes());
-        logger.debug("Received attributes: {}", attributes);
-
         String provider = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Attribute oAuth2Attribute = OAuth2Attribute.of(provider, attributes);
-
         String email = oAuth2Attribute.getEmail();
-        log.debug("✅ OAuth2 로그인 시도 이메일: {}", email);
 
-        // 🔒 여기서 차단되어야 함!
-        if (!userRepository.existsByEmail(email)) {
-            log.warn("❌ 회원 탈퇴된 계정 로그인 시도: {}", email);
-            throw new OAuth2AuthenticationException(
-                    new OAuth2Error("WITHDRAWN_USER", "회원 탈퇴된 계정입니다.", null)
-            );
-        }
+        log.debug("✅ OAuth2 로그인 이메일: {}", email);
+
+        // 탈퇴 여부 검사는 제거됨 (DB에 없으면 새로운 유저로 간주)
 
         attributes.put("name", oAuth2Attribute.getName());
         attributes.put("email", email);
         attributes.put("picture", oAuth2Attribute.getPicture());
         attributes.put("provider", provider);
 
-        OAuth2User modifiedUser = new DefaultOAuth2User(
-                user.getAuthorities(),
-                attributes,
-                "name"
-        );
-
+        OAuth2User modifiedUser = new DefaultOAuth2User(user.getAuthorities(), attributes, "name");
         return new CustomOAuth2User(modifiedUser);
     }
 }

@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -64,11 +63,6 @@ public class SecurityConfig {
 
                             String errorCode = "UNKNOWN_ERROR";
                             String message = "로그인에 실패했습니다.";
-
-                            if (exception instanceof OAuth2AuthenticationException ex) {
-                                errorCode = ex.getError().getErrorCode();       // 예: WITHDRAWN_USER
-                                message = ex.getError().getDescription();      // 예: 회원 탈퇴된 계정입니다.
-                            }
 
                             String json = String.format("{\"errorCode\": \"%s\", \"message\": \"%s\"}", errorCode, message);
                             response.getWriter().write(json);
