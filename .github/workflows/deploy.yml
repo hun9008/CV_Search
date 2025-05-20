@@ -25,7 +25,11 @@ jobs:
           sshpass -p "$HUNIAN_PASSWORD" ssh -o StrictHostKeyChecking=no $HUNIAN_USER@$HUNIAN_HOST << 'EOF'
             cd /home/hun/Desktop/goodjob/CV_Search
 
+            echo "🔄 Pulling latest changes from dev_front branch..."
             git pull origin dev_front
+
+            echo "📦 Installing dependencies..."
+            npm install
 
             echo "🏗️ Building project..."
             npm run build
