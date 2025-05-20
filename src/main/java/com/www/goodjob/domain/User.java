@@ -3,6 +3,9 @@ package com.www.goodjob.domain;
 import com.www.goodjob.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,16 +31,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    @PrePersist
-    public void onCreate() {
-        this.createdAt = this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
+    @UpdateTimestamp
+    private LocalDateTime lastUpdatedAt;
 }

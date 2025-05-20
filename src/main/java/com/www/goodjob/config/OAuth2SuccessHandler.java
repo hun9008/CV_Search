@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Base64;
 
 @RequiredArgsConstructor
 @Component
@@ -72,13 +73,22 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
         // accessToken과 firstLogin은 프론트에서 처리
-        String redirectParam = request.getParameter("redirect_uri");
-        String redirectUri = (redirectParam != null && !redirectParam.isBlank())
-                ? redirectParam
-                : "https://www.goodjob.ai.kr/auth/callback";
+        String encodedState = request.getParameter("state");
+        String redirectUri;
+
+        try {
+            if (encodedState != null) {
+                redirectUri = new String(Base64.getDecoder().decode(encodedState));
+                log.info("✅ decoded redirect_uri from state: {}", redirectUri);
+            } else {
+                redirectUri = "https://www.goodjob.ai.kr/auth/callback";
+            }
+        } catch (Exception e) {
+            log.warn("❌ failed to decode state, fallback to default");
+            redirectUri = "https://www.goodjob.ai.kr/auth/callback";
+        }
 
         response.sendRedirect(redirectUri);
-
     }
 
     private OAuthProvider extractProvider(CustomOAuth2User user) {
