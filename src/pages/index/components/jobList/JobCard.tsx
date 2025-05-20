@@ -59,11 +59,13 @@ function JobCard({ job, isSelected, onSelect, onToggleBookmark }: JobCardProps) 
                             )}
                         </div>
 
-                        <p className={style.jobCard__tags__location}>
-                            {`${job.regions?.[0].sido ? job.regions?.[0].sido : ''} ${
-                                job.regions?.[0].sigungu ? job.regions?.[0].sigungu : ''
-                            }`}
-                        </p>
+                        {job.regions?.length ? (
+                            <p className={style.jobCard__tags__location}>
+                                {job.regions[0].sido ?? ''} {job.regions[0].sigungu ?? ''}
+                            </p>
+                        ) : (
+                            ''
+                        )}
                     </>
                 </div>
             </div>
