@@ -34,5 +34,5 @@ jobs:
             pm2 delete goodjob || true
 
             echo "🚀 Starting static server on port 3013..."
-            pm2 start serve --name "goodjob" -- -s dist -l 3013
+            pm2 start "npx serve -s dist -l 3013" --name goodjob
           EOF
