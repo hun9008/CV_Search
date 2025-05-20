@@ -47,7 +47,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuthProvider provider = extractProvider(customUser);
         String oauthId = customUser.getOauthId(provider);
 
-        // 유저가 없으면 생성 = 첫 로그인
+        // 첫 로그인이라면 유저 생성
         if (!userRepository.existsByEmail(email)) {
             User newUser = userRepository.save(User.builder()
                     .email(email)
@@ -62,7 +62,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .build());
         }
 
-        // JWT 발급
+        // Refresh Token 생성 및 쿠키 설정
         String refreshToken = jwtTokenProvider.generateRefreshToken(email);
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
@@ -79,36 +79,31 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         try {
             if (encodedState != null) {
-                // Base64가 아닐 수 있으므로 안전하게 디코딩
-                byte[] decodedBytes = Base64.getDecoder().decode(encodedState);
-                String decoded = new String(decodedBytes, StandardCharsets.UTF_8);
+                byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedState); // URL-safe decoder
+                String decoded = new String(decodedBytes, StandardCharsets.UTF_8).replaceAll("[\\r\\n]", "");
 
-                // 줄바꿈 문자 제거
-                decoded = decoded.replaceAll("[\\r\\n]", "");
-
-                // 로컬/배포 환경 구분
-                if (decoded.contains("localhost")) {
-                    redirectUri = "http://localhost:5173/auth/callback";
+                if (isValidRedirectUri(decoded)) {
+                    redirectUri = decoded.contains("localhost")
+                            ? "http://localhost:5173/auth/callback"
+                            : "https://www.goodjob.ai.kr/auth/callback";
+                    log.info("✅ decoded redirect_uri from state: {}", redirectUri);
                 } else {
-                    redirectUri = "https://www.goodjob.ai.kr/auth/callback";
+                    throw new IllegalArgumentException("CRLF detected in redirect URI");
                 }
-
-                log.info("✅ decoded redirect_uri from state: {}", redirectUri);
             } else {
                 redirectUri = "https://www.goodjob.ai.kr/auth/callback";
             }
         } catch (IllegalArgumentException e) {
-            log.warn("❌ invalid Base64 state: {}, fallback to default", encodedState);
+            log.warn("❌ invalid Base64 state or unsafe URI: {}, fallback to default", encodedState);
             redirectUri = "https://www.goodjob.ai.kr/auth/callback";
         }
 
-        response.sendRedirect(redirectUri);
-
-
-        response.sendRedirect(redirectUri);
+        // 중복 방지 + 응답 커밋 여부 확인 후 리디렉트
+        if (!response.isCommitted()) {
+            response.sendRedirect(redirectUri);
+        }
     }
 
-    // CRLF 방지용 유효성 검사 함수
     private boolean isValidRedirectUri(String uri) {
         return uri != null && !uri.contains("\n") && !uri.contains("\r");
     }
