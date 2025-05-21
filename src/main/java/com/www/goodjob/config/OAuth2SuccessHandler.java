@@ -30,6 +30,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtTokenProvider jwtTokenProvider;
 
     private final UserRepository userRepository;
+
     private final UserOAuthRepository userOAuthRepository;
 
     @Override
