@@ -107,8 +107,9 @@ public class AuthController {
 
         Optional<User> userOpt = userRepository.findByEmail(email);
 
-        // 유저가 존재하지 않으면 firstLogin: true 반환
         if (userOpt.isEmpty()) {
+            logger.info("[LOGIN] firstLogin = true for email={}", email); // 로그 추가
+
             // refresh_token 삭제
             ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
                     .httpOnly(true)
@@ -126,13 +127,15 @@ public class AuthController {
             ));
         }
 
-        // ✅ 유저가 존재하는 경우
+        logger.info("[LOGIN] firstLogin = false for email={}", email); // 로그 추가
+
         return ResponseEntity.ok(Map.of(
                 "email", email,
                 "accessToken", jwtTokenProvider.generateAccessToken(email),
                 "firstLogin", false
         ));
     }
+
 
     @Operation(summary = "로그아웃 (refresh_token 쿠키 제거)", description = """
             refresh_token 삭제하여 로그아웃 처리함 /
