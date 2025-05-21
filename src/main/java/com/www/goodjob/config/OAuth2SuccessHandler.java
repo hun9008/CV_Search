@@ -86,7 +86,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
                 if (isValidRedirectUri(decoded)) {
                     redirectUri = decoded;
-                    log.info("✅ decoded redirect_uri from state: {}", redirectUri);
+                    log.info("[OAUTH] decoded redirect_uri from state: {}", redirectUri);
                 } else {
                     throw new IllegalArgumentException("Invalid redirect URI");
                 }
@@ -94,7 +94,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 redirectUri = "https://www.goodjob.ai.kr/auth/callback";
             }
         } catch (IllegalArgumentException e) {
-            log.warn("❌ failed to decode or validate state, fallback to default. state: {}", encodedState);
+            log.warn("[OAUTH] failed to decode or validate state, fallback to default. state: {}", encodedState);
             redirectUri = "https://www.goodjob.ai.kr/auth/callback";
         }
 
