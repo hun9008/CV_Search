@@ -111,7 +111,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         return uri != null &&
                 !uri.contains("\r") &&
                 !uri.contains("\n") &&
-                (uri.startsWith("http://localhost:5173") || uri.startsWith("https://www.goodjob.ai.kr"));
+                (uri.startsWith("https://localhost:5173") || uri.startsWith("https://www.goodjob.ai.kr"));  // http 아님!! https가 맞음
     }
 
     private OAuthProvider extractProvider(CustomOAuth2User user) {
