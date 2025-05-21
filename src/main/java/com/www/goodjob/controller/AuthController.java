@@ -75,17 +75,16 @@ public class AuthController {
     @Operation(
             summary = "accessToken + firstLogin 여부 반환",
             description = """
-            ✅ 소셜 로그인 완료 후 프론트가 호출하는 엔드포인트
+        ✅ 소셜 로그인 완료 후 프론트가 호출하는 엔드포인트
 
-            - 쿠키에서 refresh_token을 읽고 email, accessToken, firstLogin 여부를 반환함
-            - firstLogin은 유저가 DB에 존재하지 않을 경우 true로 설정됨
-              (예: 탈퇴 후 재로그인한 경우에도 true로 간주)
-            - refresh_token이 만료되었거나 유효하지 않으면 401 반환
+        - 쿠키에 저장된 refresh_token에서 email, accessToken, firstLogin 값을 파싱하여 반환함
+        - firstLogin은 OAuth2SuccessHandler에서 발급한 refresh_token 내부의 클레임으로 판단
+        - refresh_token이 유효하지 않으면 401 반환
 
-            🔁 프론트 처리 예시:
-              1. firstLogin = true → /signUp 페이지로 이동
-              2. firstLogin = false → /main 페이지로 이동
-            """
+        🔁 프론트 처리 예시:
+          1. firstLogin = true → /signUp 페이지로 이동
+          2. firstLogin = false → /main 페이지로 이동
+        """
     )
     @GetMapping("/callback-endpoint")
     public ResponseEntity<?> handleCallback(
@@ -98,43 +97,24 @@ public class AuthController {
         }
 
         String email;
+        Boolean firstLogin;
         try {
             email = jwtTokenProvider.getEmail(refreshToken);
+            firstLogin = jwtTokenProvider.getFirstLoginClaim(refreshToken);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "유효하지 않은 refresh token"));
         }
 
-        Optional<User> userOpt = userRepository.findByEmail(email);
-
-        if (userOpt.isEmpty()) {
-            logger.info("[LOGIN] firstLogin = true for email={}", email); // 로그 추가
-
-            // refresh_token 삭제
-            ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/")
-                    .maxAge(0)
-                    .sameSite("None")
-                    .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
-
-            return ResponseEntity.ok(Map.of(
-                    "email", email,
-                    "accessToken", jwtTokenProvider.generateAccessToken(email),
-                    "firstLogin", true
-            ));
-        }
-
-        logger.info("[LOGIN] firstLogin = false for email={}", email); // 로그 추가
+        logger.info("[LOGIN] firstLogin = {} for email={}", firstLogin, email);
 
         return ResponseEntity.ok(Map.of(
                 "email", email,
                 "accessToken", jwtTokenProvider.generateAccessToken(email),
-                "firstLogin", false
+                "firstLogin", firstLogin
         ));
     }
+
 
 
     @Operation(summary = "로그아웃 (refresh_token 쿠키 제거)", description = """
