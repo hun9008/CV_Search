@@ -7,6 +7,7 @@ import useBookmarkStore from '../../../../store/bookmarkStore';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorFallback from '../../../../components/common/error/ErrorFallback';
+import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
 
 interface jobListProps {
     bookmarked: boolean;
@@ -17,6 +18,7 @@ function JobList({ bookmarked }: jobListProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
     const [hasError, setHasError] = useState(false);
+    const [isPending, setIsPending] = useState(false); // 업로드 직후 topk-list 요청 시 fallback 용
 
     const jobListRef = useRef<HTMLDivElement>(null);
     const experienceFilterRef = useRef<HTMLDivElement>(null);
@@ -39,6 +41,23 @@ function JobList({ bookmarked }: jobListProps) {
     const jobsPerPage = 15;
 
     const TOTAL_JOB = 80;
+
+    // 파일 업로드에서 다른 pending 페이지를 만들어 1분 가량을 벌어야함
+    // 현재 파일 업로드에서 10초의 시간을 확보
+    // 최대 1분 20초 소요
+    // setTimeout 70000
+    // 최초 업로드 및 재업로드에 70000~80000ms
+    // 최초 업로드시에는 업로드 페이지에서 10000ms 확보
+    useEffect(() => {
+        const checkPending = () => {
+            setTimeout(() => {
+                console.log('pending end');
+                setIsPending(false);
+            }, 80000);
+        };
+        setIsPending(true);
+        checkPending();
+    }, [hasError]);
 
     const filterJobs = useCallback(() => {
         const filtered = (bookmarked ? filteredJobs || [] : jobList || []).filter((job) => {
@@ -109,7 +128,43 @@ function JobList({ bookmarked }: jobListProps) {
         }
     };
 
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         setIsLoading(true);
+    //         try {
+    //             if (bookmarked) {
+    //                 const updatedJob = await getBookmark();
+
+    //                 if (Array.isArray(updatedJob)) {
+    //                     setFilteredJobs(updatedJob);
+    //                     setSelectedJob(updatedJob[0]?.id ?? 0);
+    //                 } else {
+    //                     throw new Error('북마크 응답이 배열이 아님');
+    //                 }
+    //             } else {
+    //                 if (!jobList || jobList.length === 0) {
+    //                     await getJobList(TOTAL_JOB);
+    //                     await getBookmark();
+    //                 }
+    //             }
+    //         } catch (error) {
+    //             console.error('데이터 가져오기 에러:', error);
+    //             // 여기에서 임의의 시간(70000ms) 동안 주기적으로 fetchData 호출
+    //             setHasError(true);
+    //         } finally {
+    //             setIsLoading(false);
+    //         }
+    //     };
+
+    //     fetchData();
+    // }, []);
+
+    // 최초 업로드 후 80초 동안 topk-list 재호출
     useEffect(() => {
+        let pollingInterval: NodeJS.Timeout;
+        let timeoutHandle: NodeJS.Timeout;
+        let pollingActive = true;
+
         const fetchData = async () => {
             setIsLoading(true);
             try {
@@ -119,6 +174,7 @@ function JobList({ bookmarked }: jobListProps) {
                     if (Array.isArray(updatedJob)) {
                         setFilteredJobs(updatedJob);
                         setSelectedJob(updatedJob[0]?.id ?? 0);
+                        pollingActive = false; // 성공했으면 polling 멈춤
                     } else {
                         throw new Error('북마크 응답이 배열이 아님');
                     }
@@ -126,8 +182,10 @@ function JobList({ bookmarked }: jobListProps) {
                     if (!jobList || jobList.length === 0) {
                         await getJobList(TOTAL_JOB);
                         await getBookmark();
+                        pollingActive = false;
                     }
                 }
+                setHasError(false);
             } catch (error) {
                 console.error('데이터 가져오기 에러:', error);
                 setHasError(true);
@@ -136,9 +194,30 @@ function JobList({ bookmarked }: jobListProps) {
             }
         };
 
-        fetchData();
-    }, []);
+        const startPolling = () => {
+            fetchData(); // 초기 1회 호출
+            pollingInterval = setInterval(() => {
+                if (pollingActive) {
+                    fetchData();
+                    // 만약에 응답이 정상적으로 온다면 바로 polling 중단
+                }
+            }, 10000); // 10초 간격
+        };
 
+        startPolling();
+
+        // eslint-disable-next-line prefer-const
+        timeoutHandle = setTimeout(() => {
+            pollingActive = false;
+            clearInterval(pollingInterval);
+            console.log('⏱️ 80초 polling 중단');
+        }, 80000); // 80초 뒤 polling 종료
+
+        return () => {
+            clearInterval(pollingInterval);
+            clearTimeout(timeoutHandle);
+        };
+    }, []);
     const totalItems = filteredJobs.length;
     const calculatedTotalPages = Math.ceil(totalItems / jobsPerPage);
     // const currentJobs = useEffect(() => {
@@ -247,7 +326,11 @@ function JobList({ bookmarked }: jobListProps) {
             <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <div className={styles.jobList__content}>
                     {hasError ? (
-                        <ErrorFallback />
+                        isPending ? (
+                            <LoadingSpinner />
+                        ) : (
+                            <ErrorFallback />
+                        )
                     ) : isLoading ? (
                         <div className={styles.jobList__loading}>
                             <div className={styles.jobList__loadingSpinner}></div>

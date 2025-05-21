@@ -30,6 +30,7 @@ const useAuthStore = create<AuthStore>()(
                 });
                 if (res.status === 200) {
                     set({ accessToken: null, isLoggedIn: false });
+                    localStorage.removeItem('page-storage');
                 }
             },
             withdraw: async (accessToken) => {
@@ -40,9 +41,11 @@ const useAuthStore = create<AuthStore>()(
                     });
                     console.log('탈퇴중');
                     if (res.status === 200) {
-                        console.log(res);
-                        console.log(res.data);
                         console.log('탈퇴완료');
+                        localStorage.removeItem('user-token');
+                        localStorage.removeItem('user-storage');
+                        localStorage.removeItem('search-history');
+                        localStorage.removeItem('page-storage');
                     }
                 } catch (error) {
                     console.log(error);
