@@ -60,9 +60,9 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthFilter(jwtTokenProvider, userRepository), UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/auth/login")
-//                        .authorizationEndpoint(endpoint -> endpoint
-//                                .authorizationRequestResolver(customAuthorizationRequestResolver(clientRegistrationRepository))
-//                        )
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .authorizationRequestResolver(customAuthorizationRequestResolver(clientRegistrationRepository))
+                        )
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler((HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -81,38 +81,38 @@ public class SecurityConfig {
         return http.build();
     }
 
-//    @Bean
-//    public OAuth2AuthorizationRequestResolver customAuthorizationRequestResolver(ClientRegistrationRepository repo) {
-//        DefaultOAuth2AuthorizationRequestResolver defaultResolver =
-//                new DefaultOAuth2AuthorizationRequestResolver(repo, "/oauth2/authorization");
-//
-//        return new OAuth2AuthorizationRequestResolver() {
-//
-//            @Override
-//            public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
-//                return customizeState(request, defaultResolver.resolve(request));
-//            }
-//
-//            @Override
-//            public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
-//                return customizeState(request, defaultResolver.resolve(request, clientRegistrationId));
-//            }
-//
-//            private OAuth2AuthorizationRequest customizeState(HttpServletRequest request, OAuth2AuthorizationRequest resolved) {
-//                if (resolved == null) return null;
-//
-//                String stateParam = request.getParameter("state");
-//                if (stateParam != null) {
-//                    logger.debug("✅ Using custom state from front: {}", stateParam);
-//                    return OAuth2AuthorizationRequest.from(resolved)
-//                            .state(stateParam)
-//                            .build();
-//                }
-//
-//                return resolved;
-//            }
-//        };
-//    }
+    @Bean
+    public OAuth2AuthorizationRequestResolver customAuthorizationRequestResolver(ClientRegistrationRepository repo) {
+        DefaultOAuth2AuthorizationRequestResolver defaultResolver =
+                new DefaultOAuth2AuthorizationRequestResolver(repo, "/oauth2/authorization");
+
+        return new OAuth2AuthorizationRequestResolver() {
+
+            @Override
+            public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
+                return customizeState(request, defaultResolver.resolve(request));
+            }
+
+            @Override
+            public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
+                return customizeState(request, defaultResolver.resolve(request, clientRegistrationId));
+            }
+
+            private OAuth2AuthorizationRequest customizeState(HttpServletRequest request, OAuth2AuthorizationRequest resolved) {
+                if (resolved == null) return null;
+
+                String stateParam = request.getParameter("state");
+                if (stateParam != null) {
+                    logger.debug("✅ Using custom state from front: {}", stateParam);
+                    return OAuth2AuthorizationRequest.from(resolved)
+                            .state(stateParam)
+                            .build();
+                }
+
+                return resolved;
+            }
+        };
+    }
 
 
     @Bean
