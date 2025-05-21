@@ -15,6 +15,7 @@ function AuthCallback() {
                 withCredentials: true,
             })
             .then((res) => {
+                console.log(res.data);
                 const { accessToken, firstLogin } = res.data;
 
                 if (!accessToken) {
@@ -23,15 +24,13 @@ function AuthCallback() {
                     return;
                 }
                 console.log('AuthCallback');
-                console.log(firstLogin);
 
                 setTokens(accessToken); // 토큰 저장
                 setIsLoggedIn(true); // 로그인 처리
                 fetchUserData(accessToken); // 유저 데이터 불러오기
 
                 if (firstLogin) {
-                    // +이력서를 올리지 않았다면
-                    navigate('/signUp/detail', { replace: true });
+                    navigate('/upload', { replace: true });
                 } else {
                     // navigate('/main', { replace: true });
                     navigate('/main', { replace: true });

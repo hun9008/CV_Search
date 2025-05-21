@@ -5,8 +5,10 @@ import useUserStore from './userStore';
 
 interface fileStore {
     file: File | null;
+    hasFile: boolean;
     summary: string | null;
     setFile: (file: File | null) => void;
+    setHasFile: (exists: boolean) => void;
     removeFile: () => Promise<number>;
     getSummary: () => Promise<void>;
     uploadFile: (file: File | null, url: string) => Promise<void>;
@@ -15,7 +17,9 @@ interface fileStore {
 const useFileStore = create<fileStore>((set) => ({
     file: null,
     summary: null,
+    hasFile: false,
     setFile: (file: File | null) => set({ file }),
+    setHasFile: (exists) => set({ hasFile: exists }),
     removeFile: async () => {
         const userId = useUserStore.getState().id;
         const accessToken = useAuthStore.getState().accessToken;
@@ -52,16 +56,19 @@ const useFileStore = create<fileStore>((set) => ({
             return;
         }
         try {
+            console.time('⏱️ Upload to S3');
             const res = await axios.put(url, file, {
                 // S3에 파일 업로드
                 headers: { 'Content-Type': file.type },
             });
+            console.timeEnd('⏱️ Upload to S3');
             if (res.status === 200) {
                 const accessToken = useAuthStore.getState().accessToken;
                 const userEmail = useUserStore.getState().email;
                 const userId = useUserStore.getState().id;
                 const fileName = userEmail.split('@')[0];
 
+                console.time('⏱️ confirm-upload');
                 // confirm 후에 로딩해야함
                 const confirm = await axios.post(
                     `https://be.goodjob.ai.kr/s3/confirm-upload?fileName=${fileName}_${userId}`,
@@ -73,6 +80,7 @@ const useFileStore = create<fileStore>((set) => ({
                         withCredentials: true,
                     }
                 );
+                console.timeEnd('⏱️ confirm-upload');
                 console.log(confirm);
             }
         } catch (error) {
