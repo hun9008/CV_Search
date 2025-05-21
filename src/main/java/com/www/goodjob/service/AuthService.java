@@ -1,6 +1,7 @@
 package com.www.goodjob.service;
 
 import com.www.goodjob.domain.User;
+import com.www.goodjob.repository.ApplicationRepository;
 import com.www.goodjob.repository.SearchLogRepository;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
@@ -15,11 +16,14 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserOAuthRepository userOAuthRepository;
     private final SearchLogRepository searchLogRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Transactional
     public void withdraw(User user) {
         searchLogRepository.deleteAllByUser(user);
         userOAuthRepository.deleteAllByUser(user);
+        applicationRepository.deleteAllByUser(user);
         userRepository.delete(user);
+
     }
 }
