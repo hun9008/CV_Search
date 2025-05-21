@@ -38,17 +38,35 @@ public class JwtTokenProvider {
     /**
      * Refresh Token 생성
      */
+    // 기존 메서드 유지 (기본 버전)
     public String generateRefreshToken(String email) {
+        return generateRefreshToken(email, false); // 기본값 false로
+    }
+
+    // firstLogin 포함 버전 오버로드
+    public String generateRefreshToken(String email, boolean isFirstLogin) {
         long now = System.currentTimeMillis();
         Date validity = new Date(now + REFRESH_TOKEN_VALID_TIME);
 
         return Jwts.builder()
                 .setSubject(email)
+                .claim("firstLogin", isFirstLogin)
                 .setIssuedAt(new Date(now))
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
+
+    public Boolean getFirstLoginClaim(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
+
+        Object value = claims.get("firstLogin");
+        return value instanceof Boolean ? (Boolean) value : Boolean.parseBoolean(value.toString());
+    }
+
 
     /**
      * 간단한 유효성 검사 (기존 방식)

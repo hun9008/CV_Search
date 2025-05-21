@@ -30,9 +30,7 @@ import java.util.Base64;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
-
     private final UserRepository userRepository;
-
     private final UserOAuthRepository userOAuthRepository;
 
     @Override
@@ -49,8 +47,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuthProvider provider = extractProvider(customUser);
         String oauthId = customUser.getOauthId(provider);
 
-        // 첫 로그인이라면 유저 생성
-        if (!userRepository.existsByEmail(email)) {
+        // 첫 로그인 여부 판단
+        boolean isFirstLogin = !userRepository.existsByEmail(email);
+
+        if (isFirstLogin) {
             User newUser = userRepository.save(User.builder()
                     .email(email)
                     .name(name)
@@ -62,10 +62,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .provider(provider)
                     .oauthId(oauthId)
                     .build());
+
+            log.info("[OAUTH] firstLogin = true for email={}", email);
+        } else {
+            log.info("[OAUTH] firstLogin = false for email={}", email);
         }
 
-        // Refresh Token 생성 및 쿠키 설정
-        String refreshToken = jwtTokenProvider.generateRefreshToken(email);
+        //  Refresh Token에 firstLogin 정보 포함
+        String refreshToken = jwtTokenProvider.generateRefreshToken(email, isFirstLogin);
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
                 .secure(true)
@@ -75,7 +79,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-        // 리디렉션 URI 설정
+        // 리디렉션 URI 디코딩
         String encodedState = request.getParameter("state");
         String redirectUri;
 
@@ -107,7 +111,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         return uri != null &&
                 !uri.contains("\r") &&
                 !uri.contains("\n") &&
-                (uri.startsWith("https://localhost:5173") || uri.startsWith("https://www.goodjob.ai.kr"));
+                (uri.startsWith("https://localhost:5173") || uri.startsWith("https://www.goodjob.ai.kr"));  // http 아님!! https가 맞음
     }
 
     private OAuthProvider extractProvider(CustomOAuth2User user) {
