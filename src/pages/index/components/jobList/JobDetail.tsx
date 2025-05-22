@@ -5,6 +5,7 @@ import { Bookmark, Share2, ExternalLink, MapPin, Calendar, Clock, Briefcase } fr
 import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
 import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
+import useBookmarkStore from '../../../../store/bookmarkStore';
 
 function JobDetail() {
     const { getSelectedJob, getFeedback } = useJobStore();
@@ -19,6 +20,9 @@ function JobDetail() {
     const [isManaging, setIsManaging] = useState(false);
     // const [showManageModal, setShowManageModal] = useState(false);
     const [manageButtonClicked, setManageButtonClicked] = useState(false);
+
+    const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
+    const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
 
     useEffect(() => {
         const initializeApplications = async () => {
@@ -36,17 +40,22 @@ function JobDetail() {
         }
     }, [applications, selectedJob]);
 
+    useEffect(() => {
+        // bookmarkedList가 변경될 때마다 현재 선택된 작업의 북마크 상태 업데이트
+        if (bookmarkedList && selectedJob) {
+            const isCurrentJobBookmarked = bookmarkedList.some(
+                (bookmark) => bookmark.id === selectedJob
+            );
+            setIsBookmarked(isCurrentJobBookmarked);
+        }
+    }, [bookmarkedList, selectedJob]);
+
     if (!job) {
         return <JobDetailSkeleton />;
     }
 
     const handleApply = () => {
         window.open(`${job?.url}`, '_blank');
-    };
-
-    const handleBookmark = () => {
-        setIsBookmarked(!isBookmarked);
-        //  북마크 상태를 저장하는 로직 추가
     };
 
     const handleShare = () => {
@@ -115,6 +124,31 @@ function JobDetail() {
         }
     };
 
+    const toggleBookmark = async (jobId: number) => {
+        const currentBookmarks = bookmarkedList || [];
+        const isBookmarked = currentBookmarks.some((job) => job.id === jobId);
+
+        try {
+            // 현재 북마크 상태 반전
+            const newBookmarkState = !isBookmarked;
+
+            // UI 즉시 업데이트 (낙관적 업데이트)
+            setIsBookmarked(newBookmarkState);
+
+            // 서버에 북마크 상태 변경 요청
+            if (isBookmarked) {
+                await removeBookmark(jobId);
+            } else {
+                await addBookmark(jobId);
+            }
+            // 북마크 목록 갱신
+            await getBookmark();
+        } catch (error) {
+            console.error('북마크 토글 중 오류 발생:', error);
+            setIsBookmarked(!isBookmarked); // 북마크 상태 되돌리기
+        }
+    };
+
     return (
         <div className={style.container}>
             <div className={style.header}>
@@ -133,7 +167,7 @@ function JobDetail() {
                         className={`${style.header__actionButton} ${
                             isBookmarked ? style.active : ''
                         }`}
-                        onClick={handleBookmark}
+                        onClick={() => toggleBookmark(selectedJob)}
                         aria-label={isBookmarked ? '북마크 해제' : '북마크 추가'}>
                         <Bookmark size={20} />
                     </button>

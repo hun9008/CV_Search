@@ -108,23 +108,31 @@ function JobList({ bookmarked }: jobListProps) {
         const isBookmarked = currentBookmarks.some((job) => job.id === jobId);
 
         try {
+            // 낙관적 업데이트: UI 즉시 반영
+            const updatedJobs = filteredJobs.map((job) =>
+                job.id === jobId ? { ...job, isBookmarked: !isBookmarked } : job
+            );
+            setFilteredJobs(updatedJobs);
+
+            // 서버에 북마크 상태 변경 요청
             if (isBookmarked) {
                 await removeBookmark(jobId);
             } else {
                 await addBookmark(jobId);
                 // 북마크 추가 후 상태를 강제로 업데이트하여 UI 반영
-                const updatedJobs = [...filteredJobs]; // filter 적용 후 북마크 했을 때 동작 보장
-
-                setFilteredJobs(updatedJobs);
             }
 
             // 북마크 목록 갱신
             await getBookmark();
 
             // 강제 리렌더링을 위한 상태 업데이트
-            setFilteredJobs([...filteredJobs]);
+            // setFilteredJobs([...filteredJobs]);
         } catch (error) {
             console.error('북마크 토글 중 오류 발생:', error);
+            const revertedJobs = filteredJobs.map((job) =>
+                job.id === jobId ? { ...job, isBookmarked: isBookmarked } : job
+            );
+            setFilteredJobs(revertedJobs);
         }
     };
 

@@ -23,9 +23,6 @@ function Header() {
 
     const navigate = useNavigate();
 
-    const moveToSignUpPage = () => {
-        navigate('./signUp/detail');
-    };
     const moveToSignInPage = () => {
         navigate('./signIn');
     };
@@ -154,7 +151,7 @@ function Header() {
                     <div className={style.header__mobileMenu__buttons}>
                         <button
                             className={style.header__mobileMenu__buttonsSignUp}
-                            onClick={moveToSignUpPage}>
+                            onClick={moveToSignInPage}>
                             회원가입
                         </button>
                         <button
