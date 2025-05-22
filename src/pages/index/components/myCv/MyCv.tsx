@@ -168,19 +168,21 @@ function MyCv() {
                             <div className={style.info__content__error}>
                                 <ErrorFallback />
                             </div>
-                        ) : isSummaryLoading ? (
-                            <LoadingSpinner />
                         ) : (
-                            <Suspense fallback={<Loading content="Summary" />}>
-                                <div className={style.info__content}>
-                                    <h2>요약</h2>
-                                    <div
-                                        className={style.feedbackText}
-                                        dangerouslySetInnerHTML={{
-                                            __html: parseMarkdown(summaryText ?? ''),
-                                        }}></div>
-                                </div>
-                            </Suspense>
+                            <div className={style.info__content}>
+                                {isSummaryLoading ? (
+                                    <LoadingSpinner />
+                                ) : (
+                                    <Suspense fallback={<Loading content="Summary" />}>
+                                        <h2>요약</h2>
+                                        <div
+                                            className={style.feedbackText}
+                                            dangerouslySetInnerHTML={{
+                                                __html: parseMarkdown(summaryText ?? ''),
+                                            }}></div>
+                                    </Suspense>
+                                )}
+                            </div>
                         )}
                     </ErrorBoundary>
 

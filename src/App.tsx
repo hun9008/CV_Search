@@ -6,7 +6,6 @@ import SignUp from './pages/signUp/SignUp';
 import LandingPage from './pages/landing/index';
 import LoadingPage from './pages/loading/index';
 import UploadPage from './pages/upload/Upload';
-import SignUpDetail from './pages/signUp/SignUpDetail';
 
 function App() {
     return (
@@ -19,7 +18,7 @@ function App() {
                 <Route index path="/loading" element={<LoadingPage />}></Route>
                 <Route index path="/auth/callback" element={<AuthCallback />}></Route>
                 <Route index path="/upload" element={<UploadPage />}></Route>
-                <Route index path="/signUp/detail" element={<SignUpDetail />}></Route>
+                {/* <Route index path="/signUp/detail" element={<SignUpDetail />}></Route> */}
             </Routes>
         </BrowserRouter>
     );
