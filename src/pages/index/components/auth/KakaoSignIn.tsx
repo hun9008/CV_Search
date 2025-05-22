@@ -2,7 +2,9 @@ import style from './styles/KakaoSignIn.module.scss';
 
 function KakaoSignIn() {
     const handleKakaoLogin = () => {
-        window.location.href = `https://be.goodjob.ai.kr/auth/login?provider=kakao`;
+        const redirectUri = 'https://www.goodjob.ai.kr/auth/callback';
+        const state = btoa(redirectUri);
+        window.location.href = `https://be.goodjob.ai.kr/oauth2/authorization/kakao?state=${state}`;
     };
 
     return (
