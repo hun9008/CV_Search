@@ -1,5 +1,6 @@
 package com.www.goodjob.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.Job;
 import com.www.goodjob.domain.JobRegion;
 import com.www.goodjob.domain.Region;
@@ -7,6 +8,7 @@ import com.www.goodjob.domain.User;
 import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.RegionGroupDto;
 import com.www.goodjob.repository.JobRepository;
+import com.www.goodjob.repository.JobValidTypeRepository;
 import com.www.goodjob.repository.RegionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +48,9 @@ class JobServiceTest {
 
     @Mock
     private RegionRepository regionRepository;
+
+    @Mock
+    private JobValidTypeRepository jobValidTypeRepository;
 
     @BeforeEach
     void setup() {
@@ -208,5 +213,33 @@ class JobServiceTest {
 
         assertTrue(thrown.getMessage().contains("FastAPI 요청 실패"));
         verify(restTemplate).delete(expectedUrl);
+    }
+
+    @Test
+    void deleteJobWithValidType_shouldNotDeleteWhenValidTypeIsZero() {
+        // given
+        Long jobId = 456L;
+        Integer validType = 0;
+        String expectedUrl = "http://localhost:8000/delete-job?job_id=456";
+
+        // when
+        jobService.deleteJobWithValidType(jobId, validType);
+
+        // then
+        verify(restTemplate, never()).delete(expectedUrl); // 삭제가 일어나지 않아야 함
+    }
+
+    @Test
+    void deleteJobWithValidType_shouldDeleteWhenValidTypeIsNotZero() {
+        // given
+        Long jobId = 456L;
+        Integer validType = 1;
+        String expectedUrl = "http://localhost:8000/delete-job?job_id=456";
+
+        // when
+        jobService.deleteJobWithValidType(jobId, validType);
+
+        // then
+        verify(restTemplate).delete(expectedUrl); // 삭제가 일어나야함
     }
 }

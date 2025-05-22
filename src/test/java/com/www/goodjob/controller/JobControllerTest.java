@@ -6,12 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class JobControllerTest {
 
-    @Test
-    void deleteJobWithValidType() {
 
-        assertArrayEquals();
-    }
 
-    @Test
 
 }

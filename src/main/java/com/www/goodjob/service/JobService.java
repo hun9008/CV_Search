@@ -7,6 +7,7 @@ import com.www.goodjob.dto.*;
 import com.www.goodjob.enums.ExperienceCategory;
 import com.www.goodjob.enums.JobTypeCategory;
 import com.www.goodjob.repository.JobRepository;
+import com.www.goodjob.repository.JobValidTypeRepository;
 import com.www.goodjob.repository.RegionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ public class JobService {
     private final RegionRepository regionRepository;
     private final RestTemplate restTemplate;
     private final SearchLogService searchLogService;
+    private final JobValidTypeRepository jobValidTypeRepository;
 
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
@@ -177,9 +179,20 @@ public class JobService {
         }
     }
 
-//    public String deleteJobWithValidType(Long jobId, Integer validType){
-//
-//    }
+    public String deleteJobWithValidType(Long jobId, Integer validType){
+
+        try{
+            if(validType !=0){
+                deleteJob(jobId);
+            }
+            jobValidTypeRepository.upsertJobValidType(jobId,validType);
+
+            return "Job " + jobId + " deleted from Elasticsearch and updated in RDB and ValidType.";
+
+        }catch (Exception e){
+            throw new RuntimeException("ValidTypeUpdate 및 삭제 실패 "+e.getMessage(),e);
+        }
+    }
 
     public List<ValidJobDto> findAllJobWithValidType() {
         List<Job> jobList = jobRepository.findAllWithValidType();
