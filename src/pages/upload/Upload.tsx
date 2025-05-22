@@ -64,7 +64,7 @@ function Upload() {
         setTimeout(() => {
             setIsUploading(false);
             setUploadSuccess(true);
-        }, 2500);
+        }, 10000);
     };
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -106,6 +106,7 @@ function Upload() {
         // 계속하기 버튼 처리 로직
         if (file && uploadSuccess) {
             console.log('Continue with uploaded file:', file.name);
+            navigate('/main', { replace: true });
             // 여기에 다음 페이지로 이동하는 로직 추가
         } else {
             setError('계속하려면 CV를 업로드해주세요.');

@@ -1,16 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import style from './styles/CVViewer.module.scss';
 import useS3Store from '../../../../store/s3Store';
+import useFileStore from '../../../../store/fileStore';
 
 function CvViewer() {
     const [hidden, setHidden] = useState(true);
     const { getDownloadPresignedURL, url } = useS3Store();
+    const { setHasFile } = useFileStore();
+    const hasFile = useFileStore((state) => state.hasFile);
 
     const handleGetCV = async () => {
-        await getDownloadPresignedURL();
-        console.log(url);
-        setHidden(!hidden);
+        try {
+            await getDownloadPresignedURL();
+            setHasFile(true);
+            setHidden(false);
+        } catch (error) {
+            console.error('CV 뷰어 에러: ', error);
+            throw error;
+        }
     };
+
+    useEffect(() => {}, [hasFile]);
 
     return (
         <div className={style.container}>
@@ -20,16 +30,16 @@ function CvViewer() {
                 </button>
             )}
 
-            {url && !hidden ? (
+            {!hidden && (
                 <div className={style.cvContainer}>
-                    <iframe src={url} className={style.cvContainer__cv} title="CV Preview"></iframe>
-                </div>
-            ) : (
-                !hidden && (
-                    <div className={style.cvContainer}>
+                    <object
+                        data={url}
+                        type="application/pdf"
+                        className={style.cvContainer__cv}
+                        title="CV Preview">
                         <p>CV가 존재하지 않습니다</p>
-                    </div>
-                )
+                    </object>
+                </div>
             )}
         </div>
     );

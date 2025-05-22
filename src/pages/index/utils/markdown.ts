@@ -1,8 +1,9 @@
 // 간단한 마크다운 파서 함수
 export function parseMarkdown(text: string): string {
     // 제목 변환 (## 제목)
-    text = text.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
-    text = text.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+    text = text.replace(/^### (.*?)$/gm, '<h4>$1</h4>');
+    text = text.replace(/^## (.*?)$/gm, '<h3>$1</h3>');
+    text = text.replace(/^# (.*?)$/gm, '<h2>$1</h2>');
 
     // 강조 변환 (**텍스트**)
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');

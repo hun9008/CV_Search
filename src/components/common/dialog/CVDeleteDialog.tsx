@@ -15,9 +15,12 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
     const [isDeleting, setIsDeleting] = useState(false);
     const [countdown, setCountdown] = useState(5);
     const [showCountdown, setShowCountdown] = useState(false);
-    const { removeFile } = useFileStore();
+    const { removeFile, setHasFile } = useFileStore();
 
     const handleOutsideClick = (e: MouseEvent) => {
+        if (!isDeleting) {
+            return;
+        }
         if (dialogRef.current && !dialogRef.current.contains(e.target as Node)) {
             onClose();
         }
@@ -32,6 +35,7 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
         const res = await removeFile();
 
         if (res === 200) {
+            setHasFile(false);
             onClose();
             setIsDeleting(false);
             console.log('CV delete Success!!!');
@@ -41,7 +45,7 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
     };
 
     useEffect(() => {
-        if (isOpen) {
+        if (isOpen && !isDeleting) {
             document.addEventListener('mousedown', handleOutsideClick);
             return () => {
                 document.removeEventListener('mousedown', handleOutsideClick);

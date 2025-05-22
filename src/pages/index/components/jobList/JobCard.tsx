@@ -13,9 +13,8 @@ interface JobCardProps {
 function JobCard({ job, isSelected, onSelect, onToggleBookmark }: JobCardProps) {
     const handleBookmarkClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        onToggleBookmark();
 
-        console.log(`북마크 토글: ${job.id}, 현재 상태: ${job.isBookmarked}`);
+        onToggleBookmark();
     };
 
     return (
