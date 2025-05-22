@@ -23,7 +23,6 @@ jobs:
           HUNIAN_PASSWORD: ${{ secrets.HUNIAN_PASSWORD }}
         run: |
           sshpass -p "$HUNIAN_PASSWORD" ssh -o StrictHostKeyChecking=no $HUNIAN_USER@$HUNIAN_HOST << 'EOF'
-            set -e  # 명령 실패 시 즉시 종료
 
             cd /home/hun/Desktop/goodjob/CV_Search
 
