@@ -21,7 +21,6 @@ function MyCv() {
     // 로딩
     const [isSummaryLoading, setIsSummaryLoading] = useState(false);
     const [isReuploadLoading, setIsReuploadLoading] = useState(false);
-    const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [reuploadDialogHidden, setReuploadDialogHidden] = useState(false);
     const [deleteDialogHidden, setDeleteDialogHidden] = useState(false);
@@ -77,6 +76,7 @@ function MyCv() {
         const fileExtension = `.${selectedFile.name.split('.').pop()?.toLowerCase()}`;
         if (fileExtension !== '.pdf') {
             setError('PDF 파일만 업로드 가능합니다.');
+            console.error(error);
             setIsReuploadLoading(false);
             return;
         }
@@ -90,7 +90,6 @@ function MyCv() {
             return;
         }
 
-        setFile(selectedFile);
         console.log('파일 준비 완료:', selectedFile.name);
 
         try {
