@@ -49,5 +49,12 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             "LEFT JOIN FETCH jr.region " +
             "WHERE j.id IN :ids")
     List<Job> findByIdInWithRegion(@Param("ids") List<Long> ids);
+
+    @Query("SELECT DISTINCT j FROM Job j " +
+            "LEFT JOIN FETCH j.jobRegions jr " +
+            "LEFT JOIN FETCH jr.region " +
+            "LEFT JOIN FETCH j.jobValidType "
+                )
+    List<Job> findAllWithValidType();
 }
 

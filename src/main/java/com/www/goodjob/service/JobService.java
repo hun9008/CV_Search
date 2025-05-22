@@ -3,10 +3,7 @@ package com.www.goodjob.service;
 import com.www.goodjob.domain.Job;
 import com.www.goodjob.domain.Region;
 import com.www.goodjob.domain.User;
-import com.www.goodjob.dto.JobDto;
-import com.www.goodjob.dto.JobSearchResponse;
-import com.www.goodjob.dto.RegionDto;
-import com.www.goodjob.dto.RegionGroupDto;
+import com.www.goodjob.dto.*;
 import com.www.goodjob.enums.ExperienceCategory;
 import com.www.goodjob.enums.JobTypeCategory;
 import com.www.goodjob.repository.JobRepository;
@@ -17,6 +14,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.InterfaceAddress;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -169,7 +167,6 @@ public class JobService {
                 .collect(Collectors.toList());
     }
 
-
     public String deleteJob(Long jobId) {
         String url = fastapiHost + "/delete-job?job_id=" + jobId;
         try {
@@ -178,5 +175,14 @@ public class JobService {
         } catch (Exception e) {
             throw new RuntimeException("FastAPI 요청 실패: " + e.getMessage(), e);
         }
+    }
+
+//    public String deleteJobWithValidType(Long jobId, Integer validType){
+//
+//    }
+
+    public List<ValidJobDto> findAllJobWithValidType() {
+        List<Job> jobList = jobRepository.findAllWithValidType();
+        return jobList.stream().map(ValidJobDto::from).collect(Collectors.toList());
     }
 }

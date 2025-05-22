@@ -2,6 +2,7 @@ package com.www.goodjob.controller;
 
 import com.www.goodjob.domain.User;
 import com.www.goodjob.dto.JobDto;
+import com.www.goodjob.dto.ValidJobDto;
 import com.www.goodjob.dto.JobSearchResponse;
 import com.www.goodjob.dto.RegionGroupDto;
 import com.www.goodjob.security.CustomUserDetails;
@@ -255,4 +256,46 @@ public class JobController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
+
+    @Operation(summary = "특정 job 하나 삭제", description = "FastAPI 서버로 특정 job 하나 삭제 요청을 보냄." +
+            "해당 job에 대해 ES에서 vector 삭제 & RDB의 is_public을 0으로 설정" +
+            "실패 시, is_public은 다시 1로 롤백하는 로직 포함."+
+            "삭제시 삭제이유 valid type을 업데이트 함")
+    @DeleteMapping("/delete-one-job-valid-type")
+    public ResponseEntity<?> deleteJobWithValidType(
+            @RequestParam("jobId") Long jobId,
+            @RequestParam("validType") String validType,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
+        }
+        try {
+            String message = jobService.deleteJob(jobId);
+
+            return ResponseEntity.ok(Map.of("message", message));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
+    @Operation(summary = "job +valid Type 함께 가져오는 함수" ,description= " ")
+    @GetMapping("/job-valid-type")
+    public ResponseEntity<?> getJobWithValidType(){
+        try{
+            List<ValidJobDto> JobList =jobService.findAllJobWithValidType();
+            return ResponseEntity.ok(JobList);
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
+
+
 }

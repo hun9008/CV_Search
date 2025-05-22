@@ -19,8 +19,11 @@ public class Job {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 공고 고유 ID
 
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true ,fetch =FetchType.LAZY)
     private List<JobRegion> jobRegions = new ArrayList<>();
+
+    @OneToOne(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true, fetch =FetchType.LAZY)
+    private JobValidType jobValidType = new JobValidType();
 
     @Column(name = "company_name")
     private String companyName;
