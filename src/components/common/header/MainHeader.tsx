@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Search, Bell, Menu, ChevronRight, X } from 'lucide-react';
+import {
+    Search,
+    Bell,
+    Menu,
+    ChevronRight,
+    X,
+    Moon,
+    ArrowRightToLine,
+    ArrowLeftToLine,
+} from 'lucide-react';
 import styles from './MainHeader.module.scss';
 import useAuthStore from '../../../store/authStore';
 import axios from 'axios';
@@ -21,6 +30,8 @@ const MainHeader = () => {
     const accessToken = useAuthStore((state) => state.accessToken);
     const isCompactMenu = usePageStore((state) => state.isCompactMenu);
     const navigate = useNavigate();
+
+    const toggleDarkmode = () => {};
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
@@ -166,7 +177,11 @@ const MainHeader = () => {
                         className={styles.header__menuButton}
                         onClick={toggleMobileMenu}
                         aria-label="메뉴 열기">
-                        <Menu size={30} />
+                        {isCompactMenu ? (
+                            <ArrowRightToLine size={30} color="#666666" />
+                        ) : (
+                            <ArrowLeftToLine size={30} color="#666666" />
+                        )}
                     </button>
 
                     <div
@@ -283,10 +298,15 @@ const MainHeader = () => {
                 <div className={styles.header__actions}>
                     {accessToken ? (
                         <>
-                            <button className={styles.header__actionButton} aria-label="알림">
-                                <Bell size={24} />
+                            <button
+                                className={styles.header__actionButton}
+                                aria-label="다크모드"
+                                onClick={toggleDarkmode}>
+                                <Moon size={24} color="#666666" />
                             </button>
-                            {/* <ProfileDialog /> */}
+                            <button className={styles.header__actionButton} aria-label="알림">
+                                <Bell size={24} color="#666666" />
+                            </button>
                         </>
                     ) : (
                         <div className={styles.header__authButtons}>

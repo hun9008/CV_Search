@@ -18,7 +18,6 @@ function App() {
                 <Route index path="/loading" element={<LoadingPage />}></Route>
                 <Route index path="/auth/callback" element={<AuthCallback />}></Route>
                 <Route index path="/upload" element={<UploadPage />}></Route>
-                {/* <Route index path="/signUp/detail" element={<SignUpDetail />}></Route> */}
             </Routes>
         </BrowserRouter>
     );

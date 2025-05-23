@@ -1,28 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom';
-import {
-    ClipboardList,
-    Star,
-    Bookmark,
-    User,
-    CircleHelp,
-    Settings,
-    LogOut,
-    Crown,
-} from 'lucide-react';
+import { ClipboardList, Star, Bookmark, User, Crown, FileUser } from 'lucide-react';
 
 import usePageStore from '../../../store/pageStore';
 import style from './SideBar.module.scss';
 import useUserStore from '../../../store/userStore';
-import useAuthStore from '../../../store/authStore';
-import ProfileDialog from '../dialog/ProfileDialog';
+import SideBarProfileDialog from '../dialog/SideBarProfileDialog';
 
 function SideBar() {
     const { setActiveContent } = usePageStore();
     const { name, email } = useUserStore();
     const activeContent = usePageStore((state) => state.activeContent);
     const isCompactMenu = usePageStore((state) => state.isCompactMenu);
-    const { clearTokens, setLogout } = useAuthStore();
-    const accessToken = useAuthStore.getState().accessToken;
 
     const navigate = useNavigate();
     type PageContent = (typeof menuItems)[number]['id'];
@@ -53,14 +41,9 @@ function SideBar() {
 
     const subMenuItems = [
         {
-            id: '설정',
-            path: '/setting',
-            icon: Settings,
-        },
-        {
-            id: '도움말',
-            path: '/help',
-            icon: CircleHelp,
+            id: 'CV 생성',
+            path: '/',
+            icon: FileUser,
         },
     ] as const;
 
@@ -70,13 +53,6 @@ function SideBar() {
 
     const handleLogoClick = () => {
         navigate('/');
-    };
-
-    const handleLogout = () => {
-        setLogout(accessToken);
-        clearTokens();
-
-        navigate('/', { replace: true });
     };
 
     return (
@@ -131,17 +107,11 @@ function SideBar() {
                         </div>
                         <span className={style.divider}></span>
                         <div className={style.sidebar__profile}>
-                            {/* <CircleUser className={style.sidebar__profile__icon} /> */}
-                            <ProfileDialog />
+                            <SideBarProfileDialog />
                             <div className={style.sidebar__profile__textArea}>
                                 <p className={style.userName}>{name}</p>
                                 <p className={style.userEmail}>{email}</p>
                             </div>
-                            <LogOut
-                                size={18}
-                                className={style.sidebar__profile__logoutIcon}
-                                onClick={handleLogout}
-                            />
                         </div>
                     </div>
                 </div>

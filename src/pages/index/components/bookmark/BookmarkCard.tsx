@@ -64,9 +64,14 @@ function BookmarkCard({
                     <h3 className={style.jobCard__title}>{job.title}</h3>
 
                     <div className={style.jobCard__meta}>
-                        {job.score && (
-                            <div className={style.jobCard__score}>{job.score.toFixed(1)}</div>
+                        {job.score?.toFixed(0) === '0' ? (
+                            <button>CV 등록하여 점수 확인하기</button>
+                        ) : (
+                            job.score && (
+                                <div className={style.jobCard__score}>{job.score.toFixed(1)}</div>
+                            )
                         )}
+
                         <div className={style.jobCard__tags}>
                             <div className={style.jobCard__tags__container}>
                                 {job.jobType && (

@@ -357,10 +357,93 @@ function JobList({ bookmarked }: jobListProps) {
                             />
                         ))
                     )}
+                    {hasError || isLoading ? (
+                        ''
+                    ) : (
+                        <div className={styles.jobList__pagination}>
+                            {calculatedTotalPages > 1 && (
+                                <>
+                                    <button
+                                        className={`${styles.jobList__paginationButton} ${
+                                            currentPage === 1 ? styles.disabled : ''
+                                        }`}
+                                        onClick={goToPreviousPage}
+                                        disabled={currentPage === 1}>
+                                        이전
+                                    </button>
+
+                                    <div className={styles.jobList__paginationNumbers}>
+                                        {Array.from(
+                                            { length: calculatedTotalPages },
+                                            (_, i) => i + 1
+                                        )
+                                            .filter(
+                                                (page) =>
+                                                    page === 1 ||
+                                                    page === calculatedTotalPages ||
+                                                    Math.abs(page - currentPage) <= 1
+                                            )
+                                            .map((page, index, array) => {
+                                                if (index > 0 && array[index - 1] !== page - 1) {
+                                                    return (
+                                                        <React.Fragment key={`ellipsis-${page}`}>
+                                                            <span
+                                                                className={
+                                                                    styles.jobList__paginationEllipsis
+                                                                }>
+                                                                ...
+                                                            </span>
+                                                            <button
+                                                                className={`${
+                                                                    styles.jobList__paginationNumber
+                                                                } ${
+                                                                    currentPage === page
+                                                                        ? styles.active
+                                                                        : ''
+                                                                }`}
+                                                                onClick={() =>
+                                                                    handlePageChange(page)
+                                                                }>
+                                                                {page}
+                                                            </button>
+                                                        </React.Fragment>
+                                                    );
+                                                }
+                                                return (
+                                                    <button
+                                                        key={page}
+                                                        className={`${
+                                                            styles.jobList__paginationNumber
+                                                        } ${
+                                                            currentPage === page
+                                                                ? styles.active
+                                                                : ''
+                                                        }`}
+                                                        onClick={() => handlePageChange(page)}>
+                                                        {page}
+                                                    </button>
+                                                );
+                                            })}
+                                    </div>
+
+                                    <button
+                                        className={`${styles.jobList__paginationButton} ${
+                                            currentPage === calculatedTotalPages
+                                                ? styles.disabled
+                                                : ''
+                                        }`}
+                                        onClick={goToNextPage}
+                                        disabled={currentPage === calculatedTotalPages}>
+                                        다음
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
             </ErrorBoundary>
 
-            {hasError || isLoading ? (
+            {/* {hasError || isLoading ? (
                 ''
             ) : (
                 <div className={styles.jobList__pagination}>
@@ -431,7 +514,7 @@ function JobList({ bookmarked }: jobListProps) {
                         </>
                     )}
                 </div>
-            )}
+            )} */}
         </div>
     );
 }

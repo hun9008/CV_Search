@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import style from './styles/CVViewer.module.scss';
 import useS3Store from '../../../../store/s3Store';
 import useFileStore from '../../../../store/fileStore';
+import useActionStore from '../../../../store/actionStore';
 
 function CvViewer() {
     const [hidden, setHidden] = useState(true);
     const { getDownloadPresignedURL, url } = useS3Store();
     const { setHasFile } = useFileStore();
+    const cvState = useActionStore((state) => state.cvAction);
     const hasFile = useFileStore((state) => state.hasFile);
 
     const handleGetCV = async () => {
@@ -21,6 +23,10 @@ function CvViewer() {
     };
 
     useEffect(() => {}, [hasFile]);
+
+    useEffect(() => {
+        setHidden(true);
+    }, [cvState]);
 
     return (
         <div className={style.container}>

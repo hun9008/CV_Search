@@ -11,17 +11,17 @@ import Loading from '../../../../components/common/loading/Loading';
 import ErrorFallback from '../../../../components/common/error/ErrorFallback';
 import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
 import { parseMarkdown } from '../../utils/markdown';
-// import { parseMarkdown } from '../../utils/markdown';
+import useActionStore from '../../../../store/actionStore';
 
 function MyCv() {
     const { uploadFile, getSummary, setHasFile } = useFileStore();
     const { getUploadPresignedURL } = useS3Store();
+    const { setCVAction } = useActionStore();
     const [error, setError] = useState<string | null>(null);
     const [hasError, setHasError] = useState(false);
     // 로딩
     const [isSummaryLoading, setIsSummaryLoading] = useState(false);
     const [isReuploadLoading, setIsReuploadLoading] = useState(false);
-    const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [reuploadDialogHidden, setReuploadDialogHidden] = useState(false);
     const [deleteDialogHidden, setDeleteDialogHidden] = useState(false);
@@ -32,42 +32,6 @@ function MyCv() {
         const selectedFile = event.target.files?.[0];
         validateAndSetFile(selectedFile);
     };
-    // const validateAndSetFile = async (selectedFile?: File) => {
-    //     setError(null);
-    //     setIsReuploadLoading(true);
-    //     if (!selectedFile) return;
-
-    //     const fileExtension = `.${selectedFile.name.split('.').pop()?.toLowerCase()}`;
-    //     if (fileExtension !== '.pdf') {
-    //         setError('PDF 파일만 업로드 가능합니다.');
-    //         return;
-    //     }
-    //     const maxFileSize = 5;
-    //     const fileSize = selectedFile.size / (1024 * 1024);
-
-    //     if (fileSize > maxFileSize) {
-    //         setError(`파일 크기는 5MB 이하여야 합니다. ${error}`);
-    //         return;
-    //     }
-    //     setFile(selectedFile);
-    //     console.log(file); // 나중에 삭제
-
-    //     try {
-    //         const presignedURL = await getUploadPresignedURL();
-    //         if (typeof presignedURL === 'string' && presignedURL) {
-    //             await uploadFile(selectedFile, presignedURL);
-    //         } else {
-    //             setError('업로드 URL을 받아오는 데 실패했습니다.');
-    //             throw error;
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //     } finally {
-    //         console.log('CV 재업로드 완료');
-    //         setIsReuploadLoading(false);
-    //         setHasFile(true);
-    //     }
-    // };
 
     const validateAndSetFile = async (selectedFile?: File) => {
         setError(null);
@@ -77,6 +41,7 @@ function MyCv() {
         const fileExtension = `.${selectedFile.name.split('.').pop()?.toLowerCase()}`;
         if (fileExtension !== '.pdf') {
             setError('PDF 파일만 업로드 가능합니다.');
+            console.error(error);
             setIsReuploadLoading(false);
             return;
         }
@@ -90,10 +55,10 @@ function MyCv() {
             return;
         }
 
-        setFile(selectedFile);
         console.log('파일 준비 완료:', selectedFile.name);
 
         try {
+            setCVAction((prev) => !prev);
             console.time('⏱️ getUploadPresignedURL');
             const presignedURL = await getUploadPresignedURL();
             console.timeEnd('⏱️ getUploadPresignedURL');
@@ -174,7 +139,6 @@ function MyCv() {
                                     <LoadingSpinner />
                                 ) : (
                                     <Suspense fallback={<Loading content="Summary" />}>
-                                        <h2>요약</h2>
                                         <div
                                             className={style.feedbackText}
                                             dangerouslySetInnerHTML={{

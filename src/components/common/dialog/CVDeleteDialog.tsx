@@ -3,6 +3,7 @@ import style from './styles/CVDeleteDialog.module.scss';
 import { AlertTriangle, Clock } from 'lucide-react';
 import useFileStore from '../../../store/fileStore';
 import LoadingSpinner from '../loading/LoadingSpinner';
+import useActionStore from '../../../store/actionStore';
 
 interface CVDeleteDialogProps {
     isOpen: boolean;
@@ -16,6 +17,7 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
     const [countdown, setCountdown] = useState(5);
     const [showCountdown, setShowCountdown] = useState(false);
     const { removeFile, setHasFile } = useFileStore();
+    const { setCVAction } = useActionStore();
 
     const handleOutsideClick = (e: MouseEvent) => {
         if (!isDeleting) {
@@ -35,6 +37,7 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
         const res = await removeFile();
 
         if (res === 200) {
+            setCVAction((prev) => !prev);
             setHasFile(false);
             onClose();
             setIsDeleting(false);
@@ -105,9 +108,15 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
                 </div>
 
                 <div className={style.container__content}>
-                    <button className={`${style.button} ${style.cancel}`} onClick={onClose}>
-                        취소하기
-                    </button>
+                    {isDeleting ? (
+                        <button className={`${style.button} ${style.cancel}`} disabled={true}>
+                            취소하기
+                        </button>
+                    ) : (
+                        <button className={`${style.button} ${style.cancel}`} onClick={onClose}>
+                            취소하기
+                        </button>
+                    )}
 
                     <button
                         className={`${style.button} ${style.delete}`}
