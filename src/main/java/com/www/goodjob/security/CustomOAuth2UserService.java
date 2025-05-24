@@ -33,7 +33,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2Attribute oAuth2Attribute = OAuth2Attribute.of(provider, attributes);
         String email = oAuth2Attribute.getEmail();
 
-        log.debug("✅ OAuth2 로그인 이메일: {}", email);
+        log.debug("[AUTH] OAuth2 로그인 이메일: {}", email);
 
         // 탈퇴 여부 검사는 제거됨 (DB에 없으면 새로운 유저로 간주)
 
