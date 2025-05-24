@@ -3,23 +3,16 @@ package com.www.goodjob.controller;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.JwtTokenProvider;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.mock.web.MockCookie;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @WebMvcTest(AuthController.class)
-@Import(AuthControllerTest.TestConfig.class) // ✅ @MockBean 대체 방식
+@Import(AuthControllerTest.TestConfig.class) // @MockBean 대체 방식
 class AuthControllerTest {
 
     @Autowired
