@@ -1,9 +1,0 @@
-.env
-**/node_modules
-**/package-lock.json
-**/.DS_Store
-/src/CV2DB/vila
-__pycache__
-.pytest_cache
-**/data
-**/screenshot
