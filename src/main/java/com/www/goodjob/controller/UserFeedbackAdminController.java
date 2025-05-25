@@ -64,7 +64,7 @@ public class UserFeedbackAdminController {
         return feedbackService.getTotalFeedbackCount();
     }
 
-    @Operation(summary = "피드백 수정", description = "피드백 내용을 수정합니다")
+    @Operation(summary = "피드백 수정", description = "피드백 내용을 수정합니다, 수정 성공 시 204 응답")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -72,7 +72,7 @@ public class UserFeedbackAdminController {
         feedbackService.updateFeedback(id, dto);
     }
 
-    @Operation(summary = "피드백 삭제", description = "특정 피드백을 삭제합니다")
+    @Operation(summary = "피드백 삭제", description = "특정 피드백을 삭제합니다, 삭제 성공 시 204 응답")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
