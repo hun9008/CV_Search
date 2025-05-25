@@ -8,7 +8,7 @@ interface AuthStore {
     setIsLoggedIn: (isLoggedIn: boolean) => void;
     setLogout: (accessToken: string | null) => Promise<void>;
     setTokens: (accessToken: string | null) => void;
-    clearTokens: () => void; // refreshToken은 백에서 제거해줌
+    clearTokens: () => void;
     fetchAuthData: () => Promise<void>;
     withdraw: (accessToken: string | null) => Promise<void>;
 }

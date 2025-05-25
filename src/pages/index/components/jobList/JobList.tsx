@@ -8,6 +8,7 @@ import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorFallback from '../../../../components/common/error/ErrorFallback';
 import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
+import LoadingAnime1 from '../../../../components/common/loading/LoadingAnime1';
 
 interface jobListProps {
     bookmarked: boolean;
@@ -335,14 +336,14 @@ function JobList({ bookmarked }: jobListProps) {
                 <div className={styles.jobList__content}>
                     {hasError ? (
                         isPending ? (
-                            <LoadingSpinner />
+                            // <LoadingSpinner />
+                            <LoadingAnime1 />
                         ) : (
                             <ErrorFallback />
                         )
                     ) : isLoading ? (
-                        <div className={styles.jobList__loading}>
-                            <div className={styles.jobList__loadingSpinner}></div>
-                        </div>
+                        // <LoadingSpinner />
+                        <LoadingAnime1 />
                     ) : (
                         currentJobs.map((job) => (
                             <JobCard

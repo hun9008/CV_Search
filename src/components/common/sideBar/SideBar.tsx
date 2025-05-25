@@ -1,17 +1,24 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ClipboardList, Star, Bookmark, User, Crown, FileUser } from 'lucide-react';
-
+import {
+    ClipboardList,
+    Star,
+    Bookmark,
+    User,
+    Crown,
+    FileUser,
+    LayoutDashboard,
+    Briefcase,
+    Sticker,
+} from 'lucide-react';
 import usePageStore from '../../../store/pageStore';
 import style from './SideBar.module.scss';
 import useUserStore from '../../../store/userStore';
 import SideBarProfileDialog from '../dialog/SideBarProfileDialog';
-
 function SideBar() {
     const { setActiveContent } = usePageStore();
     const { name, email } = useUserStore();
     const activeContent = usePageStore((state) => state.activeContent);
     const isCompactMenu = usePageStore((state) => state.isCompactMenu);
-
     const navigate = useNavigate();
     type PageContent = (typeof menuItems)[number]['id'];
     type PageSubContent = (typeof subMenuItems)[number]['id'];
@@ -37,12 +44,23 @@ function SideBar() {
             path: '/main',
             icon: User,
         },
+        {
+            id: '대시보드',
+            path: '/main',
+            icon: LayoutDashboard,
+        },
+        {
+            id: '공고 관리',
+            path: '/main',
+            icon: Briefcase,
+        },
+        { id: '피드백 관리', path: '/main', icon: Sticker },
     ] as const; // as const를 붙이면 타입을 추론하는 것이 아니라 리터럴 자체로 고정됨
 
     const subMenuItems = [
         {
             id: 'CV 생성',
-            path: '/',
+            path: '/main',
             icon: FileUser,
         },
     ] as const;
@@ -61,7 +79,6 @@ function SideBar() {
                 <div className={style.sidebar__logo} onClick={handleLogoClick}>
                     goodJob
                 </div>
-
                 <div className={style.sidebar__navigation}>
                     <ul className={style.sidebar__menu}>
                         {menuItems.map((item) => (
