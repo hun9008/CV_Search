@@ -17,55 +17,26 @@ import java.util.List;
 public class ValidJobDto {
 
     private Long id;
-    private List<RegionDto> regions;
     private String companyName;
     private String title;
-    private String department;
-    private String requireExperience;
-    private String jobType;
     private Integer jobValidType;
-    private String requirements;
-    private String preferredQualifications;
-    private String idealCandidate;
-    private String jobDescription;
-    private LocalDate applyStartDate;
-    private LocalDate applyEndDate;
     private Boolean isPublic;
     private LocalDateTime createdAt;
-    private LocalDateTime lastUpdatedAt;
-    private LocalDateTime expiredAt;
-    private LocalDateTime archivedAt;
-    private String rawJobsText;
+    private LocalDate applyEndDate;
     private String url;
-    private String favicon;
-    private String regionText;
+
 
     public static ValidJobDto from(Job job) {
         List<RegionDto> regions = RegionDto.fromJob(job);
         JobValidType jobValidType = job.getJobValidType();
         return ValidJobDto.builder()
                 .id(job.getId())
-                .regions(regions)
                 .companyName(job.getCompanyName())
                 .title(job.getTitle())
-                .department(job.getDepartment())
-                .requireExperience(job.getExperience())
-                .jobType(job.getJobType())
-                .requirements(job.getRequirements())
-                .preferredQualifications(job.getPreferredQualifications())
-                .idealCandidate(job.getIdealCandidate())
-                .jobDescription(job.getJobDescription())
-                .applyStartDate(job.getApplyStartDate())
-                .applyEndDate(job.getApplyEndDate())
                 .isPublic(job.getIsPublic())
                 .createdAt(job.getCreatedAt())
-                .lastUpdatedAt(job.getLastUpdatedAt())
-                .expiredAt(job.getExpiredAt())
-                .archivedAt(job.getArchivedAt())
-                .rawJobsText(job.getRawJobsText())
+                .applyEndDate(job.getApplyEndDate())
                 .url(job.getUrl())
-                .favicon(job.getFavicon())
-                .regionText(job.getRegionText())
                 .jobValidType(jobValidType != null ? jobValidType.getValidType() : null)
                 .build();
     }
