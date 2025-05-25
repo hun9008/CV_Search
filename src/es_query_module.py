@@ -83,7 +83,7 @@ async def search_cosine_similar_jobs(query_vector, top_k):
 
     # response = es.search(index=JOBS_INDEX_NAME, body=query)
     # return response["hits"]["hits"]
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(auth=(es_username, es_password)) as client:
         response = await client.post(f"{ES_HOST}/{JOBS_INDEX_NAME}/_search", json=query)
         response.raise_for_status() 
         return response.json()["hits"]["hits"]
@@ -99,7 +99,7 @@ async def search_bm25_jobs(query_text, top_k):
     }
     # response = es.search(index=JOBS_INDEX_NAME, body=query)
     # return response["hits"]["hits"]
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(auth=(es_username, es_password)) as client:
         response = await client.post(f"{ES_HOST}/{JOBS_INDEX_NAME}/_search", json=query)
         response.raise_for_status() 
         return response.json()["hits"]["hits"]
@@ -200,7 +200,7 @@ async def recommandation(u_id, top_k=10):
     response = es.search(index=CV_INDEX_NAME, body=query)
 
     if not response["hits"]["hits"]:
-        logger.debub("[Recommend] No CV found for user_id=%s", u_id)
+        logger.debug("[Recommend] No CV found for user_id=%s", u_id)
         return []
 
     cv_vector = response["hits"]["hits"][0]["_source"]["vector"]
