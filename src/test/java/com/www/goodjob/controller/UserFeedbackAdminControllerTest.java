@@ -13,12 +13,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Collections;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -101,6 +104,7 @@ class UserFeedbackAdminControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DisplayName("피드백 수정 성공시 204 응답")
     void updateFeedback_204() throws Exception {
         UserFeedbackDto.Update dto = new UserFeedbackDto.Update();
@@ -109,15 +113,18 @@ class UserFeedbackAdminControllerTest {
 
         mockMvc.perform(put("/admin/feedback/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .content(objectMapper.writeValueAsString(dto))
+                        .with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DisplayName("피드백 삭제 성공시 204 응답")
     void deleteFeedback_204() throws Exception {
-        mockMvc.perform(delete("/admin/feedback/1"))
+        mockMvc.perform(delete("/admin/feedback/1")
+                        .with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }

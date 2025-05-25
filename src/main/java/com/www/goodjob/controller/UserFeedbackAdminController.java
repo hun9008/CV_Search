@@ -6,6 +6,7 @@ import com.www.goodjob.service.UserFeedbackService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,6 +67,7 @@ public class UserFeedbackAdminController {
     @Operation(summary = "피드백 수정", description = "피드백 내용을 수정합니다")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateFeedback(@PathVariable Long id, @RequestBody UserFeedbackDto.Update dto) {
         feedbackService.updateFeedback(id, dto);
     }
@@ -73,6 +75,7 @@ public class UserFeedbackAdminController {
     @Operation(summary = "피드백 삭제", description = "특정 피드백을 삭제합니다")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFeedback(@PathVariable Long id) {
         feedbackService.deleteFeedback(id);
     }
