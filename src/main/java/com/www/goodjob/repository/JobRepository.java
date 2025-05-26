@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,5 +57,8 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             "LEFT JOIN FETCH j.jobValidType "
                 )
     List<Job> findAllWithValidType();
+
+    long countByCreatedAtAfter(LocalDateTime date);
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }
 
