@@ -186,9 +186,7 @@ public class JobService {
                 deleteJob(jobId);
             }
             jobValidTypeRepository.upsertJobValidType(jobId,validType);
-
             return "Job " + jobId + " deleted from Elasticsearch and updated in RDB and ValidType.";
-
         }catch (Exception e){
             throw new RuntimeException("ValidTypeUpdate 및 삭제 실패 "+e.getMessage(),e);
         }

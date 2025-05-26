@@ -237,9 +237,12 @@ public class JobController {
     }
 
 
-    @Operation(summary = "특정 job 하나 삭제", description = "FastAPI 서버로 특정 job 하나 삭제 요청을 보냄." +
-            "해당 job에 대해 ES에서 vector 삭제 & RDB의 is_public을 0으로 설정" +
-            "실패 시, is_public은 다시 1로 롤백하는 로직 포함.")
+    @Operation(summary = "특정 job 하나 삭제",
+            description ="""
+                        FastAPI 서버로 특정 job 하나 삭제 요청을 보냄. 
+                        해당 job에 대해 ES에서 vector 삭제 & RDB의 is_public을 0으로 설정
+                        실패 시, is_public은 다시 1로 롤백하는 로직 포함.
+                        """)
     @DeleteMapping("/delete-one-job")
     public ResponseEntity<?> deleteJob(
             @RequestParam("jobId") Long jobId,
@@ -258,10 +261,18 @@ public class JobController {
     }
 
 
-    @Operation(summary = "특정 job 하나 삭제", description = "FastAPI 서버로 특정 job 하나 삭제 요청을 보냄." +
-            "해당 job에 대해 ES에서 vector 삭제 & RDB의 is_public을 0으로 설정" +
-            "실패 시, is_public은 다시 1로 롤백하는 로직 포함."+
-            "삭제시 삭제이유 valid type을 업데이트 함")
+    @Operation(summary = "특정 job 하나 삭제",
+            description =
+            """
+             FastAPI 서버로 특정 job 하나 삭제 요청을 보냄.
+             해당 job에 대해 ES에서 vector 삭제 & RDB의 is_public을 0으로 설정\n
+             validType :\n 
+             0 정상 \n
+             1 마감 (페이지 표시되지않음, 기간만료됨 포함)\n
+             2.잘못된내용(채용공고가 확실히 아님) \n
+             실패 시, is_public은 다시 1로 롤백하는 로직 포함.
+             삭제시 삭제이유 valid type을 업데이트 함
+            """)
     @DeleteMapping("/delete-one-job-valid-type")
     public ResponseEntity<?> deleteJobWithValidType(
             @RequestParam("jobId") Long jobId,
