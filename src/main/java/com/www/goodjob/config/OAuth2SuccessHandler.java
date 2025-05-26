@@ -120,4 +120,5 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
         throw new IllegalStateException("OAuth provider not found in user attributes");
     }
+
 }
