@@ -27,4 +27,5 @@ public class SearchLog {
         log.createdAt = LocalDateTime.now();
         return log;
     }
+
 }

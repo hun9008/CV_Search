@@ -1,5 +1,6 @@
 package com.www.goodjob.dto;
 
+import com.www.goodjob.domain.SearchLog;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -15,13 +16,8 @@ public class SearchLogDto {
         this.createdAt = createdAt;
     }
 
-    public String getKeyword() {
-        return keyword;
+    public static SearchLogDto from(SearchLog log) {
+        return new SearchLogDto(log.getKeyword(), log.getCreatedAt());
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    // 필요하면 Setter도 추가 가능
 }
