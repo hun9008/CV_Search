@@ -71,6 +71,11 @@ public class CvService {
         }
 
         String cvText = cv.getRawText();
+
+        if ("Ready".equalsIgnoreCase(cvText)) {
+            throw new IllegalStateException("아직 CV가 처리중 입니다.");
+        }
+
         String summary = claudeClient.generateCvSummary(cvText);
 
         cv.setSummary(summary);
