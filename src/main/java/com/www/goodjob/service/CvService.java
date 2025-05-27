@@ -7,6 +7,7 @@ import com.www.goodjob.util.ClaudeClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -20,6 +21,7 @@ public class CvService {
     private final CvRepository cvRepository;
     private final RecommendScoreRepository recommendScoreRepository;
     private final ClaudeClient claudeClient;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
@@ -32,9 +34,28 @@ public class CvService {
                 .orElseThrow(() -> new RuntimeException("CV not found"));
         Long cvId = cv.getId();
         try {
+            long t1 = System.currentTimeMillis();
+
             recommendScoreRepository.deleteByCvId(cvId);
+            long t2 = System.currentTimeMillis();
+
+            cvRepository.delete(cv);
+            long t3 = System.currentTimeMillis();
+
             restTemplate.delete(url);
-            return "CV " + userId + " deleted from Elasticsearch and deleted from RDB.";
+            long t4 = System.currentTimeMillis();
+
+            // Redis 캐시 삭제
+            String zsetKey = "recommendation:" + userId;
+            redisTemplate.delete(zsetKey);
+            log.info("[CV 삭제] Redis 캐시 삭제 완료: key={}", zsetKey);
+
+            log.info("[CV 삭제] recommendScoreRepository.deleteByCvId: {}ms", (t2 - t1));
+            log.info("[CV 삭제] cvRepository.delete: {}ms", (t3 - t2));
+            log.info("[CV 삭제] restTemplate.delete (FastAPI 호출): {}ms", (t4 - t3));
+            log.info("[CV 삭제] 전체 삭제 소요 시간: {}ms (userId={})", (t4 - t1), userId);
+
+            return "CV " + userId + " deleted from Elasticsearch, RDB, and Redis.";
         } catch (Exception e) {
             log.error("삭제 실패", e);
             throw new RuntimeException("FastAPI 요청 실패: " + e.getMessage(), e);
