@@ -177,11 +177,11 @@ def delete_job(job_id):
         return False
 
 def delete_cv(user_id):
-    try:
-        rdb_result = delete_cv_RDB(user_id)
-    except Exception as e:
-        print(f"[!] RDB CV 삭제 실패: {e}")
-        return False
+    # try:
+    #     rdb_result = delete_cv_RDB(user_id)
+    # except Exception as e:
+    #     print(f"[!] RDB CV 삭제 실패: {e}")
+    #     return False
 
     try:
         response = es.delete(index=CV_INDEX_NAME, id=str(user_id))

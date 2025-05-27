@@ -313,79 +313,71 @@ def encode_long_text(text):
 
 
 def es_save_cv(s3_url, u_id):
-
-    if not es.indices.exists(index=CV_INDEX_NAME):
-        es.indices.create(
-            index=CV_INDEX_NAME,
-            body={
-                "mappings": {
-                    "properties": {
-                        "text": {"type": "text"},
-                        "text_hash": {"type": "keyword"},
-                        "vector": {"type": "dense_vector", "dims": 384},
-                        "u_id": {"type": "keyword"},
-                        "created_at": {"type": "date"} 
+    try:
+        if not es.indices.exists(index=CV_INDEX_NAME):
+            es.indices.create(
+                index=CV_INDEX_NAME,
+                body={
+                    "mappings": {
+                        "properties": {
+                            "text": {"type": "text"},
+                            "text_hash": {"type": "keyword"},
+                            "vector": {"type": "dense_vector", "dims": 384},
+                            "u_id": {"type": "keyword"},
+                            "created_at": {"type": "date"} 
+                        }
                     }
                 }
-            }
-        )
+            )
 
-    run_vila(s3_url)
+        run_vila(s3_url)
 
-    raw_text = open("/tmp/temp_cv.txt", "r", encoding="utf-8").read()
-    vector = encode_long_text(raw_text)
+        with open("/tmp/temp_cv.txt", "r", encoding="utf-8") as f:
+            raw_text = f.read()
 
-    text_hash = hashlib.sha256(raw_text.encode('utf-8')).hexdigest()
+        vector = encode_long_text(raw_text)
+        text_hash = hashlib.sha256(raw_text.encode('utf-8')).hexdigest()
 
-    doc = {
-        "text": raw_text,
-        "text_hash": text_hash,
-        "vector": vector,
-        "u_id": u_id,
-        "created_at": datetime.now(KST).isoformat()
-    }
-
-    # doc
-    print(f"Document to be indexed: {doc}")
-
-    try:
-        # 정확한 term match를 위해 .keyword 사용 (u_id가 keyword 매핑되었다면 생략 가능)
-        query = {
-            "query": {
-                "term": {
-                    "u_id.keyword": u_id
-                }
-            }
+        doc = {
+            "text": raw_text,
+            "text_hash": text_hash,
+            "vector": vector,
+            "u_id": u_id,
+            "created_at": datetime.now(KST).isoformat()
         }
+
+        print(f"Document to be indexed: {doc}")
 
         same_user_result = es.get(index=CV_INDEX_NAME, id=str(u_id), ignore=[404])
 
         if same_user_result.get("found"):
-            # 이미 저장된 문서가 있을 경우
             existing_hash = same_user_result["_source"].get("text_hash")
-
             if existing_hash == text_hash:
                 print(f"[SKIP] u_id={u_id} 동일한 text_hash 존재 → ES 저장 생략")
             else:
-                # 해시가 다르면 덮어쓰기
                 response = es.index(index=CV_INDEX_NAME, id=str(u_id), body=doc)
                 print(f"[UPDATE] u_id={u_id} CV Updated in ES. Document ID: {response['_id']}")
         else:
-            # 문서가 없을 경우 신규 저장
             response = es.index(index=CV_INDEX_NAME, id=str(u_id), body=doc)
             print(f"[NEW] u_id={u_id} CV Saved in ES. Document ID: {response['_id']}")
 
-    except Exception as e:
-        print(f"[X] Elasticsearch 저장 실패: {e}")
-        raise
+        try:
+            fetch_cv_save_data(s3_url, u_id, raw_text)
+            print(f"[✓] CV RDB 저장 완료: user_id={u_id}")
+        except mysql.connector.Error as err:
+            print(f"[X] MySQL 오류: {err}")
+        except Exception as e:
+            print(f"[X] 오류 발생: {e}")
 
-    try:
-        fetch_cv_save_data(s3_url, u_id, raw_text)
-        print(f"[✓] CV RDB 저장 완료: user_id={u_id}")
-    except mysql.connector.Error as err:
-        print(f"[X] MySQL 오류: {err}")
-    except Exception as e:
-        print(f"[X] 오류 발생: {e}")
+    finally:
+        for temp_path in ["/tmp/temp_cv.pdf", "/tmp/temp_cv.txt"]:
+            try:
+                os.remove(temp_path)
+                print(f"[✓] 임시 파일 삭제 완료: {temp_path}")
+            except FileNotFoundError:
+                print(f"[!] 삭제할 파일이 없습니다: {temp_path}")
+            except Exception as e:
+                print(f"[X] 임시 파일 삭제 실패: {temp_path}, 오류: {e}")
 
 ####################### ^ save cv function #######################
 
