@@ -206,8 +206,11 @@ goodJob은 구직자가 PDF 형식의 이력서(CV)를 업로드하기만 하면
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-6db33f?style=for-the-badge&logo=springboot&logoColor=white)]()
 [![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-6db33f?style=for-the-badge&logo=spring&logoColor=white)]()
 [![Spring Security](https://img.shields.io/badge/Spring_Security-6db33f?style=for-the-badge&logo=springsecurity&logoColor=white)]()
+[![JUnit](https://img.shields.io/badge/JUnit-25A162?style=for-the-badge&logo=java&logoColor=white)]()
+[![Jacoco](https://img.shields.io/badge/Jacoco-EC1C24?style=for-the-badge&logo=codecov&logoColor=white)]()
 [![Gradle](https://img.shields.io/badge/Gradle-02303a?style=for-the-badge&logo=gradle&logoColor=white)]()
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)]()
+[![Pytest](https://img.shields.io/badge/Pytest-3776AB?style=for-the-badge&logo=python&logoColor=white)]()
 [![Tomcat](https://img.shields.io/badge/Tomcat-f8dc75?style=for-the-badge&logo=apachetomcat&logoColor=black)]()
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)]()
 
