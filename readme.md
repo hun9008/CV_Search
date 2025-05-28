@@ -18,9 +18,9 @@
 <td></td>
 </tr>
 <tr>
-<td>...</td>
-<td>blk</td>
-<td>blk</td>
+      <td>[팀원] 유진</td>
+      <td>BE</td>
+      <td>OAuth 회원가입, 지원이력, 피드백 생성, 공고 검색 및 필터 기능 구현</td>
 </tr>
 <tr>
 <td>...</td>
