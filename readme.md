@@ -65,6 +65,8 @@
 
 # 프로젝트 개요
 
+[![DeepWiki Docs](https://img.shields.io/badge/View_on-DeepWiki-4B8DF8?style=for-the-badge&logo=readthedocs&logoColor=white)](https://deepwiki.com/hun9008/CV_Search)
+
 goodJob은 구직자가 PDF 형식의 이력서(CV)를 업로드하기만 하면 </br>
 이력서 내용을 분석하여 맞춤 채용 공고를 추천하고 </br>
 지원 현황을 통합 관리할 수 있도록 돕는 통합 플랫폼입니다.
