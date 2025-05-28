@@ -1,0 +1,45 @@
+{
+  "name": "web-crawler-modular",
+  "version": "1.0.0",
+  "description": "모듈화된 웹 크롤링 및 스크립트 분석 도구",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "crawl": "node src/index.js",
+    "crawl:debug": "node src/index.js --debug",
+    "test": "jest",
+    "lint": "eslint src/"
+  },
+  "keywords": [
+    "crawler",
+    "puppeteer",
+    "web-scraping",
+    "url-extraction",
+    "script-analysis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^20.8.0",
+    "chalk": "^4.1.2",
+    "commander": "^10.0.1",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.41.0",
+    "jest": "^29.5.0",
+    "prettier": "^2.8.8"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/test/**/*.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ]
+  }
+}

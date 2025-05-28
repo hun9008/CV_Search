@@ -1,0 +1,38 @@
+{
+  "name": "cv_search",
+  "version": "1.0.0",
+  "description": "스크립트 분석 및 URL 추출 웹 크롤러",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/crawl/baseWorkerManager",
+    "test": "jest --config=test/__tests__/jest.config.cjs --detectOpenHandles",
+    "stats": "node --env-file=.env src/database/domain-url-stats ",
+    "server": "node src/server/index",
+    "visited-reset": "node src/database/reset-visits"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@src": "src",
+    "@database": "src/database",
+    "@crawl": "src/crawl",
+    "@utils": "src/utils",
+    "@models": "src/models",
+    "@server": "src/server",
+    "@test": "test",
+    "@config": "config"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "module-alias": "^2.2.3",
+    "morgan": "^1.10.0",
+    "puppeteer": "^24.4.0"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "jest-html-reporters": "^3.1.7",
+    "mongodb-memory-server": "^10.1.4"
+  }
+}

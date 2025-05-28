@@ -1,0 +1,147 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.search-form {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+input, button, select {
+    padding: 8px;
+    font-size: 16px;
+}
+
+.results {
+    margin-top: 20px;
+}
+
+.result-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.result-domain {
+    color: #555;
+    font-weight: bold;
+}
+
+.result-url {
+    color: #1a0dab;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.result-url:hover {
+    text-decoration: underline;
+}
+
+.result-text {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    border-left: 3px solid #ddd;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 14px;
+}
+
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination button {
+    cursor: pointer;
+    padding: 8px 16px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.pagination button:hover:not([disabled]) {
+    background-color: #e0e0e0;
+}
+
+.pagination button[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.highlight {
+    background-color: yellow;
+    font-weight: bold;
+    padding: 0 2px;
+}
+
+#results-count {
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+.result-date {
+    color: #70757a;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.text-toggle {
+    background: #f0f0f0;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.keywords-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.keyword-tag {
+    background-color: #e1f5fe;
+    color: #0277bd;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+}
