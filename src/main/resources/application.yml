@@ -102,3 +102,7 @@ management:
       prometheus:
         enabled: true
 
+monitoring:
+  prometheus:
+    url: ${PROMETHEUS_HOST}
+

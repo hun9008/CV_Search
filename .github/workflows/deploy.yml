@@ -41,6 +41,7 @@ jobs:
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
           ANTHROPIC_API_KEY : ${{ secrets.ANTHROPIC_API_KEY }}
+          PROMETHEUS_HOST: ${{ secrets.PROMETHEUS_HOST }}
 
         run: |
           sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
@@ -68,6 +69,7 @@ jobs:
             echo "FASTAPI_HOST=$FASTAPI_HOST" >> .env
             echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> .env
             echo "EC2_HOST=$EC2_HOST" >> .env
+            echo "PROMETHEUS_HOST=$PROMETHEUS_HOST" >> .env
           
             docker-compose down || true
             docker-compose up -d --build
