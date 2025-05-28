@@ -19,6 +19,11 @@ public class DashboardDto {
     private float averageSatisfaction;
     private float weeklySatisfactionChange;
 
+    private long activeUserCount;
+    private int weeklyActiveUserChange;
+
+    private float ctr;
+
     private List<KeywordCount> topKeywords;
 
 }

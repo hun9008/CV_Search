@@ -2,10 +2,7 @@ package com.www.goodjob.service;
 
 import com.www.goodjob.dto.DashboardDto;
 import com.www.goodjob.dto.KeywordCount;
-import com.www.goodjob.repository.JobRepository;
-import com.www.goodjob.repository.SearchLogRepository;
-import com.www.goodjob.repository.UserFeedbackRepository;
-import com.www.goodjob.repository.UserRepository;
+import com.www.goodjob.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -22,6 +19,7 @@ public class DashboardService {
     private final UserRepository userRepository;
     private final UserFeedbackRepository userFeedbackRepository;
     private final SearchLogRepository searchLogRepository;
+    private final JobEventLogRepository jobEventLogRepository;
 
     public DashboardDto getDashboardStats() {
         LocalDateTime startOfThisWeek = LocalDate.now().with(java.time.DayOfWeek.MONDAY).atStartOfDay();
@@ -62,6 +60,14 @@ public class DashboardService {
 
         List<KeywordCount> topKeywords = searchLogRepository.findTopKeywords(PageRequest.of(0, 10));
 
+        long activeUsersThisWeek = jobEventLogRepository.countActiveUsersSince(startOfThisWeek);
+        long activeUsersLastWeek = jobEventLogRepository.countActiveUsersSince(startOfLastWeek);
+        int activeUserDiff = (int)(activeUsersThisWeek - activeUsersLastWeek);
+
+        long impressions = jobEventLogRepository.countImpressionsSince(startOfThisWeek);
+        long clicks = jobEventLogRepository.countClicksSince(startOfThisWeek);
+
+        float ctr = impressions > 0 ? ((float) clicks / impressions) * 100 : 0f;
 
         return new DashboardDto(
                 totalUsers,
@@ -70,6 +76,9 @@ public class DashboardService {
                 weeklyJobChange,
                 averageSatisfaction != null ? averageSatisfaction : 0f,
                 weeklySatisfactionChange,
+                activeUsersThisWeek,
+                activeUserDiff,
+                ctr,
                 topKeywords
         );
     }
