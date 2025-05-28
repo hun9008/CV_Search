@@ -38,23 +38,27 @@ merge_service() {
   SERVICE=$1
   DEV_BRANCH="dev_${SERVICE}"
   TARGET_DIR="${SERVICE}"
+  TMP_DIR="tmp_merge_${SERVICE}"
 
   echo ""
   echo "=== Merging $DEV_BRANCH → $TARGET_DIR ==="
 
   echo "Deleting old $TARGET_DIR..."
   git rm -r --cached "$TARGET_DIR" 2>/dev/null || true
-  rm -rf "$TARGET_DIR"
+  [ -d "$TARGET_DIR" ] && rm -rf "$TARGET_DIR"
 
-  TMP_DIR="tmp_merge_${SERVICE}"
+  echo "Checking out $DEV_BRANCH to $TMP_DIR..."
   git worktree add "$TMP_DIR" "$DEV_BRANCH"
 
   echo "Copying files from $DEV_BRANCH to $TARGET_DIR..."
   mkdir -p "$TARGET_DIR"
-  cp -r "$TMP_DIR"/* "$TARGET_DIR"/
+  rsync -a --delete --exclude='.git' "$TMP_DIR"/ "$TARGET_DIR"/
 
+  echo "Cleaning up worktree..."
   git worktree remove "$TMP_DIR" --force
-
+  rm -rf ".git/worktrees/tmp_merge_${SERVICE}" 
+  
+  echo "Staging and committing $TARGET_DIR..."
   git add "$TARGET_DIR"
   git commit -m "Reset $TARGET_DIR with $DEV_BRANCH" || echo "Nothing to commit for $SERVICE"
 }
@@ -73,6 +77,14 @@ else
 fi
 
 echo ""
-echo "Pushing to main branch..."
-git push origin main
-echo "Done."
+echo "Previewing changes before pushing:"
+git status
+
+read -p "Proceed with git push to origin/main? (y/N): " CONFIRM
+if [[ "$CONFIRM" == "y" || "$CONFIRM" == "Y" ]]; then
+  echo "Pushing to main branch..."
+  git push origin main
+  echo "Done."
+else
+  echo "Push cancelled."
+fi
