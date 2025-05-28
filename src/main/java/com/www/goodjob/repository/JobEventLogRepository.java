@@ -14,6 +14,12 @@ public interface JobEventLogRepository extends JpaRepository<JobEventLog, Long> 
     @Query("SELECT COUNT(e) FROM JobEventLog e WHERE e.event = 'click' AND e.timestamp >= :start")
     long countClicksSince(@Param("start") LocalDateTime start);
 
+    @Query("SELECT COUNT(*) FROM JobEventLog e WHERE e.event = 'IMPRESSION' AND e.timestamp BETWEEN :start AND :end")
+    long countImpressionsBetween(LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT COUNT(*) FROM JobEventLog e WHERE e.event = 'CLICK' AND e.timestamp BETWEEN :start AND :end")
+    long countClicksBetween(LocalDateTime start, LocalDateTime end);
+
     @Query("SELECT COUNT(DISTINCT e.userId) " +
             "FROM JobEventLog e " +
             "WHERE e.timestamp >= :start")

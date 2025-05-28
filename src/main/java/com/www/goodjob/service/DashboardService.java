@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -69,6 +70,20 @@ public class DashboardService {
 
         float ctr = impressions > 0 ? ((float) clicks / impressions) * 100 : 0f;
 
+        List<Float> dailyCtrList = new ArrayList<>();
+
+        for (int i = 6; i >= 0; i--) {
+            LocalDate targetDate = LocalDate.now().minusDays(i);
+            LocalDateTime startOfDay = targetDate.atStartOfDay();
+            LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1);
+
+            long dailyImpressions = jobEventLogRepository.countImpressionsBetween(startOfDay, endOfDay);
+            long dailyClicks = jobEventLogRepository.countClicksBetween(startOfDay, endOfDay);
+
+            float dailyCtr = dailyImpressions > 0 ? ((float) dailyClicks / dailyImpressions) * 100 : 0f;
+            dailyCtrList.add(dailyCtr);
+        }
+
         return new DashboardDto(
                 totalUsers,
                 weeklyUserChange,
@@ -79,6 +94,7 @@ public class DashboardService {
                 activeUsersThisWeek,
                 activeUserDiff,
                 ctr,
+                dailyCtrList,
                 topKeywords
         );
     }

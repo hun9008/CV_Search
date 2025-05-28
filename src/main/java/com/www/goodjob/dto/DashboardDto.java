@@ -24,6 +24,8 @@ public class DashboardDto {
 
     private float ctr;
 
+    private List<Float> dailyCtrList;
+
     private List<KeywordCount> topKeywords;
 
 }

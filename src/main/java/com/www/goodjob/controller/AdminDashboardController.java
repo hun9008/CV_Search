@@ -36,7 +36,8 @@ public class AdminDashboardController {
         - weeklySatisfactionChange: 전주 대비 만족도 변화량
         - activeUsersThisWeek: 이번 주 한 번 이상 활동한 유저 수
         - activeUserDiff: 전주 대비 활동 유저 수 변화량
-        - ctr: 이번 주 채용공고 클릭률 (Click Through Rate, %)
+        - ctr: 이번 주 채용공고 전체 클릭률 (Click Through Rate, %)
+        - dailyCtrList: 최근 7일간 일별 클릭률 목록 (과거 → 현재 순서, 단위: %)
         - topKeywords: 인기 검색 키워드 Top 10 목록
         """
     )
