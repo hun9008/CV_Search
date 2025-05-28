@@ -95,3 +95,4 @@ uvicorn
 xxhash
 yarl
 httpx
+prometheus_client
