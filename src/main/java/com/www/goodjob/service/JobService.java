@@ -193,7 +193,6 @@ public class JobService {
     }
 
     public List<ValidJobDto> findAllJobWithValidType() {
-        List<Job> jobList = jobRepository.findAllWithValidType();
-        return jobList.stream().map(ValidJobDto::from).collect(Collectors.toList());
+        return jobRepository.findAllWithValidType();
     }
 }
