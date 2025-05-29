@@ -13,10 +13,10 @@ public class ScoredJobDto extends JobDto {
     private double cosineScore;
     private double bm25Score;
 
-    @Override
-    public String getRawJobsText() {
-        return "HIDE";
-    }
+//    @Override
+//    public String getRawJobsText() {
+//        return "HIDE";
+//    }
 
     public static ScoredJobDto from(JobDto base, double score, double cosineScore, double bm25Score) {
         return ScoredJobDto.builder()
