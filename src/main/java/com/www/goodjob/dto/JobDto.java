@@ -1,5 +1,6 @@
 package com.www.goodjob.dto;
 
+import com.www.goodjob.domain.Favicon;
 import com.www.goodjob.domain.Job;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -62,7 +63,7 @@ public class JobDto {
                 .archivedAt(job.getArchivedAt())
                 .rawJobsText(job.getRawJobsText())
                 .url(job.getUrl())
-                .favicon(job.getFavicon())
+                .favicon(job.getFavicon().getLogo())
                 .regionText(job.getRegionText())
                 .build();
     }

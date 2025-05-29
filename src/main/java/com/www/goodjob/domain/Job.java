@@ -77,8 +77,9 @@ public class Job {
     @Column(columnDefinition = "TEXT")
     private String url;
 
-    @Column(columnDefinition = "TEXT")
-    private String favicon;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "favicon_id")
+    private Favicon favicon;
 
     @Column(name = "region_text")
     private String regionText;
