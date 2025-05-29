@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
+import com.www.goodjob.dto.ValidJobDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +40,11 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             "WHERE j.id IN :ids")
     List<Job> findByIdInWithRegion(@Param("ids") List<Long> ids);
 
-    @Query("SELECT DISTINCT j FROM Job j " +
-            "LEFT JOIN FETCH j.jobRegions jr " +
-            "LEFT JOIN FETCH jr.region " +
-            "LEFT JOIN FETCH j.jobValidType "
-                )
-    List<Job> findAllWithValidType();
+    @Query("SELECT new com.www.goodjob.dto.ValidJobDto(" +
+            "j.id, j.companyName, j.title, j.jobValidType.validType, j.isPublic, j.createdAt, j.applyEndDate, j.url) " +
+            "FROM Job j " +
+            "LEFT JOIN j.jobValidType jvt")
+    List<ValidJobDto> findAllWithValidType();
 
     long countByCreatedAtAfter(LocalDateTime date);
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);

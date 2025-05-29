@@ -34,7 +34,7 @@ public class JobDto {
     private LocalDateTime lastUpdatedAt;
     private LocalDateTime expiredAt;
     private LocalDateTime archivedAt;
-    private String rawJobsText;
+    // private String rawJobsText;
     private String url;
     private String favicon;
     private String regionText;
@@ -61,7 +61,7 @@ public class JobDto {
                 .lastUpdatedAt(job.getLastUpdatedAt())
                 .expiredAt(job.getExpiredAt())
                 .archivedAt(job.getArchivedAt())
-                .rawJobsText(job.getRawJobsText())
+                // .rawJobsText(job.getRawJobsText())
                 .url(job.getUrl())
                 .favicon(job.getFavicon().getLogo())
                 .regionText(job.getRegionText())
