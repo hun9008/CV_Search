@@ -103,8 +103,8 @@
 | 항목        | 설명 |
 |-------------|------|
 | **형식 자유도** | 어떤 형태의 PDF 이력서든 업로드만 하면 분석 가능 |
-| **기술 기반** | <a href="https://github.com/allenai/vila" target="_blank">VILA</a> 기반 OCR (EfficientNet)로 문서 구조와 시각 블록 정밀 인식 |
-| **추천 로직** | BM25 (TF-IDF 기반 키워드 유사도)<br>+ <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2" target="_blank">SentenceTransformer</a> (Cosine Similarity) |
+| **기술 기반** | <a href="https://github.com/allenai/vila" target="_blank">VILA</a> 기반 OCR (<a href="https://arxiv.org/pdf/1905.11946" target="_blank">EfficientNet</a> 기반)로 문서 구조와 시각 블록 정밀 인식 |
+| **추천 로직** | <a href="https://en.wikipedia.org/wiki/Okapi_BM25" target="_blank">BM25</a> (<a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf" target="_blank">TF-IDF</a> 기반 키워드 유사도) </br> + <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2" target="_blank">SentenceTransformer</a> (<a href="https://en.wikipedia.org/wiki/Cosine_similarity" target="_blank">Cosine Similarity</a>) |
 | **결과** | 자유 양식 이력서도 높은 정확도로 채용 공고 자동 추천 |
 
 
@@ -161,7 +161,7 @@
 - Docker 및 GitHub Actions로 **CI/CD 자동화** 
 - **Prometheus + Grafana**로 로그 및 상태 실시간 모니터링 
 - 프론트엔드는 **S3 + CloudFront + Route53**으로 정적 배포
-- **Redis** 캐싱으로 추천 결과 응답 속도 <strong style="color:#FF5722;">약 60% 개선</strong>
+- **Redis** 캐싱으로 추천 결과 응답 속도 <span style="color:red;">약 60% 개선</span>
 
 # 공고 크롤링 파이프라인
 
