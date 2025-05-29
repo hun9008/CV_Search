@@ -293,7 +293,40 @@ public class JobController {
     }
 
 
-    @Operation(summary = "job +valid Type 함께 가져오는 함수" ,description= " ")
+    @Operation(summary = "job +valid Type 함께 가져오는 함수" ,description=  """
+            응답 방식
+             기존의 공고 정보와 validType이 전달됨   
+             validType :\n 
+             0 정상 \n
+             1 마감 (페이지 표시되지않음, 기간만료됨 포함)\n
+             2.잘못된내용(채용공고가 확실히 아님) \n
+             실패 시, is_public은 다시 1로 롤백하는 로직 포함.
+             삭제시 삭제이유 valid type을 업데이트 함
+                
+            예시 응답:
+            [
+              {
+                "id": 4,
+                "companyName": "SK\\t바이오텍",
+                "title": "공고(상세페이지) < Jobs < SK Careers",
+                "jobValidType": 1,
+                "isPublic": false,
+                "createdAt": "2025-04-21T15:30:46",
+                "applyEndDate": "2025-03-17",
+                "url": "https://www.skcareers.com/Recruit/Detail/R250305"
+              },
+              {
+                "id": 5,
+                "companyName": "SK바이오텍",
+                "title": "공고(상세페이지) < Jobs < SK Careers",
+                "jobValidType": 1,
+                "isPublic": false,
+                "createdAt": "2025-04-21T15:30:57",
+                "applyEndDate": "2025-03-24",
+                "url": "https://www.skcareers.com/Recruit/Detail/R250442"
+              },
+            ]
+            """)
     @GetMapping("/job-valid-type")
     public ResponseEntity<?> getJobWithValidType(){
         try{
