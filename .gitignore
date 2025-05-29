@@ -3,3 +3,10 @@ cv_env
 /src/CV2DB/vila
 __pycache__
 .pytest_cache
+!spring/
+!spring/**/
+!spring/src/
+!spring/src/**/
+!spring/src/main/
+!spring/src/main/java/
+!spring/src/main/java/**
