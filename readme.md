@@ -1,4 +1,4 @@
-# goodJob: CV 기반 채용공고 추천 플랫폼
+# <a href="https://www.goodjob.ai.kr" target="_blank">goodJob</a>: CV 기반 채용공고 추천 플랫폼
 
 ![](./img/title.jpg)
 
@@ -29,7 +29,9 @@
 </td>
 </tr>
 <tr>
-      <td>유진</td>
+      <td>
+        <a href="https://github.com/21YuJin" target="_blank">유진</a>
+      </td>
       <td>BE</td>
       <td>OAuth 회원가입, 지원이력, 피드백 생성, 공고 검색 및 필터 기능 구현</td>
       <td>
@@ -39,7 +41,7 @@
       </td>
 </tr>
 <tr>
-<td>육세현</td>
+<td><a href="https://github.com/sehyunsix" target="_blank">육세현</a></td>
 <td>blk</td>
 <td>blk</td>
 <td>
@@ -49,7 +51,9 @@
 </td>
 </tr>
 <tr>
-<td>위의종</td>
+<td>
+<a href="https://github.com/Carcassi0" target="_blank">위의종</a>
+</td>
 <td>blk</td>
 <td>blk</td>
 <td>
@@ -65,9 +69,9 @@
 
 # 프로젝트 개요
 
-[![DeepWiki Docs](https://img.shields.io/badge/View_on-DeepWiki-4B8DF8?style=for-the-badge&logo=readthedocs&logoColor=white)](https://deepwiki.com/hun9008/CV_Search)
+[![DeepWiki Docs](https://img.shields.io/badge/View_on-DeepWiki-4B8DF8?style=for-the-badge&logo=readthedocs&logoColor=white)](https://deepwiki.com/hun9008/CV_Search) [![Visit GoodJob](https://img.shields.io/badge/Visit-www.GoodJob.ai.kr-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://www.goodjob.ai.kr)
 
-goodJob은 구직자가 PDF 형식의 이력서(CV)를 업로드하기만 하면 </br>
+<a href="https://www.goodjob.ai.kr" target="_blank">goodJob</a>은 구직자가 PDF 형식의 이력서(CV)를 업로드하기만 하면 </br>
 이력서 내용을 분석하여 맞춤 채용 공고를 추천하고 </br>
 지원 현황을 통합 관리할 수 있도록 돕는 통합 플랫폼입니다.
 
@@ -99,8 +103,8 @@ goodJob은 구직자가 PDF 형식의 이력서(CV)를 업로드하기만 하면
 | 항목        | 설명 |
 |-------------|------|
 | **형식 자유도** | 어떤 형태의 PDF 이력서든 업로드만 하면 분석 가능 |
-| **기술 기반** | VILA 기반 OCR (EfficientNet)로 문서 구조와 시각 블록 정밀 인식 |
-| **추천 로직** | BM25 (TF-IDF 기반 키워드 유사도)<br>+ SentenceTransformer (의미 기반 임베딩 유사도) |
+| **기술 기반** | <a href="https://github.com/allenai/vila" target="_blank">VILA</a> 기반 OCR (EfficientNet)로 문서 구조와 시각 블록 정밀 인식 |
+| **추천 로직** | BM25 (TF-IDF 기반 키워드 유사도)<br>+ <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2" target="_blank">SentenceTransformer</a> (Cosine Similarity) |
 | **결과** | 자유 양식 이력서도 높은 정확도로 채용 공고 자동 추천 |
 
 
@@ -151,13 +155,13 @@ goodJob은 구직자가 PDF 형식의 이력서(CV)를 업로드하기만 하면
 
 3. 모듈화와 책임 분리: 프론트엔드, 백엔드, 추천 서버, 모니터링, 데이터베이스는 모두 컨테이너 단위로 분리되어 구성되며 각 컴포넌트는 독립적으로 운영되어 유지보수와 장애 대응이 용이합니다.
 
-- Spring 기반 메인 서버를 중심으로 통신 구조 통합 
-- FastAPI 서버는 ECS에 배포되어 Auto Scaling 지원
-- Redis, RabbitMQ를 통한 데이터 처리 안정성 확보 
-- Docker 및 GitHub Actions로 CI/CD 자동화 
-- Prometheus + Grafana로 로그 및 상태 실시간 모니터링 
-- 프론트엔드는 S3 + CloudFront + Route53으로 정적 배포
-- Redis 캐싱으로 추천 결과 응답 속도 약 60% 개선
+- **Spring** 기반 메인 서버를 중심으로 통신 구조 통합 
+- **FastAPI** 서버는 **ECS**에 배포되어 Auto Scaling 지원
+- **Redis, RabbitMQ**를 통한 데이터 처리 안정성 확보 
+- Docker 및 GitHub Actions로 **CI/CD 자동화** 
+- **Prometheus + Grafana**로 로그 및 상태 실시간 모니터링 
+- 프론트엔드는 **S3 + CloudFront + Route53**으로 정적 배포
+- **Redis** 캐싱으로 추천 결과 응답 속도 <strong style="color:#FF5722;">약 60% 개선</strong>
 
 # 공고 크롤링 파이프라인
 
@@ -271,11 +275,11 @@ goodJob은 구직자가 PDF 형식의 이력서(CV)를 업로드하기만 하면
 
 | 브랜치명     | 역할                    | 배포 방식                        |
 |--------------|-------------------------|----------------------------------|
-| dev_front    | 프론트엔드              | GitHub Actions → S3, CloudFront |
-| dev_spring   | Spring 백엔드 서버      | GitHub Actions → EC2            |
-| dev_crawl    | 크롤러 서버 (Node.js)   | GitHub Actions → EC2            |
-| dev_RDB      | MySQL 데이터베이스      | GitHub Actions → EC2 + Docker   |
-| dev_ES       | Elasticsearch 서버      | GitHub Actions → ECS, ECR       |
+| <a href="https://github.com/hun9008/CV_Search/tree/dev_front" target="_blank">dev_front</a>    | 프론트엔드              | GitHub Actions → S3, CloudFront |
+| <a href="https://github.com/hun9008/CV_Search/tree/dev_spring" target="_blank">dev_spring</a>   | Spring 백엔드 서버      | GitHub Actions → EC2            |
+| <a href="https://github.com/hun9008/CV_Search/tree/dev_crawl" target="_blank">dev_crawl</a>    | 크롤러 서버 (Node.js)   | GitHub Actions → EC2            |
+| <a href="https://github.com/hun9008/CV_Search/tree/dev_RDB" target="_blank">dev_RDB</a>      | MySQL 데이터베이스      | GitHub Actions → EC2 + Docker   |
+| <a href="https://github.com/hun9008/CV_Search/tree/dev_ES" target="_blank">dev_ES</a>       | FastAPI 서버      | GitHub Actions → ECS, ECR       |
 
 - 각 브랜치는 다음 파일들을 포함합니다:
   - `Dockerfile`
