@@ -9,6 +9,7 @@ import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.ScoredJobDto;
 import com.www.goodjob.repository.CvRepository;
 import com.www.goodjob.repository.JobRepository;
+import com.www.goodjob.repository.RecommendScoreJdbcRepository;
 import com.www.goodjob.repository.RecommendScoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,8 @@ public class AsyncService {
     private final RedisTemplate<String, String> redisTemplate;
     private final CvRepository cvRepository;
     private final RecommendScoreRepository recommendScoreRepository;
+    private final RecommendScoreJdbcRepository jdbcRepository;
+
 
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
@@ -110,6 +113,24 @@ public class AsyncService {
         }
     }
 
+//    @Async
+//    @Transactional
+//    public void saveRecommendScores(Long userId, List<ScoredJobDto> recommendations) {
+//        Cv cv = cvRepository.findByUserId(userId)
+//                .orElseThrow(() -> new RuntimeException("[Error] CV not found for userId=" + userId));
+//
+//        try {
+//            for (ScoredJobDto dto : recommendations) {
+//                recommendScoreRepository.upsertScore(cv.getId(), dto.getId(), (float) dto.getScore()); // user_id -> cv_id 사용
+//            }
+//            log.info("[Recommend] 추천 점수 저장 성공: userId={}", userId);
+//        } catch (Exception e) {
+//            log.error("[Recommend] 추천 점수 upsert 중 예외 발생: userId={}, error={}", userId, e.getMessage(), e);
+//            throw new RuntimeException("추천 점수 저장 실패", e);
+//        }
+//    }
+
+
     @Async
     @Transactional
     public void saveRecommendScores(Long userId, List<ScoredJobDto> recommendations) {
@@ -117,12 +138,10 @@ public class AsyncService {
                 .orElseThrow(() -> new RuntimeException("[Error] CV not found for userId=" + userId));
 
         try {
-            for (ScoredJobDto dto : recommendations) {
-                recommendScoreRepository.upsertScore(cv.getId(), dto.getId(), (float) dto.getScore()); // user_id -> cv_id 사용
-            }
-            log.info("[Recommend] 추천 점수 저장 성공: userId={}", userId);
+            jdbcRepository.batchUpsert(cv.getId(), recommendations);
+            log.info("[Recommend] 추천 점수 일괄 저장 성공: userId={}", userId);
         } catch (Exception e) {
-            log.error("[Recommend] 추천 점수 upsert 중 예외 발생: userId={}, error={}", userId, e.getMessage(), e);
+            log.error("[Recommend] 추천 점수 일괄 저장 실패: userId={}, error={}", userId, e.getMessage(), e);
             throw new RuntimeException("추천 점수 저장 실패", e);
         }
     }

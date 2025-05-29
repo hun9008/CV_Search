@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,6 +39,9 @@ class CvServiceTest {
     @Mock
     private ClaudeClient claudeClient;
 
+    @Mock
+    private RedisTemplate<String, Object> redisTemplate;
+
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(cvService, "fastapiHost", "http://localhost:8000");
@@ -49,7 +53,7 @@ class CvServiceTest {
         Long userId = 1L;
         Long cvId = 10L;
 
-        User mockUser = User.builder().id(userId).email("test@example.com").build();
+        User mockUser = User.builder().id(userId).email("test@example.com").name("hun").build();
         Cv mockCv = Cv.builder().id(cvId).user(mockUser).build();
 
         when(cvRepository.findByUserId(userId)).thenReturn(Optional.of(mockCv));
@@ -61,7 +65,7 @@ class CvServiceTest {
         verify(cvRepository).findByUserId(userId);
         verify(recommendScoreRepository).deleteByCvId(cvId);
         verify(restTemplate).delete("http://localhost:8000/delete-cv?user_id=" + userId);
-        assertEquals("CV 1 deleted from Elasticsearch and deleted from RDB.", result);
+        assertEquals("CV 1 deleted from Elasticsearch, RDB, and Redis.", result);
     }
 
     @Test

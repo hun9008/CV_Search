@@ -1,10 +1,7 @@
 package com.www.goodjob.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.www.goodjob.domain.Job;
-import com.www.goodjob.domain.JobRegion;
-import com.www.goodjob.domain.Region;
-import com.www.goodjob.domain.User;
+import com.www.goodjob.domain.*;
 import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.RegionGroupDto;
 import com.www.goodjob.repository.JobRepository;
@@ -81,6 +78,7 @@ class JobServiceTest {
         job.setExperience("신입/경력");
         job.setJobType("정규직");
         job.setJobRegions(List.of(jobRegion));
+        job.setFavicon(new Favicon(null, "some-domain", "base64string"));
 
         when(jobRepository.searchJobsWithRegion(eq(keyword), any())).thenReturn(List.of(job));
 

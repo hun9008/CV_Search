@@ -64,6 +64,7 @@ class BookmarkServiceTest {
 
         Job job = new Job();
         job.setId(jobId);
+        job.setFavicon(new Favicon(null, "some-domain", "base64string"));
 
         when(bookmarkRepository.existsByUserIdAndJobId(userId, jobId)).thenReturn(false);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -148,10 +149,12 @@ class BookmarkServiceTest {
         Job job1 = new Job();
         job1.setId(100L);
         job1.setTitle("백엔드 개발자");
+        job1.setFavicon(new Favicon(null, "some-domain", "base64string"));
 
         Job job2 = new Job();
         job2.setId(200L);
         job2.setTitle("프론트엔드 개발자");
+        job2.setFavicon(new Favicon(null, "some-domain", "base64string"));
 
         Bookmark b1 = new Bookmark();
         b1.setUser(mockUser);

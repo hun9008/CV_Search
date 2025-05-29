@@ -106,10 +106,13 @@ class RecommendServiceTest {
         Job dummyJob1 = new Job();
         dummyJob1.setId(1L);
         dummyJob1.setTitle("Job 1");
+        dummyJob1.setFavicon(new Favicon(null, "some-domain", "base64string"));
 
         Job dummyJob2 = new Job();
         dummyJob2.setId(2L);
         dummyJob2.setTitle("Job 2");
+        dummyJob2.setFavicon(new Favicon(null, "some-domain", "base64string"));
+
 
         when(jobRepository.findByIdInWithRegion(anyList()))
                 .thenReturn(List.of(dummyJob1, dummyJob2));
@@ -153,6 +156,7 @@ class RecommendServiceTest {
 
         Job mockJob = mock(Job.class);
         when(mockJob.getId()).thenReturn(42L);
+        when(mockJob.getFavicon()).thenReturn(new Favicon(null, "some-domain", "base64string"));
         when(jobRepository.findByIdInWithRegion(anyList())).thenReturn(List.of(mockJob));
 
         // when
@@ -195,6 +199,8 @@ class RecommendServiceTest {
         Job job = new Job();
         job.setId(jobId);
         job.setRawJobsText("job text");
+        job.setFavicon(new Favicon(null, "some-domain", "base64string"));
+
 
         RecommendScore score = RecommendScore.builder()
                 .id(200L)
@@ -229,6 +235,8 @@ class RecommendServiceTest {
         Job job = new Job();
         job.setId(jobId);
         job.setRawJobsText("job raw text");
+        job.setFavicon(new Favicon(null, "some-domain", "base64string"));
+
 
         RecommendScore score = RecommendScore.builder()
                 .id(200L)
