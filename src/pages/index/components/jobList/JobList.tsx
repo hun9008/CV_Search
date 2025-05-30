@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import JobCard from './JobCard';
 import styles from './styles/JobList.module.scss';
-import type Job from '../../../../../types/job';
+import type Job from '../../../../types/job';
 import useJobStore from '../../../../store/jobStore';
 import useBookmarkStore from '../../../../store/bookmarkStore';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorFallback from '../../../../components/common/error/ErrorFallback';
-import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
+import LoadingAnime1 from '../../../../components/common/loading/LoadingAnime1';
 
 interface jobListProps {
     bookmarked: boolean;
@@ -26,7 +26,7 @@ function JobList({ bookmarked }: jobListProps) {
     const experienceButtonRef = useRef<HTMLDivElement>(null);
     const typeButtonRef = useRef<HTMLDivElement>(null);
 
-    const { setSelectedJob, jobList, getJobList } = useJobStore();
+    const { setSelectedJobDetail, jobList, getJobList } = useJobStore(); // 추가
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
 
@@ -72,19 +72,22 @@ function JobList({ bookmarked }: jobListProps) {
         setFilteredJobs(filtered);
 
         if (filtered.length > 0) {
-            console.log(`상세 정보 선택: ${filtered[0].title}`);
-            setSelectedJob(filtered[0].id);
+            setSelectedJobDetail(filtered[0]); // filtered[0].id
         }
     }, [experienceFilterVector, typeFilterVector, jobList, bookmarked]);
 
     useEffect(() => {
-        if (bookmarked) {
-            setSelectedJob(0);
-        }
-
         filterJobs();
-        setCurrentPage(1); // 필터 적용하면 페이지는 어디로 이동?
+        setCurrentPage(1);
     }, [filterJobs]);
+
+    // 추가됨
+    // useEffect(() => {
+    //     // filteredJobs가 바뀔 때마다 첫 번째 job을 자동 선택
+    //     if (filteredJobs.length > 0) {
+    //         setSelectedJobDetail(filteredJobs[0]);
+    //     }
+    // }, [filteredJobs, setSelectedJobDetail]);
 
     const handleFilterOutsideClick = (e: MouseEvent) => {
         const target = e.target as Node;
@@ -136,37 +139,6 @@ function JobList({ bookmarked }: jobListProps) {
         }
     };
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         setIsLoading(true);
-    //         try {
-    //             if (bookmarked) {
-    //                 const updatedJob = await getBookmark();
-
-    //                 if (Array.isArray(updatedJob)) {
-    //                     setFilteredJobs(updatedJob);
-    //                     setSelectedJob(updatedJob[0]?.id ?? 0);
-    //                 } else {
-    //                     throw new Error('북마크 응답이 배열이 아님');
-    //                 }
-    //             } else {
-    //                 if (!jobList || jobList.length === 0) {
-    //                     await getJobList(TOTAL_JOB);
-    //                     await getBookmark();
-    //                 }
-    //             }
-    //         } catch (error) {
-    //             console.error('데이터 가져오기 에러:', error);
-    //             // 여기에서 임의의 시간(70000ms) 동안 주기적으로 fetchData 호출
-    //             setHasError(true);
-    //         } finally {
-    //             setIsLoading(false);
-    //         }
-    //     };
-
-    //     fetchData();
-    // }, []);
-
     // 최초 업로드 후 80초 동안 topk-list 재호출
     useEffect(() => {
         let pollingInterval: NodeJS.Timeout;
@@ -181,7 +153,7 @@ function JobList({ bookmarked }: jobListProps) {
 
                     if (Array.isArray(updatedJob)) {
                         setFilteredJobs(updatedJob);
-                        setSelectedJob(updatedJob[0]?.id ?? 0);
+                        setSelectedJobDetail(updatedJob[0]?.id ?? 0);
                         pollingActive = false; // 성공했으면 polling 멈춤
                     } else {
                         throw new Error('북마크 응답이 배열이 아님');
@@ -190,6 +162,7 @@ function JobList({ bookmarked }: jobListProps) {
                     if (!jobList || jobList.length === 0) {
                         await getJobList(TOTAL_JOB);
                         await getBookmark();
+                        // setSelectedJobDetail(jobList[0]);
                         pollingActive = false;
                     }
                 }
@@ -228,9 +201,6 @@ function JobList({ bookmarked }: jobListProps) {
     }, []);
     const totalItems = filteredJobs.length;
     const calculatedTotalPages = Math.ceil(totalItems / jobsPerPage);
-    // const currentJobs = useEffect(() => {
-    //     filteredJobs.slice((currentPage - 1) * jobsPerPage, currentPage * jobsPerPage);
-    // }, [filteredJobs]);
     const currentJobs = filteredJobs.slice(
         (currentPage - 1) * jobsPerPage,
         currentPage * jobsPerPage
@@ -335,14 +305,12 @@ function JobList({ bookmarked }: jobListProps) {
                 <div className={styles.jobList__content}>
                     {hasError ? (
                         isPending ? (
-                            <LoadingSpinner />
+                            <LoadingAnime1 />
                         ) : (
                             <ErrorFallback />
                         )
                     ) : isLoading ? (
-                        <div className={styles.jobList__loading}>
-                            <div className={styles.jobList__loadingSpinner}></div>
-                        </div>
+                        <LoadingAnime1 />
                     ) : (
                         currentJobs.map((job) => (
                             <JobCard
@@ -352,48 +320,66 @@ function JobList({ bookmarked }: jobListProps) {
                                     isBookmarked: !!bookmarkedList?.some((b) => b.id === job.id),
                                 }}
                                 isSelected={false}
-                                onSelect={() => setSelectedJob(job.id)}
+                                onSelect={() => setSelectedJobDetail(job)}
                                 onToggleBookmark={() => toggleBookmark(job.id)}
                             />
                         ))
                     )}
-                </div>
-            </ErrorBoundary>
+                    {hasError || isLoading ? (
+                        ''
+                    ) : (
+                        <div className={styles.jobList__pagination}>
+                            {calculatedTotalPages > 1 && (
+                                <>
+                                    <button
+                                        className={`${styles.jobList__paginationButton} ${
+                                            currentPage === 1 ? styles.disabled : ''
+                                        }`}
+                                        onClick={goToPreviousPage}
+                                        disabled={currentPage === 1}>
+                                        이전
+                                    </button>
 
-            {hasError || isLoading ? (
-                ''
-            ) : (
-                <div className={styles.jobList__pagination}>
-                    {calculatedTotalPages > 1 && (
-                        <>
-                            <button
-                                className={`${styles.jobList__paginationButton} ${
-                                    currentPage === 1 ? styles.disabled : ''
-                                }`}
-                                onClick={goToPreviousPage}
-                                disabled={currentPage === 1}>
-                                이전
-                            </button>
-
-                            <div className={styles.jobList__paginationNumbers}>
-                                {Array.from({ length: calculatedTotalPages }, (_, i) => i + 1)
-                                    .filter(
-                                        (page) =>
-                                            page === 1 ||
-                                            page === calculatedTotalPages ||
-                                            Math.abs(page - currentPage) <= 1
-                                    )
-                                    .map((page, index, array) => {
-                                        if (index > 0 && array[index - 1] !== page - 1) {
-                                            return (
-                                                <React.Fragment key={`ellipsis-${page}`}>
-                                                    <span
-                                                        className={
-                                                            styles.jobList__paginationEllipsis
-                                                        }>
-                                                        ...
-                                                    </span>
+                                    <div className={styles.jobList__paginationNumbers}>
+                                        {Array.from(
+                                            { length: calculatedTotalPages },
+                                            (_, i) => i + 1
+                                        )
+                                            .filter(
+                                                (page) =>
+                                                    page === 1 ||
+                                                    page === calculatedTotalPages ||
+                                                    Math.abs(page - currentPage) <= 1
+                                            )
+                                            .map((page, index, array) => {
+                                                if (index > 0 && array[index - 1] !== page - 1) {
+                                                    return (
+                                                        <React.Fragment key={`ellipsis-${page}`}>
+                                                            <span
+                                                                className={
+                                                                    styles.jobList__paginationEllipsis
+                                                                }>
+                                                                ...
+                                                            </span>
+                                                            <button
+                                                                className={`${
+                                                                    styles.jobList__paginationNumber
+                                                                } ${
+                                                                    currentPage === page
+                                                                        ? styles.active
+                                                                        : ''
+                                                                }`}
+                                                                onClick={() =>
+                                                                    handlePageChange(page)
+                                                                }>
+                                                                {page}
+                                                            </button>
+                                                        </React.Fragment>
+                                                    );
+                                                }
+                                                return (
                                                     <button
+                                                        key={page}
                                                         className={`${
                                                             styles.jobList__paginationNumber
                                                         } ${
@@ -404,34 +390,26 @@ function JobList({ bookmarked }: jobListProps) {
                                                         onClick={() => handlePageChange(page)}>
                                                         {page}
                                                     </button>
-                                                </React.Fragment>
-                                            );
-                                        }
-                                        return (
-                                            <button
-                                                key={page}
-                                                className={`${styles.jobList__paginationNumber} ${
-                                                    currentPage === page ? styles.active : ''
-                                                }`}
-                                                onClick={() => handlePageChange(page)}>
-                                                {page}
-                                            </button>
-                                        );
-                                    })}
-                            </div>
+                                                );
+                                            })}
+                                    </div>
 
-                            <button
-                                className={`${styles.jobList__paginationButton} ${
-                                    currentPage === calculatedTotalPages ? styles.disabled : ''
-                                }`}
-                                onClick={goToNextPage}
-                                disabled={currentPage === calculatedTotalPages}>
-                                다음
-                            </button>
-                        </>
+                                    <button
+                                        className={`${styles.jobList__paginationButton} ${
+                                            currentPage === calculatedTotalPages
+                                                ? styles.disabled
+                                                : ''
+                                        }`}
+                                        onClick={goToNextPage}
+                                        disabled={currentPage === calculatedTotalPages}>
+                                        다음
+                                    </button>
+                                </>
+                            )}
+                        </div>
                     )}
                 </div>
-            )}
+            </ErrorBoundary>
         </div>
     );
 }

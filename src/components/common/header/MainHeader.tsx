@@ -1,36 +1,49 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Search, Bell, Menu, ChevronRight, X } from 'lucide-react';
+import {
+    Search,
+    Bell,
+    ChevronRight,
+    X,
+    Moon,
+    ArrowRightToLine,
+    ArrowLeftToLine,
+} from 'lucide-react';
 import styles from './MainHeader.module.scss';
 import useAuthStore from '../../../store/authStore';
 import axios from 'axios';
 import { debounce } from 'lodash';
 import usePageStore from '../../../store/pageStore';
 import { useNavigate } from 'react-router-dom';
-import type Job from '../../../../types/job';
+import type Job from '../../../types/job';
+import UniversalDialog from '../dialog/UniversalDialog';
+import useSearchStore from '../../../store/searchStore';
+import { SERVER_IP } from '../../../constants/env';
 
 const MainHeader = () => {
     const [searchQuery, setSearchQuery] = useState(''); // 검색어
     const [searchResults, setSearchResults] = useState<Job[]>([]); // 검색 결과
     const [isSearching, setIsSearching] = useState(false); // 검색 중
-    const [showResults, setShowResults] = useState(false); // 검색 결과 출력 여부
-    const [showHistory, setShowHistory] = useState(false); // 검색 기록 출력 여부, 서치바에 텍스트를 입력하지 않아도 출력되어야 함
     const [isFocusing, setIsFocusing] = useState(false);
+    const [showSingleSearchResult, setShowSingleSearchResult] = useState(false);
+    const [selectedResult, setSelectedResult] = useState<Job>();
     const [history, setHistory] = useState<string[]>([]);
     const searchContainerRef = useRef<HTMLDivElement>(null);
     const { setCompactMenu } = usePageStore();
+    const { setQuery } = useSearchStore();
     const accessToken = useAuthStore((state) => state.accessToken);
     const isCompactMenu = usePageStore((state) => state.isCompactMenu);
     const navigate = useNavigate();
+
+    const toggleDarkmode = () => {};
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
         setSearchQuery(query);
         if (query.length > 1) {
             debouncedSearch(query);
-            setShowResults(true);
         } else {
             debouncedSearch('');
-            setShowResults(false);
+            setSearchResults([]);
         }
     };
 
@@ -41,7 +54,7 @@ const MainHeader = () => {
 
             try {
                 const response = await axios.get(
-                    `https://be.goodjob.ai.kr/jobs/search?keyword=${query}&page=0&size=8&sort=createdAt%2CDESC`
+                    `${SERVER_IP}/jobs/search?keyword=${query}&page=0&size=8&sort=createdAt%2CDESC`
                 );
                 setSearchResults(response.data.content.slice(0, 8));
             } catch (error) {
@@ -53,32 +66,37 @@ const MainHeader = () => {
         []
     );
 
+    /** 검색 자동 완성 결과 클릭 */
     const handleResultClick = (result: Job) => {
-        // 로컬 스토리지에 클릭 결과 저장
-        // setSearchQuery(title); // 이렇게 하는게 맞나..?
-        navigate(`/${result}`);
-        setIsSearching(false);
-        setIsFocusing(false);
+        setSelectedResult(result);
+        setShowSingleSearchResult(true);
     };
 
+    /** 검색 기록을 클릭하면 해당 기록을 쿼리로 검색 */
     const handleHistoryClick = (result: string) => {
-        // 로컬 스토리지에 클릭 결과 저장
-        // setSearchQuery(title); // 이렇게 하는게 맞나..?
-        navigate(`/${result}`);
+        setQuery(result);
         setIsSearching(false);
         setIsFocusing(false);
+        navigate('searchResult');
     };
 
-    // 검색어 엔터 처리
+    /** 엔터키 처리, 입력된 값을 쿼리로 검색 */
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        console.log(`검색어: ${searchQuery}`);
         saveSearchHistory(searchQuery);
+        setQuery(searchQuery);
+        setIsSearching(false);
+        setIsFocusing(false);
+        navigate('searchResult');
+    };
 
-        // navigate 추가 => 검색 결과 페이지로
-
-        setShowResults(false);
+    /** 더 보기 버튼 클릭 처리, 기본적으로 엔터키 처리와 같음 */
+    const handleViewMoreResults = () => {
+        saveSearchHistory(searchQuery);
+        setQuery(searchQuery);
+        setIsSearching(false);
+        setIsFocusing(false);
+        navigate('searchResult');
     };
 
     const saveSearchHistory = (query: string) => {
@@ -101,11 +119,6 @@ const MainHeader = () => {
         window.dispatchEvent(new Event('search-history-changed'));
     };
 
-    // 더보기 버튼 처리
-    const handleViewMoreResults = () => {
-        navigate('/');
-    };
-
     const handleSearchBlur = (e: React.FocusEvent) => {
         if (
             searchContainerRef.current &&
@@ -115,17 +128,11 @@ const MainHeader = () => {
             return;
         }
         setIsFocusing(false);
-        setShowResults(false);
     };
 
     const handleSearchFocus = () => {
         setIsFocusing(true);
         getSearchHistory();
-        setShowHistory(true);
-
-        if (searchQuery.length > 1) {
-            setShowResults(true);
-        }
     };
 
     const toggleMobileMenu = () => {
@@ -149,13 +156,20 @@ const MainHeader = () => {
 
     return (
         <>
+            {showSingleSearchResult ? (
+                <UniversalDialog
+                    isOpen={showSingleSearchResult}
+                    onClose={() => setShowSingleSearchResult(false)}
+                    job={selectedResult}
+                />
+            ) : (
+                ''
+            )}
             {isFocusing && (
                 <div
                     className={styles.header__overlay}
                     onClick={() => {
                         setIsFocusing(false);
-                        setShowResults(false);
-                        setShowHistory(false);
                     }}
                 />
             )}
@@ -166,7 +180,11 @@ const MainHeader = () => {
                         className={styles.header__menuButton}
                         onClick={toggleMobileMenu}
                         aria-label="메뉴 열기">
-                        <Menu size={30} />
+                        {isCompactMenu ? (
+                            <ArrowRightToLine size={30} color="#666666" />
+                        ) : (
+                            <ArrowLeftToLine size={30} color="#666666" />
+                        )}
                     </button>
 
                     <div
@@ -190,86 +208,70 @@ const MainHeader = () => {
                         </div>
 
                         {/* 검색 결과 드롭다운 */}
-                        {showHistory && (
+                        {isFocusing && (
                             <div className={styles.header__searchResults}>
+                                {/* 히스토리: 항상 isFocusing일 때 보여줌 */}
+                                {history && history.length > 0 && (
+                                    <ul className={styles.header__searchResultsList}>
+                                        {history.map((result: string) => (
+                                            <li
+                                                key={result}
+                                                onClick={() => handleHistoryClick(result)}
+                                                className={styles.header__searchHistoryItem}>
+                                                <Search
+                                                    size={16}
+                                                    className={styles.header__searchResultIcon}
+                                                />
+                                                <p className={styles.header__searchResultText}>
+                                                    {result}
+                                                </p>
+                                                <X
+                                                    size={18}
+                                                    className={styles.header__searchHistoryDelete}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        deleteSearchHistory(result);
+                                                    }}
+                                                />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                {/* 검색 결과 */}
                                 {isSearching ? (
                                     <div className={styles.header__searchLoading}>검색 중...</div>
                                 ) : searchResults.length > 0 ? (
                                     <>
-                                        {/* 히스토리 */}
-                                        {history ? (
-                                            <ul className={styles.header__searchResultsList}>
-                                                {history.map((result: string) => (
-                                                    <li
-                                                        key={result}
-                                                        onClick={() => handleHistoryClick(result)}
+                                        <ul className={styles.header__searchResultsList}>
+                                            {searchResults.map((result: Job) => (
+                                                <li
+                                                    key={result.id}
+                                                    onClick={() => handleResultClick(result)}
+                                                    className={styles.header__searchResultItem}>
+                                                    <div
                                                         className={
-                                                            styles.header__searchHistoryItem
+                                                            styles.header__searchResultContent
                                                         }>
-                                                        <Search
-                                                            size={16}
+                                                        <div
                                                             className={
                                                                 styles.header__searchResultIcon
-                                                            }
-                                                        />
-                                                        <p
-                                                            className={
-                                                                styles.header__searchResultText
                                                             }>
-                                                            {result}
-                                                        </p>
-                                                        <X
-                                                            size={18}
-                                                            className={
-                                                                styles.header__searchHistoryDelete
-                                                            }
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                deleteSearchHistory(result);
-                                                            }}
-                                                        />
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : null}
-                                        {showResults && (
-                                            <>
-                                                <ul className={styles.header__searchResultsList}>
-                                                    {searchResults.map((result: Job) => (
-                                                        <li
-                                                            key={result.id}
-                                                            onClick={() =>
-                                                                handleResultClick(result)
-                                                            }
-                                                            className={
-                                                                styles.header__searchResultItem
-                                                            }>
-                                                            <div
-                                                                className={
-                                                                    styles.header__searchResultContent
-                                                                }>
-                                                                <div
-                                                                    className={
-                                                                        styles.header__searchResultIcon
-                                                                    }>
-                                                                    <img
-                                                                        rel="icon"
-                                                                        src={`data:image/x-icon;base64,${result.favicon}`}
-                                                                    />
-                                                                </div>
-                                                                <span>{result.title}</span>
-                                                            </div>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                                <button
-                                                    className={styles.header__viewMoreButton}
-                                                    onClick={handleViewMoreResults}>
-                                                    검색 결과 더 보기
-                                                    <ChevronRight size={16} />
-                                                </button>
-                                            </>
-                                        )}
+                                                            <img
+                                                                rel="icon"
+                                                                src={`data:image/x-icon;base64,${result.favicon}`}
+                                                            />
+                                                        </div>
+                                                        <span>{result.title}</span>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <button
+                                            className={styles.header__viewMoreButton}
+                                            onClick={handleViewMoreResults}>
+                                            검색 결과 더 보기
+                                            <ChevronRight size={16} />
+                                        </button>
                                     </>
                                 ) : searchQuery.length > 1 ? (
                                     <div className={styles.header__searchNoResults}>
@@ -283,10 +285,15 @@ const MainHeader = () => {
                 <div className={styles.header__actions}>
                     {accessToken ? (
                         <>
-                            <button className={styles.header__actionButton} aria-label="알림">
-                                <Bell size={24} />
+                            <button
+                                className={styles.header__actionButton}
+                                aria-label="다크모드"
+                                onClick={toggleDarkmode}>
+                                <Moon size={24} color="#666666" />
                             </button>
-                            {/* <ProfileDialog /> */}
+                            <button className={styles.header__actionButton} aria-label="알림">
+                                <Bell size={24} color="#666666" />
+                            </button>
                         </>
                     ) : (
                         <div className={styles.header__authButtons}>

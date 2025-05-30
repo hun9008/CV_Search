@@ -3,7 +3,7 @@ import ManageItem from './ManageItem';
 import style from './styles/Manage.module.scss';
 import useApplyStore from '../../../../store/applyStore';
 import { Filter, Search } from 'lucide-react';
-import type application from '../../../../../types/application';
+import type application from '../../../../types/application';
 
 type SortField = 'companyName' | 'jobTitle' | 'createdAt' | 'applyStatus';
 type SortOrder = 'asc' | 'desc';

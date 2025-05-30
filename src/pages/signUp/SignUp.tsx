@@ -5,9 +5,6 @@ import style from './styles/SignUp.module.scss';
 
 function SignUp() {
     const navigate = useNavigate();
-    // const navigateToSignUp = () => {
-    //     navigate('/signUp/detail');
-    // };
     const navigateToLandingpage = () => {
         navigate('/');
     };
@@ -26,7 +23,6 @@ function SignUp() {
                         </p>
                         <div className={style.login__buttons}>
                             <GoogleSignIn />
-                            {/* 추후 버튼에 프롭을 추가하여 SignUp후 SignUPDetail 페이지로 이동, 혹은 회원가입과 로그인 버튼 플로우 통합 */}
                             <KakaoSignIn />
                         </div>
                     </div>

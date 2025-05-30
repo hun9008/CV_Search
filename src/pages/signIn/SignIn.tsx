@@ -5,9 +5,6 @@ import { useNavigate } from 'react-router-dom';
 
 function SignIn() {
     const navigate = useNavigate();
-    // const navigateToSignUp = () => {
-    //     navigate('/signUp/detail');
-    // };
     const navigateToLandingpage = () => {
         navigate('/');
     };

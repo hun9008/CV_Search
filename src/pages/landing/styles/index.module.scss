@@ -72,10 +72,10 @@
     &__content {
         display: flex;
         align-items: start;
-        justify-content: space-between;
-        gap: 4rem;
+        justify-content: space-around;
+        gap: 3rem;
         width: 100%;
-        max-width: 1280px;
+        // max-width: 1280px;
         padding: 0 2rem; // 추가: 좌우 패딩
         position: relative;
         z-index: 1;
@@ -92,13 +92,17 @@
     }
 
     &__text {
-        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        margin-top: 2rem;
+        // max-width: 500px;
+
         position: relative; // Added to ensure content stays above the blur
         z-index: 1; // Added to ensure content stays above the blur
     }
 
     &__title {
-        font-size: 40px;
+        font-size: 35px;
         font-weight: 700;
         color: #333;
         margin-bottom: 1rem;
@@ -131,10 +135,11 @@
         background-color: #1877f2;
         color: white;
         border: none;
-        border-radius: 90px;
-        padding: 1.6rem 2rem;
+        border-radius: 24px;
+        padding: 1.4rem 2rem;
         font-size: 1.1rem;
         font-weight: 500;
+        width: 200px;
         cursor: pointer;
         transition: background-color 0.2s;
 

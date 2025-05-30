@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import axios from 'axios';
 import useAuthStore from './authStore';
-import type Job from '../../types/job';
+import type Job from '../types/job';
 import useJobStore from './jobStore';
+import { SERVER_IP } from '../../src/constants/env';
 
 interface bookmarkStore {
     bookmarkList: Job[] | null;
@@ -31,16 +32,12 @@ const useBookmarkStore = create<bookmarkStore>((set) => ({
             }
 
             // API 호출
-            const res = await axios.post(
-                `https://be.goodjob.ai.kr/bookmark/add?JobId=${id}`,
-                null,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                    withCredentials: true,
-                }
-            );
+            const res = await axios.post(`${SERVER_IP}/bookmark/add?JobId=${id}`, null, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                withCredentials: true,
+            });
 
             console.log(`Add bookmark: ${res.status}`);
 
@@ -60,7 +57,7 @@ const useBookmarkStore = create<bookmarkStore>((set) => ({
     getBookmark: async () => {
         try {
             const accessToken = useAuthStore.getState().accessToken;
-            const res = await axios.get('https://be.goodjob.ai.kr/bookmark/me', {
+            const res = await axios.get(`${SERVER_IP}/bookmark/me`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },
@@ -87,7 +84,7 @@ const useBookmarkStore = create<bookmarkStore>((set) => ({
             });
 
             // API 호출
-            const res = await axios.delete(`https://be.goodjob.ai.kr/bookmark/remove?JobId=${id}`, {
+            const res = await axios.delete(`${SERVER_IP}/bookmark/remove?JobId=${id}`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
                 },

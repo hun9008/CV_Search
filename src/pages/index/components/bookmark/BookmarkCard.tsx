@@ -1,8 +1,9 @@
 import type React from 'react';
 import { Bookmark, ExternalLink } from 'lucide-react';
-import type Job from '../../../../../types/job';
+import type Job from '../../../../types/job';
 import style from './styles/BookmarkCard.module.scss';
 import useJobStore from '../../../../store/jobStore';
+import { useNavigate } from 'react-router-dom';
 
 interface BookmarkCardProp {
     job: Job;
@@ -19,7 +20,8 @@ function BookmarkCard({
     setSelectedJobId,
     setIsDialogOpen,
 }: BookmarkCardProp) {
-    const { setSelectedJob } = useJobStore();
+    const { setSelectedJobDetail } = useJobStore();
+    const navigate = useNavigate();
 
     const handleBookmarkClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -27,9 +29,14 @@ function BookmarkCard({
     };
 
     const handleCardClick = () => {
-        setSelectedJob(job.id);
+        setSelectedJobDetail(job);
         setSelectedJobId(job.id);
         setIsDialogOpen(true);
+    };
+
+    const handleUploadCV = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        navigate('/upload');
     };
 
     return (
@@ -64,9 +71,18 @@ function BookmarkCard({
                     <h3 className={style.jobCard__title}>{job.title}</h3>
 
                     <div className={style.jobCard__meta}>
-                        {job.score && (
-                            <div className={style.jobCard__score}>{job.score.toFixed(1)}</div>
+                        {job.score?.toFixed(0) === '0' ? (
+                            <button
+                                className={style.jobCard__score__isZero}
+                                onClick={handleUploadCV}>
+                                CV 등록하여 점수 확인하기
+                            </button>
+                        ) : (
+                            job.score && (
+                                <div className={style.jobCard__score}>{job.score.toFixed(1)}</div>
+                            )
                         )}
+
                         <div className={style.jobCard__tags}>
                             <div className={style.jobCard__tags__container}>
                                 {job.jobType && (

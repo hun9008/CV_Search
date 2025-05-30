@@ -1,0 +1,271 @@
+.container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 20px;
+    overflow-y: scroll;
+}
+
+.header {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &__title {
+        display: flex;
+        align-items: center;
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #333;
+        margin: 0 0 0.5rem;
+    }
+
+    &__icon {
+        color: #f4b11f;
+        margin-right: 0.75rem;
+    }
+
+    &__subtitle {
+        font-size: 0.95rem;
+        color: #666;
+        margin: 0;
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+    flex: 1;
+
+    padding: 0.5rem 0.25rem;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #d8edff;
+        border-radius: 4px;
+    }
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #d8edff #f1f1f1;
+}
+
+.loading {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+
+    &__spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #d8edff;
+        border-top: 3px solid #1877f2;
+        border-radius: 50%;
+        margin-bottom: 1rem;
+        animation: spin 1s linear infinite;
+    }
+}
+
+.empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 0;
+
+    &__icon {
+        color: #d8edff;
+        margin-bottom: 1.5rem;
+    }
+
+    &__title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 0.75rem;
+    }
+
+    &__message {
+        font-size: 0.95rem;
+        color: #666;
+        margin: 0;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .header {
+        margin-bottom: 1.5rem;
+
+        &__title {
+            font-size: 1.25rem;
+        }
+    }
+
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.jobList {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+
+    &__pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem 1rem;
+        border-top: 1px solid #f0f0f0;
+        gap: 0.5rem;
+
+        &Button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #ffffff;
+            color: #666666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover:not(:disabled) {
+                background-color: #f5f9fd;
+                border-color: #d8edff;
+                color: #1877f2;
+            }
+
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        }
+
+        &Numbers {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        &Number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: none;
+            color: #666666;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background-color: #f5f9fd;
+                color: #1877f2;
+            }
+
+            &.active {
+                background-color: #1877f2;
+                color: #ffffff;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// 반응형 스타일
+@media (max-width: 768px) {
+    .jobList {
+        &__pagination {
+            padding: 1rem 0.75rem;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .jobList {
+        &__pagination {
+            padding: 0.75rem 0.5rem;
+        }
+
+        &__paginationButton,
+        &__paginationNumber {
+            width: 32px;
+            height: 32px;
+        }
+    }
+}

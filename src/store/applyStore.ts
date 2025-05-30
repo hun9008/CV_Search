@@ -1,7 +1,8 @@
 import axios from 'axios';
-import application from '../../types/application';
+import application from '../types/application';
 import { create } from 'zustand';
 import useAuthStore from './authStore';
+import { SERVER_IP } from '../../src/constants/env';
 
 interface applyStore {
     applications: application[] | null;
@@ -15,19 +16,15 @@ const useApplyStore = create<applyStore>((set) => ({
     applications: null,
     setApplications: async (jobId) => {
         const accessToken = useAuthStore.getState().accessToken;
-        const res = await axios.post(
-            `https://be.goodjob.ai.kr/applications/apply?jobId=${jobId}`,
-            null,
-            {
-                headers: { Authorization: `Bearer ${accessToken}` },
-                withCredentials: true,
-            }
-        );
+        const res = await axios.post(`${SERVER_IP}/applications/apply?jobId=${jobId}`, null, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            withCredentials: true,
+        });
         return res.status;
     },
     getApplications: async () => {
         const accessToken = useAuthStore.getState().accessToken;
-        const res = await axios.get('https://be.goodjob.ai.kr/applications', {
+        const res = await axios.get(`${SERVER_IP}/applications`, {
             headers: { Authorization: `Bearer ${accessToken}` },
             withCredentials: true,
         });
@@ -36,7 +33,7 @@ const useApplyStore = create<applyStore>((set) => ({
     editApplications: async (jobId, status, note) => {
         const accessToken = useAuthStore.getState().accessToken;
         const res = await axios.put(
-            `https://be.goodjob.ai.kr/applications?jobId=${jobId}`,
+            `${SERVER_IP}/applications?jobId=${jobId}`,
             {
                 applyStatus: status,
                 note: note,
@@ -47,7 +44,7 @@ const useApplyStore = create<applyStore>((set) => ({
     },
     deleteApplications: async (jobId) => {
         const accessToken = useAuthStore.getState().accessToken;
-        const res = await axios.delete(`https://be.goodjob.ai.kr/applications?jobId=${jobId}`, {
+        const res = await axios.delete(`${SERVER_IP}/applications?jobId=${jobId}`, {
             headers: { Authorization: `Bearer ${accessToken}` },
             withCredentials: true,
         });
