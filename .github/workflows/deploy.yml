@@ -30,6 +30,8 @@ jobs:
                     echo "[PULL] Pulling latest changes from dev_front branch..."
                     git pull origin dev_front
 
+                    echo "SERVER_IP=$SERVER_IP" > .env
+
                     echo "[NPM INSTALL] Installing dependencies..."
                     npm install
 
