@@ -1,4 +1,4 @@
-package com.www.goodjob.dto;
+package com.www.goodjob.dto.tossdto;
 
 import lombok.Getter;
 

@@ -1,4 +1,4 @@
-package com.www.goodjob.dto;
+package com.www.goodjob.dto.tossdto;
 
 import lombok.Getter;
 
@@ -6,5 +6,5 @@ import lombok.Getter;
 public class ConfirmPaymentRequest {
     private String paymentKey;
     private String orderId;
-    private String amount;
+    private Long amount;
 }

@@ -106,3 +106,5 @@ monitoring:
   prometheus:
     url: ${PROMETHEUS_HOST}
 
+toss:
+  secret-key: ${TOSS_SECRET_KEY}
