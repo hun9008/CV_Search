@@ -7,7 +7,6 @@ import com.www.goodjob.dto.tossdto.ConfirmPaymentRequest;
 import com.www.goodjob.dto.tossdto.CancelPaymentRequest;
 import com.www.goodjob.enums.TossPaymentStatus;
 import com.www.goodjob.repository.TossPaymentRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,11 +25,6 @@ public class TossPaymentService {
 
     @Value("${toss.secret-key}")
     private String secretKey;
-
-    @PostConstruct
-    public void init() {
-        System.out.println("✅ Loaded Toss Secret Key: " + secretKey);
-    }
 
     public HttpResponse requestConfirm(ConfirmPaymentRequest req) throws Exception {
         JsonNode requestObj = objectMapper.createObjectNode()

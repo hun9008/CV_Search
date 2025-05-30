@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/", "/auth/**", "/oauth2/**", "/swagger-ui/**", "/swagger-ui.html",
                                 "/v3/api-docs/**", "/s3/**", "/job-update/**", "/rec/**",
-                                "/jobs/**", "/error", "/actuator", "/actuator/prometheus", "/user/me", "/admin/**"
+                                "/jobs/**", "/error", "/actuator", "/actuator/prometheus", "/user/me", "/admin/**", "/payments/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -120,7 +120,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "https://localhost:5173",
-                "https://www.goodjob.ai.kr"
+                "https://www.goodjob.ai.kr",
+                "http://localhost:3000"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

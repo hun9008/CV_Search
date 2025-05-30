@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.TossPayment;
 import com.www.goodjob.dto.tossdto.ConfirmPaymentRequest;
 import com.www.goodjob.dto.tossdto.CancelPaymentRequest;
+import com.www.goodjob.dto.tossdto.TossPaymentResponseDto;
 import com.www.goodjob.enums.TossPaymentMethod;
 import com.www.goodjob.enums.TossPaymentStatus;
 import com.www.goodjob.security.CustomUserDetails;
@@ -17,8 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/payments")
@@ -59,13 +58,11 @@ public class TossPaymentController {
                     .totalAmount(node.get("totalAmount").asLong())
                     .tossPaymentMethod(TossPaymentMethod.valueOf(node.get("method").asText()))
                     .tossPaymentStatus(TossPaymentStatus.valueOf(node.get("status").asText()))
-                    .requestedAt(LocalDateTime.parse(node.get("requestedAt").asText()))
-                    .approvedAt(LocalDateTime.parse(node.get("approvedAt").asText()))
                     .user(userDetails.getUser())
                     .build();
 
             tossPaymentService.savePayment(payment);
-            return ResponseEntity.ok(payment);
+            return ResponseEntity.ok(TossPaymentResponseDto.from(payment));
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());

@@ -5,9 +5,6 @@ import com.www.goodjob.enums.TossPaymentStatus;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -41,10 +38,4 @@ public class TossPayment {
     @Column(nullable = false)
     private TossPaymentStatus tossPaymentStatus; // 결제 상태
 
-    @Column(nullable = false)
-    @CreationTimestamp
-    private LocalDateTime requestedAt; // 결제 요청 시간
-
-    @CreationTimestamp
-    private LocalDateTime approvedAt; // 결제 승인 시간
 }
