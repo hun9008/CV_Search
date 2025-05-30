@@ -28,7 +28,6 @@ public class ValidJobDto {
 
     public static ValidJobDto from(Job job) {
         List<RegionDto> regions = RegionDto.fromJob(job);
-        JobValidType jobValidType = job.getJobValidType();
         return ValidJobDto.builder()
                 .id(job.getId())
                 .companyName(job.getCompanyName())
@@ -37,7 +36,7 @@ public class ValidJobDto {
                 .createdAt(job.getCreatedAt())
                 .applyEndDate(job.getApplyEndDate())
                 .url(job.getUrl())
-                .jobValidType(jobValidType != null ? jobValidType.getValidType() : null)
+                .jobValidType(job.getJobValidType())
                 .build();
     }
 }

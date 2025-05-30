@@ -1,14 +1,16 @@
 package com.www.goodjob.service;
 
 import com.www.goodjob.domain.Job;
+import com.www.goodjob.domain.JobRegion;
 import com.www.goodjob.domain.Region;
 import com.www.goodjob.domain.User;
 import com.www.goodjob.dto.*;
 import com.www.goodjob.enums.ExperienceCategory;
 import com.www.goodjob.enums.JobTypeCategory;
+import com.www.goodjob.repository.JobRegionRepository;
 import com.www.goodjob.repository.JobRepository;
-import com.www.goodjob.repository.JobValidTypeRepository;
 import com.www.goodjob.repository.RegionRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
@@ -28,7 +30,7 @@ public class JobService {
     private final RegionRepository regionRepository;
     private final RestTemplate restTemplate;
     private final SearchLogService searchLogService;
-    private final JobValidTypeRepository jobValidTypeRepository;
+    private final JobRegionRepository jobRegionRepository;
 
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
@@ -179,13 +181,15 @@ public class JobService {
         }
     }
 
+    @Transactional
     public String deleteJobWithValidType(Long jobId, Integer validType){
 
         try{
-            if(validType !=0){
-                deleteJob(jobId);
-            }
-            jobValidTypeRepository.upsertJobValidType(jobId,validType);
+            deleteJob(jobId);
+            Job job = jobRepository.findById(jobId).orElseThrow(()-> new RuntimeException("Job Id가 존재하지 않습니다."));
+            job.setJobValidType(validType);
+            job.setIsPublic(false);
+            jobRepository.save(job);
             return "Job " + jobId + " deleted from Elasticsearch and updated in RDB and ValidType.";
         }catch (Exception e){
             throw new RuntimeException("ValidTypeUpdate 및 삭제 실패 "+e.getMessage(),e);
@@ -194,5 +198,21 @@ public class JobService {
 
     public List<ValidJobDto> findAllJobWithValidType() {
         return jobRepository.findAllWithValidType();
+    }
+
+    @Transactional
+    public Job createOrUpdateJob( CreateJobDto dto) {
+
+        Job job =  dto.toEntity();
+        job = jobRepository.save(job);
+
+        for(Long regionId : dto.getJobRegions()){
+            Region region = regionRepository.findById(regionId).orElseThrow(()-> new RuntimeException("지역명 없음: "+regionId));
+            JobRegion jobRegion = new JobRegion();
+            jobRegion.setJob(job);
+            jobRegion.setRegion(region);
+            jobRegionRepository.save(jobRegion);
+        }
+        return job;
     }
 }

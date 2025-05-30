@@ -22,8 +22,8 @@ public class Job {
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true ,fetch =FetchType.LAZY)
     private List<JobRegion> jobRegions = new ArrayList<>();
 
-    @OneToOne(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true, fetch =FetchType.LAZY)
-    private JobValidType jobValidType = new JobValidType();
+    @Column(name = "job_valid_type")
+    private Integer jobValidType;
 
     @Column(name = "company_name")
     private String companyName;
