@@ -23,7 +23,7 @@ jobs:
                   HUNIAN_PASSWORD: ${{ secrets.HUNIAN_PASSWORD }}
                   SERVER_IP: ${{ secrets.SERVER_IP }}
               run: |
-                  sshpass -p "$HUNIAN_PASSWORD" ssh -o StrictHostKeyChecking=no $HUNIAN_USER@$HUNIAN_HOST << 'EOF'
+                  sshpass -p "$HUNIAN_PASSWORD" ssh -o StrictHostKeyChecking=no $HUNIAN_USER@$HUNIAN_HOST << EOF
 
                     cd /home/hun/Desktop/goodjob/CV_Search
 
