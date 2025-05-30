@@ -274,12 +274,8 @@ public class JobController {
     @DeleteMapping("/delete-one-job-valid-type")
     public ResponseEntity<?> deleteJobWithValidType(
             @RequestParam("jobId") Long jobId,
-            @RequestParam("validType") Integer validType,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestParam("validType") Integer validType
     ) {
-        if (userDetails == null) {
-            throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
-        }
         try {
             String message = jobService.deleteJobWithValidType(jobId ,validType);
 

@@ -9,7 +9,6 @@ import com.www.goodjob.enums.ExperienceCategory;
 import com.www.goodjob.enums.JobTypeCategory;
 import com.www.goodjob.repository.JobRegionRepository;
 import com.www.goodjob.repository.JobRepository;
-import com.www.goodjob.repository.JobValidTypeRepository;
 import com.www.goodjob.repository.RegionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,6 @@ public class JobService {
     private final RegionRepository regionRepository;
     private final RestTemplate restTemplate;
     private final SearchLogService searchLogService;
-    private final JobValidTypeRepository jobValidTypeRepository;
     private final JobRegionRepository jobRegionRepository;
 
     @Value("${FASTAPI_HOST}")
@@ -188,7 +186,10 @@ public class JobService {
 
         try{
             deleteJob(jobId);
-            jobValidTypeRepository.upsertJobValidType(jobId,validType);
+            Job job = jobRepository.findById(jobId).orElseThrow(()-> new RuntimeException("Job Id가 존재하지 않습니다."));
+            job.setJobValidType(validType);
+            job.setIsPublic(false);
+            jobRepository.save(job);
             return "Job " + jobId + " deleted from Elasticsearch and updated in RDB and ValidType.";
         }catch (Exception e){
             throw new RuntimeException("ValidTypeUpdate 및 삭제 실패 "+e.getMessage(),e);
