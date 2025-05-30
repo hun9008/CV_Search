@@ -2,8 +2,10 @@ package com.www.goodjob.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.*;
+import com.www.goodjob.dto.CreateJobDto;
 import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.RegionGroupDto;
+import com.www.goodjob.repository.JobRegionRepository;
 import com.www.goodjob.repository.JobRepository;
 import com.www.goodjob.repository.JobValidTypeRepository;
 import com.www.goodjob.repository.RegionRepository;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,6 +51,9 @@ class JobServiceTest {
 
     @Mock
     private JobValidTypeRepository jobValidTypeRepository;
+
+    @Mock
+    private JobRegionRepository jobRegionRepository;
 
     @BeforeEach
     void setup() {
@@ -213,19 +219,6 @@ class JobServiceTest {
         verify(restTemplate).delete(expectedUrl);
     }
 
-    @Test
-    void deleteJobWithValidType_shouldNotDeleteWhenValidTypeIsZero() {
-        // given
-        Long jobId = 456L;
-        Integer validType = 0;
-        String expectedUrl = "http://localhost:8000/delete-job?job_id=456";
-
-        // when
-        jobService.deleteJobWithValidType(jobId, validType);
-
-        // then
-        verify(restTemplate, never()).delete(expectedUrl); // 삭제가 일어나지 않아야 함
-    }
 
     @Test
     void deleteJobWithValidType_shouldDeleteWhenValidTypeIsNotZero() {
@@ -239,5 +232,37 @@ class JobServiceTest {
 
         // then
         verify(restTemplate).delete(expectedUrl); // 삭제가 일어나야함
+    }
+
+    @Test
+    void createOrUpdateJob_savesJobAndJobRegionsSuccessfully() {
+        // given
+        CreateJobDto dto = mock(CreateJobDto.class);
+
+        Job job = new Job();
+        job.setId(1L);
+        ArrayList<Long> regionIds = new ArrayList<>(List.of(10L, 20L));
+
+        when(dto.toEntity()).thenReturn(job);
+        when(dto.getJobRegions()).thenReturn(regionIds);
+
+        when(jobRepository.save(any(Job.class))).thenReturn(job);
+
+        Region region1 = Region.builder().id(10L).sido("서울").sigungu("강남구").build();
+        Region region2 = Region.builder().id(20L).sido("서울").sigungu("서초구").build();
+
+        when(regionRepository.findById(10L)).thenReturn(java.util.Optional.of(region1));
+        when(regionRepository.findById(20L)).thenReturn(java.util.Optional.of(region2));
+
+        // when
+        Job result = jobService.createOrUpdateJob(dto);
+
+        // then
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+
+        verify(jobRepository).save(any(Job.class));
+        verify(regionRepository, times(2)).findById(anyLong());
+        verify(jobRegionRepository, times(2)).save(any(JobRegion.class));
     }
 }

@@ -35,15 +35,14 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     @Query("SELECT DISTINCT j FROM Job j " +
             "LEFT JOIN FETCH j.jobRegions jr " +
             "LEFT JOIN FETCH jr.region " +
-            "LEFT JOIN FETCH j.jobValidType jvt " +
             "LEFT JOIN FETCH j.favicon " +
             "WHERE j.id IN :ids")
     List<Job> findByIdInWithRegion(@Param("ids") List<Long> ids);
 
     @Query("SELECT new com.www.goodjob.dto.ValidJobDto(" +
-            "j.id, j.companyName, j.title, j.jobValidType.validType, j.isPublic, j.createdAt, j.applyEndDate, j.url) " +
-            "FROM Job j " +
-            "LEFT JOIN j.jobValidType jvt")
+            "j.id, j.companyName, j.title, j.jobValidType, j.isPublic, j.createdAt, j.applyEndDate, j.url) " +
+            "FROM Job j "
+       )
     List<ValidJobDto> findAllWithValidType();
 
     long countByCreatedAtAfter(LocalDateTime date);

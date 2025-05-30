@@ -1,10 +1,8 @@
 package com.www.goodjob.controller;
 
+import com.www.goodjob.domain.Job;
 import com.www.goodjob.domain.User;
-import com.www.goodjob.dto.JobDto;
-import com.www.goodjob.dto.ValidJobDto;
-import com.www.goodjob.dto.JobSearchResponse;
-import com.www.goodjob.dto.RegionGroupDto;
+import com.www.goodjob.dto.*;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.JobService;
 import com.www.goodjob.service.SearchLogService;
@@ -19,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import com.www.goodjob.dto.SearchLogDto;
 
 import java.util.List;
 import java.util.Map;
@@ -297,9 +294,10 @@ public class JobController {
             응답 방식
              기존의 공고 정보와 validType이 전달됨   
              validType :\n 
-             0 정상 \n
-             1 마감 (페이지 표시되지않음, 기간만료됨 포함)\n
-             2.잘못된내용(채용공고가 확실히 아님) \n
+             0: 확인안함
+             1: 정상 \n
+             2: 마감 (페이지 표시되지않음, 기간만료됨 포함)\n
+             3: 잘못된내용(채용공고가 확실히 아님) \n
              실패 시, is_public은 다시 1로 롤백하는 로직 포함.
              삭제시 삭제이유 valid type을 업데이트 함
                 
@@ -327,7 +325,7 @@ public class JobController {
               },
             ]
             """)
-    @GetMapping("/job-valid-type")
+    @GetMapping("/job-valid-type" )
     public ResponseEntity<?> getJobWithValidType(){
         try{
             List<ValidJobDto> JobList =jobService.findAllJobWithValidType();
@@ -340,6 +338,49 @@ public class JobController {
     }
 
 
+    @Operation(summary = "채용 공고 생성 또는 수정",
+            description = """
+        채용 공고 정보를 생성하거나, 같은 ID의 공고가 있으면 덮어씁니다.
+
+        - 입력으로는 채용 공고 정보와 해당 공고가 속한 지역 ID 리스트를 포함한 `CreateJobDto`를 전달해야 합니다.
+        - 내부적으로 job 정보를 저장하고, 연관된 지역 정보(`region_id`)를 `job_region` 테이블에 함께 저장합니다.
+        - jobRegions에 있는 각 지역 ID에 대해 해당 지역이 없으면 예외를 발생시킵니다.
+        - 성공 시 저장된 `Job` 객체를 반환합니다.
+
+        실패 시:
+        - 내부 로직 중 예외 발생 시 HTTP 500 응답을 반환합니다.
+        - 예외 메시지는 JSON 형식으로 `"error"` 필드에 담아 응답합니다.
+
+        예시 요청:
+        {
+            "title": "백엔드 개발자 채용",
+            "companyName": "GoodJob Inc.",
+            "url": "https://goodjob.com/job/123",
+            "jobRegions": [1, 2, 3]
+        }
+
+        예시 응답:
+        {
+            "id": 123,
+            "title": "백엔드 개발자 채용",
+            "companyName": "GoodJob Inc.",
+            "url": "https://goodjob.com/job/123",
+            ...
+        }
+        """
+    )
+    @PostMapping("/job")
+    public ResponseEntity<?> createOrUpdate(@RequestBody CreateJobDto dto) {
+        Job job;
+        try {
+           job = jobService.createOrUpdateJob(dto);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+        return ResponseEntity.ok(job);
+    }
 
 
 }
