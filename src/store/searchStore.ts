@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { JobContent } from '../types/searchResult';
 import axios from 'axios';
 import useAuthStore from './authStore';
+import { SERVER_IP } from '../../src/constants/env';
 
 interface searchStore {
     query: string;
@@ -30,7 +31,7 @@ const useSearchStore = create<searchStore>((set) => ({
     getSearchList: async (keyword, page, size) => {
         const accessToken = useAuthStore.getState().accessToken;
         const res = await axios.get(
-            `https://be.goodjob.ai.kr/jobs/search?keyword=${keyword}&page=${page}&size=${size}&sort=createdAt%2CDESC`,
+            `${SERVER_IP}/jobs/search?keyword=${keyword}&page=${page}&size=${size}&sort=createdAt%2CDESC`,
             { headers: { Authorization: `Bearer ${accessToken}` }, withCredentials: true }
         );
         set({

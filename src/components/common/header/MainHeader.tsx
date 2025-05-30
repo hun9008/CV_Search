@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import type Job from '../../../types/job';
 import UniversalDialog from '../dialog/UniversalDialog';
 import useSearchStore from '../../../store/searchStore';
+import { SERVER_IP } from '../../../constants/env';
 
 const MainHeader = () => {
     const [searchQuery, setSearchQuery] = useState(''); // 검색어
@@ -53,7 +54,7 @@ const MainHeader = () => {
 
             try {
                 const response = await axios.get(
-                    `https://be.goodjob.ai.kr/jobs/search?keyword=${query}&page=0&size=8&sort=createdAt%2CDESC`
+                    `${SERVER_IP}/jobs/search?keyword=${query}&page=0&size=8&sort=createdAt%2CDESC`
                 );
                 setSearchResults(response.data.content.slice(0, 8));
             } catch (error) {
@@ -65,29 +66,35 @@ const MainHeader = () => {
         []
     );
 
+    /** 검색 자동 완성 결과 클릭 */
     const handleResultClick = (result: Job) => {
-        // 로컬 스토리지에 클릭 결과 저장
-        // setSearchQuery(title); // 이렇게 하는게 맞나..?
         setSelectedResult(result);
-        // setIsSearching(false);
-        // setIsFocusing(false);
         setShowSingleSearchResult(true);
     };
 
+    /** 검색 기록을 클릭하면 해당 기록을 쿼리로 검색 */
     const handleHistoryClick = (result: string) => {
-        // 로컬 스토리지에 클릭 결과 저장
-        // setSearchQuery(title); // 이렇게 하는게 맞나..?
-        navigate(`/${result}`);
+        setQuery(result);
         setIsSearching(false);
         setIsFocusing(false);
+        navigate('searchResult');
     };
 
-    // 검색어 엔터 처리
+    /** 엔터키 처리, 입력된 값을 쿼리로 검색 */
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log(`검색어: ${searchQuery}`);
         saveSearchHistory(searchQuery);
         setQuery(searchQuery);
+        setIsSearching(false);
+        setIsFocusing(false);
+        navigate('searchResult');
+    };
+
+    /** 더 보기 버튼 클릭 처리, 기본적으로 엔터키 처리와 같음 */
+    const handleViewMoreResults = () => {
+        saveSearchHistory(searchQuery);
+        setQuery(searchQuery);
+        setIsSearching(false);
         setIsFocusing(false);
         navigate('searchResult');
     };
@@ -110,11 +117,6 @@ const MainHeader = () => {
         const updatedHistory = history.filter((item: string) => item !== query);
         localStorage.setItem(key, JSON.stringify(updatedHistory));
         window.dispatchEvent(new Event('search-history-changed'));
-    };
-
-    // 더보기 버튼 처리
-    const handleViewMoreResults = () => {
-        navigate('searchResult');
     };
 
     const handleSearchBlur = (e: React.FocusEvent) => {

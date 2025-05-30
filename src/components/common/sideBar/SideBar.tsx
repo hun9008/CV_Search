@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     ClipboardList,
     Star,
@@ -14,17 +14,33 @@ import usePageStore from '../../../store/pageStore';
 import style from './SideBar.module.scss';
 import useUserStore from '../../../store/userStore';
 import SideBarProfileDialog from '../dialog/SideBarProfileDialog';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useAuthStore from '../../../store/authStore';
 function SideBar() {
-    const { setActiveContent } = usePageStore();
     const { name, email, fetchUserData } = useUserStore();
     const isAdmin = useUserStore((state) => state.isAdmin);
-    const activeContent = usePageStore((state) => state.activeContent);
+    const [activeContent, setActiveContent] = useState('');
     const isCompactMenu = usePageStore((state) => state.isCompactMenu);
     const navigate = useNavigate();
     type userPageContent = (typeof userMenuItems)[number]['id'];
     type adminPageContent = (typeof adminMenuItems)[number]['id'];
+    const location = useLocation();
+    const path = location.pathname;
+
+    useEffect(() => {
+        const currentMenu = (path: string) => {
+            if (path.includes('recommend')) return '추천 공고';
+            if (path.includes('bookmark')) return '북마크';
+            if (path.includes('manage')) return '지원 관리';
+            if (path.includes('mycv')) return '나의 CV';
+            if (path.includes('/main')) return 'CV 생성';
+            if (path.includes('admin/dashboard')) return '대시 보드';
+            if (path.includes('admin/jobManage')) return '공고 관리';
+            if (path.includes('admin/feedback')) return '피드백 관리';
+        };
+        const current = currentMenu(path);
+        setActiveContent(current ?? '');
+    }, []);
 
     const userMenuItems = [
         {

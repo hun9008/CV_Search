@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import axios from 'axios';
 import useAuthStore from './authStore';
 import useUserStore from './userStore';
+import { SERVER_IP } from '../../src/constants/env';
 
 interface fileStore {
     file: File | null;
@@ -12,6 +13,7 @@ interface fileStore {
     removeFile: () => Promise<number>;
     getSummary: () => Promise<void>;
     uploadFile: (file: File | null, url: string) => Promise<void>;
+    reUploadFile: (file: File | null, url: string) => Promise<void>;
 }
 
 const useFileStore = create<fileStore>((set) => ({
@@ -25,21 +27,18 @@ const useFileStore = create<fileStore>((set) => ({
         const accessToken = useAuthStore.getState().accessToken;
         const userEmail = useUserStore.getState().email;
         const fileName = userEmail.split('@')[0];
-        const res = await axios.delete(
-            `https://be.goodjob.ai.kr/cv/delete-cv?fileName=${fileName}_${userId}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                withCredentials: true,
-            }
-        );
+        const res = await axios.delete(`${SERVER_IP}/cv/delete-cv?fileName=${fileName}_${userId}`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+        });
         return res.status;
     },
     getSummary: async () => {
         try {
             const accessToken = useAuthStore.getState().accessToken;
-            const res = await axios.get('https://be.goodjob.ai.kr/cv/summary-cv', {
+            const res = await axios.get(`${SERVER_IP}/cv/summary-cv`, {
                 headers: { Authorization: `Bearer ${accessToken}` },
                 withCredentials: true,
             });
@@ -71,7 +70,7 @@ const useFileStore = create<fileStore>((set) => ({
                 console.time('⏱️ confirm-upload');
                 // confirm 후에 로딩해야함
                 const confirm = await axios.post(
-                    `https://be.goodjob.ai.kr/s3/confirm-upload?fileName=${fileName}_${userId}`,
+                    `${SERVER_IP}/s3/confirm-upload?fileName=${fileName}_${userId}`,
                     null,
                     {
                         headers: {
@@ -81,6 +80,44 @@ const useFileStore = create<fileStore>((set) => ({
                     }
                 );
                 console.timeEnd('⏱️ confirm-upload');
+                console.log(confirm);
+            }
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    },
+    reUploadFile: async (file: File | null, url: string) => {
+        if (!file) {
+            console.log('파일이 비어있습니다');
+            return;
+        }
+        try {
+            console.time('⏱️ Upload to S3');
+            const res = await axios.put(url, file, {
+                // S3에 파일 업로드
+                headers: { 'Content-Type': file.type },
+            });
+            console.timeEnd('⏱️ Upload to S3');
+            if (res.status === 200) {
+                const accessToken = useAuthStore.getState().accessToken;
+                const userEmail = useUserStore.getState().email;
+                const userId = useUserStore.getState().id;
+                const fileName = userEmail.split('@')[0];
+
+                console.time('⏱️ confirm-re-upload');
+                // confirm 후에 로딩해야함
+                const confirm = await axios.post(
+                    `${SERVER_IP}/s3/confirm-re-upload?fileName=${fileName}_${userId}`,
+                    null,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        withCredentials: true,
+                    }
+                );
+                console.timeEnd('⏱️ confirm-re-upload');
                 console.log(confirm);
             }
         } catch (error) {

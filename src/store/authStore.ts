@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { SERVER_IP } from '../../src/constants/env';
 
 interface AuthStore {
     accessToken: string | null;
@@ -24,18 +25,21 @@ const useAuthStore = create<AuthStore>()(
             // 수정 필요
             fetchAuthData: async () => {},
             setLogout: async (accessToken) => {
-                const res = await axios.post('https://be.goodjob.ai.kr/auth/logout', {
+                const res = await axios.post(`${SERVER_IP}/auth/logout`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                     withCredentials: true,
                 });
                 if (res.status === 200) {
                     set({ accessToken: null, isLoggedIn: false });
+                    localStorage.removeItem('admin-storage');
+                    localStorage.removeItem('user-storage');
                     localStorage.removeItem('page-storage');
+                    localStorage.removeItem('user-token');
                 }
             },
             withdraw: async (accessToken) => {
                 try {
-                    const res = await axios.delete('https://be.goodjob.ai.kr/auth/withdraw', {
+                    const res = await axios.delete(`${SERVER_IP}/auth/withdraw`, {
                         headers: { Authorization: `Bearer ${accessToken}` },
                         withCredentials: true,
                     });
@@ -44,6 +48,7 @@ const useAuthStore = create<AuthStore>()(
                         console.log('탈퇴완료');
                         localStorage.removeItem('user-token');
                         localStorage.removeItem('user-storage');
+                        localStorage.removeItem('admin-storage');
                         localStorage.removeItem('search-history');
                         localStorage.removeItem('page-storage');
                     }

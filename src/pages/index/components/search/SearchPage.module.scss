@@ -10,13 +10,16 @@
 }
 
 .header {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 
     &__title {
         display: flex;
         align-items: center;
         font-size: 1.5rem;
-        font-weight: 600;
+        font-weight: 500;
         color: #333;
         margin: 0 0 0.5rem;
     }

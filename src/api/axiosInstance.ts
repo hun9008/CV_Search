@@ -1,8 +1,9 @@
 import axios from 'axios';
 import useAuthStore from '../store/authStore';
+import { SERVER_IP } from '../../src/constants/env';
 
 const axiosInstance = axios.create({
-    baseURL: 'https://be.goodjob.ai.kr',
+    baseURL: `${SERVER_IP}`,
     withCredentials: true, // 쿠키로 refreshToken 전달
 });
 

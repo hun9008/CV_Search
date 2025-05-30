@@ -4,6 +4,8 @@ import { UploadCloud, FileText, X, Check, AlertCircle } from 'lucide-react';
 import useFileStore from '../../store/fileStore';
 import useS3Store from '../../store/s3Store';
 import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../../store/authStore';
+import useUserStore from '../../store/userStore';
 
 function CVUpload() {
     const [isDragging, setIsDragging] = useState(false);
@@ -12,12 +14,13 @@ function CVUpload() {
     const [uploadSuccess, setUploadSuccess] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { setFile, uploadFile } = useFileStore();
+    const { fetchUserData } = useUserStore();
     const file = useFileStore((state) => state.file);
     const { getUploadPresignedURL } = useS3Store();
     const navigate = useNavigate();
 
     const handleContinue = () => {
-        navigate('/main');
+        navigate('/main/recommend');
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,6 +29,14 @@ function CVUpload() {
     };
 
     const validateAndSetFile = async (selectedFile?: File) => {
+        try {
+            const accessToken = useAuthStore.getState().accessToken;
+            await fetchUserData(accessToken);
+        } catch (error) {
+            console.log('회원 검증 중 에러 발생: ', error);
+            setError('회원 가입 후 자신의 CV에 맞는 공고를 추천 받아 보세요');
+            return;
+        }
         setError(null);
         if (!selectedFile) return;
 
@@ -46,7 +57,7 @@ function CVUpload() {
         try {
             const presignedURL = await getUploadPresignedURL();
             if (typeof presignedURL === 'string' && presignedURL) {
-                fileUpload(selectedFile, presignedURL);
+                await fileUpload(selectedFile, presignedURL);
             } else {
                 setError('업로드 URL을 받아오는 데 실패했습니다.');
             }
@@ -55,7 +66,7 @@ function CVUpload() {
         }
     };
 
-    const fileUpload = (selectedFile: File, presignedURL: string) => {
+    const fileUpload = async (selectedFile: File, presignedURL: string) => {
         setIsUploading(true);
         setUploadSuccess(false);
 
@@ -64,7 +75,7 @@ function CVUpload() {
         setTimeout(() => {
             setIsUploading(false);
             setUploadSuccess(true);
-        }, 2500);
+        }, 10000);
     };
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {

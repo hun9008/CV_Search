@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import type application from '../../../../../types/application';
+import type application from '../../../../types/application';
 import style from './styles/ManageItem.module.scss';
 import { Trash, Check, X, MoreHorizontal } from 'lucide-react';
 

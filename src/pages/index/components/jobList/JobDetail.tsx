@@ -6,53 +6,54 @@ import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
 import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
 import useBookmarkStore from '../../../../store/bookmarkStore';
+import { useNavigate } from 'react-router-dom';
 
 function JobDetail() {
-    const { getSelectedJob, getFeedback } = useJobStore();
+    const { getSelectedJobDetail, getFeedback } = useJobStore();
     const applications = useApplyStore((state) => state.applications);
     const { setApplications, deleteApplications, getApplications } = useApplyStore();
-    const selectedJob = useJobStore((state) => state.selectedJob);
+    const selectedJobDetail = useJobStore((state) => state.selectedJobDetail);
     const feedbackText = useJobStore((state) => state.feedback);
-    const job = useJobStore((state) => state.getSelectedJob());
+    const job = useJobStore((state) => state.selectedJobDetail);
     const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(job?.isBookmarked || false);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     const [isManaging, setIsManaging] = useState(false);
     // const [showManageModal, setShowManageModal] = useState(false);
     const [manageButtonClicked, setManageButtonClicked] = useState(false);
-
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const initializeApplications = async () => {
             await getApplications();
         };
-        getSelectedJob();
+        getSelectedJobDetail();
         initializeApplications();
-    }, [selectedJob]);
+    }, [selectedJobDetail]);
 
+    /** 유저가 관리 버튼 클릭 */
     useEffect(() => {
-        if (selectedJob && applications) {
-            const isCurrentJobManaged = applications.some((app) => app.jobId === selectedJob);
+        if (selectedJobDetail && applications) {
+            const isCurrentJobManaged = applications.some(
+                (app) => app.jobId === selectedJobDetail.id
+            );
             setIsManaging(isCurrentJobManaged);
             console.log(isCurrentJobManaged);
         }
-    }, [applications, selectedJob]);
+    }, [applications, selectedJobDetail]);
 
+    /** 유저가 북마크 버튼 클릭 */
     useEffect(() => {
-        // bookmarkedList가 변경될 때마다 현재 선택된 작업의 북마크 상태 업데이트
-        if (bookmarkedList && selectedJob) {
+        if (bookmarkedList && selectedJobDetail) {
             const isCurrentJobBookmarked = bookmarkedList.some(
-                (bookmark) => bookmark.id === selectedJob
+                (bookmark) => bookmark.id === selectedJobDetail.id
             );
             setIsBookmarked(isCurrentJobBookmarked);
         }
-    }, [bookmarkedList, selectedJob]);
-
-    if (!job) {
-        return <JobDetailSkeleton />;
-    }
+    }, [bookmarkedList, selectedJobDetail]);
 
     const handleApply = () => {
         window.open(`${job?.url}`, '_blank');
@@ -62,8 +63,8 @@ function JobDetail() {
         if (navigator.share) {
             navigator
                 .share({
-                    title: job.title,
-                    text: `${job.companyName}의 ${job.title} 채용공고`,
+                    title: job?.title,
+                    text: `${job?.companyName}의 ${job?.title} 채용공고`,
                     url: window.location.href,
                 })
                 .catch((err) => {
@@ -80,6 +81,10 @@ function JobDetail() {
                     console.log('클립보드 복사 실패:', err);
                 });
         }
+    };
+    const handleUploadCV = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        navigate('/upload');
     };
 
     const handleFeedback = async (jobId: number) => {
@@ -149,6 +154,11 @@ function JobDetail() {
         }
     };
 
+    /** 로딩 시 스켈레톤 UI 출력 */
+    if (!job) {
+        return <JobDetailSkeleton />;
+    }
+
     return (
         <div className={style.container}>
             <div className={style.header}>
@@ -167,7 +177,9 @@ function JobDetail() {
                         className={`${style.header__actionButton} ${
                             isBookmarked ? style.active : ''
                         }`}
-                        onClick={() => toggleBookmark(selectedJob)}
+                        onClick={() =>
+                            selectedJobDetail?.id && toggleBookmark(selectedJobDetail.id)
+                        }
                         aria-label={isBookmarked ? '북마크 해제' : '북마크 추가'}>
                         <Bookmark size={20} />
                     </button>
@@ -212,8 +224,20 @@ function JobDetail() {
                 {job.score && (
                     <div className={style.scoreContainer}>
                         <div className={style.score}>
-                            <span className={style.score__label}>매칭 점수</span>
-                            <span className={style.score__value}>{job.score.toFixed(2)}</span>
+                            {job.score?.toFixed(0) === '0' ? (
+                                <button
+                                    className={style.jobCard__score__isZero}
+                                    onClick={handleUploadCV}>
+                                    CV 등록하여 점수 확인하기
+                                </button>
+                            ) : (
+                                <>
+                                    <span className={style.score__label}>매칭 점수</span>
+                                    <span className={style.score__value}>
+                                        {job.score.toFixed(2)}
+                                    </span>
+                                </>
+                            )}
                         </div>
                     </div>
                 )}
@@ -233,7 +257,7 @@ function JobDetail() {
                     className={`${style.actionButtons__manage} ${
                         manageButtonClicked ? '' : style.clicked
                     }`}
-                    onClick={() => handleManagement(selectedJob)}>
+                    onClick={() => selectedJobDetail && handleManagement(selectedJobDetail.id)}>
                     {isManaging ? '관리중' : '관리 시작'}
                 </button>
             </div>

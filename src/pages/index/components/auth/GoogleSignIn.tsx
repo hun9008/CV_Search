@@ -1,11 +1,12 @@
 import style from './styles/GoogleSignIn.module.scss';
+import { SERVER_IP } from '../../../../constants/env';
 
 function SignIn() {
     const handleGoogleLogin = () => {
-        // const redirectUri = 'https://www.goodjob.ai.kr/auth/callback';
-        const redirectUri = 'https://localhost:5173/auth/callback';
+        const redirectUri = `${SERVER_IP}/auth/callback`;
+        // const redirectUri = 'https://localhost:5173/auth/callback';
         const state = btoa(redirectUri);
-        window.location.href = `https://be.goodjob.ai.kr/oauth2/authorization/google?state=${state}`;
+        window.location.href = `${SERVER_IP}/oauth2/authorization/google?state=${state}`;
     };
 
     return (

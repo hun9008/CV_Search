@@ -1,5 +1,5 @@
 import styles from './styles/FeedbackDialog.module.scss';
-import { parseMarkdown } from '../../utils/markdown';
+import { parseMarkdown } from '../../../../utils/markdown';
 import { X } from 'lucide-react';
 import { useRef, useEffect } from 'react';
 

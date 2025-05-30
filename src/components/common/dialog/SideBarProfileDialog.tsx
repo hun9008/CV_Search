@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import style from './styles/SideBarProfileDialog.module.scss';
-import { User, UserCircle, Settings, HelpCircle, LogOut, ChevronRight } from 'lucide-react';
+import { User, UserCircle, LogOut, ChevronRight } from 'lucide-react';
 import useAuthStore from '../../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import AccountDialog from './AccountDialog';
@@ -76,7 +76,7 @@ function SideBarProfileDialog() {
                             계정
                             <ChevronRight size={16} className={style.menuArrow} />
                         </li>
-                        <li>
+                        {/* <li>
                             <Settings size={18} className={style.menuIcon} />
                             설정
                             <ChevronRight size={16} className={style.menuArrow} />
@@ -85,7 +85,7 @@ function SideBarProfileDialog() {
                             <HelpCircle size={18} className={style.menuIcon} />
                             도움말
                             <ChevronRight size={16} className={style.menuArrow} />
-                        </li>
+                        </li> */}
                     </ul>
 
                     <span className={style.divider}></span>

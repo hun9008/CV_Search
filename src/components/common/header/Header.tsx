@@ -31,31 +31,6 @@ function Header() {
         setMobileMenuOpen(!mobileMenuOpen);
     };
 
-    // const debouncedSearch = useCallback(
-    //     debounce(async (query: string) => {
-    //         if (!query) return;
-    //         setIsSearching(true);
-
-    //         try {
-    //             const response = await axios.get(
-    //                 `https://be.goodjob.ai.kr/jobs/search?keyword=${query}&page=0&size=8&sort=string`,
-    //                 {
-    //                     headers: { Authorization: `Bearer ${accessToken}` },
-    //                     withCredentials: true,
-    //                 }
-    //             );
-    //             setSearchResults(response.data.content.slice(0, 8));
-    //         } catch (error) {
-    //             console.log(`검색 오류: ${error}`);
-    //         } finally {
-    //             setIsSearching(false);
-    //         }
-    //     }, 500),
-    //     [accessToken]
-    // );
-
-    //테스트용
-
     return (
         <header className={style.header}>
             <div className={style.header__container}>

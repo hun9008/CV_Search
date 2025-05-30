@@ -4,19 +4,53 @@ import SearchCard from './SearchCard';
 import useSearchStore from '../../../../store/searchStore';
 import { BookmarkIcon } from 'lucide-react';
 import React from 'react';
+import useBookmarkStore from '../../../../store/bookmarkStore';
 
 function SearchPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { getSearchList } = useSearchStore();
     const searchList = useSearchStore((state) => state.searchList);
     const query = useSearchStore((state) => state.query);
-    // 페이지네이션
+    const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
+    /** 북마크 */
+    const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
+    /** 페이지네이션 */
     const jobListRef = useRef<HTMLDivElement>(null);
     const { goToNextPage, goToPrevPage, setCurrentPage } = useSearchStore();
     const currentPage = useSearchStore((state) => state.currentPage);
     const calculatedTotalPages = useSearchStore((state) => state.totalPage);
 
-    const toggleBookmark = (jobId: number) => {};
+    const toggleBookmark = async (jobId: number) => {
+        const currentBookmarks = bookmarkedList || [];
+        const isBookmarked = currentBookmarks.some((job) => job.id === jobId);
+
+        try {
+            // 낙관적 업데이트: searchList를 직접 업데이트
+            useSearchStore.setState((state) => ({
+                searchList: state.searchList.map((job) =>
+                    job.id === jobId ? { ...job, isBookmarked: !isBookmarked } : job
+                ),
+            }));
+
+            // 서버에 북마크 상태 변경 요청
+            if (isBookmarked) {
+                await removeBookmark(jobId);
+            } else {
+                await addBookmark(jobId);
+            }
+
+            // 북마크 목록 갱신
+            await getBookmark();
+        } catch (error) {
+            console.error('북마크 토글 중 오류 발생:', error);
+            // 실패 시 원래 상태로 복구
+            useSearchStore.setState((state) => ({
+                searchList: state.searchList.map((job) =>
+                    job.id === jobId ? { ...job, isBookmarked: isBookmarked } : job
+                ),
+            }));
+        }
+    };
 
     const handlePageChange = (pageNum: number) => {
         setCurrentPage(pageNum);
@@ -41,7 +75,8 @@ function SearchPage() {
     return (
         <div className={style.container} ref={jobListRef}>
             <div className={style.header}>
-                <h2 className={style.header__title}>{query}에 대한 검색 결과</h2>
+                <h2 className={style.header__title}>"{query}"</h2>
+                <p className={style.header__subtitle}> 에 대한 검색 결과</p>
             </div>
             {isLoading ? (
                 <div className={style.loading}>
@@ -56,7 +91,7 @@ function SearchPage() {
                                 key={job.id}
                                 job={{
                                     ...job,
-                                    isBookmarked: true,
+                                    isBookmarked: !!bookmarkedList?.some((b) => b.id === job.id),
                                 }}
                                 isSelected={false}
                                 onToggleBookmark={() => toggleBookmark(job.id)}

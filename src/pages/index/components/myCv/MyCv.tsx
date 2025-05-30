@@ -10,11 +10,11 @@ import useS3Store from '../../../../store/s3Store';
 import Loading from '../../../../components/common/loading/Loading';
 import ErrorFallback from '../../../../components/common/error/ErrorFallback';
 import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
-import { parseMarkdown } from '../../utils/markdown';
+import { parseMarkdown } from '../../../../utils/markdown';
 import useActionStore from '../../../../store/actionStore';
 
 function MyCv() {
-    const { uploadFile, getSummary, setHasFile } = useFileStore();
+    const { reUploadFile, getSummary, setHasFile } = useFileStore();
     const { getUploadPresignedURL } = useS3Store();
     const { setCVAction } = useActionStore();
     const [error, setError] = useState<string | null>(null);
@@ -65,7 +65,7 @@ function MyCv() {
 
             if (typeof presignedURL === 'string' && presignedURL) {
                 console.time('⏱️ uploadFile');
-                await uploadFile(selectedFile, presignedURL);
+                await reUploadFile(selectedFile, presignedURL);
                 console.timeEnd('⏱️ uploadFile');
             } else {
                 setError('업로드 URL을 받아오는 데 실패했습니다.');

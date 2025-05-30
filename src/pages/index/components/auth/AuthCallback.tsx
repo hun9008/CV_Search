@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../../../store/authStore';
 import useUserStore from '../../../../store/userStore';
+import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
+import { SERVER_IP } from '../../../../constants/env';
 
 function AuthCallback() {
     const navigate = useNavigate();
@@ -11,10 +13,10 @@ function AuthCallback() {
 
     useEffect(() => {
         axios
-            .get('https://be.goodjob.ai.kr/auth/callback-endpoint', {
+            .get(`${SERVER_IP}/auth/callback-endpoint`, {
                 withCredentials: true,
             })
-            .then((res) => {
+            .then(async (res) => {
                 console.log(res.data);
                 const { accessToken, firstLogin } = res.data;
 
@@ -23,26 +25,31 @@ function AuthCallback() {
                     navigate('/signIn');
                     return;
                 }
-                console.log('AuthCallback');
 
-                setTokens(accessToken); // 토큰 저장
-                setIsLoggedIn(true); // 로그인 처리
-                fetchUserData(accessToken); // 유저 데이터 불러오기
+                setTokens(accessToken);
+                setIsLoggedIn(true);
+                const isAdmin = await fetchUserData(accessToken);
+
+                if (isAdmin) {
+                    navigate('/main/admin/dashboard', { replace: true });
+                    return;
+                }
 
                 if (firstLogin) {
                     navigate('/upload', { replace: true });
+                    return;
                 } else {
-                    // navigate('/main', { replace: true });
-                    navigate('/main', { replace: true });
+                    navigate('/main/recommend', { replace: true });
+                    return;
                 }
             })
             .catch((err) => {
                 console.error('콜백 처리 중 오류', err);
-                navigate('/signIn');
+                navigate('/signIn', { replace: true });
             });
     }, [navigate, setTokens]);
 
-    return <div>로그인 처리 중입니다...</div>; // pending UI 만들기
+    return <LoadingSpinner />;
 }
 
 export default AuthCallback;

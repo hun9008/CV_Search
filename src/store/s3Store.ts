@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 import useUserStore from './userStore';
+import { SERVER_IP } from '../../src/constants/env';
 
 interface s3Store {
     url: string;
@@ -18,7 +19,7 @@ const useS3Store = create<s3Store>((set) => ({
             console.log(fileName);
             console.log(userId);
             const res = await axios.get(
-                `https://be.goodjob.ai.kr/s3/presigned-url/upload?fileName=${fileName}_${userId}`
+                `${SERVER_IP}/s3/presigned-url/upload?fileName=${fileName}_${userId}`
             );
             const url = res.data;
             set({ url });
@@ -34,7 +35,7 @@ const useS3Store = create<s3Store>((set) => ({
             const fileName = userEmail.split('@')[0];
             console.log(fileName);
             const res = await axios.get(
-                `https://be.goodjob.ai.kr/s3/presigned-url/download?fileName=${fileName}_${userId}`
+                `${SERVER_IP}/s3/presigned-url/download?fileName=${fileName}_${userId}`
             );
             const url = res.data;
             set({ url });

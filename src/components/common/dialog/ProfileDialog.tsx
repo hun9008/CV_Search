@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import style from './styles/ProfileDialog.module.scss';
-import { User, UserCircle, Settings, HelpCircle, Crown, LogOut, ChevronRight } from 'lucide-react';
+import { User, UserCircle, Crown, LogOut, ChevronRight } from 'lucide-react';
 import useAuthStore from '../../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import AccountDialog from './AccountDialog';
@@ -81,7 +81,7 @@ function ProfileDialog() {
                             계정
                             <ChevronRight size={16} className={style.menuArrow} />
                         </li>
-                        <li>
+                        {/* <li>
                             <Settings size={18} className={style.menuIcon} />
                             설정
                             <ChevronRight size={16} className={style.menuArrow} />
@@ -90,8 +90,9 @@ function ProfileDialog() {
                             <HelpCircle size={18} className={style.menuIcon} />
                             도움말
                             <ChevronRight size={16} className={style.menuArrow} />
-                        </li>
+                        </li> */}
                     </ul>
+
                     <span className={style.divider}></span>
                     <div className={style.plan}>
                         <div className={style.plan__textContainer}>
@@ -103,6 +104,7 @@ function ProfileDialog() {
                         </div>
                         <button className={style.plan__upgrade}>업그레이드</button>
                     </div>
+
                     <span className={style.divider}></span>
                     <div className={style.logout} onClick={handleLogout}>
                         <LogOut size={18} className={style.logoutIcon} />
