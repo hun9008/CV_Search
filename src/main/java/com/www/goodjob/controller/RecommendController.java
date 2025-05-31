@@ -28,7 +28,7 @@ public class RecommendController {
     @PostMapping("/topk-list")
     @Operation(
             summary = "추천 리스트 조회",
-            description = "유저의 ID를 기반된으로 Redis에 캐시 데이터 중 상위 topK개의 추천 직무 리스트를 반환합니다." +
+            description = "[CV ID 필요] 유저의 ID를 기반된으로 Redis에 캐시 데이터 중 상위 topK개의 추천 직무 리스트를 반환합니다." +
                     "Redis에 캐시된 데이터가 없다면 FastAPI의 결과를 반환하며, 백그라운드로(Async) 캐시 작업을 시작합니다."
     )
     public ResponseEntity<List<ScoredJobDto>> recommendTopK(
@@ -65,13 +65,13 @@ public class RecommendController {
     @Operation(
             summary = "추천 공고에 대한 이력서 피드백 생성 또는 조회",
             description = """
+            [CV ID 필요] 
             특정 추천 항목(recommendScoreId)에 대한 이력서 피드백을 생성하거나,
             이미 생성된 피드백이 있으면 그대로 반환함
             - Claude AI 기반으로 자동 생성됨
             - 이미 피드백이 있다면 새로 생성하지 않고 그대로 반환함
             """
     )
-
     // 피드백 생성 or 조회
     @PostMapping("/feedback")
     public ResponseEntity<String> generateFeedback(
