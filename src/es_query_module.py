@@ -9,7 +9,7 @@ import matplotlib.patches as patches
 
 from collections import defaultdict
 
-from src.fetch_RDB_query import fetch_cv_data, fetch_job_data_dict
+from src.fetch_RDB_query import fetch_job_data_dict
 
 import os
 
@@ -55,7 +55,10 @@ es = Elasticsearch(
     headers={
         "Accept": "application/json",
         "Content-Type": "application/json"
-    }
+    },
+    timeout=30,  
+    max_retries=3,
+    retry_on_timeout=True
 )
 
 print(es.info())
@@ -184,7 +187,7 @@ async def search_combined_jobs(cv_vector, cv_text, top_k, cosine_weight=0.5, bm2
 
     return result
 
-async def recommandation(u_id, top_k=10):
+async def recommandation(cv_id, top_k=10):
     start = time.time()
 
     # [1] Elasticsearch에서 CV 벡터 및 텍스트 가져오기
@@ -192,7 +195,7 @@ async def recommandation(u_id, top_k=10):
     query = {
         "query": {
             "match": {
-                "u_id": u_id
+                "cv_id": cv_id
             }
         }
     }
@@ -200,7 +203,7 @@ async def recommandation(u_id, top_k=10):
     response = es.search(index=CV_INDEX_NAME, body=query)
 
     if not response["hits"]["hits"]:
-        logger.debug("[Recommend] No CV found for user_id=%s", u_id)
+        logger.debug("[Recommend] No CV found for user_id=%s", cv_id)
         return []
 
     cv_vector = response["hits"]["hits"][0]["_source"]["vector"]

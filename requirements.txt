@@ -96,3 +96,9 @@ xxhash
 yarl
 httpx
 prometheus_client
+google-api-core
+google-auth
+google-cloud-vision
+googleapis-common-protos
+grpcio
+grpcio-status

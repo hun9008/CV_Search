@@ -50,10 +50,10 @@ async def delete_job_endpoint(job_id: int):
     summary="Delete a specific CV document from Elasticsearch",
     description="하나의 CV data를 ES에서 삭제합니다.",
 )
-async def delete_cv_endpoint(user_id: int):
+async def delete_cv_endpoint(cv_id: int):
     try:
-        delete_cv(user_id)
-        return {"message": f"CV for user {user_id} deleted from Elasticsearch."}
+        delete_cv(cv_id)
+        return {"message": f"CV for {cv_id} deleted from Elasticsearch."}
     except Exception as e:
         return {"error": str(e)}
     return {"message": "CV deletion failed."}

@@ -12,6 +12,12 @@ from src.fetch_RDB_query import fetch_job_data, fetch_cv_save_data
 from collections import defaultdict
 
 import os
+import requests
+import base64
+from google.oauth2 import service_account
+from google.auth.transport.requests import Request
+from pdf2image import convert_from_path
+import io
 
 import boto3
 
@@ -55,7 +61,10 @@ es = Elasticsearch(
     headers={
         "Accept": "application/json",
         "Content-Type": "application/json"
-    }
+    },
+    timeout=30,  
+    max_retries=3,
+    retry_on_timeout=True
 )
 
 print(es.info())
@@ -311,8 +320,60 @@ def encode_long_text(text):
     avg_vector = np.mean(sentence_vectors, axis=0)  
     return avg_vector.tolist()
 
+def google_ocr() -> str:
+    local_pdf_path = "/tmp/temp_cv.pdf"
+    try:
+        # PDF → 모든 페이지 이미지 변환
+        images = convert_from_path(local_pdf_path, dpi=300)
 
-def es_save_cv(s3_url, u_id):
+        key_path = "./capstone-461411-6906e44fef88.json"
+        scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+        credentials = service_account.Credentials.from_service_account_file(
+            key_path,
+            scopes=scopes
+        )
+        credentials.refresh(Request())
+        access_token = credentials.token
+
+        endpoint = "https://vision.googleapis.com/v1/images:annotate"
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+
+        all_text = ""
+
+        for i, image in enumerate(images):
+            buf = io.BytesIO()
+            image.save(buf, format='PNG')
+            encoded_image = base64.b64encode(buf.getvalue()).decode()
+
+            body = {
+                "requests": [
+                    {
+                        "image": {
+                            "content": encoded_image
+                        },
+                        "features": [
+                            {"type": "TEXT_DETECTION"}
+                        ]
+                    }
+                ]
+            }
+
+            res = requests.post(endpoint, headers=headers, json=body)
+            result_json = res.json()
+
+            page_text = result_json["responses"][0].get("fullTextAnnotation", {}).get("text", "")
+            all_text += f"\n--- Page {i+1} ---\n{page_text}"
+
+        return all_text.strip()
+
+    except Exception as e:
+        print(f"[X] Google OCR 처리 중 오류 발생: {e}")
+        return ""
+
+def es_save_cv(s3_url, cv_id):
     try:
         if not es.indices.exists(index=CV_INDEX_NAME):
             es.indices.create(
@@ -323,7 +384,7 @@ def es_save_cv(s3_url, u_id):
                             "text": {"type": "text"},
                             "text_hash": {"type": "keyword"},
                             "vector": {"type": "dense_vector", "dims": 384},
-                            "u_id": {"type": "keyword"},
+                            "cv_id": {"type": "keyword"},
                             "created_at": {"type": "date"} 
                         }
                     }
@@ -332,8 +393,19 @@ def es_save_cv(s3_url, u_id):
 
         run_vila(s3_url)
 
-        with open("/tmp/temp_cv.txt", "r", encoding="utf-8") as f:
-            raw_text = f.read()
+        try:
+            with open("/tmp/temp_cv.txt", "r", encoding="utf-8") as f:
+                raw_text = f.read().strip()
+        except FileNotFoundError:
+            raw_text = ""
+
+        if not raw_text:
+            print("[!] run_vila 결과가 비어 있음 → google_ocr()로 대체 시도")
+            raw_text = google_ocr()
+
+        if not raw_text:
+            print("[X] OCR 실패: 빈 텍스트 → 저장 중단")
+            return
 
         vector = encode_long_text(raw_text)
         text_hash = hashlib.sha256(raw_text.encode('utf-8')).hexdigest()
@@ -342,28 +414,28 @@ def es_save_cv(s3_url, u_id):
             "text": raw_text,
             "text_hash": text_hash,
             "vector": vector,
-            "u_id": u_id,
+            "cv_id": cv_id,
             "created_at": datetime.now(KST).isoformat()
         }
 
         print(f"Document to be indexed: {doc}")
 
-        same_user_result = es.get(index=CV_INDEX_NAME, id=str(u_id), ignore=[404])
+        same_user_result = es.get(index=CV_INDEX_NAME, id=str(cv_id), ignore=[404])
 
         if same_user_result.get("found"):
             existing_hash = same_user_result["_source"].get("text_hash")
             if existing_hash == text_hash:
-                print(f"[SKIP] u_id={u_id} 동일한 text_hash 존재 → ES 저장 생략")
+                print(f"[SKIP] cv_id={cv_id} 동일한 text_hash 존재 → ES 저장 생략")
             else:
-                response = es.index(index=CV_INDEX_NAME, id=str(u_id), body=doc)
-                print(f"[UPDATE] u_id={u_id} CV Updated in ES. Document ID: {response['_id']}")
+                response = es.index(index=CV_INDEX_NAME, id=str(cv_id), body=doc)
+                print(f"[UPDATE] cv_id={cv_id} CV Updated in ES. Document ID: {response['_id']}")
         else:
-            response = es.index(index=CV_INDEX_NAME, id=str(u_id), body=doc)
-            print(f"[NEW] u_id={u_id} CV Saved in ES. Document ID: {response['_id']}")
+            response = es.index(index=CV_INDEX_NAME, id=str(cv_id), body=doc)
+            print(f"[NEW] cv_id={cv_id} CV Saved in ES. Document ID: {response['_id']}")
 
         try:
-            fetch_cv_save_data(s3_url, u_id, raw_text)
-            print(f"[✓] CV RDB 저장 완료: user_id={u_id}")
+            fetch_cv_save_data(s3_url, cv_id, raw_text)
+            print(f"[✓] CV RDB 저장 완료: user_id={cv_id}")
         except mysql.connector.Error as err:
             print(f"[X] MySQL 오류: {err}")
         except Exception as e:
@@ -376,6 +448,87 @@ def es_save_cv(s3_url, u_id):
                 print(f"[✓] 임시 파일 삭제 완료: {temp_path}")
             except FileNotFoundError:
                 print(f"[!] 삭제할 파일이 없습니다: {temp_path}")
+            except Exception as e:
+                print(f"[X] 임시 파일 삭제 실패: {temp_path}, 오류: {e}")
+
+
+def extract_raw_text_from_pdf(s3_url: str) -> str:
+    local_pdf_path = "/tmp/temp_cv.pdf"
+    local_txt_path = "/tmp/temp_cv.txt"
+
+    try:
+        # 기존 방식: run_vila를 이용한 텍스트 추출
+        run_vila(s3_url)
+
+        with open(local_txt_path, "r", encoding="utf-8") as f:
+            raw_text = f.read().strip()
+            if raw_text:
+                return raw_text
+            else:
+                print("[!] run_vila 결과가 비어 있음. Google Vision API로 대체 시도")
+
+    except Exception as e:
+        print(f"[X] run_vila 처리 중 예외 발생: {e}")
+
+    try:
+        # PDF → 모든 페이지 이미지로 변환
+        images = convert_from_path(local_pdf_path, dpi=300)
+
+        key_path = "./capstone-461411-6906e44fef88.json"
+        scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+        credentials = service_account.Credentials.from_service_account_file(
+            key_path,
+            scopes=scopes
+        )
+        credentials.refresh(Request())
+        access_token = credentials.token
+
+        endpoint = "https://vision.googleapis.com/v1/images:annotate"
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+
+        all_text = ""
+
+        for i, image in enumerate(images):
+            # 이미지 → base64 인코딩
+            buf = io.BytesIO()
+            image.save(buf, format='PNG')
+            encoded_image = base64.b64encode(buf.getvalue()).decode()
+
+            body = {
+                "requests": [
+                    {
+                        "image": {
+                            "content": encoded_image
+                        },
+                        "features": [
+                            {"type": "TEXT_DETECTION"}
+                        ]
+                    }
+                ]
+            }
+
+            res = requests.post(endpoint, headers=headers, json=body)
+            result_json = res.json()
+
+            page_text = result_json["responses"][0].get("fullTextAnnotation", {}).get("text", "")
+            all_text += f"\n--- Page {i+1} ---\n" + page_text
+
+        return all_text.strip()
+
+    except Exception as e:
+        print(f"[X] Google OCR 처리 중 오류 발생: {e}")
+        return ""
+
+    finally:
+        for temp_path in [local_pdf_path, local_txt_path]:
+            try:
+                os.remove(temp_path)
+                print(f"[✓] 임시 파일 삭제 완료: {temp_path}")
+            except FileNotFoundError:
+                pass
             except Exception as e:
                 print(f"[X] 임시 파일 삭제 실패: {temp_path}, 오류: {e}")
 

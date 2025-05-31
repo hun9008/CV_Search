@@ -10,7 +10,7 @@ router = APIRouter()
 async def recommend_jobs(body: RecommendationRequest = Body(...)):
     start_time = time.time()
     try:
-        results = await recommandation(body.u_id, body.top_k)
+        results = await recommandation(body.cv_id, body.top_k)
         if not results:
             raise HTTPException(status_code=404, detail="No CV data found for this user.")
         

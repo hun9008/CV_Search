@@ -135,7 +135,7 @@ def fetch_cv_data(user_id):
         if 'conn' in locals():
             conn.close()
 
-def fetch_cv_save_data(s3_url, user_id, raw_text):
+def fetch_cv_save_data(s3_url, cv_id, raw_text):
     db_config = {
         "host": RDB_HOST,
         "port": 3306,
@@ -152,19 +152,19 @@ def fetch_cv_save_data(s3_url, user_id, raw_text):
         UPDATE cv
         SET raw_text = %s,
             last_updated = %s
-        WHERE user_id = %s
+        WHERE id = %s
         """
 
         now = datetime.now()
-        values = (raw_text, now, user_id)
+        values = (raw_text, now, cv_id)
 
         cursor.execute(query, values)
         conn.commit()
 
         if cursor.rowcount > 0:
-            print(f"[✓] CV 업데이트 완료: user_id={user_id}")
+            print(f"[✓] CV 업데이트 완료: cv_id={cv_id}")
         else:
-            print(f"[!] 업데이트된 행이 없습니다: user_id={user_id}")
+            print(f"[!] 업데이트된 행이 없습니다: cv_id={cv_id}")
 
     except mysql.connector.Error as err:
         print(f"[X] MySQL 오류: {err}")
