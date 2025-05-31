@@ -15,4 +15,5 @@ public interface CvRepository extends JpaRepository<Cv, Long> {
     boolean existsByUserIdAndFileName(Long userId, String fileName);
     Optional<Cv> findByUserIdAndFileName(Long userId, String fileName);
 
+    void deleteAllByUser(User user);
 }

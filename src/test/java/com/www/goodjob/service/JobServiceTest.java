@@ -7,7 +7,7 @@ import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.RegionGroupDto;
 import com.www.goodjob.repository.JobRegionRepository;
 import com.www.goodjob.repository.JobRepository;
-import com.www.goodjob.repository.JobValidTypeRepository;
+// import com.www.goodjob.repository.JobValidTypeRepository;
 import com.www.goodjob.repository.RegionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,11 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -49,8 +46,8 @@ class JobServiceTest {
     @Mock
     private RegionRepository regionRepository;
 
-    @Mock
-    private JobValidTypeRepository jobValidTypeRepository;
+//    @Mock
+//    private JobValidTypeRepository jobValidTypeRepository;
 
     @Mock
     private JobRegionRepository jobRegionRepository;
@@ -86,7 +83,14 @@ class JobServiceTest {
         job.setJobRegions(List.of(jobRegion));
         job.setFavicon(new Favicon(null, "some-domain", "base64string"));
 
-        when(jobRepository.searchJobsWithRegion(eq(keyword), any())).thenReturn(List.of(job));
+        when(jobRepository.searchJobsWithFilters(
+                eq(keyword),
+                eq(jobTypes),
+                eq(List.of("신입", "경력", "경력무관")), // '경력무관' 확장
+                eq(sidoFilters),
+                eq(sigunguFilters),
+                eq(pageable)
+        )).thenReturn(new PageImpl<>(List.of(job)));
 
         // when
         Page<JobDto> result = jobService.searchJobs(
@@ -105,8 +109,14 @@ class JobServiceTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
 
         // keyword와 user가 null일 때, jobRepository에서 빈 리스트를 반환하도록 설정
-        when(jobRepository.searchJobsWithRegion(null, pageable.getSort()))
-                .thenReturn(List.of());
+        when(jobRepository.searchJobsWithFilters(
+                eq(null),              // keyword
+                eq(null),              // jobTypes
+                eq(null),              // experiences
+                eq(null),              // sidos
+                eq(null),              // sigungus
+                eq(pageable)
+        )).thenReturn(Page.empty());
 
         // when
         Page<JobDto> result = jobService.searchJobs(
