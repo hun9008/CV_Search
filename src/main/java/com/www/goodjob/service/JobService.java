@@ -41,70 +41,33 @@ public class JobService {
             searchLogService.saveSearchLog(keyword.trim(), user);
         }
 
-        Sort sort = pageable.getSort();
-        List<Job> allJobs = jobRepository.searchJobsWithRegion(keyword, sort);
+        // 경력무관 확장 처리
+        List<String> expandedExperienceFilters = experienceFilters == null ? null :
+                experienceFilters.stream()
+                        .flatMap(filter -> filter.equals("경력무관")
+                                ? Stream.of("경력무관", "신입", "경력")
+                                : Stream.of(filter))
+                        .distinct()
+                        .toList();
 
-        List<JobDto> filtered = allJobs.stream()
-                .filter(job -> {
-                    Set<String> expMatched = getMatchingExperienceCategories(job.getExperience());
-                    Set<String> typeMatched = getMatchingJobTypes(job.getJobType());
+        // 빈 리스트는 null로 변경 (IN 절에서 오류 방지)
+        List<String> safeJobTypes = (jobTypes == null || jobTypes.isEmpty()) ? null : jobTypes;
+        List<String> safeExperience = (expandedExperienceFilters == null || expandedExperienceFilters.isEmpty()) ? null : expandedExperienceFilters;
+        List<String> safeSido = (sidoFilters == null || sidoFilters.isEmpty()) ? null : sidoFilters;
+        List<String> safeSigungu = (sigunguFilters == null || sigunguFilters.isEmpty()) ? null : sigunguFilters;
 
-                    Set<String> normExpFilter = experienceFilters == null ? Set.of() :
-                            experienceFilters.stream()
-                                    .flatMap(filter -> {
-                                        if (filter.equals("경력무관")) {
-                                            return Stream.of("경력무관", "신입", "경력");
-                                        } else {
-                                            return Stream.of(filter);
-                                        }
-                                    })
-                                    .collect(Collectors.toSet());
+        Page<Job> jobPage = jobRepository.searchJobsWithFilters(
+                keyword,
+                safeJobTypes,
+                safeExperience,
+                safeSido,
+                safeSigungu,
+                pageable
+        );
 
-                    Set<String> normTypeFilter = jobTypes == null ? Set.of() :
-                            jobTypes.stream().map(String::trim).collect(Collectors.toSet());
-
-                    Set<String> normSido = sidoFilters == null ? Set.of() :
-                            sidoFilters.stream().map(String::trim).collect(Collectors.toSet());
-
-                    Set<String> normSigungu = sigunguFilters == null ? Set.of() :
-                            sigunguFilters.stream().map(String::trim).collect(Collectors.toSet());
-
-                    boolean experienceMatches = experienceFilters == null || experienceFilters.isEmpty()
-                            || !Collections.disjoint(expMatched, normExpFilter);
-
-                    boolean jobTypeMatches = jobTypes == null || jobTypes.isEmpty()
-                            || !Collections.disjoint(typeMatched, normTypeFilter);
-
-                    boolean regionMatches = (sidoFilters == null || sidoFilters.isEmpty())
-                            && (sigunguFilters == null || sigunguFilters.isEmpty())
-                            || job.getJobRegions().stream().anyMatch(jr -> {
-                        String s = jr.getRegion().getSido();
-                        String g = jr.getRegion().getSigungu();
-                        boolean sidoOk = normSido.isEmpty() || normSido.contains(s);
-                        boolean sigunguOk = normSigungu.isEmpty() || normSigungu.contains(g);
-                        return sidoOk && sigunguOk;
-                    });
-
-                    return experienceMatches && jobTypeMatches && regionMatches;
-                })
-                .map(JobDto::from)
-                .collect(Collectors.toList());
-
-        int total = filtered.size();
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), total);
-        List<JobDto> paged = start >= total ? List.of() : filtered.subList(start, end);
-
-        return new PageImpl<>(paged, pageable, total);
+        return jobPage.map(JobDto::from);
     }
 
-    public Set<String> getMatchingExperienceCategories(String rawText) {
-        return rawText == null ? Set.of() : Set.of(rawText.trim());
-    }
-
-    public Set<String> getMatchingJobTypes(String rawJobType) {
-        return rawJobType == null ? Set.of() : Set.of(rawJobType.trim());
-    }
 
     public List<String> getAvailableJobTypes() {
         return JobTypeCategory.asList();

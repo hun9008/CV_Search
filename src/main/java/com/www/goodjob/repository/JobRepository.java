@@ -16,21 +16,74 @@ import java.util.Optional;
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
 
-    @Query("SELECT DISTINCT j FROM Job j " +
-            "LEFT JOIN FETCH j.jobRegions jr " +
-            "LEFT JOIN FETCH jr.region r " +
-            "WHERE j.isPublic = true AND (" +
-            "(:keyword IS NULL OR " +
-            "LOWER(j.companyName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(j.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(j.department) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(j.experience) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(j.jobDescription) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(j.jobType) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(j.preferredQualifications) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(j.idealCandidate) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(j.requirements) LIKE LOWER(CONCAT('%', :keyword, '%'))))")
-    List<Job> searchJobsWithRegion(@Param("keyword") String keyword, Sort sort);
+    @Query(value = """
+    SELECT DISTINCT j FROM Job j
+    LEFT JOIN j.jobRegions jr
+    LEFT JOIN jr.region r
+    LEFT JOIN j.favicon f
+    WHERE j.isPublic = true
+    AND (
+        :keyword IS NULL OR
+        LOWER(j.companyName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.department) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.experience) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.jobDescription) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.jobType) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.preferredQualifications) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.idealCandidate) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.requirements) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    )
+    AND (:jobTypes IS NULL OR j.jobType IN :jobTypes)
+    AND (:experiences IS NULL OR j.experience IN :experiences)
+    AND (
+        (:sidos IS NULL AND :sigungus IS NULL)
+        OR EXISTS (
+            SELECT 1 FROM JobRegion jr2
+            WHERE jr2.job = j
+            AND (:sidos IS NULL OR jr2.region.sido IN :sidos)
+            AND (:sigungus IS NULL OR jr2.region.sigungu IN :sigungus)
+        )
+    )
+    """,
+            countQuery = """
+    SELECT COUNT(DISTINCT j.id) FROM Job j
+    LEFT JOIN j.jobRegions jr
+    LEFT JOIN jr.region r
+    WHERE j.isPublic = true
+    AND (
+        :keyword IS NULL OR
+        LOWER(j.companyName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.department) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.experience) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.jobDescription) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.jobType) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.preferredQualifications) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.idealCandidate) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+        LOWER(j.requirements) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    )
+    AND (:jobTypes IS NULL OR j.jobType IN :jobTypes)
+    AND (:experiences IS NULL OR j.experience IN :experiences)
+    AND (
+        (:sidos IS NULL AND :sigungus IS NULL)
+        OR EXISTS (
+            SELECT 1 FROM JobRegion jr2
+            WHERE jr2.job = j
+            AND (:sidos IS NULL OR jr2.region.sido IN :sidos)
+            AND (:sigungus IS NULL OR jr2.region.sigungu IN :sigungus)
+        )
+    )
+    """
+    )
+    Page<Job> searchJobsWithFilters(
+            @Param("keyword") String keyword,
+            @Param("jobTypes") List<String> jobTypes,
+            @Param("experiences") List<String> experiences,
+            @Param("sidos") List<String> sidos,
+            @Param("sigungus") List<String> sigungus,
+            Pageable pageable
+    );
 
     @Query("SELECT DISTINCT j FROM Job j " +
             "LEFT JOIN FETCH j.jobRegions jr " +
