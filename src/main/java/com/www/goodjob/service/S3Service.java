@@ -119,19 +119,21 @@ public class S3Service {
                 .rawText("Ready")
                 .uploadedAt(LocalDateTime.now())
                 .build();
-        cvRepository.save(newCv);
-        log.info("새로운 cv 저장 {}", userId);
+        Cv savedCv = cvRepository.save(newCv);
+        Long cvId = savedCv.getId();
+        log.info("새로운 cv 저장: userId={}, cvId={}", userId, cvId);
 
         try {
             String url = fastapiHost + "/save-es-cv";
             Map<String, Object> request = new HashMap<>();
+            request.put("cv_id", cvId);
             request.put("s3_url", fileUrl.toString());
-            request.put("u_id", userId);
 
             restTemplate.postForEntity(url, request, String.class);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("[FastAPI 호출 실패] " + e.getMessage());
+            return false;
         }
 
         return true;

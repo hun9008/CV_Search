@@ -53,7 +53,7 @@ public class AsyncService {
     private ObjectMapper objectMapper;
 
     @Async
-    public void cacheRecommendForUser(Long userId) {
+    public void cacheRecommendForUser(Long cvId) {
 
         long startTime = System.nanoTime();
         long responseTime = 0;
@@ -67,7 +67,7 @@ public class AsyncService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Map<String, Object> body = Map.of(
-                "u_id", userId,
+                "cv_id", cvId,
                 "top_k", totalJobCount
         );
 
@@ -79,9 +79,9 @@ public class AsyncService {
 
             responseTime = System.nanoTime();
             durationMs = (responseTime - startTime) / 1_000_000;
-            log.info("[Debug] 추천 리스트 응답 시간: {}ms (userId={})", durationMs, userId);
+            log.info("[Debug] 추천 리스트 응답 시간: {}ms (cvId={})", durationMs, cvId);
 
-            String zsetKey = "recommendation:" + userId;
+            String zsetKey = "recommendation:" + cvId;
 
             JsonNode root = objectMapper.readTree(responseBody);
             JsonNode recommendedJobsNode = root.get("recommended_jobs");
@@ -102,28 +102,26 @@ public class AsyncService {
             });
 
             redisTemplate.expire(zsetKey, Duration.ofHours(6));
-            log.info("[Debug] 추천 점수 전체 캐싱 완료: userId=" + userId);
+            log.info("[Debug] 추천 점수 전체 캐싱 완료: cvId=" + cvId);
 
         } catch (Exception e) {
-            log.error("[Debug] 추천 점수 캐싱 실패: userId=" + userId, e);
+            log.error("[Debug] 추천 점수 캐싱 실패: cvId=" + cvId, e);
         } finally {
             endTime = System.nanoTime();
             durationMs = (endTime - responseTime) / 1_000_000;
-            log.info("[Debug] 추천 캐싱 수행 시간: {}ms (userId={})", durationMs, userId);
+            log.info("[Debug] 추천 캐싱 수행 시간: {}ms (userId={})", durationMs, cvId);
         }
     }
 
     @Async
     @Transactional
-    public void saveRecommendScores(Long userId, List<ScoredJobDto> recommendations) {
-        Cv cv = cvRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("[Error] CV not found for userId=" + userId));
+    public void saveRecommendScores(Long cvId, List<ScoredJobDto> recommendations) {
 
         try {
-            jdbcRepository.batchUpsert(cv.getId(), recommendations);
-            log.info("[Recommend] 추천 점수 일괄 저장 성공: userId={}", userId);
+            jdbcRepository.batchUpsert(cvId, recommendations);
+            log.info("[Recommend] 추천 점수 일괄 저장 성공: cvId={}", cvId);
         } catch (Exception e) {
-            log.error("[Recommend] 추천 점수 일괄 저장 실패: userId={}, error={}", userId, e.getMessage(), e);
+            log.error("[Recommend] 추천 점수 일괄 저장 실패: cvId={}, error={}", cvId, e.getMessage(), e);
             throw new RuntimeException("추천 점수 저장 실패", e);
         }
     }

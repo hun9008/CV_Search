@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,27 +57,35 @@ public class BookmarkService {
 
     @Transactional(readOnly = true)
     public List<ScoredJobDto> getBookmarkedJobsByUser(User user) {
-        Long userId = user.getId();
-
-        // 1. 북마크된 Job 목록
         List<Bookmark> bookmarks = bookmarkRepository.findAllByUser(user);
         List<Job> jobs = bookmarks.stream().map(Bookmark::getJob).toList();
         List<Long> jobIds = jobs.stream().map(Job::getId).toList();
 
-        Cv cv = cvRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("CV not found"));
-        Long cvId = cv.getId();
-        List<RecommendScore> scores = recommendScoreRepository.findByCvIdAndJobIdIn(cvId, jobIds);
-        Map<Long, Float> scoreMap = scores.stream()
-                .collect(Collectors.toMap(rs -> rs.getJob().getId(), RecommendScore::getScore));
+        List<Cv> cvs = cvRepository.findAllByUser(user);
+        if (cvs.isEmpty()) {
+            throw new RuntimeException("CV not found for user");
+        }
 
-        // 3. ScoredJobDto로 변환
+        List<RecommendScore> allScores = new ArrayList<>();
+        for (Cv cv : cvs) {
+            allScores.addAll(
+                    recommendScoreRepository.findByCvIdAndJobIdIn(cv.getId(), jobIds)
+            );
+        }
+
+        Map<Long, Float> scoreMap = new HashMap<>();
+        for (RecommendScore rs : allScores) {
+            Long jobId = rs.getJob().getId();
+            float score = rs.getScore();
+            scoreMap.put(jobId, Math.max(scoreMap.getOrDefault(jobId, 0f), score));
+        }
+
         return jobs.stream()
                 .map(JobDto::from)
                 .map(dto -> ScoredJobDto.from(
                         dto,
                         scoreMap.getOrDefault(dto.getId(), 0f),
-                        0.0,  // cosine, bm25 점수는 없으므로 기본값
+                        0.0,  // cosine, bm25 점수 없음
                         0.0
                 ))
                 .collect(Collectors.toList());

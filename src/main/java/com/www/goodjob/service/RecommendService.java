@@ -60,14 +60,14 @@ public class RecommendService {
     /**
      * FastAPI 서버로 추천 점수 요청
      */
-    private List<ScoredJobDto> fetchRecommendationFromFastAPI(Long userId, int topk) {
+    private List<ScoredJobDto> fetchRecommendationFromFastAPI(Long cvId, int topk) {
         String url = fastapiHost + "/recommend-jobs";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Map<String, Object> body = Map.of(
-                "u_id", userId,
+                "cv_id", cvId,
                 "top_k", topk
         );
 
@@ -117,8 +117,8 @@ public class RecommendService {
         }
     }
 
-    public List<ScoredJobDto> getScoredFromCache(Long userId, int topk) {
-        String zsetKey = "recommendation:" + userId;
+    public List<ScoredJobDto> getScoredFromCache(Long cvId, int topk) {
+        String zsetKey = "recommendation:" + cvId;
 
         Set<ZSetOperations.TypedTuple<String>> topKJobIds = redisTemplate.opsForZSet()
                 .reverseRangeWithScores(zsetKey, 0, topk - 1);
@@ -172,18 +172,18 @@ public class RecommendService {
         }
     }
 
-    public List<ScoredJobDto> requestRecommendation(Long userId, int topk) {
+    public List<ScoredJobDto> requestRecommendation(Long cvId, int topk) {
         long startTime = System.nanoTime();
         long endTime;
         long durationMs;
         try {
-            List<ScoredJobDto> cachedResult = getScoredFromCache(userId, topk);
-            log.info("[Recommend] 캐시된 추천 결과 사용: userId={}, topK={}", userId, topk);
+            List<ScoredJobDto> cachedResult = getScoredFromCache(cvId, topk);
+            log.info("[Recommend] 캐시된 추천 결과 사용: cvId={}, topK={}", cvId, topk);
             long saveStart = System.nanoTime();
             long saveEnd = 0;
-            asyncService.saveRecommendScores(userId, cachedResult);
+            asyncService.saveRecommendScores(cvId, cachedResult);
             saveEnd = System.nanoTime();
-            log.info("[Recommend] 스코어 저장 시간: {}ms (userId={})", (saveEnd - saveStart) / 1_000_000, userId);
+            log.info("[Recommend] 스코어 저장 시간: {}ms (cvId={})", (saveEnd - saveStart) / 1_000_000, cvId);
             return cachedResult;
         } catch (ResponseStatusException e) {
             if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
@@ -191,22 +191,22 @@ public class RecommendService {
             }
 
             // 2. 캐시 없음 → 캐싱 비동기 실행
-            log.info("[Recommend] 캐시 없음 → FastAPI 요청 후 캐시 비동기 처리 시작: userId={}, topK={}", userId, topk);
-            asyncService.cacheRecommendForUser(userId);
+            log.info("[Recommend] 캐시 없음 → FastAPI 요청 후 캐시 비동기 처리 시작: cvId={}, topK={}", cvId, topk);
+            asyncService.cacheRecommendForUser(cvId);
 
-            List<ScoredJobDto> apiResult = fetchRecommendationFromFastAPI(userId, topk);
-            log.info("[Recommend] FastAPI 결과 반환 완료: userId={}, 추천 수={}", userId, apiResult.size());
+            List<ScoredJobDto> apiResult = fetchRecommendationFromFastAPI(cvId, topk);
+            log.info("[Recommend] FastAPI 결과 반환 완료: userId={}, 추천 수={}", cvId, apiResult.size());
             long saveStart = System.nanoTime();
             long saveEnd = 0;
-            asyncService.saveRecommendScores(userId, apiResult);
+            asyncService.saveRecommendScores(cvId, apiResult);
             saveEnd = System.nanoTime();
-            log.info("[Recommend] 스코어 저장 시간: {}ms (userId={})", (saveEnd - saveStart) / 1_000_000, userId);
+            log.info("[Recommend] 스코어 저장 시간: {}ms (cvId={})", (saveEnd - saveStart) / 1_000_000, cvId);
             return apiResult;
         } finally {
             endTime = System.nanoTime();
             durationMs = (endTime - startTime) / 1_000_000;
 
-            log.info("[Recommend] 전체 추천 수행 시간: {}ms (userId={})", durationMs, userId);
+            log.info("[Recommend] 전체 추천 수행 시간: {}ms (userId={})", durationMs, cvId);
         }
     }
 
@@ -214,18 +214,15 @@ public class RecommendService {
     /**
      * 추천 점수 기반 피드백 무조건 새로 생성 (기존 피드백 덮어쓰기) -> 테스트용
      */
-    public String getOrGenerateFeedback(Long jobId, CustomUserDetails userDetails) {
+    public String getOrGenerateFeedback(Long cvId, Long jobId, CustomUserDetails userDetails) {
         long totalStart = System.nanoTime();
 
         User user = userDetails.getUser();
 
         long startCvFetch = System.nanoTime();
-        Cv cv = cvRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("CV not found"));
+
         long endCvFetch = System.nanoTime();
         log.info("[Feedback] CV fetch 시간: {}ms", (endCvFetch - startCvFetch) / 1_000_000);
-
-        Long cvId = cv.getId();
 
         long startScoreFetch = System.nanoTime();
         RecommendScore score = recommendScoreRepository.findByCvIdAndJobId(cvId, jobId);

@@ -33,13 +33,14 @@ public class RecommendController {
     )
     public ResponseEntity<List<ScoredJobDto>> recommendTopK(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam int topk
+            @RequestParam int topk,
+            @RequestParam Long cvId
     ) {
         if (userDetails == null) {
             throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
         }
-        Long userId = userDetails.getId();
-        List<ScoredJobDto> result = recommendService.requestRecommendation(userId, topk);
+//        Long userId = userDetails.getId();
+        List<ScoredJobDto> result = recommendService.requestRecommendation(cvId, topk);
         return ResponseEntity.ok(result);
     }
 
@@ -47,16 +48,17 @@ public class RecommendController {
             summary = "추천 캐시 생성",
             description = "[Not Used] 관리용으로 호출될 수 있습니다. FastAPI로부터 전체 추천 점수를 받아 Redis에 캐싱합니다. (Sync)"
     )
-    @GetMapping("/cache")
+    @PostMapping("/cache")
     public ResponseEntity<String> cacheRecommendationForUser(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam Long cvId
     ) {
         if (userDetails == null) {
             throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
         }
 
-        Long userId = userDetails.getId();
-        asyncService.cacheRecommendForUser(userId);
+//        Long userId = userDetails.getId();
+        asyncService.cacheRecommendForUser(cvId);
         return ResponseEntity.ok("추천 캐시 생성 시작. log 확인 필요.");
     }
 
@@ -74,9 +76,10 @@ public class RecommendController {
     @PostMapping("/feedback")
     public ResponseEntity<String> generateFeedback(
             @RequestParam Long jobId,
+            @RequestParam Long cvId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        String feedback = recommendService.getOrGenerateFeedback(jobId, userDetails);
+        String feedback = recommendService.getOrGenerateFeedback(cvId, jobId, userDetails);
         return ResponseEntity.ok(feedback);
     }
 }
