@@ -15,6 +15,9 @@ public class AuthService {
     private final SearchLogRepository searchLogRepository;
     private final ApplicationRepository applicationRepository;
     private final TossPaymentRepository tossPaymentRepository;
+    private final BookmarkRepository bookmarkRepository;
+    private final CvRepository cvRepository;
+    private final UserFeedbackRepository userFeedbackRepository;
 
     @Transactional
     public void withdraw(User user) {
@@ -22,6 +25,9 @@ public class AuthService {
         userOAuthRepository.deleteAllByUser(user);
         applicationRepository.deleteAllByUser(user);
         tossPaymentRepository.deleteAllByUser(user);
+        bookmarkRepository.deleteAllByUser(user);
+        cvRepository.deleteAllByUser(user);
+        userFeedbackRepository.deleteAllByUser(user);
 
         userRepository.delete(user);
     }
