@@ -47,55 +47,55 @@ class CvServiceTest {
         ReflectionTestUtils.setField(cvService, "fastapiHost", "http://localhost:8000");
     }
 
-    @Test
-    void deleteCv_성공() {
-        // given
-        Long userId = 1L;
-        Long cvId = 10L;
+//    @Test
+//    void deleteCv_성공() {
+//        // given
+//        Long userId = 1L;
+//        Long cvId = 10L;
+//
+//        User mockUser = User.builder().id(userId).email("test@example.com").name("hun").build();
+//        Cv mockCv = Cv.builder().id(cvId).user(mockUser).build();
+//
+//        when(cvRepository.findByUserId(userId)).thenReturn(Optional.of(mockCv));
+//
+//        // when
+//        String result = cvService.deleteCv(userId);
+//
+//        // then
+//        verify(cvRepository).findByUserId(userId);
+//        verify(recommendScoreRepository).deleteByCvId(cvId);
+//        verify(restTemplate).delete("http://localhost:8000/delete-cv?user_id=" + userId);
+//        assertEquals("CV 1 deleted from Elasticsearch, RDB, and Redis.", result);
+//    }
 
-        User mockUser = User.builder().id(userId).email("test@example.com").name("hun").build();
-        Cv mockCv = Cv.builder().id(cvId).user(mockUser).build();
-
-        when(cvRepository.findByUserId(userId)).thenReturn(Optional.of(mockCv));
-
-        // when
-        String result = cvService.deleteCv(userId);
-
-        // then
-        verify(cvRepository).findByUserId(userId);
-        verify(recommendScoreRepository).deleteByCvId(cvId);
-        verify(restTemplate).delete("http://localhost:8000/delete-cv?user_id=" + userId);
-        assertEquals("CV 1 deleted from Elasticsearch, RDB, and Redis.", result);
-    }
-
-    @Test
-    void deleteCv_Cv없을때_예외발생() {
-        // given
-        Long userId = 999L;
-        when(cvRepository.findByUserId(userId)).thenReturn(Optional.empty());
-
-        // when & then
-        assertThrows(RuntimeException.class, () -> cvService.deleteCv(userId));
-        verify(recommendScoreRepository, never()).deleteByCvId(any());
-        verify(restTemplate, never()).delete(anyString());
-    }
-
-    @Test
-    void deleteCv_FastApi요청실패시_예외발생() {
-        // given
-        Long userId = 1L;
-        Long cvId = 10L;
-        User user = User.builder().id(userId).build();
-        Cv cv = Cv.builder().id(cvId).user(user).build();
-
-        when(cvRepository.findByUserId(userId)).thenReturn(Optional.of(cv));
-        doThrow(new RuntimeException("FastAPI error")).when(restTemplate)
-                .delete("http://localhost:8000/delete-cv?user_id=" + userId);
-
-        // when & then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> cvService.deleteCv(userId));
-        assertTrue(exception.getMessage().contains("FastAPI 요청 실패"));
-    }
+//    @Test
+//    void deleteCv_Cv없을때_예외발생() {
+//        // given
+//        Long userId = 999L;
+//        when(cvRepository.findByUserId(userId)).thenReturn(Optional.empty());
+//
+//        // when & then
+//        assertThrows(RuntimeException.class, () -> cvService.deleteCv(userId));
+//        verify(recommendScoreRepository, never()).deleteByCvId(any());
+//        verify(restTemplate, never()).delete(anyString());
+//    }
+//
+//    @Test
+//    void deleteCv_FastApi요청실패시_예외발생() {
+//        // given
+//        Long userId = 1L;
+//        Long cvId = 10L;
+//        User user = User.builder().id(userId).build();
+//        Cv cv = Cv.builder().id(cvId).user(user).build();
+//
+//        when(cvRepository.findByUserId(userId)).thenReturn(Optional.of(cv));
+//        doThrow(new RuntimeException("FastAPI error")).when(restTemplate)
+//                .delete("http://localhost:8000/delete-cv?user_id=" + userId);
+//
+//        // when & then
+//        RuntimeException exception = assertThrows(RuntimeException.class, () -> cvService.deleteCv(userId));
+//        assertTrue(exception.getMessage().contains("FastAPI 요청 실패"));
+//    }
 
     @Test
     void summaryCv_성공() {

@@ -97,13 +97,6 @@ public class S3Service {
         }
     }
 
-//    public boolean fileExists(Long userId, String fileName) {
-//
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//        return cvRepository.findByUserAndFileName(user, fileName).isEmpty();
-//    }
-
     public URL getFileUrl(String key) {
         return s3Client.utilities().getUrl(GetUrlRequest.builder()
                 .bucket(bucketName)
@@ -119,28 +112,15 @@ public class S3Service {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Optional<Cv> existingCvOpt = cvRepository.findByUser(user);
-
-        // DB에 없으면 저장
-        if (existingCvOpt.isEmpty()) {
-            Cv newCv = Cv.builder()
-                    .user(user)
-                    .fileName(fileName)
-                    .fileUrl(fileUrl.toString())
-                    .rawText("Ready")
-                    .uploadedAt(LocalDateTime.now())
-                    .build();
-            cvRepository.save(newCv);
-            log.info("새로운 cv 저장 {}", userId);
-        } else {
-            // 기존 CV 업데이트
-            Cv existingCv = existingCvOpt.get();
-            existingCv.setFileName(fileName);
-            existingCv.setFileUrl(fileUrl.toString());
-            existingCv.setUploadedAt(LocalDateTime.now());
-            cvRepository.save(existingCv);  // save는 merge를 수행
-            log.info("기존 CV 업데이트: userId={}, fileName={}", userId, fileName);
-        }
+        Cv newCv = Cv.builder()
+                .user(user)
+                .fileName(fileName)
+                .fileUrl(fileUrl.toString())
+                .rawText("Ready")
+                .uploadedAt(LocalDateTime.now())
+                .build();
+        cvRepository.save(newCv);
+        log.info("새로운 cv 저장 {}", userId);
 
         try {
             String url = fastapiHost + "/save-es-cv";
@@ -155,6 +135,53 @@ public class S3Service {
         }
 
         return true;
+    }
+
+    public boolean isFileNameAvailable(Long userId, String fileName) {
+        if (!userRepository.existsById(userId)) {
+            return false;
+        }
+
+        boolean exists = cvRepository.existsByUserIdAndFileName(userId, fileName);
+        return !exists;
+    }
+
+    public boolean isOwnedFile(Long userId, String fileName) {
+        return cvRepository.existsByUserIdAndFileName(userId, fileName);
+    }
+
+    public boolean renameS3FileAndUpdateDB(Long userId, String oldFileName, String newFileName) {
+        String prefix = "cv/";
+        String oldKey = prefix + oldFileName;
+        String newKey = prefix + newFileName;
+
+        // 1. S3 객체 복사
+        CopyObjectRequest copyReq = CopyObjectRequest.builder()
+                .sourceBucket(bucketName)
+                .sourceKey(oldKey)
+                .destinationBucket(bucketName)
+                .destinationKey(newKey)
+                .build();
+        s3Client.copyObject(copyReq);
+
+        // 2. 원래 객체 삭제
+        DeleteObjectRequest delReq = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(oldKey)
+                .build();
+        s3Client.deleteObject(delReq);
+
+        // 3. DB 업데이트
+        Optional<Cv> cvOpt = cvRepository.findByUserIdAndFileName(userId, oldFileName);
+        if (cvOpt.isPresent()) {
+            Cv cv = cvOpt.get();
+            cv.setFileName(newFileName);
+            cv.setFileUrl(getFileUrl(newKey).toString());
+            cvRepository.save(cv);
+            return true;
+        }
+
+        return false;
     }
 
 }

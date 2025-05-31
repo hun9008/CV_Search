@@ -63,9 +63,9 @@ public class RecommendController {
     @Operation(
             summary = "추천 공고에 대한 이력서 피드백 생성 또는 조회",
             description = """
-            특정 추천 항목(recommendScoreId)에 대한 이력서 피드백을 생성하거나, 
+            특정 추천 항목(recommendScoreId)에 대한 이력서 피드백을 생성하거나,
             이미 생성된 피드백이 있으면 그대로 반환함
-            - Claude AI 기반으로 자동 생성됨  
+            - Claude AI 기반으로 자동 생성됨
             - 이미 피드백이 있다면 새로 생성하지 않고 그대로 반환함
             """
     )
