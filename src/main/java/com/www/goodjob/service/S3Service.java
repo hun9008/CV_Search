@@ -34,6 +34,7 @@ public class S3Service {
     private final UserRepository userRepository;
     private final CvRepository cvRepository;
     private final RestTemplate restTemplate;
+    private final AsyncService asyncService;
 
     @Value("${AWS_S3_BUCKET}")
     private String bucketName;
@@ -133,9 +134,14 @@ public class S3Service {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("[FastAPI 호출 실패] " + e.getMessage());
+
+            if (savedCv != null) {
+                cvRepository.deleteById(savedCv.getId());
+            }
+            deleteFile(fileName);
             return false;
         }
-
+        asyncService.generateCvSummaryAsync(cvId);
         return true;
     }
 

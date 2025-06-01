@@ -11,6 +11,7 @@ import com.www.goodjob.repository.CvRepository;
 import com.www.goodjob.repository.JobRepository;
 import com.www.goodjob.repository.RecommendScoreJdbcRepository;
 import com.www.goodjob.repository.RecommendScoreRepository;
+import com.www.goodjob.util.ClaudeClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,8 @@ public class AsyncService {
     private final CvRepository cvRepository;
     private final RecommendScoreRepository recommendScoreRepository;
     private final RecommendScoreJdbcRepository jdbcRepository;
+
+    private final ClaudeClient claudeClient;
 
 
     @Value("${FASTAPI_HOST}")
@@ -123,6 +126,35 @@ public class AsyncService {
         } catch (Exception e) {
             log.error("[Recommend] 추천 점수 일괄 저장 실패: cvId={}, error={}", cvId, e.getMessage(), e);
             throw new RuntimeException("추천 점수 저장 실패", e);
+        }
+    }
+
+    @Async
+    @Transactional
+    public void generateCvSummaryAsync(Long cvId) {
+        try {
+            Cv cv = cvRepository.findById(cvId)
+                    .orElseThrow(() -> new RuntimeException("CV not found for id: " + cvId));
+
+            if (cv.getSummary() != null && !cv.getSummary().isBlank()) {
+                log.info("[CV Summary] 이미 요약이 존재함: cvId={}", cvId);
+                return;
+            }
+
+            String cvText = cv.getRawText();
+
+            if ("Ready".equalsIgnoreCase(cvText)) {
+                log.warn("[CV Summary] 아직 CV 텍스트가 준비되지 않음: cvId={}", cvId);
+                return;
+            }
+
+            String summary = claudeClient.generateCvSummary(cvText);
+            cv.setSummary(summary);
+            cvRepository.save(cv);
+            log.info("[CV Summary] 요약 생성 및 저장 완료: cvId={}", cvId);
+
+        } catch (Exception e) {
+            log.error("[CV Summary] 요약 생성 실패: cvId={}, error={}", cvId, e.getMessage(), e);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.www.goodjob.controller;
 
 import com.www.goodjob.security.CustomUserDetails;
+import com.www.goodjob.service.AsyncService;
 import com.www.goodjob.service.CvService;
 import com.www.goodjob.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,7 +74,7 @@ public class S3Controller {
         if (saved) {
             return ResponseEntity.ok("CV 정보가 저장되었습니다.");
         } else {
-            return ResponseEntity.badRequest().body("S3에 해당 파일이 존재하지 않습니다.");
+            return ResponseEntity.badRequest().body("S3에 해당 파일이 존재하지 않거나 신뢰도 낮은 CV 입니다. (서버 로그 확인 필요)");
         }
     }
 
