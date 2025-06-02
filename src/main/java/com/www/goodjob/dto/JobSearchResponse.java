@@ -1,23 +1,10 @@
 package com.www.goodjob.dto;
 
-import com.www.goodjob.domain.Job;
-import lombok.*;
-import java.time.LocalDateTime;
+import lombok.Data;
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class JobSearchResponse {
-    private Long id;
-    private String companyName;
-    private String title;
-    private String jobDescription;
-    private String jobType;
-    private String experience;
-    private String url;
-    private LocalDateTime createdAt;
-    private List<RegionDto> regions; // 지역 반환 추가
+    private int total;
+    private List<JobSearchDto> results;
 }
