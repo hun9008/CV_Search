@@ -35,6 +35,8 @@ from urllib.parse import urlparse, unquote
 from datetime import datetime, timedelta, timezone
 import hashlib
 
+from sklearn.metrics.pairwise import cosine_similarity
+
 KST = timezone(timedelta(hours=9))
 
 load_dotenv(dotenv_path="./.env")
@@ -420,6 +422,25 @@ def es_save_cv(s3_url, cv_id):
 
         print(f"Document to be indexed: {doc}")
 
+        positive_vector_path = os.path.join(os.path.dirname(__file__), "positive_vector.json")
+        positive_vector = None
+
+        if os.path.exists(positive_vector_path):
+            with open(positive_vector_path, "r", encoding="utf-8") as f:
+                positive_vector = json.load(f)
+
+        if positive_vector is not None:
+            sim = cosine_similarity(
+                np.array(vector).reshape(1, -1),
+                np.array(positive_vector).reshape(1, -1)
+            )[0][0]
+            print(f"[INFO] positive_vector와 cosine similarity: {sim:.4f}")
+            if sim <= 0.75:
+                print(f"[X] 유사도 {sim:.4f} ≤ 0.75 → 저장 중단")
+                return
+        else:
+            print("[!] positive_vector 파일이 존재하지 않음 → 유사도 검사 생략")
+
         same_user_result = es.get(index=CV_INDEX_NAME, id=str(cv_id), ignore=[404])
 
         if same_user_result.get("found"):
@@ -534,8 +555,99 @@ def extract_raw_text_from_pdf(s3_url: str) -> str:
 
 ####################### ^ save cv function #######################
 
-def es_save_jobs():
+# def es_save_jobs():
     
+#     if not es.indices.exists(index=JOBS_INDEX_NAME):
+        # es.indices.create(
+        #     index=JOBS_INDEX_NAME,
+        #     body={
+        #         "mappings": {
+        #             "properties": {
+        #                 "text": {"type": "text"},
+        #                 "text_hash": {"type": "keyword"},
+        #                 "vector": {"type": "dense_vector", "dims": 384},
+        #                 "job_id": {"type": "keyword"},
+        #                 "created_at": {"type": "date"} 
+        #             }
+        #         }
+        #     }
+        # )
+        
+#     jobs, job_ids = fetch_job_data()
+
+#     print(f"[DEBUG] jobs: {len(jobs)}")
+#     print(f"[DEBUG] job_ids: {len(job_ids)}")
+
+#     # jobs가 비어있을 경우 예외처리
+#     if not jobs:
+#         print("No jobs found.")
+#         return
+
+#     try:
+#         for job_text, job_id in tqdm(zip(jobs, job_ids), total=len(jobs), desc="Indexing jobs to ES"):
+#             text_hash = hashlib.sha256(job_text.encode('utf-8')).hexdigest()
+
+#             query = {
+#                 "query": {
+#                     "term": {
+#                         "job_id": str(job_id)
+#                     }
+#                 }
+#             }
+
+#             same_job_result = es.get(index=JOBS_INDEX_NAME, id=str(job_id), ignore=[404])
+
+#             if same_job_result.get("found"):
+#                 # 이미 저장된 문서가 있을 경우
+#                 existing_hash = same_job_result["_source"].get("text_hash")
+
+#                 if existing_hash == text_hash:
+#                     # print(f"[SKIP] job  _id={job_id} 동일한 text_hash 존재 → ES 저장 생략")
+#                     continue
+#                 else:
+#                     # 해시가 다르면 덮어쓰기
+#                     response = es.index(index=JOBS_INDEX_NAME, id=str(job_id), body=doc)
+#                     print(f"[UPDATE] job_id={job_id} Job Updated in ES. Document ID: {response['_id']}")
+#                     continue
+#             else:
+#                 # 문서가 없을 경우 신규 저장
+#                 # print(f"Processing job_id={job_id}, {len(job_text)} characters")
+#                 vector = encode_long_text(job_text)
+
+#                 doc = {
+#                     "text": job_text,
+#                     "text_hash": text_hash,
+#                     "vector": vector,
+#                     "job_id": str(job_id),
+#                     "created_at": datetime.now(KST).isoformat()
+#                 }
+
+#                 response = es.index(index=JOBS_INDEX_NAME, id=str(job_id), body=doc)
+#                 print(f"[NEW] job_id={job_id} Job Saved in ES. Document ID: {response['_id']}")
+#     except Exception as e:
+#         print(f"[X] Elasticsearch 저장 실패: {e}")
+#         raise
+
+def parse_structured_fields(text: str) -> dict:
+    """
+    fetch_job_data로부터 생성된 job_text에서 각 필드를 파싱하여 dict로 반환
+    """
+    import re
+
+    fields = [
+        "company_name", "title", "department", "require_experience", "job_description",
+        "job_type", "requirements", "preferred_qualifications", "ideal_candidate",
+        "raw_jobs_text", "region_text"
+    ]
+
+    parsed = {}
+    for field in fields:
+        match = re.search(rf'"{field}": "(.*?)"', text, re.DOTALL)
+        parsed[field] = match.group(1).strip() if match else ""
+
+    return parsed
+
+def es_save_jobs():
     if not es.indices.exists(index=JOBS_INDEX_NAME):
         es.indices.create(
             index=JOBS_INDEX_NAME,
@@ -546,18 +658,28 @@ def es_save_jobs():
                         "text_hash": {"type": "keyword"},
                         "vector": {"type": "dense_vector", "dims": 384},
                         "job_id": {"type": "keyword"},
-                        "created_at": {"type": "date"} 
+                        "company_name": {"type": "text"},
+                        "title": {"type": "text"},
+                        "department": {"type": "text"},
+                        "require_experience": {"type": "text"},
+                        "job_description": {"type": "text"},
+                        "job_type": {"type": "text"},
+                        "requirements": {"type": "text"},
+                        "preferred_qualifications": {"type": "text"},
+                        "ideal_candidate": {"type": "text"},
+                        "raw_jobs_text": {"type": "text"},
+                        "region_text": {"type": "text"},
+                        "created_at": {"type": "date"}
                     }
                 }
             }
         )
-        
+
     jobs, job_ids = fetch_job_data()
 
     print(f"[DEBUG] jobs: {len(jobs)}")
     print(f"[DEBUG] job_ids: {len(job_ids)}")
 
-    # jobs가 비어있을 경우 예외처리
     if not jobs:
         print("No jobs found.")
         return
@@ -566,41 +688,38 @@ def es_save_jobs():
         for job_text, job_id in tqdm(zip(jobs, job_ids), total=len(jobs), desc="Indexing jobs to ES"):
             text_hash = hashlib.sha256(job_text.encode('utf-8')).hexdigest()
 
-            query = {
-                "query": {
-                    "term": {
-                        "job_id": str(job_id)
-                    }
-                }
-            }
-
             same_job_result = es.get(index=JOBS_INDEX_NAME, id=str(job_id), ignore=[404])
 
+            # vector는 항상 새로 인코딩
+            vector = encode_long_text(job_text)
+
+            # 구조화된 필드 파싱
+            structured_fields = parse_structured_fields(job_text)
+
+            # 공통 doc 정의
+            doc = {
+                "text": job_text,
+                "text_hash": text_hash,
+                "vector": vector,
+                "job_id": str(job_id),
+                "created_at": datetime.now(KST).isoformat(),
+                **structured_fields
+            }
+
             if same_job_result.get("found"):
-                # 이미 저장된 문서가 있을 경우
-                existing_hash = same_job_result["_source"].get("text_hash")
+                existing_source = same_job_result["_source"]
+                existing_hash = existing_source.get("text_hash")
 
-                if existing_hash == text_hash:
-                    # print(f"[SKIP] job  _id={job_id} 동일한 text_hash 존재 → ES 저장 생략")
+                # 구조화 필드 누락 여부 확인
+                missing_structured_fields = any(
+                    key not in existing_source for key in structured_fields
+                )
+
+                if existing_hash == text_hash and not missing_structured_fields:
                     continue
-                else:
-                    # 해시가 다르면 덮어쓰기
-                    response = es.index(index=JOBS_INDEX_NAME, id=str(job_id), body=doc)
-                    print(f"[UPDATE] job_id={job_id} Job Updated in ES. Document ID: {response['_id']}")
-                    continue
+                response = es.index(index=JOBS_INDEX_NAME, id=str(job_id), body=doc)
+                print(f"[UPDATE] job_id={job_id} Job Updated in ES. Document ID: {response['_id']}")
             else:
-                # 문서가 없을 경우 신규 저장
-                # print(f"Processing job_id={job_id}, {len(job_text)} characters")
-                vector = encode_long_text(job_text)
-
-                doc = {
-                    "text": job_text,
-                    "text_hash": text_hash,
-                    "vector": vector,
-                    "job_id": str(job_id),
-                    "created_at": datetime.now(KST).isoformat()
-                }
-
                 response = es.index(index=JOBS_INDEX_NAME, id=str(job_id), body=doc)
                 print(f"[NEW] job_id={job_id} Job Saved in ES. Document ID: {response['_id']}")
     except Exception as e:

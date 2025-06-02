@@ -218,10 +218,22 @@ async def recommandation(cv_id, top_k=10):
     # [4] 결과 조립
     t3 = time.time()
     results = []
+
+    apply_penalty = False
+    if recommended_jobs:
+        top_raw_cosine = recommended_jobs[0][4]  # raw_cosine_score
+        top_raw_bm25 = recommended_jobs[0][5]    # raw_bm25_score
+        if top_raw_cosine >= 1.95 or top_raw_bm25 >= 1200:
+            apply_penalty = True
+            logger.debug("[Penalty] Top-1이 패널티 조건 충족: raw_cosine=%.4f, raw_bm25=%.1f → 모든 combined_score -50", top_raw_cosine, top_raw_bm25)
+        else:
+            logger.debug("[Penalty] Top-1이 패널티 조건 미충족: raw_cosine=%.4f, raw_bm25=%.1f", top_raw_cosine, top_raw_bm25)
+
     for es_id, combined_score, cosine_score, bm25_score, raw_cosine_score, raw_bm25_score, db_job_id in recommended_jobs:
-        # job_info = job_dict.get(db_job_id)
-        # if not job_info:
-        #     continue
+        if apply_penalty:
+            combined_score -= 50
+            cosine_score -= 50
+            bm25_score -= 50
 
         result = {
             "job_id": db_job_id,
