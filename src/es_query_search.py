@@ -40,8 +40,6 @@ es = Elasticsearch(
     },
 )
 
-print(es.info())
-
 def test_keyword_filter_query(index_name=JOBS_INDEX_NAME, size=10,
                                keyword=None,
                                job_type=None, experience=None,
@@ -53,27 +51,27 @@ def test_keyword_filter_query(index_name=JOBS_INDEX_NAME, size=10,
                 "multi_match": {
                     "query": keyword,
                     "fields": [
-                        "companyName^3",
+                        "company_name^3",
                         "title^2",
                         "requirements",
-                        "jobDescription",
-                        "preferredQualifications",
-                        "idealCandidate",
+                        "job_description",
+                        "preferred_qualifications",
+                        "ideal_candidate",
                         "experience",
-                        "jobType"
+                        "job_type"
                     ]
                 }
             })
 
         filters = []
         if job_type:
-            filters.append({"terms": {"jobType": job_type}})
+            filters.append({"terms": {"job_type.keyword": job_type}})
         if experience:
-            filters.append({"terms": {"experience": experience}})
+            filters.append({"terms": {"require_experience.keyword": experience}})
         if sido:
-            filters.append({"terms": {"sido": sido}})
+            filters.append({"terms": {"sido.keyword": sido}})
         if sigungu:
-            filters.append({"terms": {"sigungu": sigungu}})
+            filters.append({"terms": {"sigungu.keyword": sigungu}})
 
         query = {
             "query": {
@@ -92,14 +90,13 @@ def test_keyword_filter_query(index_name=JOBS_INDEX_NAME, size=10,
             ]
         }
 
+        print("[DEBUG] ES QUERY =")
+        print(json.dumps(query, indent=2, ensure_ascii=False))
+
         response = es.search(index=index_name, body=query)
         hits = response.get('hits', {}).get('hits', [])
 
-        print(f"[INFO] Retrieved {len(hits)} documents (keyword + filters):")
-        for i, hit in enumerate(hits):
-            print(f"\nDocument {i+1}:")
-            print(json.dumps(hit['_source'], indent=2, ensure_ascii=False))
-
+        print(f"[INFO] Retrieved {len(hits)} documents")
         return hits
 
     except Exception as e:

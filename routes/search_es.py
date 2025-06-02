@@ -1,19 +1,18 @@
 from fastapi import APIRouter
-from schemas.schema import SearchESRequest
+from schemas.schema import SearchESRequest, SearchESResponse, JobIdDto
 from src.es_query_search import test_keyword_filter_query
 
 router = APIRouter()
 
-@router.post("/search-es")
+@router.post("/search-es", response_model=SearchESResponse)
 def search_es_api(request: SearchESRequest):
-    # ES 전체 검색
     results = test_keyword_filter_query(
         keyword=request.keyword,
         job_type=request.jobType,
         experience=request.experience,
         sido=request.sido,
         sigungu=request.sigungu,
-        size=10000  # 전체에서 수동 페이징
+        size=10000
     )
 
     total = len(results)
@@ -22,14 +21,10 @@ def search_es_api(request: SearchESRequest):
 
     paginated = results[start:end]
 
-    job_ids = []
-    for hit in paginated:
-        source = hit.get("_source", {})
-        job_id = source.get("id")
-        if job_id is not None:
-            job_ids.append({"job_id": job_id})
+    job_ids = [
+        JobIdDto(job_id=int(hit["_source"]["job_id"]))
+        for hit in paginated
+        if "job_id" in hit["_source"]
+    ]
 
-    return {
-        "total": total,
-        "results": job_ids
-    }
+    return SearchESResponse(total=total, results=job_ids)

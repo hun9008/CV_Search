@@ -20,6 +20,15 @@ class RecommendationRequest(BaseModel):
 class JobIDRequest(BaseModel):
     job_id: int
 
+
+
+class JobIdDto(BaseModel):
+    job_id: int
+
+class SearchESResponse(BaseModel):
+    total: int
+    results: list[JobIdDto]
+
 class SearchESRequest(BaseModel):
     keyword: Optional[str] = None
     jobType: Optional[List[str]] = None
