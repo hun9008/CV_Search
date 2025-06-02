@@ -33,3 +33,11 @@ jobs:
 
       - name: Push Docker image to ECR
         run: docker push ${{ secrets.ECR_URI }}/goodjob:latest
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service \
+            --cluster goodjob-cluster \
+            --service goodjob-task-service-td5txpxd \
+            --force-new-deployment \
+            --region ap-northeast-2
