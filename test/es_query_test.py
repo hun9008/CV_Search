@@ -75,7 +75,7 @@ def test_es_query(index_name=CV_INDEX_NAME, size=5):
 if __name__ == "__main__":
 
     print("Testing Elasticsearch query...")
-    hits = test_es_query(index_name=JOB_INDEX_NAME, size=5)
+    hits = test_es_query(index_name=JOBS_INDEX_NAME, size=5)
     if hits:
         print(f"Successfully retrieved {len(hits)} documents.")
     else:
