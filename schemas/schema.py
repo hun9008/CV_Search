@@ -27,7 +27,7 @@ class JobIdDto(BaseModel):
 
 class SearchESResponse(BaseModel):
     total: int
-    results: list[JobIdDto]
+    results: List[JobIdDto]
 
 class SearchESRequest(BaseModel):
     keyword: Optional[str] = None
