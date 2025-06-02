@@ -42,8 +42,8 @@
 </tr>
 <tr>
 <td><a href="https://github.com/sehyunsix" target="_blank">육세현</a></td>
-<td>blk</td>
-<td>blk</td>
+<td>DATA </td>
+<td>크롤링, 필터링, 데이터 시각화 구현</td>
 <td>
   <a href="https://github.com/hun9008/CV_Search/tree/dev_crawl">
     <img src="https://img.shields.io/badge/click--here-dev--crawl-ka?style=for-the-badge&logo=nodedotjs" alt="Go to Dev">
