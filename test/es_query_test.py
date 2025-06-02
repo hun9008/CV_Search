@@ -42,11 +42,45 @@ es = Elasticsearch(
 
 print(es.info())
 
-def test_es_query(index_name=CV_INDEX_NAME, size=5):
+def test_keyword_filter_query(index_name=JOBS_INDEX_NAME, size=10,
+                               keyword=None,
+                               job_type=None, experience=None,
+                               sido=None, sigungu=None):
     try:
+        must_clause = []
+        if keyword:
+            must_clause.append({
+                "multi_match": {
+                    "query": keyword,
+                    "fields": [
+                        "companyName^3",
+                        "title^2",
+                        "requirements",
+                        "jobDescription",
+                        "preferredQualifications",
+                        "idealCandidate",
+                        "experience",
+                        "jobType"
+                    ]
+                }
+            })
+
+        filters = []
+        if job_type:
+            filters.append({"terms": {"jobType": job_type}})
+        if experience:
+            filters.append({"terms": {"experience": experience}})
+        if sido:
+            filters.append({"terms": {"sido": sido}})
+        if sigungu:
+            filters.append({"terms": {"sigungu": sigungu}})
+
         query = {
             "query": {
-                "match_all": {}
+                "bool": {
+                    "must": must_clause,
+                    "filter": filters
+                }
             },
             "size": size,
             "sort": [
@@ -61,7 +95,7 @@ def test_es_query(index_name=CV_INDEX_NAME, size=5):
         response = es.search(index=index_name, body=query)
         hits = response.get('hits', {}).get('hits', [])
 
-        print(f"[INFO] Retrieved {len(hits)} documents from '{index_name}':")
+        print(f"[INFO] Retrieved {len(hits)} documents (keyword + filters):")
         for i, hit in enumerate(hits):
             print(f"\nDocument {i+1}:")
             print(json.dumps(hit['_source'], indent=2, ensure_ascii=False))
@@ -69,15 +103,5 @@ def test_es_query(index_name=CV_INDEX_NAME, size=5):
         return hits
 
     except Exception as e:
-        print(f"[ERROR] Failed to query Elasticsearch: {e}")
+        print(f"[ERROR] Keyword + Filter ES query failed: {e}")
         return []
-
-if __name__ == "__main__":
-
-    print("Testing Elasticsearch query...")
-    hits = test_es_query(index_name=JOBS_INDEX_NAME, size=5)
-    if hits:
-        print(f"Successfully retrieved {len(hits)} documents.")
-    else:
-        print("No documents found or query failed.")
-    print("Test completed.")

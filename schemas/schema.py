@@ -18,3 +18,12 @@ class RecommendationRequest(BaseModel):
 
 class JobIDRequest(BaseModel):
     job_id: int
+
+class SearchESRequest(BaseModel):
+    keyword: Optional[str] = None
+    jobType: Optional[List[str]] = None
+    experience: Optional[List[str]] = None
+    sido: Optional[List[str]] = None
+    sigungu: Optional[List[str]] = None
+    page: int = 0
+    size: int = 10

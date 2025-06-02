@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes import save_es, rec_es, delete_es, prometheus
+from routes import save_es, rec_es, delete_es, prometheus, search_es
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
@@ -23,3 +23,4 @@ app.include_router(save_es.router)
 app.include_router(delete_es.router)
 app.include_router(rec_es.router)
 app.include_router(prometheus.router)
+app.include_router(search_es.router)
