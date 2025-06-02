@@ -14,8 +14,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,30 +39,82 @@ public class JobService {
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
 
-    public Page<JobDto> searchJobs(String keyword, List<String> jobTypes, List<String> experienceFilters,
-                                   List<String> sidoFilters, List<String> sigunguFilters,
-                                   Pageable pageable, User user) {
+    public Page<JobDto> searchJobs(String keyword,
+                                   List<String> jobTypes,
+                                   List<String> experienceFilters,
+                                   List<String> sidoFilters,
+                                   List<String> sigunguFilters,
+                                   Pageable pageable,
+                                   User user) {
+
+        // 검색 기록 저장
         if (user != null && keyword != null && !keyword.isBlank()) {
             searchLogService.saveSearchLog(keyword.trim(), user);
         }
 
-        // 경력무관 확장 처리
+        // 경력무관 확장 (공통)
         List<String> expandedExperienceFilters = experienceFilters == null ? null :
                 experienceFilters.stream()
-                        .flatMap(filter -> filter.equals("경력무관")
+                        .flatMap(f -> f.equals("경력무관")
                                 ? Stream.of("경력무관", "신입", "경력")
-                                : Stream.of(filter))
+                                : Stream.of(f))
                         .distinct()
                         .toList();
 
-        // 빈 리스트는 null로 변경 (IN 절에서 오류 방지)
+        // keyword 기반 → FastAPI 호출
+        if (keyword != null && !keyword.isBlank()) {
+            try {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+
+                Map<String, Object> requestBody = new HashMap<>();
+                requestBody.put("keyword", keyword);
+                requestBody.put("jobType", jobTypes);
+                requestBody.put("experience", expandedExperienceFilters);
+                requestBody.put("sido", sidoFilters);
+                requestBody.put("sigungu", sigunguFilters);
+                requestBody.put("page", pageable.getPageNumber());
+                requestBody.put("size", pageable.getPageSize());
+
+                HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+                ResponseEntity<JobSearchResponse> response = restTemplate.postForEntity(
+                        fastapiHost + "/search-es", requestEntity, JobSearchResponse.class);
+
+                JobSearchResponse body = response.getBody();
+                if (body == null || body.getResults().isEmpty()) {
+                    return new PageImpl<>(List.of(), pageable, 0);
+                }
+
+                List<Long> ids = body.getResults().stream()
+                        .map(JobSearchDto::getJobId)
+                        .toList();
+
+                List<Job> jobs = jobRepository.findByIdInWithRegion(ids);
+
+                Map<Long, Job> jobMap = jobs.stream()
+                        .collect(Collectors.toMap(Job::getId, j -> j));
+
+                List<JobDto> sortedDtos = ids.stream()
+                        .map(jobMap::get)
+                        .filter(Objects::nonNull)
+                        .map(JobDto::from)
+                        .toList();
+
+                return new PageImpl<>(sortedDtos, pageable, body.getTotal());
+
+            } catch (Exception e) {
+                throw new RuntimeException("FastAPI POST 검색 요청 실패: " + e.getMessage(), e);
+            }
+        }
+
+        // keyword 없이 RDB 검색
         List<String> safeJobTypes = (jobTypes == null || jobTypes.isEmpty()) ? null : jobTypes;
         List<String> safeExperience = (expandedExperienceFilters == null || expandedExperienceFilters.isEmpty()) ? null : expandedExperienceFilters;
         List<String> safeSido = (sidoFilters == null || sidoFilters.isEmpty()) ? null : sidoFilters;
         List<String> safeSigungu = (sigunguFilters == null || sigunguFilters.isEmpty()) ? null : sigunguFilters;
 
         Page<Job> jobPage = jobRepository.searchJobsWithFilters(
-                keyword,
+                null,
                 safeJobTypes,
                 safeExperience,
                 safeSido,
@@ -67,7 +124,6 @@ public class JobService {
 
         return jobPage.map(JobDto::from);
     }
-
 
     public List<String> getAvailableJobTypes() {
         return JobTypeCategory.asList();
