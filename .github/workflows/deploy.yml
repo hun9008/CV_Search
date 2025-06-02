@@ -13,6 +13,14 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v3
 
+      - name: Restore Google Credentials JSON from base64
+        run: |
+          echo "${{ secrets.ES_GOOGLE_BASE64 }}" | base64 -d > capstone-461411-6906e44fef88.json
+
+      - name: Restore .env file
+        run: |
+          echo "${{ secrets.ES_ENV }}" > .env
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:

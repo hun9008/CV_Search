@@ -437,7 +437,7 @@ def es_save_cv(s3_url, cv_id):
             print(f"[INFO] positive_vector와 cosine similarity: {sim:.4f}")
             if sim <= 0.75:
                 print(f"[X] 유사도 {sim:.4f} ≤ 0.75 → 저장 중단")
-                raise HTTPException(status_code=403, detail="CV 내용의 신뢰도가 낮아 저장이 중단되었습니다.")
+                raise HTTPException(status_code=403, detail="[REJECT] CV 내용의 신뢰도가 낮아 저장이 중단되었습니다.")
         else:
             print("[!] positive_vector 파일이 존재하지 않음 → 유사도 검사 생략")
 
