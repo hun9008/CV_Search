@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from schemas.schema import SearchESRequest
-from test.elasticQuery import test_keyword_filter_query
+from src.es_query_search import test_keyword_filter_query
 
 router = APIRouter()
 
