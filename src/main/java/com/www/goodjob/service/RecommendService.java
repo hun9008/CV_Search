@@ -184,6 +184,11 @@ public class RecommendService {
             asyncService.saveRecommendScores(cvId, cachedResult);
             saveEnd = System.nanoTime();
             log.info("[Recommend] 스코어 저장 시간: {}ms (cvId={})", (saveEnd - saveStart) / 1_000_000, cvId);
+
+            cachedResult.stream()
+                    .limit(5)
+                    .forEach(scoredJob -> asyncService.generateFeedbackAsync(cvId, scoredJob.getId()));
+
             return cachedResult;
         } catch (ResponseStatusException e) {
             if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
@@ -201,6 +206,10 @@ public class RecommendService {
             asyncService.saveRecommendScores(cvId, apiResult);
             saveEnd = System.nanoTime();
             log.info("[Recommend] 스코어 저장 시간: {}ms (cvId={})", (saveEnd - saveStart) / 1_000_000, cvId);
+
+            apiResult.stream()
+                    .limit(5)
+                    .forEach(scoredJob -> asyncService.generateFeedbackAsync(cvId, scoredJob.getId()));
             return apiResult;
         } finally {
             endTime = System.nanoTime();
@@ -214,10 +223,8 @@ public class RecommendService {
     /**
      * 추천 점수 기반 피드백 무조건 새로 생성 (기존 피드백 덮어쓰기) -> 테스트용
      */
-    public String getOrGenerateFeedback(Long cvId, Long jobId, CustomUserDetails userDetails) {
+    public String getOrGenerateFeedback(Long cvId, Long jobId) {
         long totalStart = System.nanoTime();
-
-        User user = userDetails.getUser();
 
         long startCvFetch = System.nanoTime();
 

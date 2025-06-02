@@ -70,11 +70,17 @@ public class S3Controller {
             return ResponseEntity.badRequest().body("이미 동일한 파일명이 존재합니다.");
         }
 
-        boolean saved = s3Service.saveCvIfUploaded(userId, fileName);
-        if (saved) {
+//        boolean saved = s3Service.saveCvIfUploaded(userId, fileName);
+//        if (saved) {
+//            return ResponseEntity.ok("CV 정보가 저장되었습니다.");
+//        } else {
+//            return ResponseEntity.badRequest().body("S3에 해당 파일이 존재하지 않거나 신뢰도 낮은 CV 입니다. (서버 로그 확인 필요)");
+//        }
+        String errorMessage = s3Service.saveCvIfUploaded(userId, fileName);
+        if (errorMessage == null) {
             return ResponseEntity.ok("CV 정보가 저장되었습니다.");
         } else {
-            return ResponseEntity.badRequest().body("S3에 해당 파일이 존재하지 않거나 신뢰도 낮은 CV 입니다. (서버 로그 확인 필요)");
+            return ResponseEntity.badRequest().body(errorMessage);
         }
     }
 
@@ -94,11 +100,11 @@ public class S3Controller {
                     .body("기존 이력서 삭제 중 오류가 발생했습니다.");
         }
 
-        boolean saved = s3Service.saveCvIfUploaded(userId, newFileName);
-        if (saved) {
+        String errorMessage = s3Service.saveCvIfUploaded(userId, newFileName);
+        if (errorMessage == null) {
             return ResponseEntity.ok("CV 정보가 저장되었습니다.");
         } else {
-            return ResponseEntity.badRequest().body("S3에 해당 파일이 존재하지 않습니다.");
+            return ResponseEntity.badRequest().body(errorMessage);
         }
     }
 

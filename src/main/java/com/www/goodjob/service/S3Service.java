@@ -105,9 +105,9 @@ public class S3Service {
                 .build());
     }
 
-    public boolean saveCvIfUploaded(Long userId, String fileName) {
+    public String saveCvIfUploaded(Long userId, String fileName) {
         String key = "cv/" + fileName;
-        if (!fileExistsOnS3(key)) return false;
+        if (!fileExistsOnS3(key)) return "s3에 파일이 존재하지 않습니다.";
 
         URL fileUrl = getFileUrl(key);
         User user = userRepository.findById(userId)
@@ -139,10 +139,10 @@ public class S3Service {
                 cvRepository.deleteById(savedCv.getId());
             }
             deleteFile(fileName);
-            return false;
+            return e.getMessage();
         }
         asyncService.generateCvSummaryAsync(cvId);
-        return true;
+        return null;
     }
 
     public boolean isFileNameAvailable(Long userId, String fileName) {

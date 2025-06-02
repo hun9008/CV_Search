@@ -79,7 +79,7 @@ public class RecommendController {
             @RequestParam Long cvId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        String feedback = recommendService.getOrGenerateFeedback(cvId, jobId, userDetails);
+        String feedback = recommendService.getOrGenerateFeedback(cvId, jobId);
         return ResponseEntity.ok(feedback);
     }
 }

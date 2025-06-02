@@ -4,13 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.Cv;
+import com.www.goodjob.domain.CvFeedback;
 import com.www.goodjob.domain.Job;
+import com.www.goodjob.domain.RecommendScore;
 import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.ScoredJobDto;
-import com.www.goodjob.repository.CvRepository;
-import com.www.goodjob.repository.JobRepository;
-import com.www.goodjob.repository.RecommendScoreJdbcRepository;
-import com.www.goodjob.repository.RecommendScoreRepository;
+import com.www.goodjob.repository.*;
 import com.www.goodjob.util.ClaudeClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +44,7 @@ public class AsyncService {
     private final CvRepository cvRepository;
     private final RecommendScoreRepository recommendScoreRepository;
     private final RecommendScoreJdbcRepository jdbcRepository;
+    private final CvFeedbackRepository cvFeedbackRepository;
 
     private final ClaudeClient claudeClient;
 
@@ -155,6 +155,55 @@ public class AsyncService {
 
         } catch (Exception e) {
             log.error("[CV Summary] 요약 생성 실패: cvId={}, error={}", cvId, e.getMessage(), e);
+        }
+    }
+
+    @Async
+    @Transactional
+    public void generateFeedbackAsync(Long cvId, Long jobId) {
+        long totalStart = System.nanoTime();
+
+        try {
+            long startScoreFetch = System.nanoTime();
+            RecommendScore score = recommendScoreRepository.findByCvIdAndJobId(cvId, jobId);
+            long endScoreFetch = System.nanoTime();
+            log.info("[Feedback] RecommendScore fetch 시간: {}ms", (endScoreFetch - startScoreFetch) / 1_000_000);
+
+            Long recommendScoreId = score.getId();
+
+            long startFeedbackCheck = System.nanoTime();
+            Optional<CvFeedback> existing = cvFeedbackRepository.findByRecommendScore_Id(recommendScoreId);
+            long endFeedbackCheck = System.nanoTime();
+            log.info("[Feedback] 피드백 존재 여부 확인 시간: {}ms", (endFeedbackCheck - startFeedbackCheck) / 1_000_000);
+
+            if (existing.isPresent()) {
+                log.info("[Feedback] 기존 피드백 존재함 → 생성 생략 (cvId={}, jobId={})", cvId, jobId);
+                return;
+            }
+
+            long startClaude = System.nanoTime();
+            String feedback = claudeClient.generateFeedback(
+                    score.getCv().getRawText(),
+                    score.getJob().getRawJobsText()
+            );
+            long endClaude = System.nanoTime();
+            log.info("[Feedback] Claude 피드백 생성 시간: {}ms", (endClaude - startClaude) / 1_000_000);
+
+            long startSave = System.nanoTime();
+            CvFeedback newFeedback = CvFeedback.builder()
+                    .recommendScore(score)
+                    .feedback(feedback)
+                    .confirmed(false)
+                    .build();
+            cvFeedbackRepository.save(newFeedback);
+            long endSave = System.nanoTime();
+            log.info("[Feedback] 피드백 저장 시간: {}ms", (endSave - startSave) / 1_000_000);
+
+        } catch (Exception e) {
+            log.error("[Feedback] 피드백 생성 실패: cvId={}, jobId={}, error={}", cvId, jobId, e.getMessage(), e);
+        } finally {
+            long totalEnd = System.nanoTime();
+            log.info("[Feedback] 전체 비동기 피드백 생성 수행 시간: {}ms (cvId={}, jobId={})", (totalEnd - totalStart) / 1_000_000, cvId, jobId);
         }
     }
 }
