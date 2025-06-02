@@ -35,8 +35,9 @@ jobs:
           aws ecr get-login-password --region ap-northeast-2 | \
           docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
 
-      - name: Build Docker image
-        run: docker build -t goodjob .
+      - name: Build Docker image for ARM64
+        run: |
+          docker buildx build --platform linux/arm64 -t goodjob --load .
 
       - name: Tag Docker image
         run: docker tag goodjob:latest ${{ secrets.ECR_URI }}/goodjob:latest
