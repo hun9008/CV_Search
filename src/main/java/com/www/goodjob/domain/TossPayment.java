@@ -1,6 +1,7 @@
 package com.www.goodjob.domain;
 
 import com.www.goodjob.enums.TossPaymentMethod;
+import com.www.goodjob.enums.TossPaymentPlan;
 import com.www.goodjob.enums.TossPaymentStatus;
 
 import jakarta.persistence.*;
@@ -37,5 +38,9 @@ public class TossPayment {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TossPaymentStatus tossPaymentStatus; // 결제 상태
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TossPaymentPlan tossPaymentPlan;
 
 }
