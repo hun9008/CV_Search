@@ -1,5 +1,6 @@
 package com.www.goodjob.domain;
 
+import com.www.goodjob.enums.TossPaymentPlan;
 import com.www.goodjob.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,5 +37,10 @@ public class User {
 
     @UpdateTimestamp
     private LocalDateTime lastUpdatedAt;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TossPaymentPlan plan = TossPaymentPlan.스타터;
 }
 
