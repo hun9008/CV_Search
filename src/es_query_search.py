@@ -59,7 +59,8 @@ def test_keyword_filter_query(index_name=JOBS_INDEX_NAME, size=10,
                         "ideal_candidate",
                         "experience",
                         "job_type"
-                    ]
+                    ],
+                    "type": "most_fields"
                 }
             })
 
@@ -82,11 +83,8 @@ def test_keyword_filter_query(index_name=JOBS_INDEX_NAME, size=10,
             },
             "size": size,
             "sort": [
-                {
-                    "created_at": {
-                        "order": "desc"
-                    }
-                }
+                {"_score": "desc"},
+                {"created_at": {"order": "desc"}}
             ]
         }
 
