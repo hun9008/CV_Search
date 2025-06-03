@@ -37,6 +37,8 @@ import hashlib
 
 from sklearn.metrics.pairwise import cosine_similarity
 
+from fastapi import HTTPException
+
 KST = timezone(timedelta(hours=9))
 
 load_dotenv(dotenv_path="./.env")
