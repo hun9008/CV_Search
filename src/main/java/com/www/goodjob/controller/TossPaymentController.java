@@ -161,9 +161,22 @@ public class TossPaymentController {
     public ResponseEntity<?> verifyAmount(HttpSession session,
                                           @RequestBody SaveAmountRequest req,
                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+
         Object storedObj = session.getAttribute(req.orderId());
 
-        if (!(storedObj instanceof Long storedAmount) || storedAmount != req.amount()) {
+        if (!(storedObj instanceof Long storedAmount)) {
+            log.warn("검증 실패 - 세션에 저장된 금액이 없음 또는 타입 불일치. userId={}, orderId={}, storedObj={}",
+                    userDetails.getUser().getId(), req.orderId(), storedObj);
+            return ResponseEntity.badRequest()
+                    .body(PaymentErrorResponse.builder()
+                            .code(400)
+                            .message("결제 금액 정보가 유효하지 않습니다.")
+                            .build());
+        }
+
+        if (storedAmount != req.amount()) {
+            log.warn("검증 실패 - 세션 금액과 요청 금액 불일치. userId={}, orderId={}, storedAmount={}, requestedAmount={}",
+                    userDetails.getUser().getId(), req.orderId(), storedAmount, req.amount());
             return ResponseEntity.badRequest()
                     .body(PaymentErrorResponse.builder()
                             .code(400)
@@ -172,9 +185,9 @@ public class TossPaymentController {
         }
 
         session.removeAttribute(req.orderId());
+        log.info("검증 성공 - userId={}, orderId={}, amount={}", userDetails.getUser().getId(), req.orderId(), storedAmount);
         return ResponseEntity.ok("Payment is valid");
     }
-
 
     @Operation(
             summary = "사용자 결제 플랜 조회",
