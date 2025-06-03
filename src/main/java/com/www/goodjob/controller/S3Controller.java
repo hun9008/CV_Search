@@ -57,7 +57,14 @@ public class S3Controller {
         return ResponseEntity.ok(url);
     }
 
-    @Operation(summary = "S3 업로드 완료 후 이력서 등록", description = "S3에 이력서가 업로드된 후, 해당 파일명을 통해 데이터베이스에 등록 요청을 보냅니다. 같은 파일명이 존재하면 400 에러를 반환합니다.")
+    @Operation(
+            summary = "S3 업로드 완료 후 이력서 등록",
+            description = """
+        S3에 이력서가 업로드된 후, 해당 파일명을 통해 데이터베이스에 등록 요청을 보냅니다.  
+        - 같은 파일명이 이미 존재하면 400 에러를 반환합니다.  
+        - 파일 내용이 정책에 의해 거부되면 403 에러([REJECT] 포함 메시지)를 반환합니다.
+    """
+    )
     @PostMapping("/confirm-upload")
     public ResponseEntity<String> confirmUpload(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -70,17 +77,13 @@ public class S3Controller {
             return ResponseEntity.badRequest().body("이미 동일한 파일명이 존재합니다.");
         }
 
-//        boolean saved = s3Service.saveCvIfUploaded(userId, fileName);
-//        if (saved) {
-//            return ResponseEntity.ok("CV 정보가 저장되었습니다.");
-//        } else {
-//            return ResponseEntity.badRequest().body("S3에 해당 파일이 존재하지 않거나 신뢰도 낮은 CV 입니다. (서버 로그 확인 필요)");
-//        }
         String errorMessage = s3Service.saveCvIfUploaded(userId, fileName);
         if (errorMessage == null) {
             return ResponseEntity.ok("CV 정보가 저장되었습니다.");
+        } else if (errorMessage.contains("[REJECT]")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage); // 403
         } else {
-            return ResponseEntity.badRequest().body(errorMessage);
+            return ResponseEntity.badRequest().body(errorMessage); // 400
         }
     }
 
@@ -103,8 +106,10 @@ public class S3Controller {
         String errorMessage = s3Service.saveCvIfUploaded(userId, newFileName);
         if (errorMessage == null) {
             return ResponseEntity.ok("CV 정보가 저장되었습니다.");
+        } else if (errorMessage.contains("[REJECT]")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage); // 403
         } else {
-            return ResponseEntity.badRequest().body(errorMessage);
+            return ResponseEntity.badRequest().body(errorMessage); // 400
         }
     }
 
