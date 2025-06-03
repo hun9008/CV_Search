@@ -31,8 +31,12 @@ public class SearchLogService {
     }
 
     public List<SearchLogDto> getSearchHistory(User user) {
-        return searchLogRepository.findTop10ByUserOrderByCreatedAtDesc(user).stream()
-                .map(log -> new SearchLogDto(log.getKeyword(), log.getCreatedAt()))
+        List<Object[]> results = searchLogRepository.findDistinctRecentKeywordsByUser(user.getId());
+        return results.stream()
+                .map(row -> new SearchLogDto(
+                        (String) row[0],
+                        ((java.sql.Timestamp) row[1]).toLocalDateTime()
+                ))
                 .toList();
     }
 
