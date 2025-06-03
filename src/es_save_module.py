@@ -463,6 +463,11 @@ def es_save_cv(s3_url, cv_id):
             print(f"[X] MySQL 오류: {err}")
         except Exception as e:
             print(f"[X] 오류 발생: {e}")
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        print(f"[X] 처리 중 예외 발생: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
     finally:
         for temp_path in ["/tmp/temp_cv.pdf", "/tmp/temp_cv.txt"]:
