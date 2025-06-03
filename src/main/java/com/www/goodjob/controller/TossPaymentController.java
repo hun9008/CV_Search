@@ -156,9 +156,9 @@ public class TossPaymentController {
     public ResponseEntity<?> verifyAmount(HttpSession session,
                                           @RequestBody SaveAmountRequest req,
                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
-        String storedAmount = (String) session.getAttribute(req.orderId()); // 여기서 왜 orderId를 가져오는 거야?? amount 아님?
+        Object storedObj = session.getAttribute(req.orderId());
 
-        if (storedAmount == null || !storedAmount.equals(req.amount())) {
+        if (!(storedObj instanceof Long storedAmount) || storedAmount != req.amount()) {
             return ResponseEntity.badRequest()
                     .body(PaymentErrorResponse.builder()
                             .code(400)
@@ -170,19 +170,20 @@ public class TossPaymentController {
         return ResponseEntity.ok("Payment is valid");
     }
 
+
     @Operation(
             summary = "사용자 결제 플랜 조회",
             description = """
-                ✅ 로그인된 사용자의 현재 결제 플랜을 조회합니다.
-                
-                - 회원가입 시 기본 플랜은 '스타터'입니다.
-                - 결제 완료 시 '베이직'으로 변경됩니다.
-                
-                [성공 응답 예시]
-                {
-                  "plan": "베이직"
-                }
-                """
+                    ✅ 로그인된 사용자의 현재 결제 플랜을 조회합니다.
+                    
+                    - 회원가입 시 기본 플랜은 '스타터'입니다.
+                    - 결제 완료 시 '베이직'으로 변경됩니다.
+                    
+                    [성공 응답 예시]
+                    {
+                      "plan": "베이직"
+                    }
+                    """
     )
     @GetMapping("/plan")
     public ResponseEntity<?> getUserPlan(@AuthenticationPrincipal CustomUserDetails userDetails) {
