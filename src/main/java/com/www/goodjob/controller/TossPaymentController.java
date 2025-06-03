@@ -12,10 +12,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -60,6 +62,9 @@ public class TossPaymentController {
             JsonNode node = objectMapper.readTree(response.body().toString());
 
             TossPayment payment = tossPaymentService.handlePaymentConfirmation(node, userDetails.getUser());
+            if (payment == null) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Toss 결제 응답이 없습니다.");
+            }
 
             return ResponseEntity.ok(TossPaymentResponseDto.from(payment));
 
