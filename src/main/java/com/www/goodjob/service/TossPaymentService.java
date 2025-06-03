@@ -3,13 +3,17 @@ package com.www.goodjob.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.TossPayment;
+import com.www.goodjob.domain.User;
 import com.www.goodjob.dto.tossdto.ConfirmPaymentRequest;
 import com.www.goodjob.dto.tossdto.CancelPaymentRequest;
+import com.www.goodjob.enums.TossPaymentMethod;
+import com.www.goodjob.enums.TossPaymentPlan;
 import com.www.goodjob.enums.TossPaymentStatus;
 import com.www.goodjob.repository.TossPaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.net.http.*;
@@ -71,5 +75,26 @@ public class TossPaymentService {
             payment.setTossPaymentStatus(TossPaymentStatus.CANCELED);
             tossPaymentRepository.save(payment);
         });
+    }
+
+    @Transactional
+    public TossPayment handlePaymentConfirmation(JsonNode node, User user) {
+        TossPayment payment = TossPayment.builder()
+                .tossPaymentKey(node.get("paymentKey").asText())
+                .tossOrderId(node.get("orderId").asText())
+                .totalAmount(node.get("totalAmount").asLong())
+                .tossPaymentMethod(TossPaymentMethod.valueOf(node.get("method").asText()))
+                .tossPaymentStatus(TossPaymentStatus.valueOf(node.get("status").asText()))
+                .tossPaymentPlan(TossPaymentPlan.베이직)
+                .user(user)
+                .build();
+
+        tossPaymentRepository.save(payment);
+        updateUserPlan(user, TossPaymentPlan.베이직);
+        return payment;
+    }
+
+    public void updateUserPlan(User user, TossPaymentPlan plan) {
+        user.setPlan(plan);
     }
 }
