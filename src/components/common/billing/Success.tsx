@@ -3,11 +3,11 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import useBillingStore from '../../../store/billingStore';
 import './Payments.css';
 import { verifyResponse } from '../../../types/billing';
-// import usePageStore from '../../../store/pageStore';
+import usePageStore from '../../../store/pageStore';
 
 export function SuccessPage() {
     const navigate = useNavigate();
-    // const previousPage = usePageStore((state) => state.previousPage);
+    const previousPage = usePageStore((state) => state.previousPage);
     const { verifyAmountInfo, confirmPayments } = useBillingStore();
     const [searchParams] = useSearchParams();
     const [responseData, setResponseData] = useState<verifyResponse | null>(null);
@@ -31,8 +31,7 @@ export function SuccessPage() {
                 setResponseData(res);
                 const confirm = await confirmPayments(confirmData);
                 setResponseData(confirm);
-                // navigate(previousPage);
-                navigate('/main/recommend');
+                navigate(previousPage);
             } catch (error) {
                 const err = error as { code?: string; message?: string };
                 navigate(
