@@ -215,4 +215,41 @@ public class TossPaymentController {
         TossPaymentPlan plan = user.getPlan();
         return ResponseEntity.ok(Map.of("plan", plan.name()));
     }
+
+    @Operation(
+            summary = "결제 플랜 구독 취소 (베이직 → 스타터)",
+            description = """
+                    ✅ 현재 사용자의 플랜을 '베이직'에서 '스타터'로 강제 변경합니다.
+                    
+                    - 일반적으로 구독 해지나 기간 만료 시 사용합니다.
+                    - 변경된 플랜은 즉시 DB에 반영됩니다.
+                    
+                    [성공 응답 예시]
+                    {
+                      "message": "플랜이 스타터로 변경되었습니다.",
+                      "plan": "스타터"
+                    }
+                    
+                    - 확장 가능성
+                    - 1. 구독 만료일 자동 계산 후 @Scheduled로 주기적 플랜 변경
+                    - 2. 관리자 권한으로 플랜 강제 변경 API (PATCH /admin/users/{id}/plan 등)
+                    """
+    )
+    @PostMapping("/cancelPlan")
+    public ResponseEntity<?> cancelPlan(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getUser().getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPlan(TossPaymentPlan.스타터);
+        userRepository.save(user);
+
+        log.info("[플랜 취소] userId={}, 변경 플랜={}", userId, user.getPlan());
+
+        return ResponseEntity.ok(Map.of(
+                "message", "플랜이 스타터로 변경되었습니다.",
+                "plan", user.getPlan().name()
+        ));
+    }
+
 }
