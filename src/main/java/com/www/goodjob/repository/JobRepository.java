@@ -96,7 +96,8 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             "j.id, j.companyName, j.title, j.jobValidType, j.isPublic, j.createdAt, j.applyEndDate, j.url) " +
             "FROM Job j "
        )
-    List<ValidJobDto> findAllWithValidType();
+
+    Page<ValidJobDto> findAllWithValidType(Pageable pageable);
 
     long countByCreatedAtAfter(LocalDateTime date);
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);

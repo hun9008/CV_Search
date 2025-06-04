@@ -10,6 +10,10 @@ import com.www.goodjob.service.JobService;
 import com.www.goodjob.service.MonitoringService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -90,6 +94,13 @@ public class AdminDashboardController {
 
 
     @Operation(summary = "job +valid Type 함께 가져오는 함수" ,description=  """
+            
+            
+          📌 페이징 관련 설명:
+                - page는 0부터 시작함 (예: 첫 페이지 → page=0)
+                - size는 한 페이지당 보여줄 공고 수 설정함 (예: size=10이면 한 페이지에 10개씩 나옴)
+                - 기본 정렬은 createdAt(공고 등록일순) 기준 내림차순 (최신순)
+            
             응답 방식
              기존의 공고 정보와 validType이 전달됨   
              validType :\n 
@@ -125,9 +136,18 @@ public class AdminDashboardController {
             ]
             """)
     @GetMapping("/job-valid-type" )
-    public ResponseEntity<?> getJobWithValidType(){
+    public ResponseEntity<?> getJobWithValidType(
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable
+    ){
         try{
-            List<ValidJobDto> JobList =jobService.findAllJobWithValidType();
+            List<ValidJobDto> JobList =jobService.findAllJobWithValidType(pageable);
             return ResponseEntity.ok(JobList);
         }
         catch (Exception e){
