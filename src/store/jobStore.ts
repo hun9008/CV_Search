@@ -63,20 +63,31 @@ const useJobStore = create<JobStore>()(
             },
 
             getFeedback: async (jobId) => {
-                try {
-                    const accessToken = useAuthStore.getState().accessToken;
-                    const res = await axios.post(`${SERVER_IP}/rec/feedback?jobId=${jobId}`, null, {
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                        },
-                        withCredentials: true,
-                    });
-                    set({ feedback: res.data });
-                    return res.status;
-                } catch (error) {
-                    console.error('피드백 에러: ', error);
-                    throw error;
+            try {
+                const accessToken = useAuthStore.getState().accessToken;
+                const selectedCVId = get().selectedCVId;
+
+                if (!selectedCVId) {
+                throw new Error("선택된 CV가 없습니다.");
                 }
+
+                const res = await axios.post(
+                `${SERVER_IP}/rec/feedback?jobId=${jobId}&cvId=${selectedCVId}`,
+                null,
+                {
+                    headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    },
+                    withCredentials: true,
+                }
+                );
+
+                set({ feedback: res.data });
+                return res.status;
+            } catch (error) {
+                console.error("피드백 요청 실패:", error);
+                throw error;
+            }
             },
 
             setJobList: (jobList) => set({ jobList }),
