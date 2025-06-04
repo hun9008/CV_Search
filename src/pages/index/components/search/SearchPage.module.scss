@@ -269,3 +269,35 @@
         }
     }
 }
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    .header {
+        &__title {
+            font-size: 1.3em;
+            span {
+                font-size: 1.1em;
+            }
+        }
+    }
+    .resultsGrid {
+        grid-template-columns: 1fr; // Single column
+        gap: 15px;
+    }
+    .noResults,
+    .loading {
+        font-size: 1em;
+        padding: 20px;
+    }
+    .pagination {
+        button {
+            padding: 8px 12px;
+            font-size: 0.9em;
+        }
+        span {
+            font-size: 0.9em;
+        }
+    }
+}

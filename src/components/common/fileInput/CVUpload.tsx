@@ -1,11 +1,11 @@
 import style from './CVUpload.module.scss';
 import { useCallback, useRef, useState } from 'react';
 import { UploadCloud, FileText, X, Check, AlertCircle } from 'lucide-react';
-import useFileStore from '../../store/fileStore';
-import useS3Store from '../../store/s3Store';
+import useFileStore from '../../../store/fileStore';
+import useS3Store from '../../../store/s3Store';
 import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../../store/authStore';
-import useUserStore from '../../store/userStore';
+import useAuthStore from '../../../store/authStore';
+import useUserStore from '../../../store/userStore';
 
 function CVUpload() {
     const [isDragging, setIsDragging] = useState(false);

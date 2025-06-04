@@ -252,3 +252,48 @@
         }
     }
 }
+// Similar to SignUp.module.scss
+@media (max-width: 768px) {
+    .pageWrapper {
+        padding: 20px;
+    }
+    .ratioContainer {
+        padding-bottom: 0;
+        height: auto;
+        min-height: 80vh;
+    }
+    .login {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+
+        &__card {
+            padding: 25px;
+        }
+        &__title {
+            font-size: 2em;
+        }
+        &__subtitle {
+            font-size: 0.9em;
+            margin-bottom: 25px;
+        }
+        &__buttons {
+            gap: 15px;
+            button {
+                width: 100%;
+                font-size: 0.95em;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .login {
+        &__title {
+            font-size: 1.8em;
+        }
+        &__subtitle {
+            font-size: 0.85em;
+        }
+    }
+}

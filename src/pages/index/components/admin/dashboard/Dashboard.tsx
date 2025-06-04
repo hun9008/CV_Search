@@ -85,7 +85,7 @@ function Dashboard() {
             <div className={style.card}>
                 <div className={style.cardHeader}>
                     <h3 className={style.cardTitle}>🖥️ 서버 운영 상태</h3>
-                    <p className={style.cardSubtitle}>실시간 시스템 모니터링</p>
+                    <p className={style.cardSubtitle}>실시간 시스템 모니터링(10초 간격)</p>
                 </div>
                 <div className={style.serverList}>
                     {serverInfo.map((server, index) => (
@@ -106,13 +106,13 @@ function Dashboard() {
                                 <span className={style.metric}>
                                     <span className={style.metricLabel}>가동률:</span>
                                     <span className={style.metricValue}>
-                                        {server.uptime * 100}%
+                                        {(server.uptime * 100).toFixed(2)}%
                                     </span>
                                 </span>
                                 <span className={style.metric}>
                                     <span className={style.metricLabel}>응답:</span>
                                     <span className={style.metricValue}>
-                                        {server.responseTime.toFixed(1)} ms
+                                        {server.responseTime.toFixed(2)} ms
                                     </span>
                                 </span>
                             </div>
@@ -131,6 +131,9 @@ function Dashboard() {
 
     useEffect(() => {
         getServerInfo();
+        setInterval(() => {
+            getServerInfo();
+        }, 10000);
     }, []);
 
     return (

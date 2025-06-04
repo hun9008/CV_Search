@@ -31,7 +31,7 @@ const useAuthStore = create<AuthStore>()(
                 });
                 if (res.status === 200) {
                     set({ accessToken: null, isLoggedIn: false });
-                    localStorage.removeItem('admin-storage');
+                    localStorage.removeItem('admin-job-storage');
                     localStorage.removeItem('user-storage');
                     localStorage.removeItem('page-storage');
                     localStorage.removeItem('user-token');
@@ -46,11 +46,7 @@ const useAuthStore = create<AuthStore>()(
                     console.log('탈퇴중');
                     if (res.status === 200) {
                         console.log('탈퇴완료');
-                        localStorage.removeItem('user-token');
-                        localStorage.removeItem('user-storage');
-                        localStorage.removeItem('admin-storage');
-                        localStorage.removeItem('search-history');
-                        localStorage.removeItem('page-storage');
+                        localStorage.clear();
                     }
                 } catch (error) {
                     console.log(error);

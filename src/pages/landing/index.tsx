@@ -1,7 +1,7 @@
 import style from './styles/index.module.scss';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/common/header/Header';
-import CVUpload from '../../components/fileInput/CVUpload';
+import CVUpload from '../../components/common/fileInput/CVUpload';
 import useAuthStore from '../../store/authStore';
 import useUserStore from '../../store/userStore';
 
