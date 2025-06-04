@@ -3,8 +3,10 @@ package com.www.goodjob.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.TossPayment;
+import com.www.goodjob.domain.User;
 import com.www.goodjob.dto.tossdto.*;
 import com.www.goodjob.enums.TossPaymentPlan;
+import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.TossPaymentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +30,7 @@ import java.util.Map;
 public class TossPaymentController {
 
     private final TossPaymentService tossPaymentService;
+    private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
     @Operation(
@@ -205,7 +208,11 @@ public class TossPaymentController {
     )
     @GetMapping("/plan")
     public ResponseEntity<?> getUserPlan(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        TossPaymentPlan plan = userDetails.getUser().getPlan();
+        Long userId = userDetails.getUser().getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        TossPaymentPlan plan = user.getPlan();
         return ResponseEntity.ok(Map.of("plan", plan.name()));
     }
 }

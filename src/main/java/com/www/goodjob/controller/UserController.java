@@ -43,11 +43,14 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
         if (userDetails == null) {
-            // Spring Security에서 일반적으로 이 로직까지 오지 않지만, 명시적으로 작성해도 좋음
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        User user = userDetails.getUser();
+        // DB에서 유저를 다시 조회 (plan 변경 반영됨)
+        Long userId = userDetails.getUser().getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         return ResponseEntity.ok(UserDto.from(user));
     }
 

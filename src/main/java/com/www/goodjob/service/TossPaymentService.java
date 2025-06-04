@@ -20,7 +20,9 @@ import java.net.URI;
 import java.net.http.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TossPaymentService {
@@ -87,6 +89,8 @@ public class TossPaymentService {
         persistedUser.setPlan(TossPaymentPlan.베이직);
         userRepository.save(persistedUser);
 
+        log.info("[결제] 사용자 플랜 변경 완료 - userId={}, plan={}", persistedUser.getId(), persistedUser.getPlan());
+
         TossPayment payment = TossPayment.builder()
                 .tossPaymentKey(node.get("paymentKey").asText())
                 .tossOrderId(node.get("orderId").asText())
@@ -98,6 +102,8 @@ public class TossPaymentService {
                 .build();
 
         tossPaymentRepository.save(payment);
+        log.info("[결제] TossPayment 저장 완료 - paymentKey={}", payment.getTossPaymentKey());
+
         return payment;
     }
 
