@@ -1,17 +1,26 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import axios from 'axios';
 import useAuthStore from './authStore';
 import useBookmarkStore from './bookmarkStore';
 import Job from '../types/job';
 import { SERVER_IP } from '../../src/constants/env';
 
+interface CvMe {
+    id: number;
+    userId: number;
+    fileName: string;
+    uploadedAt: Date;
+}
 interface JobStore {
     jobList: Job[];
+    selectedCVId: number | null;
     filteredJobList: Job[] | null;
     selectedJob: Job | null;
     selectedJobDetail: Job | null;
     feedback: string;
     setSelectedJob: (job: Job) => void;
+    setSelectedCvId: (cvId: number) => void;
     setSelectedJobDetail: (job: Job) => void;
     getSelectedJob: () => Job | null;
     getSelectedJobDetail: () => Job | null;
@@ -20,90 +29,130 @@ interface JobStore {
     setFilteredJobList: (list: Job[] | null) => void;
     getJobList: (count: number) => Promise<Job[]>;
     getJobListwithBookmark: (count: number) => Promise<Job[]>;
+    getSelectedCvId: () => Promise<number>;
 }
 
-const useJobStore = create<JobStore>((set, get) => ({
-    jobList: [],
-    filteredJobList: [],
-    selectedJob: null,
-    selectedJobDetail: null,
-    feedback: '',
+const useJobStore = create<JobStore>()(
+    persist(
+        (set, get) => ({
+            jobList: [],
+            filteredJobList: [],
+            selectedJob: null,
+            selectedJobDetail: null,
+            feedback: '',
+            selectedCVId: null,
+            setSelectedJob: (job) => set({ selectedJob: job }),
+            setSelectedJobDetail: (job) => set({ selectedJobDetail: job }),
+            setFilteredJobList: (filteredJobList) => set({ filteredJobList }),
+            setSelectedCvId: (cvid) => set({ selectedCVId: cvid }),
 
-    setSelectedJob: (job) => set({ selectedJob: job }),
-    setSelectedJobDetail: (job) => set({ selectedJobDetail: job }),
-    setFilteredJobList: (filteredJobList) => set({ filteredJobList }),
+            getSelectedJob: () => {
+                const { selectedJob } = get();
+                return selectedJob;
+            },
+            getSelectedJobDetail: () => {
+                const { selectedJobDetail } = get();
+                return selectedJobDetail;
+            },
 
-    getSelectedJob: () => {
-        const { selectedJob } = get();
+            getFeedback: async (jobId) => {
+                try {
+                    const accessToken = useAuthStore.getState().accessToken;
+                    const res = await axios.post(`${SERVER_IP}/rec/feedback?jobId=${jobId}`, null, {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        withCredentials: true,
+                    });
+                    set({ feedback: res.data });
+                    return res.status;
+                } catch (error) {
+                    console.error('피드백 에러: ', error);
+                    throw error;
+                }
+            },
 
-        return selectedJob;
-    },
-    getSelectedJobDetail: () => {
-        const { selectedJobDetail } = get();
+            setJobList: (jobList) => set({ jobList }),
 
-        return selectedJobDetail;
-    },
+            getJobList: async (count) => {
+                try {
+                    const accessToken = useAuthStore.getState().accessToken;
+                    // CV 검증 과정
 
-    getFeedback: async (jobId) => {
-        try {
-            const accessToken = useAuthStore.getState().accessToken;
-            const res = await axios.post(`${SERVER_IP}/rec/feedback?jobId=${jobId}`, null, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                withCredentials: true,
-            });
-            set({ feedback: res.data });
-            return res.status;
-        } catch (error) {
-            console.error('피드백 에러: ', error);
-            throw error;
+                    const cvId = await useJobStore.getState().getSelectedCvId();
+
+                    const res = await axios.post(
+                        `${SERVER_IP}/rec/topk-list?topk=${count}&cvId=${cvId}`,
+                        null,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`,
+                            },
+                            withCredentials: true,
+                        }
+                    );
+                    const jobList: Job[] = res.data || [];
+                    set({ jobList });
+                    return jobList;
+                } catch (error) {
+                    console.error('잡 리스트 에러: ', error);
+                    throw error;
+                }
+            },
+
+            getJobListwithBookmark: async (count) => {
+                try {
+                    const { getJobList } = get();
+                    const getBookmark = useBookmarkStore.getState().getBookmark;
+
+                    const [topkRes, bookmarkRes] = await Promise.all([
+                        getJobList(count),
+                        getBookmark?.() || Promise.resolve([]),
+                    ]);
+
+                    const bookmarkedJob = Array.isArray(bookmarkRes) ? bookmarkRes : [];
+                    const bookmarkedIds = new Set<number>(bookmarkedJob.map((job: Job) => job.id));
+                    const bookmarkedJobs: Job[] = topkRes.map((job: Job) => ({
+                        ...job,
+                        isBookmarked: bookmarkedIds.has(job.id),
+                    }));
+
+                    return bookmarkedJobs;
+                } catch (error) {
+                    console.error('북마크 포함 잡 리스트 에러: ', error);
+                    throw error;
+                }
+            },
+            getSelectedCvId: async () => {
+                try {
+                    const accessToken = useAuthStore.getState().accessToken;
+                    const res = await axios.get(`${SERVER_IP}/cv/me`, {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                        withCredentials: true,
+                    });
+                    // uploadedAt이 가장 최근인 CV 선택
+                    const latestCV = res.data.reduce((latest: CvMe, current: CvMe) => {
+                        return new Date(current.uploadedAt) > new Date(latest.uploadedAt)
+                            ? current
+                            : latest;
+                    }, res.data[0]);
+                    set({ selectedCVId: latestCV.id });
+                    return latestCV.id;
+                } catch (error) {
+                    console.error('유저 CV 정보 가져오기 오류: ', error);
+                    throw error;
+                }
+            },
+        }),
+        {
+            name: 'cv-storage',
+            partialize: (state) => ({
+                selectedCVId: state.selectedCVId,
+            }),
         }
-    },
-
-    setJobList: (jobList) => set({ jobList }),
-
-    getJobList: async (count) => {
-        try {
-            const accessToken = useAuthStore.getState().accessToken;
-            const res = await axios.post(`${SERVER_IP}/rec/topk-list?topk=${count}`, null, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                withCredentials: true,
-            });
-            const jobList: Job[] = res.data || [];
-            set({ jobList });
-            return jobList;
-        } catch (error) {
-            console.error('잡 리스트 에러: ', error);
-            throw error;
-        }
-    },
-
-    getJobListwithBookmark: async (count) => {
-        try {
-            const { getJobList } = get();
-            const getBookmark = useBookmarkStore.getState().getBookmark;
-
-            const [topkRes, bookmarkRes] = await Promise.all([
-                getJobList(count),
-                getBookmark?.() || Promise.resolve([]),
-            ]);
-
-            const bookmarkedJob = Array.isArray(bookmarkRes) ? bookmarkRes : [];
-            const bookmarkedIds = new Set<number>(bookmarkedJob.map((job: Job) => job.id));
-            const bookmarkedJobs: Job[] = topkRes.map((job: Job) => ({
-                ...job,
-                isBookmarked: bookmarkedIds.has(job.id),
-            }));
-
-            return bookmarkedJobs;
-        } catch (error) {
-            console.error('북마크 포함 잡 리스트 에러: ', error);
-            throw error;
-        }
-    },
-}));
+    )
+);
 
 export default useJobStore;

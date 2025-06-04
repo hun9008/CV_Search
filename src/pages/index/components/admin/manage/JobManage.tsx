@@ -116,6 +116,7 @@ function JobManage() {
         if (!totalJob || totalJob.length === 0) {
             fetchData();
         }
+        // fetchData();
     }, []);
 
     const getSortIcon = (field: SortField) => {

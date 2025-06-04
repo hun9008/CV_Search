@@ -14,6 +14,9 @@ import CustomerFeedback from './pages/index/components/admin/customerService/Cus
 import Manage from './pages/index/components/manage/Manage';
 import RecommendJob from './pages/index/components/jobList/RecommendJob';
 import SearchPage from './pages/index/components/search/SearchPage';
+import { CheckoutPage } from './components/common/billing/Checkout';
+import { SuccessPage } from './components/common/billing/Success';
+import { FailPage } from './components/common/billing/Fail';
 
 function App() {
     return (
@@ -35,6 +38,9 @@ function App() {
                 <Route index path="/" element={<LandingPage />}></Route>
                 <Route index path="/signIn" element={<SignIn />}></Route>
                 <Route index path="/signUp" element={<SignUp />}></Route>
+                <Route path="/payments" element={<CheckoutPage />}></Route>
+                <Route path="/success" element={<SuccessPage />}></Route>
+                <Route path="/fail" element={<FailPage />}></Route>
             </Routes>
         </BrowserRouter>
     );

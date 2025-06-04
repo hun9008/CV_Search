@@ -21,7 +21,7 @@ const useAdminJobManageStore = create<adminJobManageStore>()(
                 try {
                     const accessToken = useAuthStore.getState().accessToken;
                     const res = await axios.delete(
-                        `${SERVER_IP}/jobs/delete-one-job-valid-type?jobId=${jobId}&validType=${vaildType}`,
+                        `${SERVER_IP}/admin/dashboard/delete-one-job-valid-type?jobId=${jobId}&validType=${vaildType}`,
                         {
                             headers: { Authorization: `Bearer ${accessToken}` },
                             withCredentials: true,
@@ -36,7 +36,7 @@ const useAdminJobManageStore = create<adminJobManageStore>()(
             getTotalJob: async () => {
                 try {
                     const accessToken = useAuthStore.getState().accessToken;
-                    const res = await axios.get(`${SERVER_IP}/jobs/job-valid-type`, {
+                    const res = await axios.get(`${SERVER_IP}/admin/dashboard/job-valid-type`, {
                         headers: { Authorization: `Bearer ${accessToken}` },
                         withCredentials: true,
                     });

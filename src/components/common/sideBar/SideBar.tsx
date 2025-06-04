@@ -5,7 +5,6 @@ import {
     Bookmark,
     User,
     Crown,
-    FileUser,
     LayoutDashboard,
     Briefcase,
     Sticker,
@@ -14,18 +13,24 @@ import usePageStore from '../../../store/pageStore';
 import style from './SideBar.module.scss';
 import useUserStore from '../../../store/userStore';
 import SideBarProfileDialog from '../dialog/SideBarProfileDialog';
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'; // useState 추가
 import useAuthStore from '../../../store/authStore';
+import PricingDialog from '../pricing/PricingDialog'; // PricingDialog import 추가
+
 function SideBar() {
     const { name, email, fetchUserData } = useUserStore();
+    const userPlan = useUserStore((state) => state.plan);
     const isAdmin = useUserStore((state) => state.isAdmin);
     const [activeContent, setActiveContent] = useState('');
     const isCompactMenu = usePageStore((state) => state.isCompactMenu);
+    const setPreviousPage = usePageStore((state) => state.setPreviousPage);
     const navigate = useNavigate();
     type userPageContent = (typeof userMenuItems)[number]['id'];
     type adminPageContent = (typeof adminMenuItems)[number]['id'];
     const location = useLocation();
     const path = location.pathname;
+
+    const [isPricingDialogOpen, setIsPricingDialogOpen] = useState(false); // 다이얼로그 상태 추가
 
     useEffect(() => {
         const currentMenu = (path: string) => {
@@ -40,7 +45,7 @@ function SideBar() {
         };
         const current = currentMenu(path);
         setActiveContent(current ?? '');
-    }, []);
+    }, [path]);
 
     const userMenuItems = [
         {
@@ -64,12 +69,12 @@ function SideBar() {
             icon: User,
         },
 
-        {
-            id: 'CV 생성',
-            path: '/main',
-            icon: FileUser,
-        },
-    ] as const; // as const를 붙이면 타입을 추론하는 것이 아니라 리터럴 자체로 고정됨
+        // {
+        //     id: 'CV 생성',
+        //     path: '/main',
+        //     icon: FileUser,
+        // },
+    ] as const;
 
     const adminMenuItems = [
         {
@@ -94,88 +99,115 @@ function SideBar() {
     };
 
     useEffect(() => {
-        const accessToken = useAuthStore.getState().accessToken; // 쿠키에서 가져오든, 로컬 변수든
+        const accessToken = useAuthStore.getState().accessToken;
         if (accessToken) {
             fetchUserData(accessToken);
         }
-    }, []);
+    }, [fetchUserData]);
+
+    const handleUpgradeClick = () => {
+        setPreviousPage(location.pathname);
+        setIsPricingDialogOpen(true);
+    };
 
     return (
-        <div className={`${style.sidebar} ${isCompactMenu ? style.sidebar__hidden : ''}`}>
-            <div className={style.sidebar__container}>
-                {isAdmin ? (
-                    <div className={style.sidebar__logo}>goodJob</div>
-                ) : (
-                    <div className={style.sidebar__logo} onClick={handleLogoClick}>
-                        goodJob
-                    </div>
-                )}
+        <>
+            {' '}
+            {/* Fragment로 감싸서 PricingDialog를 형제 요소로 추가 */}
+            <div className={`${style.sidebar} ${isCompactMenu ? style.sidebar__hidden : ''}`}>
+                <div className={style.sidebar__container}>
+                    {isAdmin ? (
+                        <div className={style.sidebar__logo}>goodJob</div>
+                    ) : (
+                        <div className={style.sidebar__logo} onClick={handleLogoClick}>
+                            goodJob
+                        </div>
+                    )}
 
-                <div className={style.sidebar__navigation}>
-                    <ul className={style.sidebar__menu}>
-                        {isAdmin
-                            ? adminMenuItems.map((item) => (
-                                  <li key={item.id} className={style.sidebar__menuItem}>
-                                      <Link
-                                          to={item.path}
-                                          className={`${style.sidebar__menuLink} ${
-                                              activeContent === item.id ? style.active : ''
-                                          }`}
-                                          onClick={() => handleMenuClick(item.id)}>
-                                          <item.icon
-                                              className={style.sidebar__menuIcon}
-                                              size={24}
-                                          />
-                                          <span className={style.sidebar__menuText}>{item.id}</span>
-                                      </Link>
-                                  </li>
-                              ))
-                            : userMenuItems.map((item) => (
-                                  <li key={item.id} className={style.sidebar__menuItem}>
-                                      <Link // 이후 삭제할 것
-                                          to={item.path}
-                                          className={`${style.sidebar__menuLink} ${
-                                              activeContent === item.id ? style.active : ''
-                                          }`}
-                                          onClick={() => handleMenuClick(item.id)}>
-                                          <item.icon
-                                              className={style.sidebar__menuIcon}
-                                              size={24}
-                                          />
-                                          <span className={style.sidebar__menuText}>{item.id}</span>
-                                      </Link>
-                                  </li>
-                              ))}
-                    </ul>
+                    <div className={style.sidebar__navigation}>
+                        <ul className={style.sidebar__menu}>
+                            {isAdmin
+                                ? adminMenuItems.map((item) => (
+                                      <li key={item.id} className={style.sidebar__menuItem}>
+                                          <Link
+                                              to={item.path}
+                                              className={`${style.sidebar__menuLink} ${
+                                                  activeContent === item.id ? style.active : ''
+                                              }`}
+                                              onClick={() => handleMenuClick(item.id)}>
+                                              <item.icon
+                                                  className={style.sidebar__menuIcon}
+                                                  size={24}
+                                              />
+                                              <span className={style.sidebar__menuText}>
+                                                  {item.id}
+                                              </span>
+                                          </Link>
+                                      </li>
+                                  ))
+                                : userMenuItems.map((item) => (
+                                      <li key={item.id} className={style.sidebar__menuItem}>
+                                          <Link
+                                              to={item.path}
+                                              className={`${style.sidebar__menuLink} ${
+                                                  activeContent === item.id ? style.active : ''
+                                              }`}
+                                              onClick={() => handleMenuClick(item.id)}>
+                                              <item.icon
+                                                  className={style.sidebar__menuIcon}
+                                                  size={24}
+                                              />
+                                              <span className={style.sidebar__menuText}>
+                                                  {item.id}
+                                              </span>
+                                          </Link>
+                                      </li>
+                                  ))}
+                        </ul>
 
-                    <div className={style.sidebar__subConatiner}>
-                        {isAdmin ? (
-                            ''
-                        ) : (
-                            <div className={style.plan}>
-                                <div className={style.plan__textContainer}>
-                                    <h3>
-                                        <Crown size={16} className={style.planIcon} />
-                                        베이직 플랜
-                                    </h3>
-                                    <p>제한적인 추천과 관리만 제공됩니다</p>
+                        <div className={style.sidebar__subConatiner}>
+                            {isAdmin ? (
+                                ''
+                            ) : (
+                                <div className={style.plan}>
+                                    <div className={style.plan__textContainer}>
+                                        <h3>
+                                            <Crown size={16} className={style.planIcon} />
+                                            베이직 플랜
+                                        </h3>
+                                        <p>제한적인 추천과 관리만 제공됩니다</p>
+                                    </div>
+                                    <button
+                                        className={style.plan__upgrade}
+                                        onClick={handleUpgradeClick} // onClick 핸들러 연결
+                                    >
+                                        업그레이드
+                                    </button>
                                 </div>
-                                <button className={style.plan__upgrade}>업그레이드</button>
-                            </div>
-                        )}
+                            )}
 
-                        <span className={style.divider}></span>
-                        <div className={style.sidebar__profile}>
-                            <SideBarProfileDialog />
-                            <div className={style.sidebar__profile__textArea}>
-                                <p className={style.userName}>{name}</p>
-                                <p className={style.userEmail}>{email}</p>
+                            <span className={style.divider}></span>
+                            <div className={style.sidebar__profile}>
+                                <SideBarProfileDialog />
+                                <div className={style.sidebar__profile__textArea}>
+                                    <p className={style.userName}>{name}</p>
+                                    <p className={style.userEmail}>{email}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            {/* TODO: 추후 유저 플랜에 따라 UI 조정 가능 */}
+            {userPlan === '스타터' ? (
+                <PricingDialog
+                    isOpen={isPricingDialogOpen}
+                    onClose={() => setIsPricingDialogOpen(false)}
+                />
+            ) : (
+                ''
+            )}
+        </>
     );
 }
 

@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { UploadCloud, FileText, X, Check, AlertCircle } from 'lucide-react';
+import { UploadCloud, FileText, X, Check, AlertCircle, FolderPen } from 'lucide-react';
 import style from './styles/Upload.module.scss';
 import { useNavigate } from 'react-router-dom';
 import useFileStore from '../../store/fileStore';
@@ -7,6 +7,8 @@ import useS3Store from '../../store/s3Store';
 
 function Upload() {
     const [isDragging, setIsDragging] = useState(false);
+    const [isChangingName, setIsChangingName] = useState(false);
+    const [fileName, setFileName] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
@@ -42,23 +44,16 @@ function Upload() {
             return;
         }
         setFile(selectedFile); // 파일 세팅
-        try {
-            const presignedURL = await getUploadPresignedURL(); // 서버로부터 S3 업로드 URL을 받아옴
-            if (typeof presignedURL === 'string' && presignedURL) {
-                fileUpload(selectedFile, presignedURL);
-            } else {
-                setError('업로드 URL을 받아오는 데 실패했습니다.');
-            }
-        } catch (error) {
-            console.log(error);
-        }
+
+        setIsChangingName(true);
     };
 
     const fileUpload = (selectedFile: File, presignedURL: string) => {
         setIsUploading(true);
         setUploadSuccess(false);
+        // cvlist 최신화 추가
 
-        uploadFile(selectedFile, presignedURL);
+        uploadFile(selectedFile, presignedURL, fileName);
 
         // pdf 업로드와 스프링 서버의 CV 처리 시간을 벌어줌
         setTimeout(() => {
@@ -93,20 +88,60 @@ function Upload() {
         }
     };
 
+    /** 파일 이름 설정 */
+    const handleFileNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setError(null);
+        const text = e.target.value;
+        setFileName(text);
+    };
+
+    const handleFileNameSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log(`FileName: ${fileName}`);
+
+        // 파일 이름을 입력했다면
+        if (fileName) {
+            try {
+                console.log(`FileName: ${fileName}`);
+                const presignedURL = await getUploadPresignedURL(fileName); // 서버로부터 S3 업로드 URL을 받아옴
+                if (typeof presignedURL === 'string' && presignedURL) {
+                    if (file) {
+                        setIsChangingName(false);
+                        fileUpload(file, presignedURL);
+                    } else {
+                        setError('파일이 선택되지 않았습니다.');
+                    }
+                } else {
+                    console.log(error);
+                    return;
+                }
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    console.error(error.message);
+                }
+                return;
+            }
+        } else {
+            setError('CV의 별명을 입력해주세요!');
+            return;
+        }
+    };
+
     const handleButtonClick = () => {
         fileInputRef.current?.click();
     };
 
     /** 나중에 할래요 버튼 처리 로직 */
     const handleSkip = () => {
+        setFile(null);
         navigate('/');
     };
 
     const handleContinue = () => {
         // 계속하기 버튼 처리 로직
         if (file && uploadSuccess) {
-            console.log('Continue with uploaded file:', file.name);
             navigate('/main/recommend', { replace: true });
+            setTimeout(() => setFile(null), 2000);
         } else {
             setError('계속하려면 CV를 업로드해주세요.');
         }
@@ -116,9 +151,13 @@ function Upload() {
         <div className={style.page}>
             <div className={style.container}>
                 <div className={style.title}>
-                    <h1 className={style.title__text}>CV를 업로드하세요</h1>
+                    <h1 className={style.title__text}>
+                        {isChangingName ? 'CV의 별명을 입력해주세요' : 'CV를 업로드하세요'}
+                    </h1>
                     <p className={style.title__subtext}>
-                        업로드하지 않으면 맞춤 공고 추천을 받을 수 없습니다.
+                        {isChangingName
+                            ? '별명은...'
+                            : '업로드하지 않으면 맞춤 공고 추천을 받을 수 없습니다.'}
                     </p>
                 </div>
 
@@ -199,6 +238,30 @@ function Upload() {
                             )}
                         </div>
                     )}
+                    {isChangingName && (
+                        <div className={style.filePreview}>
+                            <div className={style.filePreview__header}>
+                                <div className={style.filePreview__icon}>
+                                    <FolderPen size={32} />
+                                </div>
+                                <div className={style.filePreview__info}>
+                                    <form onSubmit={handleFileNameSubmit}>
+                                        <input
+                                            type="text"
+                                            placeholder="CV 별명"
+                                            value={fileName}
+                                            onChange={handleFileNameChange}
+                                            className={style.searchInput}
+                                        />
+                                    </form>
+                                    {/* <p className={style.filePreview__name}>{file.name}</p>
+                                    <p className={style.filePreview__size}>
+                                        {(file.size / (1024 * 1024)).toFixed(2)} MB
+                                    </p> */}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {error && (
@@ -216,7 +279,7 @@ function Upload() {
                         className={`${style.dragAndDropCard__button} ${
                             !file || isUploading ? style.disabled : ''
                         }`}
-                        onClick={handleContinue}
+                        onClick={isChangingName ? handleFileNameSubmit : handleContinue}
                         disabled={!file || isUploading}>
                         계속하기
                     </button>

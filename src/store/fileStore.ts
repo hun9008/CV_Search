@@ -3,6 +3,7 @@ import axios from 'axios';
 import useAuthStore from './authStore';
 import useUserStore from './userStore';
 import { SERVER_IP } from '../../src/constants/env';
+import useJobStore from './jobStore';
 
 interface fileStore {
     file: File | null;
@@ -10,9 +11,9 @@ interface fileStore {
     summary: string | null;
     setFile: (file: File | null) => void;
     setHasFile: (exists: boolean) => void;
-    removeFile: () => Promise<number>;
+    removeFile: (fileName: string) => Promise<number>;
     getSummary: () => Promise<void>;
-    uploadFile: (file: File | null, url: string) => Promise<void>;
+    uploadFile: (file: File | null, url: string, fileName: string) => Promise<void>;
     reUploadFile: (file: File | null, url: string) => Promise<void>;
 }
 
@@ -22,12 +23,9 @@ const useFileStore = create<fileStore>((set) => ({
     hasFile: false,
     setFile: (file: File | null) => set({ file }),
     setHasFile: (exists) => set({ hasFile: exists }),
-    removeFile: async () => {
-        const userId = useUserStore.getState().id;
+    removeFile: async (fileName) => {
         const accessToken = useAuthStore.getState().accessToken;
-        const userEmail = useUserStore.getState().email;
-        const fileName = userEmail.split('@')[0];
-        const res = await axios.delete(`${SERVER_IP}/cv/delete-cv?fileName=${fileName}_${userId}`, {
+        const res = await axios.delete(`${SERVER_IP}/cv/delete-cv?fileName=${fileName}`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
@@ -38,7 +36,8 @@ const useFileStore = create<fileStore>((set) => ({
     getSummary: async () => {
         try {
             const accessToken = useAuthStore.getState().accessToken;
-            const res = await axios.get(`${SERVER_IP}/cv/summary-cv`, {
+            const selectedCVId = useJobStore.getState().selectedCVId;
+            const res = await axios.post(`${SERVER_IP}/cv/summary-cv?cvId=${selectedCVId}`, null, {
                 headers: { Authorization: `Bearer ${accessToken}` },
                 withCredentials: true,
             });
@@ -49,7 +48,7 @@ const useFileStore = create<fileStore>((set) => ({
             throw error;
         }
     },
-    uploadFile: async (file: File | null, url: string) => {
+    uploadFile: async (file: File | null, url: string, fileName: string) => {
         if (!file) {
             console.log('파일이 비어있습니다');
             return;
@@ -63,14 +62,11 @@ const useFileStore = create<fileStore>((set) => ({
             console.timeEnd('⏱️ Upload to S3');
             if (res.status === 200) {
                 const accessToken = useAuthStore.getState().accessToken;
-                const userEmail = useUserStore.getState().email;
-                const userId = useUserStore.getState().id;
-                const fileName = userEmail.split('@')[0];
 
                 console.time('⏱️ confirm-upload');
                 // confirm 후에 로딩해야함
                 const confirm = await axios.post(
-                    `${SERVER_IP}/s3/confirm-upload?fileName=${fileName}_${userId}`,
+                    `${SERVER_IP}/s3/confirm-upload?fileName=${fileName}`,
                     null,
                     {
                         headers: {

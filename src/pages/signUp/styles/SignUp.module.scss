@@ -250,3 +250,49 @@
         }
     }
 }
+@media (max-width: 768px) {
+    .pageWrapper {
+        padding: 20px;
+    }
+    .ratioContainer {
+        padding-bottom: 0; // Adjust as needed, or set a min-height
+        height: auto; // Allow content to define height
+        min-height: 80vh; // Ensure it takes up most of the screen
+    }
+    .login {
+        width: 100%;
+        max-width: 400px; // Limit card width on mobile
+        padding: 20px;
+
+        &__card {
+            padding: 25px;
+        }
+        &__title {
+            font-size: 2em;
+        }
+        &__subtitle {
+            font-size: 0.9em;
+            margin-bottom: 25px;
+        }
+        &__buttons {
+            gap: 15px;
+            // Buttons inside might need width: 100% if they don't stack well
+            button {
+                // Assuming buttons are direct children or target them more specifically
+                width: 100%;
+                font-size: 0.95em;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .login {
+        &__title {
+            font-size: 1.8em;
+        }
+        &__subtitle {
+            font-size: 0.85em;
+        }
+    }
+}

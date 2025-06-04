@@ -4,13 +4,15 @@ import { AlertTriangle, Clock } from 'lucide-react';
 import useFileStore from '../../../store/fileStore';
 import LoadingSpinner from '../loading/LoadingSpinner';
 import useActionStore from '../../../store/actionStore';
+import useCvStore from '../../../store/cvStore';
 
 interface CVDeleteDialogProps {
     isOpen: boolean;
     onClose: () => void;
+    fileName: string;
 }
 
-function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
+function CVDeleteDialog({ isOpen, onClose, fileName }: CVDeleteDialogProps) {
     const dialogRef = useRef<HTMLDivElement>(null);
     const [isChecked, setIsChecked] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -18,6 +20,7 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
     const [showCountdown, setShowCountdown] = useState(false);
     const { removeFile, setHasFile } = useFileStore();
     const { setCVAction } = useActionStore();
+    const { getUserCvList } = useCvStore();
 
     const handleOutsideClick = (e: MouseEvent) => {
         if (!isDeleting) {
@@ -34,11 +37,12 @@ function CVDeleteDialog({ isOpen, onClose }: CVDeleteDialogProps) {
             return;
         }
         setIsDeleting(true);
-        const res = await removeFile();
+        const res = await removeFile(fileName);
 
         if (res === 200) {
             setCVAction((prev) => !prev);
             setHasFile(false);
+            getUserCvList();
             onClose();
             setIsDeleting(false);
             console.log('CV delete Success!!!');

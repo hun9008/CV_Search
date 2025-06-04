@@ -251,3 +251,37 @@
         }
     }
 }
+
+// Similar to JobCard, adjust if structure differs
+@media (max-width: 768px) {
+    .searchCard {
+        padding: 15px;
+    }
+    .header {
+        &__logo {
+            width: 35px;
+            height: 35px;
+        }
+        &__companyInfo h3 {
+            font-size: 1em;
+        }
+        &__companyInfo p {
+            font-size: 0.8em;
+        }
+    }
+    .body {
+        &__title {
+            font-size: 1.1em;
+        }
+        &__tags {
+            .tag {
+                font-size: 0.75em;
+            }
+        }
+    }
+    .footer {
+        &__info {
+            font-size: 0.8em;
+        }
+    }
+}

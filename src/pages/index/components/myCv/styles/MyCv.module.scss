@@ -113,13 +113,14 @@
 }
 
 .cvviewer {
-    width: 50%;
+    min-width: 50%;
+    max-width: 50%;
     display: flex;
     flex-direction: column;
-    background-color: white;
+    // background-color: white;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 @media (max-width: 992px) {
@@ -170,4 +171,38 @@
         font-weight: 600;
         color: #333;
     }
+}
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 15px;
+        &__title {
+            font-size: 1.5em;
+        }
+        &__actions {
+            flex-direction: column; // Stack buttons
+            width: 100%;
+            gap: 10px;
+            button {
+                width: 100%;
+                font-size: 0.9em;
+                padding: 10px;
+            }
+        }
+    }
+    .noCvMessage {
+        font-size: 1em;
+        padding: 20px;
+        button {
+            font-size: 0.9em;
+            padding: 10px 15px;
+            margin-top: 15px;
+        }
+    }
+    // CVViewer styles are separate
 }
