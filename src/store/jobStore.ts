@@ -19,6 +19,7 @@ interface JobStore {
     selectedJob: Job | null;
     selectedJobDetail: Job | null;
     feedback: string;
+    jobListRefreshTrigger: number;
     setSelectedJob: (job: Job) => void;
     setSelectedCvId: (cvId: number) => void;
     setSelectedJobDetail: (job: Job) => void;
@@ -30,6 +31,11 @@ interface JobStore {
     getJobList: (count: number) => Promise<Job[]>;
     getJobListwithBookmark: (count: number) => Promise<Job[]>;
     getSelectedCvId: () => Promise<number>;
+
+    //
+    triggerJobPolling: () => void;
+    setPollingCallback: (cb: () => void) => void;
+    pollingCallback?: () => void;
 }
 
 const useJobStore = create<JobStore>()(
@@ -41,6 +47,7 @@ const useJobStore = create<JobStore>()(
             selectedJobDetail: null,
             feedback: '',
             selectedCVId: null,
+            jobListRefreshTrigger: Date.now(),
             setSelectedJob: (job) => set({ selectedJob: job }),
             setSelectedJobDetail: (job) => set({ selectedJobDetail: job }),
             setFilteredJobList: (filteredJobList) => set({ filteredJobList }),
@@ -77,9 +84,14 @@ const useJobStore = create<JobStore>()(
             getJobList: async (count) => {
                 try {
                     const accessToken = useAuthStore.getState().accessToken;
-                    // CV 검증 과정
+                    const selectedCVId = useJobStore.getState().selectedCVId;
+                    let cvId;
 
-                    const cvId = await useJobStore.getState().getSelectedCvId();
+                    if (!selectedCVId) {
+                        cvId = await useJobStore.getState().getSelectedCvId();
+                    } else {
+                        cvId = selectedCVId;
+                    }
 
                     const res = await axios.post(
                         `${SERVER_IP}/rec/topk-list?topk=${count}&cvId=${cvId}`,
@@ -145,6 +157,9 @@ const useJobStore = create<JobStore>()(
                     throw error;
                 }
             },
+            setJobListRefreshTrigger: () => set({ jobListRefreshTrigger: Date.now() }),
+            triggerJobPolling: () => set({ jobListRefreshTrigger: Date.now() }, false),
+            setPollingCallback: (cb) => set({ pollingCallback: cb }),
         }),
         {
             name: 'cv-storage',

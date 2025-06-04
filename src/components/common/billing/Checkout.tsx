@@ -15,6 +15,10 @@ export function CheckoutPage() {
     const amount = useBillingStore((state) => state.amount);
     const planName = useBillingStore((state) => state.planName);
     const navigate = useNavigate();
+    // const [setAmount] = useState({
+    //     currency: 'KRW',
+    //     value: 1000,
+    // });
     const [ready, setReady] = useState(false);
     const [widgets, setWidgets] = useState<
         import('@tosspayments/tosspayments-sdk').TossPaymentsWidgets | null
@@ -150,6 +154,15 @@ export function CheckoutPage() {
                                 customerName: '김토스',
                                 customerMobilePhone: '01012341234',
                             });
+                            // await widgets?.requestPayment({
+                            //     orderId: id,
+                            //     orderName: planName,
+                            //     successUrl: 'https://localhost:5173/success',
+                            //     failUrl: 'https://localhost:5173/fail',
+                            //     customerEmail: 'customer123@gmail.com',
+                            //     customerName: '김토스',
+                            //     customerMobilePhone: '01012341234',
+                            // });
                         } catch (error) {
                             navigate('/');
                             console.error(error);

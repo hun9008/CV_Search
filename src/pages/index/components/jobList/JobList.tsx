@@ -27,6 +27,7 @@ function JobList({ bookmarked }: jobListProps) {
     const typeButtonRef = useRef<HTMLDivElement>(null);
 
     const { setSelectedJobDetail, jobList, getJobList } = useJobStore(); // 추가
+    const jobListRefreshTrigger = useJobStore((state) => state.jobListRefreshTrigger);
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
 
@@ -150,6 +151,7 @@ function JobList({ bookmarked }: jobListProps) {
             try {
                 if (bookmarked) {
                     const updatedJob = await getBookmark();
+                    console.log('실행되나?');
 
                     if (Array.isArray(updatedJob)) {
                         setFilteredJobs(updatedJob);
@@ -160,6 +162,7 @@ function JobList({ bookmarked }: jobListProps) {
                     }
                 } else {
                     if (!jobList || jobList.length === 0) {
+                        console.log('실행되나?');
                         await getJobList(TOTAL_JOB);
                         await getBookmark();
                         // setSelectedJobDetail(jobList[0]);
@@ -176,6 +179,7 @@ function JobList({ bookmarked }: jobListProps) {
         };
 
         const startPolling = () => {
+            console.log('실행되나?');
             fetchData(); // 초기 1회 호출
             pollingInterval = setInterval(() => {
                 if (pollingActive) {
@@ -184,6 +188,11 @@ function JobList({ bookmarked }: jobListProps) {
                 }
             }, 10000); // 10초 간격
         };
+
+        useJobStore.getState().setPollingCallback(() => {
+            console.log('🔁 외부에서 polling 실행 요청됨');
+            startPolling();
+        });
 
         startPolling();
 
@@ -198,7 +207,8 @@ function JobList({ bookmarked }: jobListProps) {
             clearInterval(pollingInterval);
             clearTimeout(timeoutHandle);
         };
-    }, []);
+    }, [jobListRefreshTrigger]);
+
     const totalItems = filteredJobs.length;
     const calculatedTotalPages = Math.ceil(totalItems / jobsPerPage);
     const currentJobs = filteredJobs.slice(

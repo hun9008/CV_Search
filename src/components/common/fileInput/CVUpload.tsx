@@ -1,6 +1,6 @@
 import style from './CVUpload.module.scss';
 import { useCallback, useRef, useState } from 'react';
-import { UploadCloud, FileText, X, Check, AlertCircle } from 'lucide-react';
+import { UploadCloud, FileText, X, Check, AlertCircle, FolderPen } from 'lucide-react';
 import useFileStore from '../../../store/fileStore';
 import useS3Store from '../../../store/s3Store';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,8 @@ function CVUpload() {
     const [error, setError] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [isChangingName, setIsChangingName] = useState(false);
+    const [fileName, setFileName] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { setFile, uploadFile } = useFileStore();
     const { fetchUserData } = useUserStore();
@@ -54,23 +56,14 @@ function CVUpload() {
         }
         setFile(selectedFile);
 
-        try {
-            const presignedURL = await getUploadPresignedURL();
-            if (typeof presignedURL === 'string' && presignedURL) {
-                await fileUpload(selectedFile, presignedURL);
-            } else {
-                setError('업로드 URL을 받아오는 데 실패했습니다.');
-            }
-        } catch (error) {
-            console.log(error);
-        }
+        setIsChangingName(true);
     };
 
     const fileUpload = async (selectedFile: File, presignedURL: string) => {
         setIsUploading(true);
         setUploadSuccess(false);
 
-        uploadFile(selectedFile, presignedURL);
+        uploadFile(selectedFile, presignedURL, fileName);
 
         setTimeout(() => {
             setIsUploading(false);
@@ -99,6 +92,8 @@ function CVUpload() {
     const handleRemoveFile = () => {
         setFile(null);
         setUploadSuccess(false);
+        setIsChangingName(false);
+        setFileName('');
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -106,6 +101,38 @@ function CVUpload() {
 
     const handleButtonClick = () => {
         fileInputRef.current?.click();
+    };
+
+    // 파일 이름 입력 핸들러
+    const handleFileNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setError(null);
+        setFileName(e.target.value);
+    };
+
+    // 파일 이름 제출 핸들러
+    const handleFileNameSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (fileName) {
+            try {
+                const presignedURL = await getUploadPresignedURL(fileName);
+                if (typeof presignedURL === 'string' && presignedURL) {
+                    if (file) {
+                        setIsChangingName(false);
+                        await fileUpload(file, presignedURL);
+                    } else {
+                        setError('파일이 선택되지 않았습니다.');
+                    }
+                } else {
+                    setError('업로드 URL을 받아오는 데 실패했습니다.');
+                }
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    setError(error.message);
+                }
+            }
+        } else {
+            setError('CV의 별명을 입력해주세요!');
+        }
     };
 
     return (
@@ -152,7 +179,7 @@ function CVUpload() {
                     </div>
                 )}
 
-                {file && (
+                {file && !isChangingName && (
                     <div className={style.filePreview}>
                         <div className={style.filePreview__header}>
                             <div className={style.filePreview__icon}>
@@ -201,6 +228,27 @@ function CVUpload() {
                                 </div>
                             </>
                         )}
+                    </div>
+                )}
+
+                {file && isChangingName && (
+                    <div className={style.filePreview}>
+                        <div className={style.filePreview__header}>
+                            <div className={style.filePreview__icon}>
+                                <FolderPen size={32} />
+                            </div>
+                            <div className={style.filePreview__info}>
+                                <form onSubmit={handleFileNameSubmit}>
+                                    <input
+                                        type="text"
+                                        placeholder="CV 별명"
+                                        value={fileName}
+                                        onChange={handleFileNameChange}
+                                        className={style.searchInput}
+                                    />
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>

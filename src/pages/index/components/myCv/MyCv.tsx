@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import useFileStore from '../../../../store/fileStore';
 import CvViewer from './CvViewer';
