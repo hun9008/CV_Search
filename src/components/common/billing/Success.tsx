@@ -32,7 +32,7 @@ export function SuccessPage() {
                 const confirm = await confirmPayments(confirmData);
                 setResponseData(confirm);
                 // navigate(previousPage);
-                navigate('/main');
+                navigate('/main/recommend');
             } catch (error) {
                 const err = error as { code?: string; message?: string };
                 navigate(
