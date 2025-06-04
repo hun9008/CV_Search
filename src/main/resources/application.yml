@@ -84,6 +84,10 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+    session:
+      cookie:
+        same-site: None
+        secure: true
   forward-headers-strategy: framework
 
 anthropic:
