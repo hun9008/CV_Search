@@ -10,6 +10,7 @@ import com.www.goodjob.enums.TossPaymentMethod;
 import com.www.goodjob.enums.TossPaymentPlan;
 import com.www.goodjob.enums.TossPaymentStatus;
 import com.www.goodjob.repository.TossPaymentRepository;
+import com.www.goodjob.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.Base64;
 public class TossPaymentService {
 
     private final TossPaymentRepository tossPaymentRepository;
+    private final UserRepository userRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${toss.secret-key}")
@@ -94,7 +96,9 @@ public class TossPaymentService {
         return payment;
     }
 
+    @Transactional
     public void updateUserPlan(User user, TossPaymentPlan plan) {
         user.setPlan(plan);
+        userRepository.save(user);
     }
 }
