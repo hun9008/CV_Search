@@ -80,7 +80,13 @@ public class TossPaymentService {
     }
 
     @Transactional
-    public TossPayment handlePaymentConfirmation(JsonNode node, User user) {
+    public TossPayment handlePaymentConfirmation(JsonNode node, User sessionUser) {
+        User persistedUser = userRepository.findById(sessionUser.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        persistedUser.setPlan(TossPaymentPlan.베이직);
+        userRepository.save(persistedUser);
+
         TossPayment payment = TossPayment.builder()
                 .tossPaymentKey(node.get("paymentKey").asText())
                 .tossOrderId(node.get("orderId").asText())
@@ -88,11 +94,10 @@ public class TossPaymentService {
                 .tossPaymentMethod(TossPaymentMethod.valueOf(node.get("method").asText()))
                 .tossPaymentStatus(TossPaymentStatus.valueOf(node.get("status").asText()))
                 .tossPaymentPlan(TossPaymentPlan.베이직)
-                .user(user)
+                .user(persistedUser)
                 .build();
 
         tossPaymentRepository.save(payment);
-        updateUserPlan(user, TossPaymentPlan.베이직);
         return payment;
     }
 
