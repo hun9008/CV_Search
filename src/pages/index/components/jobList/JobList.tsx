@@ -337,7 +337,7 @@ function JobList({ bookmarked }: jobListProps) {
                         ))
                     )}
                     {hasError || isLoading ? (
-                        ''
+                        <LoadingAnime1 />
                     ) : (
                         <div className={styles.jobList__pagination}>
                             {calculatedTotalPages > 1 && (
