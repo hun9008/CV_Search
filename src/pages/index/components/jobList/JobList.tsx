@@ -20,14 +20,16 @@ function JobList({ bookmarked }: jobListProps) {
     const [hasError, setHasError] = useState(false);
     const [isPending, setIsPending] = useState(false); // 업로드 직후 topk-list 요청 시 fallback 용
 
+    const selectedCVId = useJobStore((state) => state.selectedCVId);
+    const previousSelectedCVId = useJobStore((state) => state.previousSelectedCVId);
+
     const jobListRef = useRef<HTMLDivElement>(null);
     const experienceFilterRef = useRef<HTMLDivElement>(null);
     const typeFilterRef = useRef<HTMLDivElement>(null);
     const experienceButtonRef = useRef<HTMLDivElement>(null);
     const typeButtonRef = useRef<HTMLDivElement>(null);
 
-    const { setSelectedJobDetail, jobList, getJobList } = useJobStore(); // 추가
-    const jobListRefreshTrigger = useJobStore((state) => state.jobListRefreshTrigger);
+    const { setSelectedJobDetail, jobList, getJobList, setPreviousSelectedCVId } = useJobStore(); // 추가
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
 
@@ -151,8 +153,10 @@ function JobList({ bookmarked }: jobListProps) {
             try {
                 if (bookmarked) {
                     const updatedJob = await getBookmark();
-                    console.log('실행되나?');
 
+                    if (selectedCVId !== null) {
+                        await getJobList(TOTAL_JOB, selectedCVId);
+                    }
                     if (Array.isArray(updatedJob)) {
                         setFilteredJobs(updatedJob);
                         setSelectedJobDetail(updatedJob[0]?.id ?? 0);
@@ -161,9 +165,11 @@ function JobList({ bookmarked }: jobListProps) {
                         throw new Error('북마크 응답이 배열이 아님');
                     }
                 } else {
-                    if (!jobList || jobList.length === 0) {
-                        console.log('실행되나?');
-                        await getJobList(TOTAL_JOB);
+                    if (previousSelectedCVId !== selectedCVId) {
+                        if (selectedCVId !== null) {
+                            await getJobList(TOTAL_JOB, selectedCVId);
+                            setPreviousSelectedCVId(selectedCVId);
+                        }
                         await getBookmark();
                         // setSelectedJobDetail(jobList[0]);
                         pollingActive = false;
@@ -178,9 +184,8 @@ function JobList({ bookmarked }: jobListProps) {
             }
         };
 
-        const startPolling = () => {
-            console.log('실행되나?');
-            fetchData(); // 초기 1회 호출
+        const startPolling = async () => {
+            await fetchData(); // 초기 1회 호출
             pollingInterval = setInterval(() => {
                 if (pollingActive) {
                     fetchData();
@@ -189,10 +194,10 @@ function JobList({ bookmarked }: jobListProps) {
             }, 10000); // 10초 간격
         };
 
-        useJobStore.getState().setPollingCallback(() => {
-            console.log('🔁 외부에서 polling 실행 요청됨');
-            startPolling();
-        });
+        // useJobStore.getState().setPollingCallback(() => {
+        //     console.log('🔁 외부에서 polling 실행 요청됨');
+        //     startPolling();
+        // });
 
         startPolling();
 
@@ -207,7 +212,7 @@ function JobList({ bookmarked }: jobListProps) {
             clearInterval(pollingInterval);
             clearTimeout(timeoutHandle);
         };
-    }, [jobListRefreshTrigger]);
+    }, [selectedCVId]);
 
     const totalItems = filteredJobs.length;
     const calculatedTotalPages = Math.ceil(totalItems / jobsPerPage);

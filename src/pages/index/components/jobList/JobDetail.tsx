@@ -23,6 +23,7 @@ function JobDetail() {
     const [manageButtonClicked, setManageButtonClicked] = useState(false);
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
+    const selectedCVId = useJobStore((state) => state.selectedCVId);
 
     const navigate = useNavigate();
 
@@ -90,7 +91,7 @@ function JobDetail() {
     const handleFeedback = async (jobId: number) => {
         try {
             setIsFeedbackLoading(true);
-            if ((await getFeedback(jobId)) === 200) {
+            if (selectedCVId !== null && (await getFeedback(jobId, selectedCVId)) === 200) {
                 setIsFeedbackLoading(false);
                 setShowFeedbackModal(true);
             }

@@ -39,11 +39,6 @@ function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemPr
     const handleSelectCv = (e: React.MouseEvent) => {
         e.stopPropagation();
         setSelectedCvId(cv.id);
-        // gpt 수정
-        const pollingCallback = useJobStore.getState().pollingCallback;
-        if (pollingCallback) {
-            pollingCallback(); // 🚀 recommend의 polling 강제 실행
-        }
     };
 
     useEffect(() => {}, [selctedCvId]);
