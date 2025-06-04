@@ -23,7 +23,9 @@ function MyCv() {
     const hasFile = useFileStore((state) => state.hasFile);
     const summaryText = useFileStore((state) => state.summary);
     const userCvList = useCvStore((state) => state.userCvList);
+    const { setPreviousSelectedCVId } = useJobStore();
     const selectedCVId = useJobStore((state) => state.selectedCVId);
+    const previousSelectedCVId = useJobStore((state) => state.previousSelectedCVId);
 
     const navigate = useNavigate();
 
@@ -38,12 +40,13 @@ function MyCv() {
     // };
 
     useEffect(() => {
-        console.log('CV 요약 요청');
+        if (previousSelectedCVId === selectedCVId) return;
         const fetchCVSummary = async () => {
             try {
                 setIsSummaryLoading(true);
                 if (selectedCVId !== null) {
                     await getSummary(selectedCVId);
+                    setPreviousSelectedCVId(selectedCVId);
                 }
             } catch (error) {
                 console.error('데이터 가져오기 에러:', error);

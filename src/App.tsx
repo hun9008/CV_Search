@@ -32,12 +32,12 @@ function App() {
                     <Route path="admin/jobManage" element={<JobManage />}></Route>
                     <Route path="admin/feedback" element={<CustomerFeedback />}></Route>
                 </Route>
-                <Route index path="/upload" element={<UploadPage />}></Route>
-                <Route index path="/auth/callback" element={<AuthCallback />}></Route>
-                <Route index path="/loading" element={<LoadingPage />}></Route>
-                <Route index path="/" element={<LandingPage />}></Route>
-                <Route index path="/signIn" element={<SignIn />}></Route>
-                <Route index path="/signUp" element={<SignUp />}></Route>
+                <Route path="/upload" element={<UploadPage />}></Route>
+                <Route path="/auth/callback" element={<AuthCallback />}></Route>
+                <Route path="/loading" element={<LoadingPage />}></Route>
+                <Route path="/" element={<LandingPage />}></Route>
+                <Route path="/signIn" element={<SignIn />}></Route>
+                <Route path="/signUp" element={<SignUp />}></Route>
                 <Route path="/payments" element={<CheckoutPage />}></Route>
                 <Route path="/success" element={<SuccessPage />}></Route>
                 <Route path="/fail" element={<FailPage />}></Route>
