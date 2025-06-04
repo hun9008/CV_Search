@@ -4,6 +4,7 @@ import style from './styles/CVViewer.module.scss';
 import useCvStore, { type CvMe } from '../../../../store/cvStore';
 import { Eye, FileText, Loader2, Trash2, Edit3, Check, X } from 'lucide-react';
 import CVDeleteDialog from '../../../../components/common/dialog/CVDeleteDialog';
+import useJobStore from '../../../../store/jobStore';
 
 interface CvItemProps {
     cv: CvMe;
@@ -14,6 +15,8 @@ interface CvItemProps {
 }
 
 function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemProps) {
+    const { setSelectedCvId } = useJobStore();
+    const selctedCvId = useJobStore((state) => state.selectedCVId);
     const [deleteDialogHidden, setDeleteDialogHidden] = useState(false);
     const [isRenaming, setIsRenaming] = useState(false);
     const [newFileName, setNewFileName] = useState('');
@@ -27,13 +30,23 @@ function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemPr
         }
     }, [isRenaming]);
 
-    // useEffect(() => {}, [userCvList]);
-
     const startRename = (e: React.MouseEvent) => {
         e.stopPropagation(); // 이벤트 버블링 방지
         setIsRenaming(true);
         setNewFileName(cv.fileName || '');
     };
+
+    const handleSelectCv = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setSelectedCvId(cv.id);
+        // gpt 수정
+        const pollingCallback = useJobStore.getState().pollingCallback;
+        if (pollingCallback) {
+            pollingCallback(); // 🚀 recommend의 polling 강제 실행
+        }
+    };
+
+    useEffect(() => {}, [selctedCvId]);
 
     const handleConfirmRename = (e: React.MouseEvent | React.KeyboardEvent) => {
         e.stopPropagation(); // 이벤트 버블링 방지
@@ -84,7 +97,9 @@ function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemPr
                 <div
                     className={`${style.cvCard} ${
                         isViewingThis && !isRenaming ? style.cvCardHidden : ''
-                    }`}>
+                    } ${selctedCvId === cv.id ? style.popular : ''}`}
+                    onClick={handleSelectCv}>
+                    {selctedCvId === cv.id && <div className={style.popularBadge}>선택된 CV</div>}
                     <div className={style.cvCardPreview}>
                         <div className={style.cvCard__header}>
                             <FileText size={30} className={style.cvCard__header__icon} />

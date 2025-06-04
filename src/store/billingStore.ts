@@ -17,7 +17,7 @@ interface billingStore {
     setAmount: (amount: billingType) => void;
     saveAmountInfo: (amount: amountType) => Promise<number>;
     verifyAmountInfo: (amount: amountType) => Promise<verifyResponse>;
-    confirmPayments: (amount: confirmPaymentsType) => Promise<number>;
+    confirmPayments: (amount: confirmPaymentsType) => Promise<verifyResponse>;
     cancelPayments: (cancel: cancelPaymentsType) => Promise<number>;
 }
 
@@ -68,7 +68,7 @@ const useBillingStore = create<billingStore>((set) => ({
                 },
                 withCredentials: true,
             });
-            return res.status;
+            return res.data;
         } catch (error) {
             console.error('토스 결제 확정 오류: ', error);
             throw error;

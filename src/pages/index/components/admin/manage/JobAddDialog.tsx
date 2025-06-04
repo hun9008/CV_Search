@@ -1,7 +1,7 @@
 import style from './JobAddDialog.module.scss';
 
 function JobAddDialog() {
-    return <div>JobAddDialog</div>;
+    return <div className={style.modalOverlay}>JobAddDialog</div>;
 }
 
 export default JobAddDialog;

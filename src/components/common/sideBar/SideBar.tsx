@@ -166,14 +166,14 @@ function SideBar() {
                         </ul>
 
                         <div className={style.sidebar__subConatiner}>
-                            {isAdmin ? (
+                            {isAdmin || userPlan === '베이직' ? (
                                 ''
                             ) : (
                                 <div className={style.plan}>
                                     <div className={style.plan__textContainer}>
                                         <h3>
                                             <Crown size={16} className={style.planIcon} />
-                                            베이직 플랜
+                                            스타터 플랜
                                         </h3>
                                         <p>제한적인 추천과 관리만 제공됩니다</p>
                                     </div>

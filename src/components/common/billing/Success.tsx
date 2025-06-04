@@ -8,7 +8,7 @@ import usePageStore from '../../../store/pageStore';
 export function SuccessPage() {
     const navigate = useNavigate();
     const previousPage = usePageStore((state) => state.previousPage);
-    const { verifyAmountInfo } = useBillingStore();
+    const { verifyAmountInfo, confirmPayments } = useBillingStore();
     const [searchParams] = useSearchParams();
     const [responseData, setResponseData] = useState<verifyResponse | null>(null);
 
@@ -19,10 +19,18 @@ export function SuccessPage() {
                 amount: Number(searchParams.get('amount')) || 0,
             };
 
+            const confirmData = {
+                orderId: searchParams.get('orderId') ?? '',
+                amount: Number(searchParams.get('amount')) || 0,
+                paymentKey: searchParams.get('paymentKey') ?? '',
+            };
+
             try {
                 console.log(requestData);
                 const res = await verifyAmountInfo(requestData);
                 setResponseData(res);
+                const confirm = await confirmPayments(confirmData);
+                setResponseData(confirm);
                 navigate(previousPage);
             } catch (error) {
                 const err = error as { code?: string; message?: string };
