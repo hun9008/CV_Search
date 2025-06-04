@@ -31,7 +31,17 @@ export function SuccessPage() {
                 setResponseData(res);
                 const confirm = await confirmPayments(confirmData);
                 setResponseData(confirm);
-                navigate(previousPage);
+
+                // 테스트
+                // navigate 전에 토큰 체크
+                console.log(previousPage);
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    // 토큰 없으면 로그인 등으로 fallback
+                    navigate('/signIn');
+                    return;
+                }
+                navigate(previousPage || '/');
             } catch (error) {
                 const err = error as { code?: string; message?: string };
                 navigate(
