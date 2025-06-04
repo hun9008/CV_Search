@@ -169,14 +169,13 @@ function JobList({ bookmarked }: jobListProps) {
                     }
                     await getBookmark();
                     // setSelectedJobDetail(jobList[0]);
+                    setIsLoading(false);
                     pollingActive = false;
                 }
                 setHasError(false);
             } catch (error) {
                 console.error('데이터 가져오기 에러:', error);
                 setHasError(true);
-            } finally {
-                setIsLoading(false);
             }
         };
 
@@ -337,7 +336,7 @@ function JobList({ bookmarked }: jobListProps) {
                         ))
                     )}
                     {hasError || isLoading ? (
-                        <LoadingAnime1 />
+                        ''
                     ) : (
                         <div className={styles.jobList__pagination}>
                             {calculatedTotalPages > 1 && (
