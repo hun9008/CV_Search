@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import useBillingStore from '../../../store/billingStore';
 import './Payments.css';
-import { verifyResponse } from '../../../types/billing';
+// import { verifyResponse } from '../../../types/billing';
 import usePageStore from '../../../store/pageStore';
 
 export function SuccessPage() {
@@ -10,7 +10,7 @@ export function SuccessPage() {
     const previousPage = usePageStore((state) => state.previousPage);
     const { verifyAmountInfo, confirmPayments } = useBillingStore();
     const [searchParams] = useSearchParams();
-    const [responseData, setResponseData] = useState<verifyResponse | null>(null);
+    // const [responseData, setResponseData] = useState<verifyResponse | null>(null);
 
     useEffect(() => {
         async function confirm() {
@@ -27,21 +27,13 @@ export function SuccessPage() {
 
             try {
                 console.log(requestData);
-                const res = await verifyAmountInfo(requestData);
-                setResponseData(res);
-                const confirm = await confirmPayments(confirmData);
-                setResponseData(confirm);
-                // 테스트
-                // navigate 전에 토큰 체크
-                console.log(previousPage);
-                const accessToken = localStorage.getItem('accessToken');
-                if (!accessToken) {
-                    // 토큰 없으면 로그인
-                    navigate('/signIn');
-                    return;
-                }
-                navigate(previousPage || '/');
-                // navigate(previousPage);
+                // const res = await verifyAmountInfo(requestData);
+                // setResponseData(res);
+                // const confirm = await confirmPayments(confirmData);
+                // setResponseData(confirm);
+                await verifyAmountInfo(requestData);
+                await confirmPayments(confirmData);
+                navigate(previousPage);
             } catch (error) {
                 const err = error as { code?: string; message?: string };
                 navigate(
@@ -104,12 +96,12 @@ export function SuccessPage() {
                     </Link>
                 </div>
             </div>
-            <div className="box_section" style={{ width: '600px', textAlign: 'left' }}>
+            {/* <div className="box_section" style={{ width: '600px', textAlign: 'left' }}>
                 <b>Response Data :</b>
                 <div id="response" style={{ whiteSpace: 'initial' }}>
                     {responseData && <pre>{JSON.stringify(responseData, null, 4)}</pre>}
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }
