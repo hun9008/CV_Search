@@ -11,6 +11,7 @@ import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner
 import { parseMarkdown } from '../../../../utils/markdown';
 import { useNavigate } from 'react-router-dom';
 import useCvStore from '../../../../store/cvStore';
+import useJobStore from '../../../../store/jobStore';
 
 function MyCv() {
     const { getSummary } = useFileStore();
@@ -22,6 +23,7 @@ function MyCv() {
     const hasFile = useFileStore((state) => state.hasFile);
     const summaryText = useFileStore((state) => state.summary);
     const userCvList = useCvStore((state) => state.userCvList);
+    const selectedCVId = useJobStore((state) => state.selectedCVId);
 
     const navigate = useNavigate();
 
@@ -36,11 +38,12 @@ function MyCv() {
     // };
 
     useEffect(() => {
+        console.log('CV 요약 요청');
         const fetchCVSummary = async () => {
             try {
-                if (!summaryText || summaryText.length === 0) {
-                    setIsSummaryLoading(true);
-                    await getSummary();
+                setIsSummaryLoading(true);
+                if (selectedCVId !== null) {
+                    await getSummary(selectedCVId);
                 }
             } catch (error) {
                 console.error('데이터 가져오기 에러:', error);
@@ -50,7 +53,7 @@ function MyCv() {
             }
         };
         fetchCVSummary();
-    }, [hasFile, userCvList]);
+    }, [hasFile, userCvList, selectedCVId]);
 
     return (
         <>

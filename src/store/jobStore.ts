@@ -15,6 +15,7 @@ interface CvMe {
 interface JobStore {
     jobList: Job[];
     selectedCVId: number | null;
+    previousSelectedCVId: number | null;
     filteredJobList: Job[] | null;
     selectedJob: Job | null;
     selectedJobDetail: Job | null;
@@ -22,14 +23,15 @@ interface JobStore {
     jobListRefreshTrigger: number;
     setSelectedJob: (job: Job) => void;
     setSelectedCvId: (cvId: number) => void;
+    setPreviousSelectedCVId: (cvId: number) => void;
     setSelectedJobDetail: (job: Job) => void;
     getSelectedJob: () => Job | null;
     getSelectedJobDetail: () => Job | null;
-    getFeedback: (jobId: number) => Promise<number>;
+    getFeedback: (jobId: number, cvId: number) => Promise<number>;
     setJobList: (list: Job[]) => void;
     setFilteredJobList: (list: Job[] | null) => void;
-    getJobList: (count: number) => Promise<Job[]>;
-    getJobListwithBookmark: (count: number) => Promise<Job[]>;
+    getJobList: (count: number, cvId: number) => Promise<Job[]>;
+    getJobListwithBookmark: (count: number, cvId: number) => Promise<Job[]>;
     getSelectedCvId: () => Promise<number>;
 
     //
@@ -47,12 +49,13 @@ const useJobStore = create<JobStore>()(
             selectedJobDetail: null,
             feedback: '',
             selectedCVId: null,
+            previousSelectedCVId: null,
             jobListRefreshTrigger: Date.now(),
             setSelectedJob: (job) => set({ selectedJob: job }),
             setSelectedJobDetail: (job) => set({ selectedJobDetail: job }),
             setFilteredJobList: (filteredJobList) => set({ filteredJobList }),
             setSelectedCvId: (cvid) => set({ selectedCVId: cvid }),
-
+            setPreviousSelectedCVId: (cvid) => set({ previousSelectedCVId: cvid }),
             getSelectedJob: () => {
                 const { selectedJob } = get();
                 return selectedJob;
@@ -62,47 +65,32 @@ const useJobStore = create<JobStore>()(
                 return selectedJobDetail;
             },
 
-            getFeedback: async (jobId) => {
-            try {
-                const accessToken = useAuthStore.getState().accessToken;
-                const selectedCVId = get().selectedCVId;
-
-                if (!selectedCVId) {
-                throw new Error("선택된 CV가 없습니다.");
+            getFeedback: async (jobId, cvId) => {
+                try {
+                    const accessToken = useAuthStore.getState().accessToken;
+                    const res = await axios.post(
+                        `${SERVER_IP}/rec/feedback?jobId=${jobId}&cvId=${cvId}`,
+                        null,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`,
+                            },
+                            withCredentials: true,
+                        }
+                    );
+                    set({ feedback: res.data });
+                    return res.status;
+                } catch (error) {
+                    console.error('피드백 에러: ', error);
+                    throw error;
                 }
-
-                const res = await axios.post(
-                `${SERVER_IP}/rec/feedback?jobId=${jobId}&cvId=${selectedCVId}`,
-                null,
-                {
-                    headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                    },
-                    withCredentials: true,
-                }
-                );
-
-                set({ feedback: res.data });
-                return res.status;
-            } catch (error) {
-                console.error("피드백 요청 실패:", error);
-                throw error;
-            }
             },
 
             setJobList: (jobList) => set({ jobList }),
 
-            getJobList: async (count) => {
+            getJobList: async (count, cvId) => {
                 try {
                     const accessToken = useAuthStore.getState().accessToken;
-                    const selectedCVId = useJobStore.getState().selectedCVId;
-                    let cvId;
-
-                    if (!selectedCVId) {
-                        cvId = await useJobStore.getState().getSelectedCvId();
-                    } else {
-                        cvId = selectedCVId;
-                    }
 
                     const res = await axios.post(
                         `${SERVER_IP}/rec/topk-list?topk=${count}&cvId=${cvId}`,
@@ -123,13 +111,13 @@ const useJobStore = create<JobStore>()(
                 }
             },
 
-            getJobListwithBookmark: async (count) => {
+            getJobListwithBookmark: async (count, cvId) => {
                 try {
                     const { getJobList } = get();
                     const getBookmark = useBookmarkStore.getState().getBookmark;
 
                     const [topkRes, bookmarkRes] = await Promise.all([
-                        getJobList(count),
+                        getJobList(count, cvId),
                         getBookmark?.() || Promise.resolve([]),
                     ]);
 

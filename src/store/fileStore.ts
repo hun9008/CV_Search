@@ -3,7 +3,6 @@ import axios from 'axios';
 import useAuthStore from './authStore';
 import useUserStore from './userStore';
 import { SERVER_IP } from '../../src/constants/env';
-import useJobStore from './jobStore';
 
 interface fileStore {
     file: File | null;
@@ -12,7 +11,7 @@ interface fileStore {
     setFile: (file: File | null) => void;
     setHasFile: (exists: boolean) => void;
     removeFile: (fileName: string) => Promise<number>;
-    getSummary: () => Promise<void>;
+    getSummary: (selectedCVId: number) => Promise<void>;
     uploadFile: (file: File | null, url: string, fileName: string) => Promise<void>;
     reUploadFile: (file: File | null, url: string) => Promise<void>;
 }
@@ -33,10 +32,9 @@ const useFileStore = create<fileStore>((set) => ({
         });
         return res.status;
     },
-    getSummary: async () => {
+    getSummary: async (selectedCVId) => {
         try {
             const accessToken = useAuthStore.getState().accessToken;
-            const selectedCVId = useJobStore.getState().selectedCVId;
             const res = await axios.post(`${SERVER_IP}/cv/summary-cv?cvId=${selectedCVId}`, null, {
                 headers: { Authorization: `Bearer ${accessToken}` },
                 withCredentials: true,
