@@ -31,7 +31,8 @@ export function SuccessPage() {
                 setResponseData(res);
                 const confirm = await confirmPayments(confirmData);
                 setResponseData(confirm);
-                navigate(previousPage);
+                // navigate(previousPage);
+                navigate('/main');
             } catch (error) {
                 const err = error as { code?: string; message?: string };
                 navigate(
