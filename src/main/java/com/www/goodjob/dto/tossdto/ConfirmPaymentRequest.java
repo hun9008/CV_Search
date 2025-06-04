@@ -1,8 +1,10 @@
 package com.www.goodjob.dto.tossdto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class ConfirmPaymentRequest {
     private String paymentKey;
     private String orderId;
