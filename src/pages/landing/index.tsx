@@ -4,10 +4,22 @@ import Header from '../../components/common/header/Header';
 import CVUpload from '../../components/common/fileInput/CVUpload';
 import useAuthStore from '../../store/authStore';
 import useUserStore from '../../store/userStore';
+import { useEffect } from 'react';
 
 function Index() {
     const { fetchUserData } = useUserStore();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const isMobile = window.matchMedia('only screen and (max-width: 768px)').matches;
+
+        // 예외 페이지를 정의하거나 조건 설정
+        const isException = location.pathname === '/mobile';
+
+        if (isMobile && !isException) {
+            navigate('/mobile');
+        }
+    }, [location.pathname]);
 
     const handleMoveToMainPage = async () => {
         try {

@@ -32,6 +32,7 @@ const useAuthStore = create<AuthStore>()(
                 if (res.status === 200) {
                     set({ accessToken: null, isLoggedIn: false });
                     localStorage.removeItem('admin-job-storage');
+                    localStorage.removeItem('admin-storage');
                     localStorage.removeItem('user-storage');
                     localStorage.removeItem('page-storage');
                     localStorage.removeItem('user-token');

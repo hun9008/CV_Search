@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react';
 import useJobStore from '../../../../store/jobStore';
 import style from './styles/JobDetail.module.scss';
-import { Bookmark, Share2, ExternalLink, MapPin, Calendar, Clock, Briefcase } from 'lucide-react';
+import {
+    Bookmark,
+    Share2,
+    ExternalLink,
+    MapPin,
+    Calendar,
+    Clock,
+    Briefcase,
+    Bot,
+} from 'lucide-react';
 import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
 import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
@@ -28,6 +37,7 @@ function JobDetail() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        setIsFeedbackLoading(false); // 다른 공고 선택하면 피드백 로딩 제거
         const initializeApplications = async () => {
             await getApplications();
         };
@@ -92,6 +102,10 @@ function JobDetail() {
         try {
             setIsFeedbackLoading(true);
             if (selectedCVId !== null && (await getFeedback(jobId, selectedCVId)) === 200) {
+                // if (isFeedbackLoading) {
+                //     setIsFeedbackLoading(false);
+                //     setShowFeedbackModal(true);
+                // }
                 setIsFeedbackLoading(false);
                 setShowFeedbackModal(true);
             }
@@ -247,13 +261,23 @@ function JobDetail() {
             <div className={style.actionButtons}>
                 <button className={style.actionButtons__apply} onClick={handleApply}>
                     지원하기
-                    <ExternalLink size={16} className={style.actionButtons__icon} />
                 </button>
-                <button
-                    className={style.actionButtons__feedback}
-                    onClick={() => handleFeedback(job.id)}>
-                    {isFeedbackLoading ? <LoadingSpinner /> : '피드백'}
-                </button>
+
+                {isFeedbackLoading ? (
+                    <button
+                        className={style.actionButtons__feedback}
+                        onClick={() => handleFeedback(job.id)}>
+                        <LoadingSpinner />
+                    </button>
+                ) : (
+                    <button
+                        className={style.actionButtons__feedback}
+                        onClick={() => handleFeedback(job.id)}>
+                        피드백
+                        <Bot size={20} className={style.actionButtons__icon} />
+                    </button>
+                )}
+
                 <button
                     className={`${style.actionButtons__manage} ${
                         manageButtonClicked ? '' : style.clicked

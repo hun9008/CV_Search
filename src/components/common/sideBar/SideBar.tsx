@@ -38,10 +38,9 @@ function SideBar() {
             if (path.includes('bookmark')) return '북마크';
             if (path.includes('manage')) return '지원 관리';
             if (path.includes('mycv')) return '나의 CV';
-            if (path.includes('/main')) return 'CV 생성';
-            if (path.includes('admin/dashboard')) return '대시 보드';
-            if (path.includes('admin/jobManage')) return '공고 관리';
-            if (path.includes('admin/feedback')) return '피드백 관리';
+            if (path.includes('dashboard')) return '대시보드';
+            if (path.includes('jobManage')) return '공고 관리';
+            if (path.includes('feedback')) return '피드백 관리';
         };
         const current = currentMenu(path);
         setActiveContent(current ?? '');

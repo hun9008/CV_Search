@@ -147,8 +147,8 @@ export function CheckoutPage() {
                             // await widgets?.requestPayment({
                             //     orderId: id,
                             //     orderName: planName,
-                            //     successUrl: `${SERVER_IP}/success`,
-                            //     failUrl: `${SERVER_IP}/fail`,
+                            //     successUrl: 'https://www.goodjob.ai.kr/success',
+                            //     failUrl: 'https://www.goodjob.ai.kr/fail',
                             //     customerEmail: 'customer123@gmail.com',
                             //     customerName: '김토스',
                             //     customerMobilePhone: '01012341234',

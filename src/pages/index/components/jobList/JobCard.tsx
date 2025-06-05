@@ -13,6 +13,7 @@ interface JobCardProps {
 function JobCard({ job, isSelected, onSelect, onToggleBookmark }: JobCardProps) {
     const handleBookmarkClick = (e: React.MouseEvent) => {
         e.stopPropagation();
+
         onToggleBookmark();
     };
 

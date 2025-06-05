@@ -21,7 +21,6 @@ function JobList({ bookmarked }: jobListProps) {
     const [isPending, setIsPending] = useState(false); // 업로드 직후 topk-list 요청 시 fallback 용
 
     const selectedCVId = useJobStore((state) => state.selectedCVId);
-    const previousSelectedCVId = useJobStore((state) => state.previousSelectedCVId);
 
     const jobListRef = useRef<HTMLDivElement>(null);
     const experienceFilterRef = useRef<HTMLDivElement>(null);
@@ -29,7 +28,7 @@ function JobList({ bookmarked }: jobListProps) {
     const experienceButtonRef = useRef<HTMLDivElement>(null);
     const typeButtonRef = useRef<HTMLDivElement>(null);
 
-    const { setSelectedJobDetail, jobList, getJobList, setPreviousSelectedCVId } = useJobStore(); // 추가
+    const { setSelectedJobDetail, jobList, getJobList } = useJobStore(); // 추가
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
 
@@ -165,22 +164,18 @@ function JobList({ bookmarked }: jobListProps) {
                         throw new Error('북마크 응답이 배열이 아님');
                     }
                 } else {
-                    if (previousSelectedCVId !== selectedCVId) {
-                        if (selectedCVId !== null) {
-                            await getJobList(TOTAL_JOB, selectedCVId);
-                            setPreviousSelectedCVId(selectedCVId);
-                        }
-                        await getBookmark();
-                        // setSelectedJobDetail(jobList[0]);
-                        pollingActive = false;
+                    if (selectedCVId !== null) {
+                        await getJobList(TOTAL_JOB, selectedCVId);
                     }
+                    await getBookmark();
+                    // setSelectedJobDetail(jobList[0]);
+                    setIsLoading(false);
+                    pollingActive = false;
                 }
                 setHasError(false);
             } catch (error) {
                 console.error('데이터 가져오기 에러:', error);
                 setHasError(true);
-            } finally {
-                setIsLoading(false);
             }
         };
 

@@ -4,7 +4,6 @@ import fs from 'fs';
 
 export default defineConfig({
     plugins: [react()],
-    // SCSS 전역 사용
     server: {
         https: {
             key: fs.readFileSync('localhost-key.pem'),

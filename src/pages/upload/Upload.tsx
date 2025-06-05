@@ -4,6 +4,8 @@ import style from './styles/Upload.module.scss';
 import { useNavigate } from 'react-router-dom';
 import useFileStore from '../../store/fileStore';
 import useS3Store from '../../store/s3Store';
+import LoadingAnime1 from '../../components/common/loading/LoadingAnime1';
+import useJobStore from '../../store/jobStore';
 
 function Upload() {
     const [isDragging, setIsDragging] = useState(false);
@@ -15,6 +17,8 @@ function Upload() {
     const { setFile, uploadFile } = useFileStore();
     const file = useFileStore((state) => state.file);
     const { getUploadPresignedURL } = useS3Store();
+    const { getJobList, getSelectedCvId } = useJobStore();
+    const TOTAL_JOB = 80;
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
@@ -48,18 +52,37 @@ function Upload() {
         setIsChangingName(true);
     };
 
-    const fileUpload = (selectedFile: File, presignedURL: string) => {
+    const fileUpload = async (selectedFile: File, presignedURL: string) => {
         setIsUploading(true);
         setUploadSuccess(false);
         // cvlist 최신화 추가
 
-        uploadFile(selectedFile, presignedURL, fileName);
+        try {
+            const res = await uploadFile(selectedFile, presignedURL, fileName);
+            if (res === 400 || res === 403) {
+                setIsUploading(false);
+                // TODO: 에러 로직 수정, 에러 발생하면 catch에서 핸들링
+                if (res == 400) {
+                    setError('같은 별명의 CV가 이미 존재합니다');
+                } else {
+                    setError('goodJob 서비스 정책에 위반되는 CV입니다.');
+                }
+                setFile(null);
+                setIsUploading(false);
+                return;
+            }
+            const selectedCVId = await getSelectedCvId();
+            await getJobList(TOTAL_JOB, selectedCVId);
+        } catch (error) {
+            console.error('CV 업로드 에러: ', error);
+            setFile(null);
+            setIsUploading(false);
+        }
+
+        setIsUploading(false);
+        setUploadSuccess(true);
 
         // pdf 업로드와 스프링 서버의 CV 처리 시간을 벌어줌
-        setTimeout(() => {
-            setIsUploading(false);
-            setUploadSuccess(true);
-        }, 10000);
     };
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -223,12 +246,13 @@ function Upload() {
                             </div>
 
                             {isUploading && (
-                                <div className={style.uploadProgress}>
-                                    <div className={style.uploadProgress__bar}>
-                                        <div className={style.uploadProgress__fill}></div>
-                                    </div>
-                                    <p className={style.uploadProgress__text}>업로드 중...</p>
-                                </div>
+                                // <div className={style.uploadProgress}>
+                                //     <div className={style.uploadProgress__bar}>
+                                //         <div className={style.uploadProgress__fill}></div>
+                                //     </div>
+                                //     <p className={style.uploadProgress__text}>업로드 중...</p>
+                                // </div>
+                                <LoadingAnime1 />
                             )}
                             {uploadSuccess && (
                                 <div className={style.uploadSuccess}>

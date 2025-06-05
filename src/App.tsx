@@ -1,11 +1,11 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import AuthCallback from './pages/index/components/auth/AuthCallback';
 import MainPage from './pages/index/index';
 import SignIn from './pages/signIn/SignIn';
 import SignUp from './pages/signUp/SignUp';
 import LandingPage from './pages/landing/index';
 import LoadingPage from './pages/loading/index';
 import UploadPage from './pages/upload/Upload';
+import AuthCallback from './pages/index/components/auth/AuthCallback';
 import Dashboard from './pages/index/components/admin/dashboard/Dashboard';
 import Bookmark from './pages/index/components/bookmark/Bookmark';
 import MyCv from './pages/index/components/myCv/MyCv';
@@ -17,11 +17,13 @@ import SearchPage from './pages/index/components/search/SearchPage';
 import { CheckoutPage } from './components/common/billing/Checkout';
 import { SuccessPage } from './components/common/billing/Success';
 import { FailPage } from './components/common/billing/Fail';
+import MobilePage from './pages/mobile/MobilePage';
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
+                <Route path="/mobile" element={<MobilePage />} />
                 <Route path="/main" element={<MainPage />}>
                     <Route path="bookmark" element={<Bookmark />}></Route>
                     <Route path="manage" element={<Manage />}></Route>

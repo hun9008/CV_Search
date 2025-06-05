@@ -9,6 +9,10 @@
     position: relative;
     overflow: hidden; // Added to contain the blur effect
 
+    @media (max-width: 480px) {
+        overflow-y: scroll;
+    }
+
     // Blurred background circle
     &::before {
         content: '';

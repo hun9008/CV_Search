@@ -3,7 +3,6 @@ import { SERVER_IP } from '../../../../constants/env';
 
 function SignIn() {
     const handleGoogleLogin = () => {
-        // const redirectUri = `${SERVER_IP}/auth/callback`;
         const redirectUri = 'https://localhost:5173/auth/callback';
         const state = btoa(redirectUri);
         window.location.href = `${SERVER_IP}/oauth2/authorization/google?state=${state}`;
