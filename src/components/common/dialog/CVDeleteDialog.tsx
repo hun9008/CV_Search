@@ -5,6 +5,7 @@ import useFileStore from '../../../store/fileStore';
 import LoadingSpinner from '../loading/LoadingSpinner';
 import useActionStore from '../../../store/actionStore';
 import useCvStore from '../../../store/cvStore';
+import useJobStore from '../../../store/jobStore';
 
 interface CVDeleteDialogProps {
     isOpen: boolean;
@@ -21,6 +22,7 @@ function CVDeleteDialog({ isOpen, onClose, fileName }: CVDeleteDialogProps) {
     const { removeFile, setHasFile } = useFileStore();
     const { setCVAction } = useActionStore();
     const { getUserCvList } = useCvStore();
+    const { getSelectedCvId } = useJobStore();
 
     const handleOutsideClick = (e: MouseEvent) => {
         if (!isDeleting) {
@@ -38,6 +40,7 @@ function CVDeleteDialog({ isOpen, onClose, fileName }: CVDeleteDialogProps) {
         }
         setIsDeleting(true);
         const res = await removeFile(fileName);
+        await getSelectedCvId();
 
         if (res === 200) {
             setCVAction((prev) => !prev);
