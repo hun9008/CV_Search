@@ -1,16 +1,7 @@
 import { useEffect, useState } from 'react';
 import useJobStore from '../../../../store/jobStore';
 import style from './styles/JobDetail.module.scss';
-import {
-    Bookmark,
-    Share2,
-    ExternalLink,
-    MapPin,
-    Calendar,
-    Clock,
-    Briefcase,
-    Bot,
-} from 'lucide-react';
+import { Bookmark, Share2, MapPin, Calendar, Clock, Briefcase, Bot } from 'lucide-react';
 import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
 import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
