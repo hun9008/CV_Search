@@ -423,25 +423,34 @@ def es_save_cv(s3_url, cv_id):
         }
 
         print(f"Document to be indexed: {doc}")
-
+         
         positive_vector_path = os.path.join(os.path.dirname(__file__), "positive_vector.json")
+        negative_vector_path = os.path.join(os.path.dirname(__file__), "negative_vector.json")
+
         positive_vector = None
+        negative_vector = None
 
         if os.path.exists(positive_vector_path):
             with open(positive_vector_path, "r", encoding="utf-8") as f:
-                positive_vector = json.load(f)
+                positive_vector = np.array(json.load(f)).reshape(1, -1)
 
-        if positive_vector is not None:
-            sim = cosine_similarity(
-                np.array(vector).reshape(1, -1),
-                np.array(positive_vector).reshape(1, -1)
-            )[0][0]
-            print(f"[INFO] positive_vector와 cosine similarity: {sim:.4f}")
-            if sim <= 0.75:
-                print(f"[X] 유사도 {sim:.4f} ≤ 0.75 → 저장 중단")
-                raise HTTPException(status_code=403, detail="[REJECT] CV 내용의 신뢰도가 낮아 저장이 중단되었습니다.")
+        if os.path.exists(negative_vector_path):
+            with open(negative_vector_path, "r", encoding="utf-8") as f:
+                negative_vector = np.array(json.load(f)).reshape(1, -1)
+
+        if positive_vector is not None and negative_vector is not None:
+            target_vector = np.array(vector).reshape(1, -1)
+
+            pos_sim = cosine_similarity(positive_vector, target_vector)[0][0]
+            neg_sim = cosine_similarity(negative_vector, target_vector)[0][0]
+
+            print(f"[INFO] Cosine similarity → Positive: {pos_sim:.4f}, Negative: {neg_sim:.4f}")
+
+            if pos_sim <= neg_sim:
+                print(f"[X] Negative similarity ≥ Positive → 저장 중단")
+                raise HTTPException(status_code=403, detail="[REJECT] CV 내용이 negative vector에 더 유사함")
         else:
-            print("[!] positive_vector 파일이 존재하지 않음 → 유사도 검사 생략")
+            print("[!] positive/negative vector가 하나 이상 없음 → 유사도 검사 생략")
 
         same_user_result = es.get(index=CV_INDEX_NAME, id=str(cv_id), ignore=[404])
 
@@ -476,6 +485,157 @@ def es_save_cv(s3_url, cv_id):
                 print(f"[✓] 임시 파일 삭제 완료: {temp_path}")
             except FileNotFoundError:
                 print(f"[!] 삭제할 파일이 없습니다: {temp_path}")
+            except Exception as e:
+                print(f"[X] 임시 파일 삭제 실패: {temp_path}, 오류: {e}")
+
+def extract_cv_vector(s3_url, cv_id):
+    try:
+        if not es.indices.exists(index=CV_INDEX_NAME):
+            es.indices.create(
+                index=CV_INDEX_NAME,
+                body={
+                    "mappings": {
+                        "properties": {
+                            "text": {"type": "text"},
+                            "text_hash": {"type": "keyword"},
+                            "vector": {"type": "dense_vector", "dims": 384},
+                            "cv_id": {"type": "keyword"},
+                            "created_at": {"type": "date"} 
+                        }
+                    }
+                }
+            )
+
+        run_vila(s3_url)
+
+        try:
+            with open("/tmp/temp_cv.txt", "r", encoding="utf-8") as f:
+                raw_text = f.read().strip()
+        except FileNotFoundError:
+            raw_text = ""
+
+        if not raw_text:
+            print("[!] run_vila 결과가 비어 있음 → google_ocr()로 대체 시도")
+            raw_text = google_ocr()
+
+        if not raw_text:
+            print("[X] OCR 실패: 빈 텍스트 → 저장 중단")
+            return
+
+        vector = encode_long_text(raw_text)
+        text_hash = hashlib.sha256(raw_text.encode('utf-8')).hexdigest()
+
+        doc = {
+            "text": raw_text,
+            "text_hash": text_hash,
+            "vector": vector,
+            "cv_id": cv_id,
+            "created_at": datetime.now(KST).isoformat()
+        }
+
+        print(f"Document to be indexed: {doc}")
+
+        same_user_result = es.get(index=CV_INDEX_NAME, id=str(cv_id), ignore=[404])
+
+        if same_user_result.get("found"):
+            existing_hash = same_user_result["_source"].get("text_hash")
+            if existing_hash == text_hash:
+                print(f"[SKIP] cv_id={cv_id} 동일한 text_hash 존재 → ES 저장 생략")
+            else:
+                response = es.index(index=CV_INDEX_NAME, id=str(cv_id), body=doc)
+                print(f"[UPDATE] cv_id={cv_id} CV Updated in ES. Document ID: {response['_id']}")
+        else:
+            response = es.index(index=CV_INDEX_NAME, id=str(cv_id), body=doc)
+            print(f"[NEW] cv_id={cv_id} CV Saved in ES. Document ID: {response['_id']}")
+
+        # try:
+        #     fetch_cv_save_data(s3_url, cv_id, raw_text)
+        #     print(f"[✓] CV RDB 저장 완료: user_id={cv_id}")
+        # except mysql.connector.Error as err:
+        #     print(f"[X] MySQL 오류: {err}")
+        # except Exception as e:
+        #     print(f"[X] 오류 발생: {e}")
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        print(f"[X] 처리 중 예외 발생: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+    finally:
+        for temp_path in ["/tmp/temp_cv.pdf", "/tmp/temp_cv.txt"]:
+            try:
+                os.remove(temp_path)
+                print(f"[✓] 임시 파일 삭제 완료: {temp_path}")
+            except FileNotFoundError:
+                print(f"[!] 삭제할 파일이 없습니다: {temp_path}")
+            except Exception as e:
+                print(f"[X] 임시 파일 삭제 실패: {temp_path}, 오류: {e}")
+
+def positive_negative_reject_test(s3_url):
+    """
+    S3 URL의 PDF에서 추출한 텍스트 임베딩이 positive/negative vector와 얼마나 유사한지 테스트합니다.
+    """
+    local_pdf_path = "/tmp/temp_cv.pdf"
+    local_txt_path = "/tmp/temp_cv.txt"
+
+    try:
+        download_pdf_from_s3(s3_url, local_pdf_path)
+        run_vila(s3_url)
+
+        try:
+            with open(local_txt_path, "r", encoding="utf-8") as f:
+                raw_text = f.read().strip()
+        except FileNotFoundError:
+            raw_text = ""
+
+        if not raw_text:
+            print("[!] run_vila 결과가 비어 있음 → google_ocr()로 대체 시도")
+            raw_text = google_ocr()
+
+        if not raw_text:
+            print("[X] OCR 실패: 빈 텍스트 → 테스트 중단")
+            return {"error": "텍스트 추출 실패"}
+
+        vector = encode_long_text(raw_text)
+
+        positive_vector_path = os.path.join(os.path.dirname(__file__), "positive_vector.json")
+        negative_vector_path = os.path.join(os.path.dirname(__file__), "negative_vector.json")
+
+        positive_vector = None
+        negative_vector = None
+
+        if os.path.exists(positive_vector_path):
+            with open(positive_vector_path, "r", encoding="utf-8") as f:
+                positive_vector = np.array(json.load(f)).reshape(1, -1)
+
+        if os.path.exists(negative_vector_path):
+            with open(negative_vector_path, "r", encoding="utf-8") as f:
+                negative_vector = np.array(json.load(f)).reshape(1, -1)
+
+        if positive_vector is not None and negative_vector is not None:
+            target_vector = np.array(vector).reshape(1, -1)
+            pos_sim = cosine_similarity(positive_vector, target_vector)[0][0]
+            neg_sim = cosine_similarity(negative_vector, target_vector)[0][0]
+            print(f"[TEST] Cosine similarity → Positive: {pos_sim:.4f}, Negative: {neg_sim:.4f}")
+            return {
+                "positive_similarity": float(pos_sim),
+                "negative_similarity": float(neg_sim),
+                "result": "positive" if pos_sim > neg_sim else "negative"
+            }
+        else:
+            print("[!] positive/negative vector가 하나 이상 없음 → 유사도 테스트 불가")
+            return {"error": "positive/negative vector 파일 없음"}
+
+    except Exception as e:
+        print(f"[X] 처리 중 예외 발생: {e}")
+        return {"error": str(e)}
+    finally:
+        for temp_path in [local_pdf_path, local_txt_path]:
+            try:
+                os.remove(temp_path)
+                print(f"[✓] 임시 파일 삭제 완료: {temp_path}")
+            except FileNotFoundError:
+                pass
             except Exception as e:
                 print(f"[X] 임시 파일 삭제 실패: {temp_path}, 오류: {e}")
 
