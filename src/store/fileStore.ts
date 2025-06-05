@@ -12,7 +12,7 @@ interface fileStore {
     setHasFile: (exists: boolean) => void;
     removeFile: (fileName: string) => Promise<number>;
     getSummary: (selectedCVId: number) => Promise<void>;
-    uploadFile: (file: File | null, url: string, fileName: string) => Promise<void>;
+    uploadFile: (file: File | null, url: string, fileName: string) => Promise<number | undefined>;
     reUploadFile: (file: File | null, url: string) => Promise<void>;
 }
 
@@ -75,6 +75,7 @@ const useFileStore = create<fileStore>((set) => ({
                 );
                 console.timeEnd('⏱️ confirm-upload');
                 console.log(confirm);
+                return confirm.status;
             }
         } catch (error) {
             console.log(error);

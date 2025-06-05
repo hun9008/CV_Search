@@ -72,7 +72,7 @@ export function SuccessPage() {
                         {searchParams.get('orderId')}
                     </div>
                 </div>
-                <div className="p-grid typography--p" style={{ marginTop: '10px' }}>
+                {/* <div className="p-grid typography--p" style={{ marginTop: '10px' }}>
                     <div className="p-grid-col text--left">
                         <b>paymentKey</b>
                     </div>
@@ -82,7 +82,7 @@ export function SuccessPage() {
                         style={{ whiteSpace: 'initial', width: '250px' }}>
                         {searchParams.get('paymentKey')}
                     </div>
-                </div>
+                </div> */}
                 <div className="p-grid-col">
                     <Link to="https://docs.tosspayments.com/guides/v2/payment-widget/integration">
                         <button className="button p-grid-col5">연동 문서</button>

@@ -282,7 +282,7 @@ function JobList({ bookmarked }: jobListProps) {
     return (
         <div className={styles.jobList} ref={jobListRef}>
             {hasError || isLoading ? (
-                <LoadingAnime1 />
+                ''
             ) : (
                 <div className={styles.jobList__filters}>
                     <div

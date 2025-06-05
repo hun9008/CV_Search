@@ -4,6 +4,7 @@ import style from './styles/Upload.module.scss';
 import { useNavigate } from 'react-router-dom';
 import useFileStore from '../../store/fileStore';
 import useS3Store from '../../store/s3Store';
+import LoadingAnime1 from '../../components/common/loading/LoadingAnime1';
 
 function Upload() {
     const [isDragging, setIsDragging] = useState(false);
@@ -48,18 +49,31 @@ function Upload() {
         setIsChangingName(true);
     };
 
-    const fileUpload = (selectedFile: File, presignedURL: string) => {
+    const fileUpload = async (selectedFile: File, presignedURL: string) => {
         setIsUploading(true);
         setUploadSuccess(false);
         // cvlist 최신화 추가
 
-        uploadFile(selectedFile, presignedURL, fileName);
+        try {
+            const res = await uploadFile(selectedFile, presignedURL, fileName);
+            if (res === 400 || res === 403) {
+                setIsUploading(false);
+                if (res == 400) {
+                    setError('같은 별명의 CV가 이미 존재합니다');
+                } else {
+                    setError('goodJob 서비스 정책에 위반되는 CV입니다.');
+                }
+                setFile(null);
+            }
+        } catch (error) {
+            console.error('CV 업로드 에러: ', error);
+        }
+
+        setIsUploading(false);
+        setUploadSuccess(true);
+        setFile(null);
 
         // pdf 업로드와 스프링 서버의 CV 처리 시간을 벌어줌
-        setTimeout(() => {
-            setIsUploading(false);
-            setUploadSuccess(true);
-        }, 10000);
     };
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -141,7 +155,6 @@ function Upload() {
         // 계속하기 버튼 처리 로직
         if (file && uploadSuccess) {
             navigate('/main/recommend', { replace: true });
-            setTimeout(() => setFile(null), 2000);
         } else {
             setError('계속하려면 CV를 업로드해주세요.');
         }
@@ -223,12 +236,13 @@ function Upload() {
                             </div>
 
                             {isUploading && (
-                                <div className={style.uploadProgress}>
-                                    <div className={style.uploadProgress__bar}>
-                                        <div className={style.uploadProgress__fill}></div>
-                                    </div>
-                                    <p className={style.uploadProgress__text}>업로드 중...</p>
-                                </div>
+                                // <div className={style.uploadProgress}>
+                                //     <div className={style.uploadProgress__bar}>
+                                //         <div className={style.uploadProgress__fill}></div>
+                                //     </div>
+                                //     <p className={style.uploadProgress__text}>업로드 중...</p>
+                                // </div>
+                                <LoadingAnime1 />
                             )}
                             {uploadSuccess && (
                                 <div className={style.uploadSuccess}>
