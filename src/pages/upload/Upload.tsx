@@ -61,6 +61,7 @@ function Upload() {
             const res = await uploadFile(selectedFile, presignedURL, fileName);
             if (res === 400 || res === 403) {
                 setIsUploading(false);
+                // TODO: 에러 로직 수정, 에러 발생하면 catch에서 핸들링
                 if (res == 400) {
                     setError('같은 별명의 CV가 이미 존재합니다');
                 } else {
@@ -74,6 +75,8 @@ function Upload() {
             await getJobList(TOTAL_JOB, selectedCVId);
         } catch (error) {
             console.error('CV 업로드 에러: ', error);
+            setFile(null);
+            setIsUploading(false);
         }
 
         setIsUploading(false);
