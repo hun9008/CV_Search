@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -170,7 +171,10 @@ class BookmarkServiceTest {
         cv.setId(500L);
         cv.setUser(mockUser);
 
-        when(cvRepository.findByUser(mockUser)).thenReturn(Optional.of(cv));
+        List<Cv> cvs = new ArrayList<Cv>();
+        cvs.add(cv);
+
+        when(cvRepository.findAllByUser(mockUser)).thenReturn(cvs);
 
         RecommendScore rs1 = new RecommendScore();
         rs1.setCv(cv);
@@ -200,7 +204,7 @@ class BookmarkServiceTest {
 
         assertEquals(0.0f, job2Dto.getScore());  // 점수 없음 → default 0
         verify(bookmarkRepository).findAllByUser(mockUser);
-        verify(cvRepository).findByUser(mockUser);
+        verify(cvRepository).findAllByUser(mockUser);
         verify(recommendScoreRepository).findByCvIdAndJobIdIn(500L, List.of(100L, 200L));
     }
 }
