@@ -26,11 +26,6 @@ export function SuccessPage() {
             };
 
             try {
-                console.log(requestData);
-                // const res = await verifyAmountInfo(requestData);
-                // setResponseData(res);
-                // const confirm = await confirmPayments(confirmData);
-                // setResponseData(confirm);
                 await verifyAmountInfo(requestData);
                 await confirmPayments(confirmData);
                 navigate(previousPage);

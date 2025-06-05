@@ -14,10 +14,6 @@ export function CheckoutPage() {
     const amount = useBillingStore((state) => state.amount);
     const planName = useBillingStore((state) => state.planName);
     const navigate = useNavigate();
-    // const [setAmount] = useState({
-    //     currency: 'KRW',
-    //     value: 1000,
-    // });
     const [ready, setReady] = useState(false);
     const [widgets, setWidgets] = useState<
         import('@tosspayments/tosspayments-sdk').TossPaymentsWidgets | null
@@ -144,20 +140,11 @@ export function CheckoutPage() {
                             });
                             // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
                             // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
-                            // await widgets?.requestPayment({
-                            //     orderId: id,
-                            //     orderName: planName,
-                            //     successUrl: 'https://www.goodjob.ai.kr/success',
-                            //     failUrl: 'https://www.goodjob.ai.kr/fail',
-                            //     customerEmail: 'customer123@gmail.com',
-                            //     customerName: '김토스',
-                            //     customerMobilePhone: '01012341234',
-                            // });
                             await widgets?.requestPayment({
                                 orderId: id,
                                 orderName: planName,
-                                successUrl: 'https://localhost:5173/success',
-                                failUrl: 'https://localhost:5173/fail',
+                                successUrl: 'https://www.goodjob.ai.kr/success',
+                                failUrl: 'https://www.goodjob.ai.kr/fail',
                                 customerEmail: 'customer123@gmail.com',
                                 customerName: '김토스',
                                 customerMobilePhone: '01012341234',

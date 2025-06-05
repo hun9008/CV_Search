@@ -1,16 +1,7 @@
 import { useEffect, useState } from 'react';
 import useJobStore from '../../../../store/jobStore';
 import style from './styles/JobDetail.module.scss';
-import {
-    Bookmark,
-    Share2,
-    ExternalLink,
-    MapPin,
-    Calendar,
-    Clock,
-    Briefcase,
-    Bot,
-} from 'lucide-react';
+import { Bookmark, Share2, MapPin, Calendar, Clock, Briefcase, Bot } from 'lucide-react';
 import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
 import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
@@ -273,8 +264,8 @@ function JobDetail() {
                     <button
                         className={style.actionButtons__feedback}
                         onClick={() => handleFeedback(job.id)}>
-                        피드백
                         <Bot size={20} className={style.actionButtons__icon} />
+                        피드백
                     </button>
                 )}
 
@@ -286,7 +277,6 @@ function JobDetail() {
                     {isManaging ? '관리중' : '관리 시작'}
                 </button>
             </div>
-
             <div className={style.content}>
                 {job.jobDescription && (
                     <section className={style.section}>
