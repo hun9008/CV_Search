@@ -15,7 +15,6 @@ interface CvMe {
 interface JobStore {
     jobList: Job[];
     selectedCVId: number | null;
-    previousSelectedCVId: number | null;
     filteredJobList: Job[] | null;
     selectedJob: Job | null;
     selectedJobDetail: Job | null;
@@ -23,7 +22,6 @@ interface JobStore {
     jobListRefreshTrigger: number;
     setSelectedJob: (job: Job) => void;
     setSelectedCvId: (cvId: number) => void;
-    setPreviousSelectedCVId: (cvId: number) => void;
     setSelectedJobDetail: (job: Job) => void;
     getSelectedJob: () => Job | null;
     getSelectedJobDetail: () => Job | null;
@@ -33,11 +31,6 @@ interface JobStore {
     getJobList: (count: number, cvId: number) => Promise<Job[]>;
     getJobListwithBookmark: (count: number, cvId: number) => Promise<Job[]>;
     getSelectedCvId: () => Promise<number>;
-
-    //
-    triggerJobPolling: () => void;
-    setPollingCallback: (cb: () => void) => void;
-    pollingCallback?: () => void;
 }
 
 const useJobStore = create<JobStore>()(
@@ -49,13 +42,11 @@ const useJobStore = create<JobStore>()(
             selectedJobDetail: null,
             feedback: '',
             selectedCVId: null,
-            previousSelectedCVId: null,
             jobListRefreshTrigger: Date.now(),
             setSelectedJob: (job) => set({ selectedJob: job }),
             setSelectedJobDetail: (job) => set({ selectedJobDetail: job }),
             setFilteredJobList: (filteredJobList) => set({ filteredJobList }),
             setSelectedCvId: (cvid) => set({ selectedCVId: cvid }),
-            setPreviousSelectedCVId: (cvid) => set({ previousSelectedCVId: cvid }),
             getSelectedJob: () => {
                 const { selectedJob } = get();
                 return selectedJob;
@@ -156,9 +147,6 @@ const useJobStore = create<JobStore>()(
                     throw error;
                 }
             },
-            setJobListRefreshTrigger: () => set({ jobListRefreshTrigger: Date.now() }),
-            triggerJobPolling: () => set({ jobListRefreshTrigger: Date.now() }, false),
-            setPollingCallback: (cb) => set({ pollingCallback: cb }),
         }),
         {
             name: 'cv-storage',
