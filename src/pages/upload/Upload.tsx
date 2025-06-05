@@ -67,6 +67,8 @@ function Upload() {
                     setError('goodJob 서비스 정책에 위반되는 CV입니다.');
                 }
                 setFile(null);
+                setIsUploading(false);
+                return;
             }
             const selectedCVId = await getSelectedCvId();
             await getJobList(TOTAL_JOB, selectedCVId);
