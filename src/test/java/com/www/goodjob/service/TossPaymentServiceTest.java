@@ -8,6 +8,7 @@ import com.www.goodjob.enums.TossPaymentMethod;
 import com.www.goodjob.enums.TossPaymentPlan;
 import com.www.goodjob.enums.TossPaymentStatus;
 import com.www.goodjob.repository.TossPaymentRepository;
+import com.www.goodjob.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,12 +22,14 @@ class TossPaymentServiceTest {
 
     private TossPaymentService tossPaymentService;
     private TossPaymentRepository tossPaymentRepository;
+    private UserRepository userRepository;
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         tossPaymentRepository = mock(TossPaymentRepository.class);
-        tossPaymentService = new TossPaymentService(tossPaymentRepository);
+        userRepository = mock(UserRepository.class);
+        tossPaymentService = new TossPaymentService(tossPaymentRepository, userRepository); //
         objectMapper = new ObjectMapper();
     }
 
@@ -34,7 +37,13 @@ class TossPaymentServiceTest {
     @DisplayName("handlePaymentConfirmation - TossPayment 정상 생성")
     void handlePaymentConfirmation() {
         // given
-        User user = User.builder().id(1L).email("test@goodjob.com").plan(TossPaymentPlan.스타터).build();
+        User user = User.builder()
+                .id(1L)
+                .email("test@goodjob.com")
+                .plan(TossPaymentPlan.스타터)
+                .build();
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         JsonNode jsonNode = objectMapper.createObjectNode()
                 .put("paymentKey", "pay123")
@@ -54,7 +63,9 @@ class TossPaymentServiceTest {
         assertEquals(TossPaymentMethod.카드, payment.getTossPaymentMethod());
         assertEquals(TossPaymentStatus.DONE, payment.getTossPaymentStatus());
         assertEquals(TossPaymentPlan.베이직, payment.getTossPaymentPlan());
+
         verify(tossPaymentRepository, times(1)).save(any());
+        verify(userRepository, times(1)).save(user);  // 플랜 변경 저장도 검증 가능
     }
 
     @Test
