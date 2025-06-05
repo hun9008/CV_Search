@@ -6,6 +6,7 @@ import useS3Store from '../../../store/s3Store';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../../store/authStore';
 import useUserStore from '../../../store/userStore';
+import useJobStore from '../../../store/jobStore';
 
 function CVUpload() {
     const [isDragging, setIsDragging] = useState(false);
@@ -19,7 +20,9 @@ function CVUpload() {
     const { fetchUserData } = useUserStore();
     const file = useFileStore((state) => state.file);
     const { getUploadPresignedURL } = useS3Store();
+    const { getJobList, getSelectedCvId } = useJobStore();
     const navigate = useNavigate();
+    const TOTAL_JOB = 80;
 
     const handleContinue = () => {
         navigate('/main/recommend');
@@ -63,12 +66,29 @@ function CVUpload() {
         setIsUploading(true);
         setUploadSuccess(false);
 
-        uploadFile(selectedFile, presignedURL, fileName);
-
-        setTimeout(() => {
+        try {
+            const res = await uploadFile(selectedFile, presignedURL, fileName);
+            if (res === 400 || res === 403) {
+                setIsUploading(false);
+                if (res === 400) {
+                    setError('같은 별명의 CV가 이미 존재합니다');
+                } else {
+                    setError('goodJob 서비스 정책에 위반되는 CV입니다.');
+                }
+                setFile(null);
+                setIsUploading(false);
+                return;
+            }
+            const selectedCVId = await getSelectedCvId();
+            await getJobList(TOTAL_JOB, selectedCVId);
+        } catch (error) {
+            console.error('CV 업로드 에러: ', error);
+            setFile(null);
             setIsUploading(false);
-            setUploadSuccess(true);
-        }, 10000);
+        }
+
+        setIsUploading(false);
+        setUploadSuccess(true);
     };
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {

@@ -264,8 +264,8 @@ function JobDetail() {
                     <button
                         className={style.actionButtons__feedback}
                         onClick={() => handleFeedback(job.id)}>
-                        피드백
                         <Bot size={20} className={style.actionButtons__icon} />
+                        피드백
                     </button>
                 )}
 
@@ -277,7 +277,6 @@ function JobDetail() {
                     {isManaging ? '관리중' : '관리 시작'}
                 </button>
             </div>
-
             <div className={style.content}>
                 {job.jobDescription && (
                     <section className={style.section}>
