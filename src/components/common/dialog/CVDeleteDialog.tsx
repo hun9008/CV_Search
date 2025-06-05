@@ -42,8 +42,6 @@ function CVDeleteDialog({ isOpen, onClose, fileName }: CVDeleteDialogProps) {
         const res = await removeFile(fileName);
         await getSelectedCvId();
 
-        await getSelectedCvId();
-
         if (res === 200) {
             setCVAction((prev) => !prev);
             setHasFile(false);

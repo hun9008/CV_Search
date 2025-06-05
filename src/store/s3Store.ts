@@ -6,7 +6,7 @@ import useAuthStore from './authStore';
 interface s3Store {
     url: string;
     getUploadPresignedURL: (fileName: string) => Promise<void>;
-    getDownloadPresignedURL: (fileName: string) => Promise<void>;
+    getDownloadPresignedURL: (fileName: string) => Promise<string>;
     reNameCv: (oldFileName: string, newFileName: string) => Promise<string>;
 }
 
@@ -19,9 +19,8 @@ const useS3Store = create<s3Store>((set) => ({
                 `${SERVER_IP}/s3/presigned-url/upload?fileName=${fileName}`,
                 { headers: { Authorization: `Bearer ${accessToken}` }, withCredentials: true }
             );
-            const url = res.data;
-            set({ url });
-            return url;
+            set({ url: res.data });
+            return res.data;
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 409) {

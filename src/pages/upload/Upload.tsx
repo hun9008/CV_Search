@@ -59,16 +59,20 @@ function Upload() {
 
         try {
             const res = await uploadFile(selectedFile, presignedURL, fileName);
+            console.log(res);
             if (res === 400 || res === 403) {
                 setIsUploading(false);
                 // TODO: 에러 로직 수정, 에러 발생하면 catch에서 핸들링
-                if (res == 400) {
-                    setError('같은 별명의 CV가 이미 존재합니다');
-                } else {
+                if (res === 400) {
+                    setFile(null);
+                    setIsUploading(false);
+                    setError('알 수 없는 에러입니다');
+                }
+                if (res === 403) {
+                    setFile(null);
+                    setIsUploading(false);
                     setError('goodJob 서비스 정책에 위반되는 CV입니다.');
                 }
-                setFile(null);
-                setIsUploading(false);
                 return;
             }
             const selectedCVId = await getSelectedCvId();
@@ -77,6 +81,7 @@ function Upload() {
             console.error('CV 업로드 에러: ', error);
             setFile(null);
             setIsUploading(false);
+            setError('goodJob 서비스 정책에 위반되는 CV입니다');
         }
 
         setIsUploading(false);

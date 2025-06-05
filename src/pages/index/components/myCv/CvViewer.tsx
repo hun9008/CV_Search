@@ -2,15 +2,12 @@ import { useEffect, useState, useCallback } from 'react';
 import style from './styles/CVViewer.module.scss';
 import useS3Store from '../../../../store/s3Store';
 import useCvStore, { type CvMe } from '../../../../store/cvStore';
-import useActionStore from '../../../../store/actionStore';
 import { Loader2, AlertTriangle, X } from 'lucide-react';
 import CvItem from './CvItem';
 
 function CvViewer() {
     const { getUserCvList } = useCvStore();
     const { getDownloadPresignedURL, reNameCv } = useS3Store();
-    const url = useS3Store((state) => state.url);
-    const cvAction = useActionStore((state) => state.cvAction);
     const userCvList = useCvStore((state) => state.userCvList);
     const [fullScreenPdfUrl, setFullScreenPdfUrl] = useState<string | null>(null);
     const [fullScreenPdfFileName, setFullScreenPdfFileName] = useState<string | null>(null);
@@ -18,34 +15,31 @@ function CvViewer() {
     const [fullScreenPdfError, setFullScreenPdfError] = useState<string | null>(null);
     const [currentlyLoadingCvName, setCurrentlyLoadingCvName] = useState<string | null>(null);
 
-    const handleViewCvFullScreen = useCallback(
-        async (fileName: string) => {
-            if (!fileName) {
-                setFullScreenPdfError('File name is missing.');
-                return;
-            }
-            setIsLoadingFullScreenPdf(true);
-            setFullScreenPdfError(null);
-            setFullScreenPdfUrl(null);
-            setFullScreenPdfFileName(fileName);
-            setCurrentlyLoadingCvName(fileName);
+    async function handleViewCvFullScreen(fileName: string) {
+        if (!fileName) {
+            setFullScreenPdfError('File name is missing.');
+            return;
+        }
+        setIsLoadingFullScreenPdf(true);
+        setFullScreenPdfError(null);
+        setFullScreenPdfUrl(null);
+        setFullScreenPdfFileName(fileName);
+        setCurrentlyLoadingCvName(fileName);
 
-            try {
-                await getDownloadPresignedURL(fileName);
-                setFullScreenPdfUrl(url);
-            } catch (err) {
-                console.error(`CV ${fileName} 뷰어 에러: `, err);
-                setFullScreenPdfError(
-                    `CV '${fileName}'를 불러오는 데 실패했습니다. 다시 시도해주세요.`
-                );
-                setFullScreenPdfUrl(null);
-            } finally {
-                setIsLoadingFullScreenPdf(false);
-                setCurrentlyLoadingCvName(null);
-            }
-        },
-        [url, getDownloadPresignedURL]
-    );
+        try {
+            const url = await getDownloadPresignedURL(fileName);
+            setFullScreenPdfUrl(url);
+        } catch (err) {
+            console.error(`CV ${fileName} 뷰어 에러: `, err);
+            setFullScreenPdfError(
+                `CV '${fileName}'를 불러오는 데 실패했습니다. 다시 시도해주세요.`
+            );
+            setFullScreenPdfUrl(null);
+        } finally {
+            setIsLoadingFullScreenPdf(false);
+            setCurrentlyLoadingCvName(null);
+        }
+    }
 
     const handleCloseFullScreenView = useCallback(() => {
         setFullScreenPdfUrl(null);
@@ -63,13 +57,13 @@ function CvViewer() {
         getUserCvList();
     }, []);
 
-    useEffect(() => {
-        // If cvAction changes (e.g., new CV uploaded), close full screen view and refresh list
-        if (fullScreenPdfError || isLoadingFullScreenPdf) {
-            handleCloseFullScreenView();
-        }
-        // No need to call getUserCvList() here again if cvAction already triggers it in the store or MyCv component
-    }, [cvAction, fullScreenPdfUrl]);
+    // useEffect(() => {
+    //     // If cvAction changes (e.g., new CV uploaded), close full screen view and refresh list
+    //     if (fullScreenPdfError || isLoadingFullScreenPdf) {
+    //         handleCloseFullScreenView();
+    //     }
+    //     // No need to call getUserCvList() here again if cvAction already triggers it in the store or MyCv component
+    // }, [cvAction, fullScreenPdfUrl]);
 
     if (isLoadingFullScreenPdf && !fullScreenPdfUrl) {
         return (

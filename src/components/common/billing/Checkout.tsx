@@ -4,6 +4,7 @@ import { billingType } from '../../../types/billing';
 import useBillingStore from '../../../store/billingStore';
 import { useNavigate } from 'react-router-dom';
 import './Payments.css';
+import { REDIRECT_IP } from '../../../constants/env';
 
 // TODO: 구매자의 고유 아이디를 불러와서 customerKey로 설정하세요. 이메일・전화번호와 같이 유추가 가능한 값은 안전하지 않습니다.
 // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
@@ -143,8 +144,8 @@ export function CheckoutPage() {
                             await widgets?.requestPayment({
                                 orderId: id,
                                 orderName: planName,
-                                successUrl: 'https://localhost:5173/success',
-                                failUrl: 'https://localhost:5173/fail',
+                                successUrl: `${REDIRECT_IP}/success`,
+                                failUrl: `${REDIRECT_IP}/fail`,
                                 customerEmail: 'customer123@gmail.com',
                                 customerName: '김토스',
                                 customerMobilePhone: '01012341234',

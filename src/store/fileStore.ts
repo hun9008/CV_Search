@@ -74,7 +74,7 @@ const useFileStore = create<fileStore>((set) => ({
                     }
                 );
                 console.timeEnd('⏱️ confirm-upload');
-                console.log(confirm);
+                console.log(confirm.status);
                 return confirm.status;
             }
         } catch (error) {

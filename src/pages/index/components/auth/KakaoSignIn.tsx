@@ -1,8 +1,8 @@
 import style from './styles/KakaoSignIn.module.scss';
-import { SERVER_IP } from '../../../../constants/env';
+import { SERVER_IP, REDIRECT_IP } from '../../../../constants/env';
 function KakaoSignIn() {
     const handleKakaoLogin = () => {
-        const redirectUri = `${SERVER_IP}/auth/callback`;
+        const redirectUri = `${REDIRECT_IP}/auth/callback`;
         const state = btoa(redirectUri);
         window.location.href = `${SERVER_IP}/oauth2/authorization/kakao?state=${state}`;
     };
