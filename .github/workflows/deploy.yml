@@ -1,16 +1,21 @@
 name: Deploy goodJob_Client to S3
+
 on:
     push:
         branches:
             - dev_front
+
 jobs:
     deploy:
         runs-on: ubuntu-latest
+
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
+
             - name: Install sshpass
               run: sudo apt-get update && sudo apt-get install -y sshpass
+
             - name: Deploy to Hunian
               env:
                   HUNIAN_USER: ${{ secrets.HUNIAN_USER }}
@@ -18,20 +23,28 @@ jobs:
                   HUNIAN_PASSWORD: ${{ secrets.HUNIAN_PASSWORD }}
                   SERVER_IP: ${{ secrets.SERVER_IP }}
               run: |
-                  sshpass -p “$HUNIAN_PASSWORD” ssh -o StrictHostKeyChecking=no $HUNIAN_USER@$HUNIAN_HOST << EOF
+                  sshpass -p "$HUNIAN_PASSWORD" ssh -o StrictHostKeyChecking=no $HUNIAN_USER@$HUNIAN_HOST << EOF
+
                     cd /home/hun/Desktop/goodjob/CV_Search
-                    echo “[PULL] Pulling latest changes from dev_front branch...”
+
+                    echo "[PULL] Pulling latest changes from dev_front branch..."
                     git pull origin dev_front
-                    echo “VITE_SERVER_IP=$SERVER_IP” > .env
-                    echo “[NPM INSTALL] Installing dependencies...”
+
+                    echo "VITE_SERVER_IP=$SERVER_IP" > .env
+
+                    echo "[NPM INSTALL] Installing dependencies..."
                     npm install
-                    echo “[CLEAN] Cleaning old dist and old process...”
+
+                    echo "[CLEAN] Cleaning old dist and old process..."
                     rm -rf dist
                     pm2 delete goodjob || true
-                    echo “[NPM BUILD] Building project...”
+
+                    echo "[NPM BUILD] Building project..."
                     npm run build
-                    echo “[CHECK] Verifying dist contents...”
+
+                    echo "[CHECK] Verifying dist contents..."
                     ls -al dist/
-                    echo “[PM2 RUN] Starting static server on port 3013...”
-                    pm2 start “npx serve -s dist -l 3013” --name goodjob
+
+                    echo "[PM2 RUN] Starting static server on port 3013..."
+                    pm2 start "npx serve -s dist -l 3013" --name goodjob
                   EOF
