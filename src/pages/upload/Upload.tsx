@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import useFileStore from '../../store/fileStore';
 import useS3Store from '../../store/s3Store';
 import LoadingAnime1 from '../../components/common/loading/LoadingAnime1';
+import useJobStore from '../../store/jobStore';
 
 function Upload() {
     const [isDragging, setIsDragging] = useState(false);
@@ -16,6 +17,8 @@ function Upload() {
     const { setFile, uploadFile } = useFileStore();
     const file = useFileStore((state) => state.file);
     const { getUploadPresignedURL } = useS3Store();
+    const { getJobList, getSelectedCvId } = useJobStore();
+    const TOTAL_JOB = 80;
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
@@ -65,13 +68,14 @@ function Upload() {
                 }
                 setFile(null);
             }
+            const selectedCVId = await getSelectedCvId();
+            await getJobList(TOTAL_JOB, selectedCVId);
         } catch (error) {
             console.error('CV 업로드 에러: ', error);
         }
 
         setIsUploading(false);
         setUploadSuccess(true);
-        setFile(null);
 
         // pdf 업로드와 스프링 서버의 CV 처리 시간을 벌어줌
     };
@@ -155,6 +159,7 @@ function Upload() {
         // 계속하기 버튼 처리 로직
         if (file && uploadSuccess) {
             navigate('/main/recommend', { replace: true });
+            setTimeout(() => setFile(null), 2000);
         } else {
             setError('계속하려면 CV를 업로드해주세요.');
         }
