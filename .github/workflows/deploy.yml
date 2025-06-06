@@ -1,50 +1,46 @@
 name: Deploy goodJob_Client to S3
 
 on:
-    push:
-        branches:
-            - dev_front
+  push:
+    branches:
+      - dev_front
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Install sshpass
-              run: sudo apt-get update && sudo apt-get install -y sshpass
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-            - name: Deploy to Hunian
-              env:
-                  HUNIAN_USER: ${{ secrets.HUNIAN_USER }}
-                  HUNIAN_HOST: ${{ secrets.HUNIAN_HOST }}
-                  HUNIAN_PASSWORD: ${{ secrets.HUNIAN_PASSWORD }}
-                  SERVER_IP: ${{ secrets.SERVER_IP }}
-              run: |
-                  sshpass -p "$HUNIAN_PASSWORD" ssh -o StrictHostKeyChecking=no $HUNIAN_USER@$HUNIAN_HOST << EOF
+      - name: Install dependencies
+        run: npm ci
 
-                    cd /home/hun/Desktop/goodjob/CV_Search
+      - name: Create .env file
+        run: |
+          echo "VITE_SERVER_IP=${{ secrets.SERVER_IP }}" > .env
+          echo "VITE_REDIRECT_IP=${{ secrets.VITE_REDIRECT_IP }}" >> .env
 
-                    echo "[PULL] Pulling latest changes from dev_front branch..."
-                    git pull origin dev_front
+      - name: Build project
+        run: npm run build
 
-                    echo "VITE_SERVER_IP=$SERVER_IP" > .env
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.FRONT_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.FRONT_AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.FRONT_S3_AWS_REGION }}
 
-                    echo "[NPM INSTALL] Installing dependencies..."
-                    npm install
+      - name: Sync to S3
+        run: aws s3 sync ./dist s3://${{ secrets.FRONT_S3_BUCKET_NAME }} --delete
 
-                    echo "[CLEAN] Cleaning old dist and old process..."
-                    rm -rf dist
-                    pm2 delete goodjob || true
-
-                    echo "[NPM BUILD] Building project..."
-                    npm run build
-
-                    echo "[CHECK] Verifying dist contents..."
-                    ls -al dist/
-
-                    echo "[PM2 RUN] Starting static server on port 3013..."
-                    pm2 start "npx serve -s dist -l 3013" --name goodjob
-                  EOF
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
