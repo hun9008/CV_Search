@@ -460,9 +460,10 @@
         display: flex;
         flex-direction: row;
         position: relative;
-        justify-content: space-evenly;
+        justify-content: center;
         border: none;
         flex: 1;
+        color: #7c40e3;
         transition: all ease 0.5s;
         &:before {
             content: '';

@@ -261,7 +261,7 @@ function JobDetail() {
                         className={style.actionButtons__icon}
                         id={`bot-icon-${job.id}`}
                     />
-                    {isFeedbackLoading ? '' : '피드백'}
+                    {isFeedbackLoading ? '' : 'AI 피드백'}
                 </button>
 
                 <button

@@ -80,7 +80,7 @@ function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemPr
                     cvId={cv.id}
                 />
             )}
-            {userCvList.length === 1 && !isRenaming ? ( // isRenaming 아닐 때만 단일 CV 뷰어 버튼 표시
+            {userCvList.length === 1 && !isRenaming ? (
                 <div className={style.container}>
                     {isViewingThis && (
                         <button className={style.viewerButton} onClick={handleView}>
@@ -113,18 +113,6 @@ function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemPr
                                         }}
                                         className={style.renameInput}
                                     />
-                                    <button
-                                        onClick={handleConfirmRename}
-                                        className={`${style.actionButton} ${style.saveButton}`}
-                                        title="이름 저장">
-                                        <Check size={18} />
-                                    </button>
-                                    <button
-                                        onClick={handleCancelRename}
-                                        className={`${style.actionButton} ${style.cancelButton}`}
-                                        title="변경 취소">
-                                        <X size={18} />
-                                    </button>
                                 </div>
                             ) : (
                                 <h2
@@ -144,31 +132,62 @@ function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemPr
                         </div>
 
                         <div className={style.cvCardActions}>
-                            <button
-                                className={`${style.actionButton} ${style.viewButton}`}
-                                onClick={handleView}
-                                disabled={isLoadingThis || isRenaming} // 이름 변경 중에는 보기 버튼 비활성화
-                                title="CV 보기">
-                                {isLoadingThis ? (
-                                    <Loader2 size={18} className={style.animateSpin} />
-                                ) : (
-                                    <Eye size={18} />
-                                )}
-                            </button>
-                            <button
-                                className={`${style.actionButton} ${style.renameButton}`}
-                                onClick={startRename}
-                                disabled={isRenaming} // 이름 변경 중에는 이름 변경 버튼 비활성화
-                                title="CV 이름 변경">
-                                <Edit3 size={18} />
-                            </button>
-                            <button
-                                className={`${style.actionButton} ${style.deleteButton}`}
-                                onClick={handleDeleteCV}
-                                disabled={isRenaming} // 이름 변경 중에는 삭제 버튼 비활성화
-                                title="CV 삭제">
-                                <Trash2 size={18} />
-                            </button>
+                            {isRenaming ? (
+                                <>
+                                    <button
+                                        onClick={handleConfirmRename}
+                                        className={`${style.actionButton} ${style.saveButton}`}
+                                        title="이름 저장">
+                                        <Check size={18} />
+                                    </button>
+                                    <button
+                                        onClick={handleCancelRename}
+                                        className={`${style.actionButton} ${style.cancelButton}`}
+                                        title="변경 취소">
+                                        <X size={18} />
+                                    </button>
+                                </>
+                            ) : (
+                                ''
+                            )}
+                            {isRenaming ? (
+                                ''
+                            ) : (
+                                <button
+                                    className={`${style.actionButton} ${style.viewButton}`}
+                                    onClick={handleView}
+                                    disabled={isLoadingThis || isRenaming} // 이름 변경 중에는 보기 버튼 비활성화
+                                    title="CV 보기">
+                                    {isLoadingThis ? (
+                                        <Loader2 size={18} className={style.animateSpin} />
+                                    ) : (
+                                        <Eye size={18} />
+                                    )}
+                                </button>
+                            )}
+                            {isRenaming ? (
+                                ''
+                            ) : (
+                                <button
+                                    className={`${style.actionButton} ${style.renameButton}`}
+                                    onClick={startRename}
+                                    disabled={isRenaming} // 이름 변경 중에는 이름 변경 버튼 비활성화
+                                    title="CV 이름 변경">
+                                    <Edit3 size={18} />
+                                </button>
+                            )}
+
+                            {isRenaming ? (
+                                ''
+                            ) : (
+                                <button
+                                    className={`${style.actionButton} ${style.deleteButton}`}
+                                    onClick={handleDeleteCV}
+                                    disabled={isRenaming} // 이름 변경 중에는 삭제 버튼 비활성화
+                                    title="CV 삭제">
+                                    <Trash2 size={18} />
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
