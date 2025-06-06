@@ -1,7 +1,10 @@
 import type React from 'react';
-import { Bookmark, ExternalLink } from 'lucide-react';
+import { Bookmark } from 'lucide-react';
 import style from './SearchCard.module.scss';
 import { JobContent } from '../../../../types/searchResult';
+import JobDetailDialog from '../bookmark/JobDetailDialog';
+import { useState } from 'react';
+import useJobStore from '../../../../store/jobStore';
 
 interface SearchCardProp {
     job: JobContent;
@@ -10,15 +13,26 @@ interface SearchCardProp {
 }
 
 function SearchCard({ job, onToggleBookmark, isSelected }: SearchCardProp) {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
+    const { setSelectedJobDetail } = useJobStore();
+
     const handleBookmarkClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         onToggleBookmark();
     };
 
-    const handleCardClick = () => {};
+    const handleCardClick = () => {
+        setSelectedJobId(job.id);
+        setSelectedJobDetail(job);
+        setIsDialogOpen(true);
+    };
 
     return (
         <>
+            {isDialogOpen && selectedJobId && (
+                <JobDetailDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+            )}
             <div
                 className={`${style.jobCard} ${isSelected ? style.selected : ''}`}
                 onClick={handleCardClick}>
@@ -74,10 +88,6 @@ function SearchCard({ job, onToggleBookmark, isSelected }: SearchCardProp) {
                                 }`}
                             </p>
                         )}
-                        <button className={style.jobCard__viewButton} onClick={handleCardClick}>
-                            <ExternalLink size={16} />
-                            <span>상세보기</span>
-                        </button>
                     </div>
                 </div>
             </div>

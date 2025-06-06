@@ -28,6 +28,10 @@ function CVUpload() {
 
     const handleContinue = () => {
         navigate('/main/recommend');
+        setTimeout(() => {
+            setFile(null);
+            setUploadSuccess(false);
+        }, 2000);
     };
 
     const handleSkip = () => {
@@ -225,15 +229,7 @@ function CVUpload() {
                             </button>
                         </div>
 
-                        {isUploading && (
-                            // <div className={style.uploadProgress}>
-                            //     <div className={style.uploadProgress__bar}>
-                            //         <div className={style.uploadProgress__fill}></div>
-                            //     </div>
-                            //     <p className={style.uploadProgress__text}>업로드 중...</p>
-                            // </div>
-                            <LoadingAnime1 />
-                        )}
+                        {isUploading && <LoadingAnime1 />}
 
                         {uploadSuccess && (
                             <>
@@ -277,21 +273,27 @@ function CVUpload() {
                         </div>
                     </div>
                 )}
-                {file && (
-                    <div className={style.continueButtons}>
-                        <button className={style.continueButtons__skip} onClick={handleSkip}>
-                            나중에 할래요
-                        </button>
-                        <button
-                            className={`${style.dragAndDropCard__button} ${
-                                !file || isUploading ? style.disabled : ''
-                            }`}
-                            onClick={isChangingName ? handleFileNameSubmit : handleContinue}
-                            disabled={!file || isUploading}>
-                            계속하기
-                        </button>
-                    </div>
-                )}
+                {file &&
+                    (isUploading || uploadSuccess ? (
+                        ''
+                    ) : (
+                        <div className={style.continueButtons}>
+                            <button
+                                className={style.continueButtons__skip}
+                                disabled={isUploading}
+                                onClick={handleSkip}>
+                                나중에 할래요
+                            </button>
+                            <button
+                                className={`${style.dragAndDropCard__button} ${
+                                    !file || isUploading ? style.disabled : ''
+                                }`}
+                                onClick={isChangingName ? handleFileNameSubmit : handleContinue}
+                                disabled={!file || isUploading}>
+                                계속하기
+                            </button>
+                        </div>
+                    ))}
             </div>
             {error && (
                 <div className={style.errorMessage}>

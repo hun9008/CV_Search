@@ -10,7 +10,8 @@ interface fileStore {
     summary: string | null;
     setFile: (file: File | null) => void;
     setHasFile: (exists: boolean) => void;
-    removeFile: (fileName: string) => Promise<number>;
+    removeFile: (cvId: number) => Promise<number>;
+    removeAllFile: () => Promise<number>;
     getSummary: (selectedCVId: number) => Promise<void>;
     uploadFile: (file: File | null, url: string, fileName: string) => Promise<number | undefined>;
     reUploadFile: (file: File | null, url: string) => Promise<void>;
@@ -22,9 +23,19 @@ const useFileStore = create<fileStore>((set) => ({
     hasFile: false,
     setFile: (file: File | null) => set({ file }),
     setHasFile: (exists) => set({ hasFile: exists }),
-    removeFile: async (fileName) => {
+    removeFile: async (cvId) => {
         const accessToken = useAuthStore.getState().accessToken;
-        const res = await axios.delete(`${SERVER_IP}/cv/delete-cv?fileName=${fileName}`, {
+        const res = await axios.delete(`${SERVER_IP}/cv/delete-cv?fileName=${cvId}`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+        });
+        return res.status;
+    },
+    removeAllFile: async () => {
+        const accessToken = useAuthStore.getState().accessToken;
+        const res = await axios.delete(`${SERVER_IP}/cv/delete-all-cvs`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },

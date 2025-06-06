@@ -77,7 +77,7 @@ function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemPr
                 <CVDeleteDialog
                     isOpen={deleteDialogHidden}
                     onClose={() => setDeleteDialogHidden((prev) => !prev)}
-                    fileName={cv.fileName}
+                    cvId={cv.id}
                 />
             )}
             {userCvList.length === 1 && !isRenaming ? ( // isRenaming 아닐 때만 단일 CV 뷰어 버튼 표시

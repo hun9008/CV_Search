@@ -6,10 +6,9 @@ import { X } from 'lucide-react';
 interface JobDetailDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    jobId: number;
 }
 
-function JobDetailDialog({ isOpen, onClose, jobId }: JobDetailDialogProps) {
+function JobDetailDialog({ isOpen, onClose }: JobDetailDialogProps) {
     const dialogRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -34,7 +33,6 @@ function JobDetailDialog({ isOpen, onClose, jobId }: JobDetailDialogProps) {
         const handleEscKey = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onClose();
-                console.log(jobId); // 지우기
             }
         };
 
