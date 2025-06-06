@@ -82,23 +82,7 @@ public class S3Service {
                 .build();
 
         s3Client.deleteObject(deleteRequest);
-        System.out.println("파일 삭제 완료: " + fileName);
-    }
-
-    public void deleteFile(Long cvId) {
-
-        Cv cv = cvRepository.findById(cvId)
-                .orElseThrow(() -> new RuntimeException("CV not found"));
-
-        String fileName = cv.getFileName();
-
-        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
-                .bucket(bucketName)
-                .key("cv/" + fileName)
-                .build();
-
-        s3Client.deleteObject(deleteRequest);
-        System.out.println("파일 삭제 완료: " + fileName);
+        System.out.println("S3 파일 삭제 완료: " + fileName);
     }
 
     public void deleteAllFilesByUserId(Long userId) {

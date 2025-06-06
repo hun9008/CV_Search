@@ -2,6 +2,7 @@ package com.www.goodjob.controller;
 
 import com.www.goodjob.domain.Cv;
 import com.www.goodjob.dto.CvDto;
+import com.www.goodjob.repository.CvRepository;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.CvService;
 import com.www.goodjob.service.S3Service;
@@ -34,10 +35,9 @@ public class CvController {
         if (userDetails == null) {
             throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
         }
-        Long userId = userDetails.getId();
+
         try {
             String message = cvService.deleteCv(cvId);
-            s3Service.deleteFile(cvId);
             return ResponseEntity.ok(Map.of("message", message));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

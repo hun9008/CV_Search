@@ -28,6 +28,7 @@ public class CvService {
     private final RecommendScoreRepository recommendScoreRepository;
     private final ClaudeClient claudeClient;
     private final RedisTemplate<String, String> redisTemplate;
+    private final S3Service s3Service;
 
     @Value("${FASTAPI_HOST}")
     private String fastapiHost;
@@ -37,6 +38,7 @@ public class CvService {
 
         Cv cv = cvRepository.findById(cvId)
                 .orElseThrow(() -> new RuntimeException("CV not found"));
+        String fileName = cv.getFileName();
 
         String url = fastapiHost + "/delete-cv?cv_id=" + cvId;
         try {
@@ -60,6 +62,8 @@ public class CvService {
             log.info("[CV 삭제] cvRepository.delete: {}ms", (t3 - t2));
             log.info("[CV 삭제] restTemplate.delete (FastAPI 호출): {}ms", (t4 - t3));
             log.info("[CV 삭제] 전체 삭제 소요 시간: {}ms (cvId={})", (t4 - t1), cvId);
+
+            s3Service.deleteFileName(fileName);
 
             return "CV " + cvId + " deleted from Elasticsearch, RDB, and Redis.";
         } catch (Exception e) {
