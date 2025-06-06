@@ -25,7 +25,7 @@ const useFileStore = create<fileStore>((set) => ({
     setHasFile: (exists) => set({ hasFile: exists }),
     removeFile: async (cvId) => {
         const accessToken = useAuthStore.getState().accessToken;
-        const res = await axios.delete(`${SERVER_IP}/cv/delete-cv?fileName=${cvId}`, {
+        const res = await axios.delete(`${SERVER_IP}/cv/delete-cv?cvId=${cvId}`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
