@@ -431,13 +431,43 @@
         }
     }
 
-    &__feedback,
     &__manage {
         background-color: #f5f9fd;
         color: #333;
         border: 1px solid #e0e0e0;
         flex: 1;
 
+        &:hover {
+            background-color: #e6f0ff;
+            border-color: #d8edff;
+            transform: translateY(-2px);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+    &__feedback {
+        display: flex;
+        flex-direction: row;
+        position: relative;
+        justify-content: space-evenly;
+        border: none;
+        flex: 1;
+        transition: all ease 0.5s;
+        &:before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            padding: 5px;
+            background: linear-gradient(to bottom right, #1877f2, #e100ff);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+        }
+        &.loading {
+            background: linear-gradient(to top left, #e100ff, #1877f2);
+        }
         &:hover {
             background-color: #e6f0ff;
             border-color: #d8edff;
@@ -704,5 +734,36 @@
         &__actions {
             align-self: flex-end;
         }
+    }
+}
+
+// actionButtons.module.scss
+
+@keyframes bounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-8px);
+    }
+    60% {
+        transform: translateY(4px);
+    }
+}
+
+.actionButtons__icon {
+    transition: transform 0.3s ease;
+}
+
+.bounce {
+    animation: bounce 1s infinite ease;
+}
+@keyframes rotate-gradient {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
     }
 }

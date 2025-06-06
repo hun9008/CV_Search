@@ -9,9 +9,10 @@ import Loading from '../../../../components/common/loading/Loading';
 import ErrorFallback from '../../../../components/common/error/ErrorFallback';
 import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
 import { parseMarkdown } from '../../../../utils/markdown';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import useCvStore from '../../../../store/cvStore';
 import useJobStore from '../../../../store/jobStore';
+import usePageStore from '../../../../store/pageStore';
 
 function MyCv() {
     const { getSummary } = useFileStore();
@@ -26,16 +27,13 @@ function MyCv() {
     const selectedCVId = useJobStore((state) => state.selectedCVId);
 
     const navigate = useNavigate();
+    const setPreviousPage = usePageStore((state) => state.setPreviousPage);
+    const location = useLocation();
 
     const handleButtonClick = () => {
+        setPreviousPage(location.pathname);
         navigate('/upload');
     };
-
-    // const handleReUploadCV = async () => {
-    //     setReuploadDialogHidden((prev) => !prev);
-    //     // if (res === 200) {
-    //     // }
-    // };
 
     useEffect(() => {
         const fetchCVSummary = async () => {

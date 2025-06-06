@@ -1,8 +1,22 @@
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import './Payments.css';
+import usePageStore from '../../../store/pageStore';
+import { useEffect } from 'react';
 
 export function FailPage() {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const previousPage = usePageStore((state) => state.previousPage);
+
+    useEffect(() => {
+        async function failRedirect() {
+            navigate(previousPage);
+        }
+
+        setTimeout(() => {
+            failRedirect();
+        }, 2000);
+    }, [searchParams, navigate]);
 
     return (
         <div className="result wrapper">

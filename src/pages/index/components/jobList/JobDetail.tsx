@@ -90,19 +90,21 @@ function JobDetail() {
     };
 
     const handleFeedback = async (jobId: number) => {
+        const icon = document.querySelector(`#bot-icon-${jobId}`);
+        icon?.classList.add(style.bounce);
+
         try {
             setIsFeedbackLoading(true);
+
             if (selectedCVId !== null && (await getFeedback(jobId, selectedCVId)) === 200) {
-                // if (isFeedbackLoading) {
-                //     setIsFeedbackLoading(false);
-                //     setShowFeedbackModal(true);
-                // }
-                setIsFeedbackLoading(false);
                 setShowFeedbackModal(true);
             }
         } catch (error) {
             console.error('피드백 요청 에러: ', error);
             throw error;
+        } finally {
+            setIsFeedbackLoading(false);
+            icon?.classList.remove(style.bounce);
         }
     };
 
@@ -253,21 +255,18 @@ function JobDetail() {
                 <button className={style.actionButtons__apply} onClick={handleApply}>
                     지원하기
                 </button>
-
-                {isFeedbackLoading ? (
-                    <button
-                        className={style.actionButtons__feedback}
-                        onClick={() => handleFeedback(job.id)}>
-                        <LoadingSpinner />
-                    </button>
-                ) : (
-                    <button
-                        className={style.actionButtons__feedback}
-                        onClick={() => handleFeedback(job.id)}>
-                        <Bot size={20} className={style.actionButtons__icon} />
-                        피드백
-                    </button>
-                )}
+                <button
+                    className={`${style.actionButtons__feedback} ${
+                        isFeedbackLoading ? 'loading' : ''
+                    }`}
+                    onClick={() => handleFeedback(job.id)}>
+                    <Bot
+                        size={20}
+                        className={style.actionButtons__icon}
+                        id={`bot-icon-${job.id}`}
+                    />
+                    {isFeedbackLoading ? '' : '피드백 받기'}
+                </button>
 
                 <button
                     className={`${style.actionButtons__manage} ${

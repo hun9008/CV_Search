@@ -10,7 +10,6 @@ export function SuccessPage() {
     const previousPage = usePageStore((state) => state.previousPage);
     const { verifyAmountInfo, confirmPayments } = useBillingStore();
     const [searchParams] = useSearchParams();
-    // const [responseData, setResponseData] = useState<verifyResponse | null>(null);
 
     useEffect(() => {
         async function confirm() {

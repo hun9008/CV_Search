@@ -57,14 +57,6 @@ function CvViewer() {
         getUserCvList();
     }, []);
 
-    // useEffect(() => {
-    //     // If cvAction changes (e.g., new CV uploaded), close full screen view and refresh list
-    //     if (fullScreenPdfError || isLoadingFullScreenPdf) {
-    //         handleCloseFullScreenView();
-    //     }
-    //     // No need to call getUserCvList() here again if cvAction already triggers it in the store or MyCv component
-    // }, [cvAction, fullScreenPdfUrl]);
-
     if (isLoadingFullScreenPdf && !fullScreenPdfUrl) {
         return (
             <div className={style.fullScreenLoading}>

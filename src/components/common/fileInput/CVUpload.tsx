@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../../store/authStore';
 import useUserStore from '../../../store/userStore';
 import useJobStore from '../../../store/jobStore';
+import LoadingAnime1 from '../loading/LoadingAnime1';
+import axios from 'axios';
 
 function CVUpload() {
     const [isDragging, setIsDragging] = useState(false);
@@ -26,6 +28,11 @@ function CVUpload() {
 
     const handleContinue = () => {
         navigate('/main/recommend');
+    };
+
+    const handleSkip = () => {
+        setFile(null);
+        setUploadSuccess(false);
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,24 +74,22 @@ function CVUpload() {
         setUploadSuccess(false);
 
         try {
-            const res = await uploadFile(selectedFile, presignedURL, fileName);
-            if (res === 400 || res === 403) {
-                setIsUploading(false);
-                if (res === 400) {
-                    setError('같은 별명의 CV가 이미 존재합니다');
-                } else {
-                    setError('goodJob 서비스 정책에 위반되는 CV입니다.');
-                }
-                setFile(null);
-                setIsUploading(false);
-                return;
-            }
+            await uploadFile(selectedFile, presignedURL, fileName);
             const selectedCVId = await getSelectedCvId();
             await getJobList(TOTAL_JOB, selectedCVId);
         } catch (error) {
-            console.error('CV 업로드 에러: ', error);
-            setFile(null);
-            setIsUploading(false);
+            if (axios.isAxiosError(error)) {
+                setFile(null);
+                setIsUploading(false);
+                setUploadSuccess(false);
+                if (error.response?.status === 403) {
+                    setError('goodJob 서비스 정책에 위반되는 CV입니다.');
+                    return;
+                } else {
+                    setError('알 수 없는 에러입니다');
+                    return;
+                }
+            }
         }
 
         setIsUploading(false);
@@ -199,7 +204,7 @@ function CVUpload() {
                     </div>
                 )}
 
-                {file && !isChangingName && (
+                {file && (
                     <div className={style.filePreview}>
                         <div className={style.filePreview__header}>
                             <div className={style.filePreview__icon}>
@@ -221,12 +226,13 @@ function CVUpload() {
                         </div>
 
                         {isUploading && (
-                            <div className={style.uploadProgress}>
-                                <div className={style.uploadProgress__bar}>
-                                    <div className={style.uploadProgress__fill}></div>
-                                </div>
-                                <p className={style.uploadProgress__text}>업로드 중...</p>
-                            </div>
+                            // <div className={style.uploadProgress}>
+                            //     <div className={style.uploadProgress__bar}>
+                            //         <div className={style.uploadProgress__fill}></div>
+                            //     </div>
+                            //     <p className={style.uploadProgress__text}>업로드 중...</p>
+                            // </div>
+                            <LoadingAnime1 />
                         )}
 
                         {uploadSuccess && (
@@ -269,6 +275,21 @@ function CVUpload() {
                                 </form>
                             </div>
                         </div>
+                    </div>
+                )}
+                {file && (
+                    <div className={style.continueButtons}>
+                        <button className={style.continueButtons__skip} onClick={handleSkip}>
+                            나중에 할래요
+                        </button>
+                        <button
+                            className={`${style.dragAndDropCard__button} ${
+                                !file || isUploading ? style.disabled : ''
+                            }`}
+                            onClick={isChangingName ? handleFileNameSubmit : handleContinue}
+                            disabled={!file || isUploading}>
+                            계속하기
+                        </button>
                     </div>
                 )}
             </div>

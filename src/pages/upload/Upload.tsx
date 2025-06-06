@@ -6,6 +6,8 @@ import useFileStore from '../../store/fileStore';
 import useS3Store from '../../store/s3Store';
 import LoadingAnime1 from '../../components/common/loading/LoadingAnime1';
 import useJobStore from '../../store/jobStore';
+import axios from 'axios';
+import usePageStore from '../../store/pageStore';
 
 function Upload() {
     const [isDragging, setIsDragging] = useState(false);
@@ -22,6 +24,7 @@ function Upload() {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
+    const previousPage = usePageStore((state) => state.previousPage);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = event.target.files?.[0];
@@ -58,30 +61,22 @@ function Upload() {
         // cvlist 최신화 추가
 
         try {
-            const res = await uploadFile(selectedFile, presignedURL, fileName);
-            console.log(res);
-            if (res === 400 || res === 403) {
-                setIsUploading(false);
-                // TODO: 에러 로직 수정, 에러 발생하면 catch에서 핸들링
-                if (res === 400) {
-                    setFile(null);
-                    setIsUploading(false);
-                    setError('알 수 없는 에러입니다');
-                }
-                if (res === 403) {
-                    setFile(null);
-                    setIsUploading(false);
-                    setError('goodJob 서비스 정책에 위반되는 CV입니다.');
-                }
-                return;
-            }
+            await uploadFile(selectedFile, presignedURL, fileName);
             const selectedCVId = await getSelectedCvId();
             await getJobList(TOTAL_JOB, selectedCVId);
         } catch (error) {
-            console.error('CV 업로드 에러: ', error);
-            setFile(null);
-            setIsUploading(false);
-            setError('goodJob 서비스 정책에 위반되는 CV입니다');
+            if (axios.isAxiosError(error)) {
+                setFile(null);
+                setIsUploading(false);
+                setUploadSuccess(false);
+                if (error.response?.status === 403) {
+                    setError('goodJob 서비스 정책에 위반되는 CV입니다.');
+                    return;
+                } else {
+                    setError('알 수 없는 에러입니다');
+                    return;
+                }
+            }
         }
 
         setIsUploading(false);
@@ -161,8 +156,12 @@ function Upload() {
 
     /** 나중에 할래요 버튼 처리 로직 */
     const handleSkip = () => {
-        setFile(null);
-        navigate('/');
+        navigate(previousPage);
+
+        setTimeout(() => {
+            setFile(null);
+            setUploadSuccess(false);
+        }, 2000);
     };
 
     const handleContinue = () => {
@@ -267,7 +266,7 @@ function Upload() {
                             )}
                         </div>
                     )}
-                    {isChangingName && (
+                    {file && isChangingName && (
                         <div className={style.filePreview}>
                             <div className={style.filePreview__header}>
                                 <div className={style.filePreview__icon}>
@@ -301,7 +300,10 @@ function Upload() {
                 )}
 
                 <div className={style.continueButtons}>
-                    <button className={style.continueButtons__skip} onClick={handleSkip}>
+                    <button
+                        className={style.continueButtons__skip}
+                        disabled={isUploading}
+                        onClick={handleSkip}>
                         나중에 할래요
                     </button>
                     <button
