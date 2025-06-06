@@ -36,6 +36,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.FRONT_AWS_SECRET_KEY }}
           aws-region: ${{ secrets.FRONT_S3_AWS_REGION }}
 
+      - name: Check AWS identity (debug)
+        run: aws sts get-caller-identity
+
       - name: Sync to S3
         run: aws s3 sync ./dist s3://${{ secrets.FRONT_S3_BUCKET_NAME }} --delete
 
