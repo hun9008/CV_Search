@@ -29,16 +29,38 @@ public class CvController {
     @DeleteMapping("/delete-cv")
     public ResponseEntity<?> deleteCv(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam String fileName
+            @RequestParam Long cvId
     ) {
         if (userDetails == null) {
             throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
         }
         Long userId = userDetails.getId();
         try {
-            String message = cvService.deleteCv(userId, fileName);
-            s3Service.deleteFile(fileName);
+            String message = cvService.deleteCv(cvId);
+            s3Service.deleteFile(cvId);
             return ResponseEntity.ok(Map.of("message", message));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "사용자의 모든 CV 삭제", description = "해당 사용자에 대해 등록된 모든 CV를 FastAPI, RDB, Redis, S3에서 삭제함")
+    @DeleteMapping("/delete-all-cvs")
+    public ResponseEntity<?> deleteAllCvs(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            throw new RuntimeException("인증되지 않은 사용자입니다. JWT를 확인하세요.");
+        }
+        Long userId = userDetails.getId();
+        try {
+            List<String> results = cvService.deleteAllCvsByUserId(userId);
+            s3Service.deleteAllFilesByUserId(userId);
+            return ResponseEntity.ok(Map.of(
+                    "deleted", results.size(),
+                    "details", results
+            ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", e.getMessage()));

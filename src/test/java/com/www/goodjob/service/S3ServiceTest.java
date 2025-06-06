@@ -177,7 +177,7 @@ class S3ServiceTest {
         ArgumentCaptor<DeleteObjectRequest> captor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
 
         // when
-        s3Service.deleteFile(fileName);
+        s3Service.deleteFileName(fileName);
 
         // then
         verify(s3Client).deleteObject(captor.capture());

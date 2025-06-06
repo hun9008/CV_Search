@@ -21,6 +21,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -74,7 +75,7 @@ public class S3Service {
         return presignedRequest.url().toString();
     }
 
-    public void deleteFile(String fileName) {
+    public void deleteFileName(String fileName) {
         DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
                 .bucket(bucketName)
                 .key("cv/" + fileName)
@@ -82,6 +83,32 @@ public class S3Service {
 
         s3Client.deleteObject(deleteRequest);
         System.out.println("파일 삭제 완료: " + fileName);
+    }
+
+    public void deleteFile(Long cvId) {
+
+        Cv cv = cvRepository.findById(cvId)
+                .orElseThrow(() -> new RuntimeException("CV not found"));
+
+        String fileName = cv.getFileName();
+
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key("cv/" + fileName)
+                .build();
+
+        s3Client.deleteObject(deleteRequest);
+        System.out.println("파일 삭제 완료: " + fileName);
+    }
+
+    public void deleteAllFilesByUserId(Long userId) {
+        List<Cv> cvs = cvRepository.findAllByUserId(userId);
+        for (Cv cv : cvs) {
+            String fileName = cv.getFileName();
+            if (fileName != null && !fileName.isBlank()) {
+                deleteFileName(fileName);
+            }
+        }
     }
 
 
@@ -138,7 +165,7 @@ public class S3Service {
             if (savedCv != null) {
                 cvRepository.deleteById(savedCv.getId());
             }
-            deleteFile(fileName);
+            deleteFileName(fileName);
             return e.getMessage();
         }
         asyncService.generateCvSummaryAsync(cvId);

@@ -87,31 +87,31 @@ public class S3Controller {
         }
     }
 
-    @Operation(summary = "기존 이력서 삭제 후 재업로드 등록", description = "기존 이력서를 삭제하고, 새 파일명을 통해 S3에서 업로드된 이력서를 등록합니다. 삭제 또는 등록 과정에서 오류 발생 시 에러를 반환합니다.")
-    @PostMapping("/confirm-re-upload")
-    public ResponseEntity<String> confirmReUpload(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam String oldFileName,
-            @RequestParam String newFileName
-    ) {
-        Long userId = userDetails.getId();
-
-        try {
-            String message = cvService.deleteCv(userId, oldFileName);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("기존 이력서 삭제 중 오류가 발생했습니다.");
-        }
-
-        String errorMessage = s3Service.saveCvIfUploaded(userId, newFileName);
-        if (errorMessage == null) {
-            return ResponseEntity.ok("CV 정보가 저장되었습니다.");
-        } else if (errorMessage.contains("[REJECT]")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage); // 403
-        } else {
-            return ResponseEntity.badRequest().body(errorMessage); // 400
-        }
-    }
+//    @Operation(summary = "기존 이력서 삭제 후 재업로드 등록", description = "기존 이력서를 삭제하고, 새 파일명을 통해 S3에서 업로드된 이력서를 등록합니다. 삭제 또는 등록 과정에서 오류 발생 시 에러를 반환합니다.")
+//    @PostMapping("/confirm-re-upload")
+//    public ResponseEntity<String> confirmReUpload(
+//            @AuthenticationPrincipal CustomUserDetails userDetails,
+//            @RequestParam String oldFileName,
+//            @RequestParam String newFileName
+//    ) {
+//        Long userId = userDetails.getId();
+//
+//        try {
+//            String message = cvService.deleteCv(userId, oldFileName);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("기존 이력서 삭제 중 오류가 발생했습니다.");
+//        }
+//
+//        String errorMessage = s3Service.saveCvIfUploaded(userId, newFileName);
+//        if (errorMessage == null) {
+//            return ResponseEntity.ok("CV 정보가 저장되었습니다.");
+//        } else if (errorMessage.contains("[REJECT]")) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage); // 403
+//        } else {
+//            return ResponseEntity.badRequest().body(errorMessage); // 400
+//        }
+//    }
 
     @Operation(summary = "S3 이력서 파일명 변경", description = "지정한 기존 파일명을 새로운 파일명으로 변경하고, 해당 변경 사항을 데이터베이스에도 반영합니다. 파일이 없거나 권한이 없을 경우 400 에러를 반환합니다.")
     @PostMapping("/rename-cv")

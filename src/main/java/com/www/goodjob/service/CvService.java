@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -32,11 +33,10 @@ public class CvService {
     private String fastapiHost;
 
     @Transactional
-    public String deleteCv(Long userId, String fileName) {
+    public String deleteCv(Long cvId) {
 
-        Cv cv = cvRepository.findByUserIdAndFileName(userId, fileName)
+        Cv cv = cvRepository.findById(cvId)
                 .orElseThrow(() -> new RuntimeException("CV not found"));
-        Long cvId = cv.getId();
 
         String url = fastapiHost + "/delete-cv?cv_id=" + cvId;
         try {
@@ -96,5 +96,27 @@ public class CvService {
             throw new NoSuchElementException("CV not found for userId: " + userId);
         }
         return cvs.stream().map(CvDto::from).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<String> deleteAllCvsByUserId(Long userId) {
+        List<Cv> cvs = cvRepository.findAllByUserId(userId);
+
+        if (cvs.isEmpty()) {
+            throw new NoSuchElementException("해당 userId에 대한 CV가 존재하지 않습니다: " + userId);
+        }
+
+        List<String> results = new ArrayList<>();
+        for (Cv cv : cvs) {
+            try {
+                String result = deleteCv(cv.getId());
+                results.add(result);
+            } catch (Exception e) {
+                log.error("CV 삭제 중 오류 발생 (cvId={})", cv.getId(), e);
+                results.add("CV " + cv.getId() + " 삭제 실패: " + e.getMessage());
+            }
+        }
+
+        return results;
     }
 }
