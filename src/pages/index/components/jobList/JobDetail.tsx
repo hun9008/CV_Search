@@ -4,7 +4,7 @@ import style from './styles/JobDetail.module.scss';
 import { Bookmark, Share2, MapPin, Calendar, Clock, Briefcase, Bot } from 'lucide-react';
 import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
-import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
+// import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
 import useBookmarkStore from '../../../../store/bookmarkStore';
 import { useNavigate } from 'react-router-dom';
 
