@@ -16,12 +16,14 @@ function Index() {
         path.includes('admin/feedback');
 
     return (
-        <div className={styles.layout}>
-            <SideBar />
-            <div className={`${styles.mainContent} ${isCompactMenu ? styles.hidden : ''}`}>
-                {!hideHeader && <MainHeader />}
-                <div className={styles.mainContent__container}>
-                    <Outlet />
+        <div className={styles.layout__wrapper}>
+            <div className={styles.layout}>
+                <SideBar />
+                <div className={`${styles.mainContent} ${isCompactMenu ? styles.hidden : ''}`}>
+                    {!hideHeader && <MainHeader />}
+                    <div className={styles.mainContent__container}>
+                        <Outlet />
+                    </div>
                 </div>
             </div>
         </div>

@@ -136,16 +136,19 @@
 .viewButton {
     &:hover:not(:disabled) {
         color: #4c6ef5;
+        background-color: #f5f9fd;
     } // Blue for view
 }
 .renameButton {
     &:hover:not(:disabled) {
         color: #fab005;
+        background-color: #fff4d1;
     } // Yellow for rename
 }
 .deleteButton {
     &:hover:not(:disabled) {
         color: #fa5252;
+        background-color: rgba(229, 57, 53, 0.05);
     } // Red for delete
 }
 
@@ -165,21 +168,23 @@
 // Styles for Rename Input
 .renameInputContainer {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 0.5rem; // Space between input and buttons
     width: 100%; // Take full width of the header area
     padding: 0.1rem 0; // 상하 패딩 약간 추가하여 아이콘과 정렬되도록
+    border: none;
 }
 
 .renameInput {
     flex-grow: 1; // Take available space
     padding: 0.45rem 0.6rem; // 입력 필드 내부 패딩 (기존 제목과 높이 맞추도록 조정)
-    border: 1px solid #ced4da; // 테두리 색상
-    border-radius: 4px; // 테두리 둥글게
-    font-size: 1.25rem; // 제목과 유사한 폰트 크기 (기존 h2와 맞추거나 약간 작게)
-    color: #343a40; // 텍스트 색상
-    font-weight: 600; // 폰트 두께
-    line-height: 1.3; // 줄 간격 (기존 h2와 맞추도록 조정)
+    border: none;
+    border-radius: 4px;
+    font-size: 1.25rem;
+    color: #343a40;
+    font-weight: 600;
+    line-height: 1.3;
 
     &:focus {
         outline: none; // 기본 포커스 아웃라인 제거

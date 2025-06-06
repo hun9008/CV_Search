@@ -9,6 +9,14 @@
     gap: 1rem;
     padding: 1rem;
 }
+.layout__wrapper {
+    max-width: 1400px;
+    padding: 0 16px; /* 좌우 여백 */
+    width: 100%; /* 반응형 유지 */
+    box-sizing: border-box;
+    margin: 0 auto;
+    background-color: #f5f9fd;
+}
 
 .mainContent {
     display: flex;
