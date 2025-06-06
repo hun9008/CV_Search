@@ -4,9 +4,7 @@ import style from './styles/JobDetail.module.scss';
 import { Bookmark, Share2, MapPin, Calendar, Clock, Briefcase, Bot } from 'lucide-react';
 import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
-import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
 import useBookmarkStore from '../../../../store/bookmarkStore';
-import { useNavigate } from 'react-router-dom';
 
 function JobDetail() {
     const { getSelectedJobDetail, getFeedback } = useJobStore();
@@ -24,8 +22,6 @@ function JobDetail() {
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const selectedCVId = useJobStore((state) => state.selectedCVId);
-
-    const navigate = useNavigate();
 
     useEffect(() => {
         setIsFeedbackLoading(false); // 다른 공고 선택하면 피드백 로딩 제거
@@ -83,10 +79,6 @@ function JobDetail() {
                     console.log('클립보드 복사 실패:', err);
                 });
         }
-    };
-    const handleUploadCV = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        navigate('/upload');
     };
 
     const handleFeedback = async (jobId: number) => {
@@ -229,15 +221,14 @@ function JobDetail() {
                     )}
                 </div>
 
-                {job.score && (
+                {'score' in job && typeof job.score === 'number' && (
                     <div className={style.scoreContainer}>
-                        <div className={style.score}>
+                        <div
+                            className={`${style.score} ${
+                                job.score?.toFixed(0) === '0' ? style.noScore : ''
+                            }`}>
                             {job.score?.toFixed(0) === '0' ? (
-                                <button
-                                    className={style.jobCard__score__isZero}
-                                    onClick={handleUploadCV}>
-                                    CV 등록하여 점수 확인하기
-                                </button>
+                                <span className={style.score__isZero}>추천 공고가 아닙니다</span>
                             ) : (
                                 <>
                                     <span className={style.score__label}>매칭 점수</span>
@@ -259,13 +250,18 @@ function JobDetail() {
                     className={`${style.actionButtons__feedback} ${
                         isFeedbackLoading ? 'loading' : ''
                     }`}
-                    onClick={() => handleFeedback(job.id)}>
+                    onClick={() => handleFeedback(job.id)}
+                    disabled={
+                        'score' in job &&
+                        typeof job.score === 'number' &&
+                        job.score.toFixed(0) === '0'
+                    }>
                     <Bot
                         size={20}
                         className={style.actionButtons__icon}
                         id={`bot-icon-${job.id}`}
                     />
-                    {isFeedbackLoading ? '' : '피드백 받기'}
+                    {isFeedbackLoading ? '' : '피드백'}
                 </button>
 
                 <button

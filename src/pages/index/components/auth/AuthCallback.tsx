@@ -5,11 +5,13 @@ import useAuthStore from '../../../../store/authStore';
 import useUserStore from '../../../../store/userStore';
 import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
 import { SERVER_IP } from '../../../../constants/env';
+import useJobStore from '../../../../store/jobStore';
 
 function AuthCallback() {
     const navigate = useNavigate();
     const { setTokens, setIsLoggedIn } = useAuthStore();
     const { fetchUserData } = useUserStore();
+    const { getSelectedCvId } = useJobStore();
 
     useEffect(() => {
         axios
@@ -33,6 +35,11 @@ function AuthCallback() {
                 if (isAdmin) {
                     navigate('/main/admin/dashboard', { replace: true });
                     return;
+                }
+
+                // 로컬 스토리지의 CV 여부 검사
+                if (!localStorage.getItem('cv-storage')) {
+                    await getSelectedCvId();
                 }
 
                 if (firstLogin) {

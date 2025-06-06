@@ -73,11 +73,7 @@ function Bookmark() {
             </div>
 
             {isDialogOpen && selectedJobId && (
-                <JobDetailDialog
-                    isOpen={isDialogOpen}
-                    onClose={() => setIsDialogOpen(false)}
-                    jobId={selectedJobId}
-                />
+                <JobDetailDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
             )}
         </>
     );

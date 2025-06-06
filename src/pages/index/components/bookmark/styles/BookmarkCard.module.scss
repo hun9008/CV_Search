@@ -113,15 +113,10 @@
             border-radius: 12px;
             font-size: 0.75rem;
             font-weight: 500;
-            background-color: #f2f7ff;
-            color: #1877f2;
+            background-color: rgba(229, 57, 53, 0.05);
+            color: #e53935;
             transition: all 0.2s ease;
             white-space: nowrap;
-
-            &:hover {
-                background-color: #dbeaff;
-                color: #125ac3;
-            }
         }
     }
 

@@ -10,10 +10,10 @@ import useJobStore from '../../../store/jobStore';
 interface CVDeleteDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    fileName: string;
+    cvId: number;
 }
 
-function CVDeleteDialog({ isOpen, onClose, fileName }: CVDeleteDialogProps) {
+function CVDeleteDialog({ isOpen, onClose, cvId }: CVDeleteDialogProps) {
     const dialogRef = useRef<HTMLDivElement>(null);
     const [isChecked, setIsChecked] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -39,7 +39,7 @@ function CVDeleteDialog({ isOpen, onClose, fileName }: CVDeleteDialogProps) {
             return;
         }
         setIsDeleting(true);
-        const res = await removeFile(fileName);
+        const res = await removeFile(cvId);
         await getSelectedCvId();
 
         if (res === 200) {

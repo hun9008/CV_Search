@@ -5,6 +5,7 @@ import useAuthStore from './authStore';
 import useBookmarkStore from './bookmarkStore';
 import Job from '../types/job';
 import { SERVER_IP } from '../../src/constants/env';
+import { JobContent } from '../types/searchResult';
 
 interface CvMe {
     id: number;
@@ -17,14 +18,14 @@ interface JobStore {
     selectedCVId: number | null;
     filteredJobList: Job[] | null;
     selectedJob: Job | null;
-    selectedJobDetail: Job | null;
+    selectedJobDetail: Job | JobContent | null;
     feedback: string;
     jobListRefreshTrigger: number;
     setSelectedJob: (job: Job) => void;
     setSelectedCvId: (cvId: number) => void;
-    setSelectedJobDetail: (job: Job) => void;
+    setSelectedJobDetail: (job: Job | JobContent) => void;
     getSelectedJob: () => Job | null;
-    getSelectedJobDetail: () => Job | null;
+    getSelectedJobDetail: () => Job | JobContent | null;
     getFeedback: (jobId: number, cvId: number) => Promise<number>;
     setJobList: (list: Job[]) => void;
     setFilteredJobList: (list: Job[] | null) => void;
@@ -140,7 +141,6 @@ const useJobStore = create<JobStore>()(
                             ? current
                             : latest;
                     }, res.data[0]);
-                    console.log(latestCV.id);
                     set({ selectedCVId: latestCV.id });
                     return latestCV.id;
                 } catch (error) {

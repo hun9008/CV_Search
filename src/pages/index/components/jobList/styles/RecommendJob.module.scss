@@ -15,12 +15,13 @@
     }
 
     &__jobList {
-        min-width: 40%; // 필요한 경우 축소 허용
+        flex-basis: 500px;
+        min-width: 450px;
         max-width: 45%;
+        flex-shrink: 0;
         overflow-y: auto;
         border-radius: 20px;
         background-color: #ffffff;
-        // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     &__jobDetail {

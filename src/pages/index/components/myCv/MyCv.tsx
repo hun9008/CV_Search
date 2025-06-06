@@ -85,7 +85,11 @@ function MyCv() {
                     </ErrorBoundary>
 
                     <div className={style.buttons}>
-                        <button className={style.button} onClick={() => {}}>
+                        <button
+                            className={style.button}
+                            onClick={() => {
+                                alert('CV 전체 삭제 기능 구현 예정');
+                            }}>
                             <Trash size={18} />
                             업로드된 모든 CV 제거
                         </button>

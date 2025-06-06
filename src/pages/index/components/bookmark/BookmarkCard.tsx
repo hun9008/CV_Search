@@ -21,7 +21,6 @@ function BookmarkCard({
     setIsDialogOpen,
 }: BookmarkCardProp) {
     const { setSelectedJobDetail } = useJobStore();
-    const navigate = useNavigate();
 
     const handleBookmarkClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -33,12 +32,6 @@ function BookmarkCard({
         setSelectedJobId(job.id);
         setIsDialogOpen(true);
     };
-
-    const handleUploadCV = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        navigate('/upload');
-    };
-
     return (
         <>
             <div
@@ -72,10 +65,8 @@ function BookmarkCard({
 
                     <div className={style.jobCard__meta}>
                         {job.score?.toFixed(0) === '0' ? (
-                            <button
-                                className={style.jobCard__score__isZero}
-                                onClick={handleUploadCV}>
-                                CV 등록하여 점수 확인하기
+                            <button className={style.jobCard__score__isZero}>
+                                추천 공고가 아닙니다
                             </button>
                         ) : (
                             job.score && (

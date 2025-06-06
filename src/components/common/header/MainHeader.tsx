@@ -34,7 +34,9 @@ const MainHeader = () => {
     const isCompactMenu = usePageStore((state) => state.isCompactMenu);
     const navigate = useNavigate();
 
-    const toggleDarkmode = () => {};
+    const toggleDarkmode = () => {
+        alert('다크 모드 구현 예정');
+    };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
@@ -291,7 +293,12 @@ const MainHeader = () => {
                                 onClick={toggleDarkmode}>
                                 <Moon size={24} color="#666666" />
                             </button>
-                            <button className={styles.header__actionButton} aria-label="알림">
+                            <button
+                                className={styles.header__actionButton}
+                                aria-label="알림"
+                                onClick={() => {
+                                    alert('알림 기능 구현 예정');
+                                }}>
                                 <Bell size={24} color="#666666" />
                             </button>
                         </>

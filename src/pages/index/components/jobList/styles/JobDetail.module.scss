@@ -392,6 +392,15 @@
         font-weight: 700;
         color: #1877f2;
     }
+
+    &__isZero {
+        font-size: 0.9rem;
+        color: #e53935;
+    }
+}
+
+.noScore {
+    background-color: rgba(229, 57, 53, 0.05);
 }
 
 .actionButtons {
