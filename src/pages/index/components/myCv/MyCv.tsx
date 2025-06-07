@@ -25,6 +25,7 @@ function MyCv() {
     const summaryText = useFileStore((state) => state.summary);
     const userCvList = useCvStore((state) => state.userCvList);
     const selectedCVId = useJobStore((state) => state.selectedCVId);
+    const { getSelectedCvId } = useJobStore();
 
     const navigate = useNavigate();
     const setPreviousPage = usePageStore((state) => state.setPreviousPage);
@@ -51,6 +52,10 @@ function MyCv() {
         };
         fetchCVSummary();
     }, [hasFile, userCvList, selectedCVId]);
+
+    useEffect(() => {
+        getSelectedCvId();
+    }, [hasError]);
 
     return (
         <>

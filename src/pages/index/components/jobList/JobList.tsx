@@ -28,7 +28,7 @@ function JobList({ bookmarked }: jobListProps) {
     const experienceButtonRef = useRef<HTMLDivElement>(null);
     const typeButtonRef = useRef<HTMLDivElement>(null);
 
-    const { setSelectedJobDetail, jobList, getJobList } = useJobStore(); // 추가
+    const { setSelectedJobDetail, jobList, getJobList, getSelectedCvId } = useJobStore(); // 추가
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
 
@@ -59,6 +59,10 @@ function JobList({ bookmarked }: jobListProps) {
         };
         setIsPending(true);
         checkPending();
+    }, [hasError]);
+
+    useEffect(() => {
+        getSelectedCvId();
     }, [hasError]);
 
     const filterJobs = useCallback(() => {
@@ -141,7 +145,6 @@ function JobList({ bookmarked }: jobListProps) {
         }
     };
 
-    // 최초 업로드 후 80초 동안 topk-list 재호출
     useEffect(() => {
         let pollingInterval: NodeJS.Timeout;
         let timeoutHandle: NodeJS.Timeout;
