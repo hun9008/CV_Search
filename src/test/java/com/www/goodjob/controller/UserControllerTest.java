@@ -1,6 +1,6 @@
 package com.www.goodjob.controller;
 
-import com.www.goodjob.config.TestSecurityConfig;
+import com.www.goodjob.config.SecurityConfigTest;
 import com.www.goodjob.domain.User;
 import com.www.goodjob.enums.UserRole;
 import com.www.goodjob.repository.UserRepository;
@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
-@Import(TestSecurityConfig.class)
+@Import(SecurityConfigTest.class)
 class UserControllerTest {
 
     @Autowired

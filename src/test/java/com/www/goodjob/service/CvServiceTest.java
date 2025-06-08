@@ -2,6 +2,7 @@ package com.www.goodjob.service;
 
 import com.www.goodjob.domain.Cv;
 import com.www.goodjob.domain.User;
+import com.www.goodjob.dto.CvDto;
 import com.www.goodjob.repository.CvRepository;
 import com.www.goodjob.repository.RecommendScoreRepository;
 import com.www.goodjob.util.ClaudeClient;
@@ -10,12 +11,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -125,5 +130,86 @@ class CvServiceTest {
 
         // when & then
         assertThrows(RuntimeException.class, () -> cvService.summaryCv(cvId));
+    }
+
+    @Test
+    void getMyCvs_userHasCvs_returnsCvDtoList() {
+        // given
+        Long userId = 1L;
+        User user = User.builder().id(userId).build();
+
+        Cv cv1 = Cv.builder().id(1L).fileName("cv1.pdf").user(user).build();
+        Cv cv2 = Cv.builder().id(2L).fileName("cv2.pdf").user(user).build();
+        when(cvRepository.findAllByUserId(userId)).thenReturn(List.of(cv1, cv2));
+
+        // when
+        List<CvDto> result = cvService.getMyCvs(userId);
+
+        // then
+        assertEquals(2, result.size());
+        assertEquals("cv1.pdf", result.get(0).getFileName());
+        assertEquals("cv2.pdf", result.get(1).getFileName());
+        assertEquals(userId, result.get(0).getUserId());
+    }
+
+    @Test
+    void getMyCvs_userHasNoCvs_throwsException() {
+        // given
+        Long userId = 1L;
+        when(cvRepository.findAllByUserId(userId)).thenReturn(Collections.emptyList());
+
+        // expect
+        assertThrows(NoSuchElementException.class, () -> cvService.getMyCvs(userId));
+    }
+
+    @Test
+    void deleteAllCvsByUserId_allSuccess_returnsSuccessMessages() {
+        // given
+        Long userId = 1L;
+        Cv cv1 = Cv.builder().id(10L).build();
+        Cv cv2 = Cv.builder().id(20L).build();
+        when(cvRepository.findAllByUserId(userId)).thenReturn(List.of(cv1, cv2));
+
+        // 내부 메서드 deleteCv mock
+        CvService spyService = Mockito.spy(cvService);
+        doReturn("CV 10 deleted").when(spyService).deleteCv(10L);
+        doReturn("CV 20 deleted").when(spyService).deleteCv(20L);
+
+        // when
+        List<String> result = spyService.deleteAllCvsByUserId(userId);
+
+        // then
+        assertEquals(List.of("CV 10 deleted", "CV 20 deleted"), result);
+    }
+
+    @Test
+    void deleteAllCvsByUserId_someFailures_returnsMixedResults() {
+        // given
+        Long userId = 1L;
+        Cv cv1 = Cv.builder().id(10L).build();
+        Cv cv2 = Cv.builder().id(20L).build();
+        when(cvRepository.findAllByUserId(userId)).thenReturn(List.of(cv1, cv2));
+
+        CvService spyService = Mockito.spy(cvService);
+        doReturn("CV 10 deleted").when(spyService).deleteCv(10L);
+        doThrow(new RuntimeException("삭제 실패")).when(spyService).deleteCv(20L);
+
+        // when
+        List<String> result = spyService.deleteAllCvsByUserId(userId);
+
+        // then
+        assertEquals(2, result.size());
+        assertTrue(result.get(0).contains("CV 10 deleted"));
+        assertTrue(result.get(1).contains("삭제 실패"));
+    }
+
+    @Test
+    void deleteAllCvsByUserId_noCvs_throwsException() {
+        // given
+        Long userId = 1L;
+        when(cvRepository.findAllByUserId(userId)).thenReturn(Collections.emptyList());
+
+        // expect
+        assertThrows(NoSuchElementException.class, () -> cvService.deleteAllCvsByUserId(userId));
     }
 }

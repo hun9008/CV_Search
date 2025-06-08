@@ -19,8 +19,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -144,6 +147,83 @@ class JobServiceTest {
 
         // searchLogService가 호출되지 않았는지 검증
         verify(searchLogService, never()).saveSearchLog(any(), any());
+    }
+
+    @Test
+    void searchJobs_withKeyword_andEmptyFastApiResponse_returnsEmptyPage() {
+        // given
+        String keyword = "백엔드";
+        Pageable pageable = PageRequest.of(0, 10);
+        User mockUser = new User();
+
+        // FastAPI returns empty result
+        JobSearchResponse emptyResponse = new JobSearchResponse();
+        emptyResponse.setResults(List.of());
+        emptyResponse.setTotal(0);
+
+        when(restTemplate.postForEntity(
+                eq("http://localhost:8000/search-es"),
+                any(HttpEntity.class),
+                eq(JobSearchResponse.class)
+        )).thenReturn(new ResponseEntity<>(emptyResponse, HttpStatus.OK));
+
+        // when
+        Page<JobDto> result = jobService.searchJobs(
+                keyword, null, null, null, null, pageable, mockUser
+        );
+
+        // then
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(restTemplate).postForEntity(anyString(), any(), eq(JobSearchResponse.class));
+        verify(jobRepository, never()).findByIdInWithRegion(any());
+    }
+
+    @Test
+    void searchJobs_withKeyword_andFastApiThrowsException_throwsRuntimeException() {
+        // given
+        String keyword = "데이터";
+        Pageable pageable = PageRequest.of(0, 10);
+        User mockUser = new User();
+
+        when(restTemplate.postForEntity(
+                anyString(),
+                any(HttpEntity.class),
+                eq(JobSearchResponse.class)
+        )).thenThrow(new RestClientException("FastAPI 실패"));
+
+        // then
+        assertThrows(RuntimeException.class, () ->
+                jobService.searchJobs(keyword, null, null, null, null, pageable, mockUser)
+        );
+
+        verify(restTemplate).postForEntity(anyString(), any(), eq(JobSearchResponse.class));
+    }
+
+    @Test
+    void searchJobs_withKeyword_andFastApiResponseIsNull_returnsEmptyPage() {
+        // given
+        String keyword = "백엔드";
+        Pageable pageable = PageRequest.of(0, 10);
+        User mockUser = new User();
+
+        // FastAPI returns null body
+        ResponseEntity<JobSearchResponse> nullResponse = new ResponseEntity<>(null, HttpStatus.OK);
+
+        when(restTemplate.postForEntity(
+                eq("http://localhost:8000/search-es"),
+                any(HttpEntity.class),
+                eq(JobSearchResponse.class)
+        )).thenReturn(nullResponse);
+
+        // when
+        Page<JobDto> result = jobService.searchJobs(keyword, null, null, null, null, pageable, mockUser);
+
+        // then
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(restTemplate).postForEntity(anyString(), any(), eq(JobSearchResponse.class));
+        verify(jobRepository, never()).findByIdInWithRegion(any());
     }
 
 
@@ -332,5 +412,54 @@ class JobServiceTest {
         verify(jobRepository).save(any(Job.class));
         verify(regionRepository, times(2)).findById(anyLong());
         verify(jobRegionRepository, times(2)).save(any(JobRegion.class));
+    }
+
+    @Test
+    void findAllJobWithValidType_returnsCorrectList() {
+        // given
+        Pageable pageable = PageRequest.of(0, 2);
+        LocalDateTime createdAt = LocalDateTime.now();
+        LocalDate applyEndDate = LocalDate.now().plusDays(10);
+
+        List<ValidJobDto> mockDtos = List.of(
+                ValidJobDto.builder()
+                        .id(1L)
+                        .companyName("Company A")
+                        .title("Backend Engineer")
+                        .jobValidType(1)
+                        .isPublic(true)
+                        .createdAt(createdAt)
+                        .applyEndDate(applyEndDate)
+                        .url("https://companyA.com/job1")
+                        .build(),
+                ValidJobDto.builder()
+                        .id(2L)
+                        .companyName("Company B")
+                        .title("Data Scientist")
+                        .jobValidType(1)
+                        .isPublic(false)
+                        .createdAt(createdAt.minusDays(1))
+                        .applyEndDate(applyEndDate.minusDays(2))
+                        .url("https://companyB.com/job2")
+                        .build()
+        );
+
+        when(jobRepository.findAllWithValidType(pageable)).thenReturn(new PageImpl<>(mockDtos));
+
+        // when
+        List<ValidJobDto> result = jobService.findAllJobWithValidType(pageable);
+
+        // then
+        assertEquals(2, result.size());
+
+        ValidJobDto first = result.get(0);
+        assertEquals("Company A", first.getCompanyName());
+        assertEquals("Backend Engineer", first.getTitle());
+        assertEquals("https://companyA.com/job1", first.getUrl());
+        assertTrue(first.getIsPublic());
+
+        ValidJobDto second = result.get(1);
+        assertEquals("Company B", second.getCompanyName());
+        assertFalse(second.getIsPublic());
     }
 }

@@ -188,75 +188,101 @@ class RecommendServiceTest {
     }
 
 
-//    @Test
-//    void getOrGenerateFeedback_existingFeedbackReturned() {
-//        // given
-//        Long jobId = 1L;
-//        User mockUser = new User();
-//        mockUser.setId(10L);
-//
-//        Cv cv = Cv.builder().id(100L).rawText("cv text").user(mockUser).build();
-//        Job job = new Job();
-//        job.setId(jobId);
-//        job.setRawJobsText("job text");
-//        job.setFavicon(new Favicon(null, "some-domain", "base64string"));
-//
-//
-//        RecommendScore score = RecommendScore.builder()
-//                .id(200L)
-//                .cv(cv)
-//                .job(job)
-//                .build();
-//        CvFeedback feedback = CvFeedback.builder().id(300L).feedback("기존 피드백").recommendScore(score).confirmed(false).build();
-//
-//        when(userDetails.getUser()).thenReturn(mockUser);
-//        when(cvRepository.findByUser(mockUser)).thenReturn(Optional.of(cv));
-//        when(recommendScoreRepository.findByCvIdAndJobId(100L, jobId)).thenReturn(score);
-//        when(cvFeedbackRepository.findByRecommendScore_Id(200L)).thenReturn(Optional.of(feedback));
-//
-//        // when
-//        String result = recommendService.getOrGenerateFeedback(jobId, userDetails);
-//
-//        // then
-//        assertEquals("기존 피드백", result);
-//        verify(claudeClient, never()).generateFeedback(any(), any());
-//        verify(cvFeedbackRepository, never()).save(any());
-//    }
-//
-//    @Test
-//    void getOrGenerateFeedback_generateNewFeedback() {
-//        // given
-//        Long jobId = 1L;
-//        User mockUser = new User();
-//        mockUser.setId(10L);
-//
-//        Cv cv = Cv.builder().id(100L).rawText("cv raw text").user(mockUser).build();
-//
-//        Job job = new Job();
-//        job.setId(jobId);
-//        job.setRawJobsText("job raw text");
-//        job.setFavicon(new Favicon(null, "some-domain", "base64string"));
-//
-//
-//        RecommendScore score = RecommendScore.builder()
-//                .id(200L)
-//                .cv(cv)
-//                .job(job)
-//                .build();
-//
-//        when(userDetails.getUser()).thenReturn(mockUser);
-//        when(cvRepository.findByUser(mockUser)).thenReturn(Optional.of(cv));
-//        when(recommendScoreRepository.findByCvIdAndJobId(100L, jobId)).thenReturn(score);
-//        when(cvFeedbackRepository.findByRecommendScore_Id(200L)).thenReturn(Optional.empty());
-//        when(claudeClient.generateFeedback("cv raw text", "job raw text")).thenReturn("새 피드백");
-//
-//        // when
-//        String result = recommendService.getOrGenerateFeedback(jobId, userDetails);
-//
-//        // then
-//        assertEquals("새 피드백", result);
-//        verify(cvFeedbackRepository).save(any(CvFeedback.class));
-//    }
+    @Test
+    void getOrGenerateFeedback_returnsExistingFeedbackWhenPresent() {
+        // given
+        Long cvId = 1L;
+        Long jobId = 2L;
+
+        Cv cv = new Cv();
+        cv.setRawText("CV_TEXT");
+
+        Job job = new Job();
+        job.setRawJobsText("JOB_TEXT");
+
+        RecommendScore score = new RecommendScore();
+        score.setId(100L);
+        score.setCv(cv);
+        score.setJob(job);
+
+        CvFeedback existing = new CvFeedback();
+        existing.setFeedback("기존 피드백");
+
+        when(recommendScoreRepository.findByCvIdAndJobId(cvId, jobId)).thenReturn(score);
+        when(cvFeedbackRepository.findByRecommendScore_Id(100L)).thenReturn(Optional.of(existing));
+
+        // when
+        String result = recommendService.getOrGenerateFeedback(cvId, jobId);
+
+        // then
+        assertEquals("기존 피드백", result);
+        verify(claudeClient, never()).generateFeedback(any(), any());
+        verify(cvFeedbackRepository, never()).save(any());
+    }
+
+    @Test
+    void getOrGenerateFeedback_createsAndSavesNewFeedbackWhenNoneExists() {
+        // given
+        Long cvId = 1L;
+        Long jobId = 2L;
+
+        Cv cv = new Cv();
+        cv.setRawText("CV_TEXT");
+
+        Job job = new Job();
+        job.setRawJobsText("JOB_TEXT");
+
+        RecommendScore score = new RecommendScore();
+        score.setId(200L);
+        score.setCv(cv);
+        score.setJob(job);
+
+        when(recommendScoreRepository.findByCvIdAndJobId(cvId, jobId)).thenReturn(score);
+        when(cvFeedbackRepository.findByRecommendScore_Id(200L)).thenReturn(Optional.empty());
+        when(claudeClient.generateFeedback("CV_TEXT", "JOB_TEXT")).thenReturn("새 피드백");
+
+        // when
+        String result = recommendService.getOrGenerateFeedback(cvId, jobId);
+
+        // then
+        assertEquals("새 피드백", result);
+        verify(claudeClient).generateFeedback("CV_TEXT", "JOB_TEXT");
+        verify(cvFeedbackRepository).save(argThat(fb ->
+                fb.getFeedback().equals("새 피드백") &&
+                        fb.getRecommendScore() == score &&
+                        !fb.isConfirmed()
+        ));
+    }
+
+    @Test
+    void getOrGenerateFeedback_returnsExistingFeedbackWithoutModifying() {
+        // given
+        Long cvId = 3L;
+        Long jobId = 4L;
+
+        Cv cv = new Cv(); cv.setRawText("RAW CV");
+        Job job = new Job(); job.setRawJobsText("RAW JOB");
+
+        RecommendScore score = new RecommendScore();
+        score.setId(300L);
+        score.setCv(cv);
+        score.setJob(job);
+
+        CvFeedback oldFeedback = new CvFeedback();
+        oldFeedback.setFeedback("이전 피드백");
+
+        when(recommendScoreRepository.findByCvIdAndJobId(cvId, jobId)).thenReturn(score);
+        when(cvFeedbackRepository.findByRecommendScore_Id(300L)).thenReturn(Optional.of(oldFeedback));
+
+        // when
+        String result = recommendService.getOrGenerateFeedback(cvId, jobId);
+
+        // then
+        assertEquals("이전 피드백", result);
+        verify(cvFeedbackRepository, never()).delete(any());
+        verify(cvFeedbackRepository, never()).save(any());
+        verify(claudeClient, never()).generateFeedback(any(), any());
+    }
 
     @Test
     void cacheRecommendForUser() {
