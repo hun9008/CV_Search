@@ -2,8 +2,10 @@ package com.www.goodjob.controller;
 
 import com.www.goodjob.config.GlobalMockBeans;
 import com.www.goodjob.config.TestSecurityConfig;
+import com.www.goodjob.domain.User;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
+import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.security.JwtTokenProvider;
 import com.www.goodjob.service.AuthService;
 import org.junit.jupiter.api.DisplayName;
@@ -13,10 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockCookie;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.*;
@@ -110,5 +115,32 @@ class AuthControllerTest {
                         .param("key", "wrongKey"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid master key"));
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 성공")
+    void withdrawSuccess() throws Exception {
+        CustomUserDetails userDetails = new CustomUserDetails(User.builder()
+                .id(1L)
+                .email("test@example.com")
+                .build());
+
+        mockMvc.perform(delete("/auth/withdraw")
+                        .with(user(userDetails))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("회원 탈퇴가 완료되었고, 로그아웃 처리되었습니다."))
+                .andExpect(jsonPath("$.loggedOut").value(true));
+
+        verify(authService).withdraw(userDetails.getUser());
+    }
+
+    @Test
+    @DisplayName("로그아웃 성공")
+    void logoutSuccess() throws Exception {
+        mockMvc.perform(post("/auth/logout")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("로그아웃 되었습니다."));
     }
 }

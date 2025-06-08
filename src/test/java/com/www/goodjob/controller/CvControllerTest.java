@@ -75,15 +75,14 @@ class CvControllerTest {
                 .andExpect(jsonPath("$.error").value("삭제 실패"));
     }
 
-//    @Test
-//    @DisplayName("/cv/delete-cv - 인증되지 않은 사용자")
-//    void deleteCv_unauthenticated_throwsException() throws Exception {
-//        mockMvc.perform(delete("/cv/delete-cv")
-//                        .param("cvId", "1")
-//                        .with(csrf()))
-//                .andExpect(status().isInternalServerError())
-//                .andExpect(jsonPath("$.error").exists()); // or custom exception resolver if applied
-//    }
+    @Test
+    @DisplayName("/cv/delete-cv - 인증되지 않은 사용자")
+    void deleteCv_unauthenticated_returns401() throws Exception {
+        mockMvc.perform(delete("/cv/delete-cv")
+                        .param("cvId", "1")
+                        .with(csrf()))
+                .andExpect(status().isUnauthorized());
+    }
 
     @Test
     @DisplayName("/cv/me - CV 조회 성공")
@@ -123,15 +122,14 @@ class CvControllerTest {
                 .andExpect(jsonPath("$.summary").value("요약 완료"));
     }
 
-//    @Test
-//    @DisplayName("/cv/summary-cv - 인증되지 않은 사용자일 경우 500 반환")
-//    void summaryCv_unauthenticated_throwsException() throws Exception {
-//        mockMvc.perform(post("/cv/summary-cv")
-//                        .param("cvId", "1")
-//                        .with(csrf()))
-//                .andExpect(status().isInternalServerError())
-//                .andExpect(jsonPath("$.error").value("인증되지 않은 사용자입니다. JWT를 확인하세요."));
-//    }
+    @Test
+    @DisplayName("/cv/summary-cv - 인증되지 않은 사용자일 경우 500 반환")
+    void summaryCv_unauthenticated_throwsException() throws Exception {
+        mockMvc.perform(post("/cv/summary-cv")
+                        .param("cvId", "1")
+                        .with(csrf()))
+                .andExpect(status().isUnauthorized());
+    }
 
     @Test
     @DisplayName("/cv/summary-cv - 서비스 예외 발생 시 500 반환")
@@ -160,14 +158,13 @@ class CvControllerTest {
                 .andExpect(jsonPath("$.details[1]").value("cv2"));
     }
 
-//    @Test
-//    @DisplayName("/cv/delete-all-cvs - 인증되지 않은 사용자일 경우 500 반환")
-//    void deleteAllCvs_unauthenticated_throwsException() throws Exception {
-//        mockMvc.perform(delete("/cv/delete-all-cvs")
-//                        .with(csrf()))
-//                .andExpect(status().isInternalServerError())
-//                .andExpect(jsonPath("$.error").value("인증되지 않은 사용자입니다. JWT를 확인하세요."));
-//    }
+    @Test
+    @DisplayName("/cv/delete-all-cvs - 인증되지 않은 사용자일 경우 500 반환")
+    void deleteAllCvs_unauthenticated_throwsException() throws Exception {
+        mockMvc.perform(delete("/cv/delete-all-cvs")
+                        .with(csrf()))
+                .andExpect(status().isUnauthorized());
+    }
 
     @Test
     @DisplayName("/cv/delete-all-cvs - 서비스 예외 발생 시 500 반환")
@@ -191,12 +188,11 @@ class CvControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.error").value("DB 연결 실패"));
     }
-//
-//    @Test
-//    @DisplayName("/cv/me - 인증되지 않은 사용자일 경우 500 반환")
-//    void getMyCv_unauthenticated_returns500() throws Exception {
-//        mockMvc.perform(get("/cv/me"))
-//                .andExpect(status().isInternalServerError())
-//                .andExpect(jsonPath("$.error").value("인증되지 않은 사용자입니다. JWT를 확인하세요."));
-//    }
+
+    @Test
+    @DisplayName("/cv/me - 인증되지 않은 사용자일 경우 500 반환")
+    void getMyCv_unauthenticated_returns500() throws Exception {
+        mockMvc.perform(get("/cv/me"))
+                .andExpect(status().isUnauthorized());
+    }
 }
