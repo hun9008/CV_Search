@@ -21,6 +21,7 @@ function UserFeedbackDialog(props: BaseProps) {
             return;
         }
         await postUserFeedback({ content: userFeedbackText, satisfactionScore: userFeedbackScore });
+        props.onClose();
     };
 
     return (
