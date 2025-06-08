@@ -3,6 +3,7 @@ import type feedback from '../../../types/feedback';
 import { useEffect, useRef } from 'react';
 import { Briefcase, Calendar, Clock, ExternalLink, MapPin, X } from 'lucide-react';
 import Job from '../../../types/job';
+import { JobContent } from '../../../types/searchResult';
 
 interface BaseProps {
     isOpen: boolean;
@@ -16,7 +17,7 @@ interface FeedbackProps extends BaseProps {
 
 interface JobProps extends BaseProps {
     feedback?: feedback | undefined;
-    job: Job | undefined;
+    job: Job | JobContent | undefined;
 }
 
 type UniversalDialogProps = FeedbackProps | JobProps;
@@ -24,7 +25,7 @@ type UniversalDialogProps = FeedbackProps | JobProps;
 function UniversalDialog(props: UniversalDialogProps) {
     const dialogRef = useRef<HTMLDivElement>(null);
 
-    const handleApply = (job: Job | undefined) => {
+    const handleApply = (job: Job | JobContent | undefined) => {
         window.open(`${job?.url}`, '_blank');
     };
 
@@ -162,13 +163,6 @@ function UniversalDialog(props: UniversalDialogProps) {
                                 <p className={style.section__text}>
                                     {props.job.preferredQualifications}
                                 </p>
-                            </section>
-                        )}
-
-                        {props.job.requireExperience && (
-                            <section className={style.section}>
-                                <h2 className={style.section__title}>경력 사항</h2>
-                                <p className={style.section__text}>{props.job.requireExperience}</p>
                             </section>
                         )}
                     </div>

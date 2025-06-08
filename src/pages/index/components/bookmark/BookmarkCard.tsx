@@ -3,7 +3,6 @@ import { Bookmark, ExternalLink } from 'lucide-react';
 import type Job from '../../../../types/job';
 import style from './styles/BookmarkCard.module.scss';
 import useJobStore from '../../../../store/jobStore';
-import { useNavigate } from 'react-router-dom';
 
 interface BookmarkCardProp {
     job: Job;

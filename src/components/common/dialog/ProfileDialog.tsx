@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import style from './styles/ProfileDialog.module.scss';
-import { User, UserCircle, Crown, LogOut, ChevronRight } from 'lucide-react';
+import { User, UserCircle, LogOut, ChevronRight } from 'lucide-react';
 import useAuthStore from '../../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import AccountDialog from './AccountDialog';

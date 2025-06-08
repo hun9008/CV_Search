@@ -39,7 +39,13 @@ function AuthCallback() {
 
                 // 로컬 스토리지의 CV 여부 검사
                 if (!localStorage.getItem('cv-storage')) {
-                    await getSelectedCvId();
+                    try {
+                        await getSelectedCvId();
+                    } catch (error) {
+                        console.error(error);
+                        navigate('/upload', { replace: true });
+                        return;
+                    }
                 }
 
                 if (firstLogin) {

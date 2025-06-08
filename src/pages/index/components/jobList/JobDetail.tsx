@@ -5,8 +5,12 @@ import { Bookmark, Share2, MapPin, Calendar, Clock, Briefcase, Bot } from 'lucid
 import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
 import useBookmarkStore from '../../../../store/bookmarkStore';
+import useActionStore from '../../../../store/actionStore';
 
-function JobDetail() {
+interface DialogSet {
+    isDialog: boolean;
+}
+function JobDetail({ isDialog }: DialogSet) {
     const { getSelectedJobDetail, getFeedback } = useJobStore();
     const applications = useApplyStore((state) => state.applications);
     const { setApplications, deleteApplications, getApplications } = useApplyStore();
@@ -22,6 +26,7 @@ function JobDetail() {
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const selectedCVId = useJobStore((state) => state.selectedCVId);
+    const isJobListLoad = useActionStore((state) => state.isJobListLoad);
 
     useEffect(() => {
         setIsFeedbackLoading(false); // 다른 공고 선택하면 피드백 로딩 제거
@@ -155,7 +160,7 @@ function JobDetail() {
     };
 
     /** 로딩 시 스켈레톤 UI 출력 */
-    if (!job) {
+    if (!job || !isJobListLoad) {
         return <JobDetailSkeleton />;
     }
 
@@ -172,24 +177,31 @@ function JobDetail() {
                     )}
                     <h3 className={style.header__companyName}>{job.companyName}</h3>
                 </div>
-                <div className={style.header__actions}>
-                    <button
-                        className={`${style.header__actionButton} ${
-                            isBookmarked ? style.active : ''
-                        }`}
-                        onClick={() =>
-                            selectedJobDetail?.id && toggleBookmark(selectedJobDetail.id)
-                        }
-                        aria-label={isBookmarked ? '북마크 해제' : '북마크 추가'}>
-                        <Bookmark size={20} />
-                    </button>
-                    <button
-                        className={style.header__actionButton}
-                        onClick={handleShare}
-                        aria-label="공유하기">
-                        <Share2 size={20} />
-                    </button>
-                </div>
+                {isDialog ? (
+                    ''
+                ) : (
+                    <div
+                        className={`${style.header__actions} ${
+                            isDialog ? style.header__dialog : ''
+                        }`}>
+                        <button
+                            className={`${style.header__actionButton} ${
+                                isBookmarked ? style.active : ''
+                            }`}
+                            onClick={() =>
+                                selectedJobDetail?.id && toggleBookmark(selectedJobDetail.id)
+                            }
+                            aria-label={isBookmarked ? '북마크 해제' : '북마크 추가'}>
+                            <Bookmark size={20} />
+                        </button>
+                        <button
+                            className={style.header__actionButton}
+                            onClick={handleShare}
+                            aria-label="공유하기">
+                            <Share2 size={20} />
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className={style.titleContainer}>
@@ -261,7 +273,9 @@ function JobDetail() {
                         className={style.actionButtons__icon}
                         id={`bot-icon-${job.id}`}
                     />
-                    {isFeedbackLoading ? '' : 'AI 피드백'}
+                    <span style={{ whiteSpace: 'pre' }}>
+                        {isFeedbackLoading ? '' : '  AI 피드백'}
+                    </span>
                 </button>
 
                 <button
@@ -291,13 +305,6 @@ function JobDetail() {
                     <section className={style.section}>
                         <h2 className={style.section__title}>이런 경험이 있으면 좋아요</h2>
                         <p className={style.section__text}>{job.preferredQualifications}</p>
-                    </section>
-                )}
-
-                {job.requireExperience && (
-                    <section className={style.section}>
-                        <h2 className={style.section__title}>경력 사항</h2>
-                        <p className={style.section__text}>{job.requireExperience}</p>
                     </section>
                 )}
             </div>
