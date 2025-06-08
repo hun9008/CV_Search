@@ -1,5 +1,6 @@
 package com.www.goodjob.controller;
 
+import com.www.goodjob.config.GlobalMockBeans;
 import com.www.goodjob.config.TestConfig; // 전역 TestConfig import
 import com.www.goodjob.config.TestSecurityConfig;
 import com.www.goodjob.repository.UserOAuthRepository;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.*;
 
-@Import({TestSecurityConfig.class, AuthControllerTest.MockedBeans.class})
+@Import({GlobalMockBeans.class, TestSecurityConfig.class})
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
 
