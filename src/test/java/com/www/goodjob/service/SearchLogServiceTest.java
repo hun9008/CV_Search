@@ -6,6 +6,7 @@ import com.www.goodjob.dto.SearchLogDto;
 import com.www.goodjob.repository.SearchLogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,11 +32,11 @@ class SearchLogServiceTest {
     @Test
     void 검색기록_조회_테스트() {
         // given
-        SearchLog log1 = SearchLog.of("백엔드", testUser);
-        SearchLog log2 = SearchLog.of("토스", testUser);
+        Object[] row1 = new Object[]{"백엔드", java.sql.Timestamp.valueOf("2024-06-01 10:00:00")};
+        Object[] row2 = new Object[]{"토스", java.sql.Timestamp.valueOf("2024-06-01 09:00:00")};
 
-        when(searchLogRepository.findTop10ByUserOrderByCreatedAtDesc(testUser))
-                .thenReturn(List.of(log1, log2));
+        when(searchLogRepository.findDistinctRecentKeywordsByUser(eq(testUser.getId())))
+                .thenReturn(List.of(row1, row2));
 
         // when
         List<SearchLogDto> result = searchLogService.getSearchHistory(testUser);
@@ -43,8 +44,9 @@ class SearchLogServiceTest {
         // then
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getKeyword()).isEqualTo("백엔드");
-        verify(searchLogRepository, times(1)).findTop10ByUserOrderByCreatedAtDesc(testUser);
+        verify(searchLogRepository, times(1)).findDistinctRecentKeywordsByUser(testUser.getId());
     }
+
 
     @Test
     void 검색기록_전체삭제_테스트() {
