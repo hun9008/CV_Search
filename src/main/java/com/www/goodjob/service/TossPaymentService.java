@@ -63,7 +63,7 @@ public class TossPaymentService {
         return HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    private String getAuthorization() {
+    String getAuthorization() {
         // TossPayments 시크릿 키를 Base64로 인코딩하여 Basic 인증 헤더 생성
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
