@@ -29,29 +29,6 @@ import static org.mockito.Mockito.*;
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
 
-    @TestConfiguration
-    static class MockedBeans {
-        @Bean
-        public JwtTokenProvider jwtTokenProvider() {
-            return mock(JwtTokenProvider.class);
-        }
-
-        @Bean
-        public UserRepository userRepository() {
-            return mock(UserRepository.class);
-        }
-
-        @Bean
-        public UserOAuthRepository userOAuthRepository() {
-            return mock(UserOAuthRepository.class);
-        }
-
-        @Bean
-        public AuthService authService() {
-            return mock(AuthService.class);
-        }
-    }
-
     @Autowired
     private MockMvc mockMvc;
 
