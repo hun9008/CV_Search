@@ -1,6 +1,7 @@
 package com.www.goodjob.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.www.goodjob.config.GlobalMockBeans;
 import com.www.goodjob.dto.UserFeedbackDto;
 import com.www.goodjob.security.CustomUserDetailsService;
 import com.www.goodjob.service.UserFeedbackService;
@@ -27,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserFeedbackAdminController.class)
 @AutoConfigureMockMvc
-@Import(UserFeedbackAdminControllerTest.TestConfig.class)
+@Import(GlobalMockBeans.class)
 class UserFeedbackAdminControllerTest {
 
     @Autowired
@@ -38,19 +39,6 @@ class UserFeedbackAdminControllerTest {
 
     @Autowired
     private UserFeedbackService feedbackService;
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public UserFeedbackService feedbackService() {
-            return Mockito.mock(UserFeedbackService.class);
-        }
-
-        @Bean
-        public CustomUserDetailsService customUserDetailsService() {
-            return Mockito.mock(CustomUserDetailsService.class);
-        }
-    }
 
     @Test
     @WithMockUser(roles = "ADMIN")

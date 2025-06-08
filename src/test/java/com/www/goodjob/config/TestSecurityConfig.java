@@ -16,6 +16,7 @@ public class TestSecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable()) // HTTP Basic 인증 제거
                 .logout(logout -> logout.disable()) // 로그아웃 제거
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated() // 모든 요청 인증 필요
                 )
                 .exceptionHandling(ex -> ex
