@@ -2,9 +2,7 @@ package com.www.goodjob.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.*;
-import com.www.goodjob.dto.CreateJobDto;
-import com.www.goodjob.dto.JobDto;
-import com.www.goodjob.dto.RegionGroupDto;
+import com.www.goodjob.dto.*;
 import com.www.goodjob.repository.JobRegionRepository;
 import com.www.goodjob.repository.JobRepository;
 // import com.www.goodjob.repository.JobValidTypeRepository;
@@ -17,11 +15,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,38 +61,41 @@ class JobServiceTest {
     }
 
     @Test
-    void searchJobs_withFilters_returnsPagedResults() {
+    void searchJobs_withKeyword_callsFastApiAndReturnsResults() {
         // given
         String keyword = "백엔드";
         List<String> jobTypes = List.of("정규직");
-        List<String> experienceFilters = List.of("신입");
+        List<String> experienceFilters = List.of("경력무관"); // 확장 대상
         List<String> sidoFilters = List.of("서울");
         List<String> sigunguFilters = List.of("강남구");
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-        User mockUser = new User(); // 최소 구조만 사용
+        Pageable pageable = PageRequest.of(0, 10);
+        User mockUser = new User();
 
-        Region region = new Region();
-        region.setSido("서울");
-        region.setSigungu("강남구");
+        Long jobId = 1L;
 
-        JobRegion jobRegion = new JobRegion();
-        jobRegion.setRegion(region);
+        // FastAPI 응답 DTO
+        JobSearchDto searchDto = new JobSearchDto();
+        searchDto.setJobId(jobId);
 
+        JobSearchResponse searchResponse = new JobSearchResponse();
+        searchResponse.setResults(List.of(searchDto));
+
+        // FastAPI mock
+        when(restTemplate.postForEntity(
+                eq("http://localhost:8000/search-es"),
+                any(HttpEntity.class),
+                eq(JobSearchResponse.class)
+        )).thenReturn(new ResponseEntity<>(searchResponse, HttpStatus.OK));
+
+        // JobRepository 응답
         Job job = new Job();
-        job.setId(1L);
-        job.setExperience("신입/경력");
+        job.setId(jobId);
         job.setJobType("정규직");
-        job.setJobRegions(List.of(jobRegion));
-        job.setFavicon(new Favicon(null, "some-domain", "base64string"));
+        job.setExperience("신입");
+        job.setJobRegions(List.of());  // 간단화
+        job.setFavicon(new Favicon(null, "domain", "base64"));
 
-        when(jobRepository.searchJobsWithFilters(
-                eq(keyword),
-                eq(jobTypes),
-                eq(List.of("신입", "경력", "경력무관")), // '경력무관' 확장
-                eq(sidoFilters),
-                eq(sigunguFilters),
-                eq(pageable)
-        )).thenReturn(new PageImpl<>(List.of(job)));
+        when(jobRepository.findByIdInWithRegion(List.of(jobId))).thenReturn(List.of(job));
 
         // when
         Page<JobDto> result = jobService.searchJobs(
@@ -99,8 +104,12 @@ class JobServiceTest {
 
         // then
         assertEquals(1, result.getTotalElements());
-        assertEquals("정규직", result.getContent().get(0).getJobType());
+        assertEquals(jobId, result.getContent().getFirst().getId());
+        assertEquals("정규직", result.getContent().getFirst().getJobType());
+
         verify(searchLogService).saveSearchLog(eq(keyword), eq(mockUser));
+        verify(restTemplate).postForEntity(anyString(), any(HttpEntity.class), eq(JobSearchResponse.class));
+        verify(jobRepository).findByIdInWithRegion(eq(List.of(jobId)));
     }
 
     @Test
@@ -231,17 +240,66 @@ class JobServiceTest {
 
 
     @Test
-    void deleteJobWithValidType_shouldDeleteWhenValidTypeIsNotZero() {
+    void deleteJobWithValidType_성공() {
         // given
-        Long jobId = 456L;
-        Integer validType = 1;
-        String expectedUrl = "http://localhost:8000/delete-job?job_id=456";
+        Long jobId = 1L;
+        Integer validType = 2;
+
+        Job job = new Job();
+        job.setId(jobId);
+        job.setIsPublic(true);
+
+        // deleteJob 호출 시 RestTemplate 내부 사용 시 mocking 필요
+        // 예: restTemplate.delete("http://localhost:8000/delete-job?id=1");
+        doNothing().when(restTemplate).delete(anyString());
+
+        when(jobRepository.findById(jobId)).thenReturn(Optional.of(job));
+        when(jobRepository.save(any(Job.class))).thenReturn(job);
 
         // when
-        jobService.deleteJobWithValidType(jobId, validType);
+        String result = jobService.deleteJobWithValidType(jobId, validType);
 
         // then
-        verify(restTemplate).delete(expectedUrl); // 삭제가 일어나야함
+        assertEquals("Job 1 deleted from Elasticsearch and updated in RDB and ValidType.", result);
+        assertEquals(validType, job.getJobValidType());
+        assertFalse(job.getIsPublic());
+
+        verify(jobRepository).save(job);
+        verify(restTemplate).delete(contains("/delete-job")); // deleteJob 내 호출이 있으면 확인
+    }
+
+    @Test
+    void deleteJobWithValidType_존재하지않는Job_예외발생() {
+        // given
+        Long jobId = 999L;
+        Integer validType = 3;
+
+        doNothing().when(restTemplate).delete(anyString());
+        when(jobRepository.findById(jobId)).thenReturn(Optional.empty());
+
+        // when & then
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> jobService.deleteJobWithValidType(jobId, validType));
+
+        assertTrue(exception.getMessage().contains("Job Id가 존재하지 않습니다."));
+    }
+
+    @Test
+    void deleteJobWithValidType_deleteJob_예외발생시_RuntimeException() {
+        // given
+        Long jobId = 1L;
+        Integer validType = 1;
+
+        doThrow(new RuntimeException("삭제 실패")).when(restTemplate).delete(anyString());
+
+        // deleteJob() 내부에서 위 에러가 발생한다고 가정
+        // findById 호출까지 안 감
+
+        // when & then
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> jobService.deleteJobWithValidType(jobId, validType));
+
+        assertTrue(exception.getMessage().contains("ValidTypeUpdate 및 삭제 실패"));
     }
 
     @Test

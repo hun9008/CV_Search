@@ -5,23 +5,51 @@ import com.www.goodjob.config.TestSecurityConfig;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.JwtTokenProvider;
+import com.www.goodjob.service.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockCookie;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.*;
 
-@Import({TestConfig.class, TestSecurityConfig.class})
+@Import({TestSecurityConfig.class, AuthControllerTest.MockedBeans.class})
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
+
+    @TestConfiguration
+    static class MockedBeans {
+        @Bean
+        public JwtTokenProvider jwtTokenProvider() {
+            return mock(JwtTokenProvider.class);
+        }
+
+        @Bean
+        public UserRepository userRepository() {
+            return mock(UserRepository.class);
+        }
+
+        @Bean
+        public UserOAuthRepository userOAuthRepository() {
+            return mock(UserOAuthRepository.class);
+        }
+
+        @Bean
+        public AuthService authService() {
+            return mock(AuthService.class);
+        }
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -35,6 +63,9 @@ class AuthControllerTest {
     @Autowired
     private UserOAuthRepository userOAuthRepository;
 
+    @Autowired
+    private AuthService authService;
+
     @Test
     @DisplayName("로그인 페이지 리다이렉트 - provider 있음")
     void loginPageRedirectWithProvider() throws Exception {
@@ -47,7 +78,8 @@ class AuthControllerTest {
     @DisplayName("로그인 페이지 메시지 출력 - provider 없음")
     void loginPageMessageNoProvider() throws Exception {
         mockMvc.perform(get("/auth/login"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("로그인 페이지입니다")));
     }
 
     @Test
@@ -67,7 +99,8 @@ class AuthControllerTest {
     @DisplayName("accessToken 재발급 - refreshToken 없음")
     void refreshTokenInvalid() throws Exception {
         mockMvc.perform(post("/auth/token/refresh"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Invalid or missing refresh token"));
     }
 
     @Test
@@ -76,7 +109,6 @@ class AuthControllerTest {
         when(jwtTokenProvider.getEmail(anyString())).thenReturn("test@example.com");
         when(jwtTokenProvider.getFirstLoginClaim(anyString())).thenReturn(true);
         when(jwtTokenProvider.generateAccessToken(anyString())).thenReturn("newAccessToken");
-        when(userRepository.existsByEmail(anyString())).thenReturn(false); // 이건 actually 안 쓰일 수도 있음
 
         mockMvc.perform(get("/auth/callback-endpoint")
                         .cookie(new MockCookie("refresh_token", "validToken")))
@@ -102,6 +134,7 @@ class AuthControllerTest {
     void masterTokenFail() throws Exception {
         mockMvc.perform(post("/auth/master-token")
                         .param("key", "wrongKey"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Invalid master key"));
     }
 }

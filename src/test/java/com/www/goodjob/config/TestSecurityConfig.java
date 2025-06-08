@@ -11,18 +11,19 @@ public class TestSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
-                .formLogin(form -> form.disable()) // 로그인 폼 제거 (302 리디렉트 방지)
-                .httpBasic(httpBasic -> httpBasic.disable()) // HTTP Basic 인증 제거
-                .logout(logout -> logout.disable()) // 로그아웃 제거
+                .csrf(csrf -> csrf.disable())
+                .formLogin(form -> form.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated() // 모든 요청 인증 필요
+                        .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) ->
-                                response.sendError(401, "Unauthorized")) // 인증 실패 시 401 반환
+                                response.sendError(401, "Unauthorized"))
                         .accessDeniedHandler((request, response, accessDeniedException) ->
-                                response.sendError(403, "Forbidden")) // 권한 부족 시 403 반환
+                                response.sendError(403, "Forbidden"))
                 );
 
         return http.build();
