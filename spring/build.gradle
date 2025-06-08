@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.www.goodjob'
@@ -68,7 +69,8 @@ dependencies {
 	// -------------------------------------------------
 	// OpenAPI / Swagger for API Documentation
 	// -------------------------------------------------
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.2.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
 	// -------------------------------------------------
 	// Testing Dependencies
@@ -77,12 +79,67 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	// Spring Security Test utilities
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'com.h2database:h2'
 	// JUnit Platform Launcher for test runtime
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
+
+	implementation 'software.amazon.awssdk:s3:2.20.40'
+
+	// Claude API
+	implementation("com.anthropic:anthropic-java:1.2.0")
+
+	// Prometheus actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//jackson-time
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
+
+//tasks.named('test') {
+//	useJUnitPlatform()
+//}
+//
+//test {
+//	jvmArgs += ["-javaagent:${classpath.find { it.name.contains("byte-buddy-agent") }}"]
+//}
 
 tasks.named('test') {
 	useJUnitPlatform()
+	systemProperty "spring.profiles.active", "test"
+	jvmArgs += ["-javaagent:${classpath.find { it.name.contains("byte-buddy-agent") }}"]
+
 }
+
+jacoco {
+	toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+		csv.required.set(false)
+		html.outputLocation = layout.buildDirectory.dir("reports/jacoco/test/html")
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				counter = 'INSTRUCTION'
+				value = 'COVEREDRATIO'
+				minimum = 0.30
+			}
+		}
+	}
+}
+
+check.dependsOn jacocoTestCoverageVerification

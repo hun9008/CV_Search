@@ -1,50 +1,70 @@
 package com.www.goodjob.controller;
 
 import com.www.goodjob.domain.User;
-import com.www.goodjob.domain.UserOAuth;
+import com.www.goodjob.dto.UserDto;
 import com.www.goodjob.repository.UserRepository;
-import com.www.goodjob.repository.UserOAuthRepository;
-import com.www.goodjob.service.JwtTokenProvider;
+import com.www.goodjob.security.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/user")
-@RequiredArgsConstructor
 public class UserController {
 
     private final UserRepository userRepository;
-    private final UserOAuthRepository userOAuthRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
-    // 회원가입(추가 정보 입력) API
-    @PostMapping("/signup")
-    public User signup(@RequestHeader("Authorization") String token,
-                       @RequestBody AdditionalSignUpRequest request) {
-        // Authorization 헤더가 "Bearer <token>" 형식이면 "Bearer " 제거
-        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
 
-        // JWT 토큰에서 이메일 추출
-        String email = jwtTokenProvider.getEmail(jwtToken);
+    @Operation(
+            summary = "현재 로그인한 사용자 정보 조회",
+            description = """
+            ✅ accessToken 기반으로 현재 로그인한 사용자 정보를 반환함
+        
+            - 헤더에 `Authorization: Bearer <accessToken>` 필요
+            - 유효하지 않거나 만료된 토큰인 경우 401 Unauthorized 반환
+            - 유효한 경우 사용자 정보(email, name, role 등) 반환
 
-        // 기존 User 조회 (로그인 시 이미 생성된 상태)
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-
-        // 추가 회원가입 정보로 User 업데이트 (예: region, name)
-        user.setRegion(request.getRegion());
-        if (request.getName() != null) {
-            user.setName(request.getName());
+            1. [비회원] accessToken 없이 /user/me 요청 시: 401 Unauthorized 응답
+            2. [회원] accessToken 유효: 200 OK + 사용자 정보
+        """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용자 정보 반환 성공"),
+            @ApiResponse(responseCode = "401", description = "accessToken이 없거나 유효하지 않음")
+    })
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        userRepository.save(user);
 
-        // UserOAuth 정보 업데이트: 로그인 시 토큰은 저장하지 않았으므로, 회원가입 시점에서 DB에 저장
-        UserOAuth userOAuth = userOAuthRepository.findByUser_Email(email)
-                .orElseThrow(() -> new IllegalStateException("UserOAuth not found"));
-        userOAuth.setAccessToken(request.getAccessToken());
-        userOAuth.setRefreshToken(request.getRefreshToken());
-        userOAuthRepository.save(userOAuth);
+        // DB에서 유저를 다시 조회 (plan 변경 반영됨)
+        Long userId = userDetails.getUser().getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return user;
+        return ResponseEntity.ok(UserDto.from(user));
     }
+
+//    @PostMapping("/profile")
+//    public ResponseEntity<?> saveProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
+//                                         @RequestBody Map<String, String> body) {
+//        User user = userDetails.getUser();
+//
+//        // body에서 원하는 값 꺼내서 user에 반영 가능 (예: 이름, 닉네임 등)
+//        if (body.containsKey("name")) {
+//            user.setName(body.get("name"));
+//        }
+//
+//        userRepository.save(user);
+//        return ResponseEntity.ok(UserDto.from(user));
+//    }
 }

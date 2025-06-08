@@ -31,6 +31,18 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          FASTAPI_HOST: ${{ secrets.FASTAPI_HOST }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          ANTHROPIC_API_KEY : ${{ secrets.ANTHROPIC_API_KEY }}
+          PROMETHEUS_HOST: ${{ secrets.PROMETHEUS_HOST }}
+          TOSS_SECRET_KEY : ${{ secrets.TOSS_SECRET_KEY }}
 
         run: |
           sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
@@ -41,8 +53,8 @@ jobs:
             ./gradlew clean build
           
             echo "RDB_URL=$RDB_URL" > .env
-            echo "RDB_USERNAME=$RDB_USERNAME" >> .env
-            echo "RDB_PASSWORD=$RDB_PASSWORD" >> .env
+            echo "RDB_USERNAME=$MYSQL_USER" >> .env
+            echo "RDB_PASSWORD=$MYSQL_PASSWORD" >> .env
             echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> .env
             echo "KAKAO_CLIENT_ID=$KAKAO_CLIENT_ID" >> .env
             echo "KAKAO_CLIENT_SECRET=$KAKAO_CLIENT_SECRET" >> .env
@@ -51,8 +63,19 @@ jobs:
             echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .env
             echo "GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI" >> .env
           
+            echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env
+            echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
+            echo "AWS_REGION=$AWS_REGION" >> .env
+            echo "AWS_S3_BUCKET=$AWS_S3_BUCKET" >> .env
+            echo "FASTAPI_HOST=$FASTAPI_HOST" >> .env
+            echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> .env
+            echo "EC2_HOST=$EC2_HOST" >> .env
+            echo "PROMETHEUS_HOST=$PROMETHEUS_HOST" >> .env
+            echo "TOSS_SECRET_KEY=$TOSS_SECRET_KEY" >> .env
+          
             docker-compose down || true
             docker-compose up -d --build
           
             docker image prune -f
+            docker buildx prune -a -f
           EOF

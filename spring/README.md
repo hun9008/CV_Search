@@ -22,3 +22,58 @@ dev_spring branch에 push 하면 github Action이 자동으로 EC2 인스턴스�
 5. docker build & run
 
 Github action에 관한 파일은 ~/.github/workflows/deploy.yml 에 작성해서 수행할 작업을 정의.
+
+# Prometheus Metric 탐색
+
+상단 “Graph” 탭 → Expression에 아래 중 하나 입력 후 Execute.
+
+```
+http_server_requests_seconds_count
+jvm_memory_used_bytes
+hikaricp_connections_active
+process_cpu_usage
+```
+
+# Redis
+```
+# 1. 네트워크 생성
+docker network create redis-net
+
+# 2. Redis 실행 
+docker run -d \
+  --name redis \
+  --network redis-net \
+  -p 6379:6379 \
+  redis \
+  redis-server --bind 0.0.0.0 --protected-mode no
+
+# 3. Redis Exporter 실행 
+docker run -d \
+--name redis_exporter \
+--network redis-net \
+-p 9121:9121 \
+oliver006/redis_exporter \
+--redis.addr=redis://redis:6379 \
+--count-keys=db0:recommendation:* \
+--count-keys.db=0
+```
+
+# Test (Jacoco)
+
+Jacoco Test 수행
+
+```
+./gradlew clean test jacocoTestReport
+```
+
+Web View로 Jacoco 결과 확인 (Test Coverage)
+
+```
+open build/reports/jacoco/test/html/index.html
+```
+
+기본 JUnit Test결과도 테스트 커버리지는 없지만 Web View로 확인 가능
+
+```
+open build/reports/tests/test/index.html
+```

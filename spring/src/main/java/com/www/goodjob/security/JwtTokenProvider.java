@@ -1,4 +1,4 @@
-package com.www.goodjob.service;
+package com.www.goodjob.security;
 
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +9,8 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 10;  // 10분
+    // private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 10;  // 10분
+    private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 30; // 1개월
     private final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 30 * 3; // 3개월
 
     private final String secretKey;
@@ -37,34 +38,61 @@ public class JwtTokenProvider {
     /**
      * Refresh Token 생성
      */
+    // 기존 메서드 유지 (기본 버전)
     public String generateRefreshToken(String email) {
+        return generateRefreshToken(email, false); // 기본값 false로
+    }
+
+    // firstLogin 포함 버전 오버로드
+    public String generateRefreshToken(String email, boolean isFirstLogin) {
         long now = System.currentTimeMillis();
         Date validity = new Date(now + REFRESH_TOKEN_VALID_TIME);
 
         return Jwts.builder()
                 .setSubject(email)
+                .claim("firstLogin", isFirstLogin)
                 .setIssuedAt(new Date(now))
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
+    public Boolean getFirstLoginClaim(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
+
+        Object value = claims.get("firstLogin");
+        return value instanceof Boolean ? (Boolean) value : Boolean.parseBoolean(value.toString());
+    }
+
+
     /**
-     * 토큰 유효성 검증
+     * 간단한 유효성 검사 (기존 방식)
      */
     public boolean validateToken(String token) {
+        return validateTokenDetailed(token) == TokenValidationResult.VALID;
+    }
+
+    /**
+     * 상세 유효성 검사 결과 반환
+     */
+    public TokenValidationResult validateTokenDetailed(String token) {
         try {
             Jwts.parser()
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token);
-            return true;
+            return TokenValidationResult.VALID;
+        } catch (ExpiredJwtException e) {
+            return TokenValidationResult.EXPIRED;
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            return TokenValidationResult.INVALID;
         }
     }
 
     /**
-     * 토큰에서 email 추출
+     * 토큰에서 이메일 추출
      */
     public String getEmail(String token) {
         return Jwts.parser()
@@ -75,9 +103,12 @@ public class JwtTokenProvider {
     }
 
     /**
-     * JwtAuthFilter 인스턴스 생성 (SecurityConfig에서 사용)
+     * 토큰 검증 결과 Enum
      */
-    public com.www.goodjob.security.JwtAuthFilter jwtAuthFilter() {
-        return new com.www.goodjob.security.JwtAuthFilter(this);
+    public enum TokenValidationResult {
+        VALID,
+        EXPIRED,
+        INVALID
     }
+
 }
