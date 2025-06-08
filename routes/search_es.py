@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from schemas.schema import SearchESRequest, SearchESResponse, JobIdDto
-from src.es_query_search import test_keyword_filter_query
+from schemas.schema import SearchESRequest, SearchESResponse, JobIdDto, JobIDListResponse
+from src.es_query_search import test_keyword_filter_query, get_similar_jobs_by_id
 
 router = APIRouter()
 
@@ -28,3 +28,8 @@ def search_es_api(request: SearchESRequest):
     ]
 
     return SearchESResponse(total=total, results=job_ids)
+
+@router.get("/similar-jobs", response_model=JobIDListResponse)
+def similar_jobs(job_id: int, k: int = 10):
+    job_ids = get_similar_jobs_by_id(job_id, k)
+    return JobIDListResponse(job_ids=job_ids)
