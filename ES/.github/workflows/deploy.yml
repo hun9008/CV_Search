@@ -1,0 +1,66 @@
+name: Deploy Docker image to ECR
+
+on:
+  push:
+    branches:
+      - dev_ES
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Set up QEMU (for ARM64 cross-compilation)
+        uses: docker/setup-qemu-action@v2
+
+      - name: Restore Google Credentials JSON from base64
+        run: |
+          echo "${{ secrets.ES_GOOGLE_BASE64 }}" | base64 -d > capstone-461411-6906e44fef88.json
+          echo "[확인] capstone-461411-6906e44fef88.json 파일 상위 3줄:"
+          head -n 3 capstone-461411-6906e44fef88.json
+
+      - name: Restore .env file
+        run: |
+          echo "${{ secrets.ES_ENV }}" > .env
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.ES_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.ES_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 | \
+          docker login --username AWS --password-stdin ${{ secrets.ECR_URI }}
+
+      # - name: Build Docker image for ARM64
+      #   run: |
+      #     docker buildx build --platform linux/arm64 -t goodjob --load .
+
+      # - name: Tag Docker image
+      #   run: docker tag goodjob:latest ${{ secrets.ECR_URI }}/goodjob:latest
+
+      # - name: Push Docker image to ECR
+      #   run: docker push ${{ secrets.ECR_URI }}/goodjob:latest
+      - name: Build and Push Docker image for ARM64
+        run: |
+          docker buildx build \
+            --platform linux/arm64 \
+            --tag ${{ secrets.ECR_URI }}/goodjob:latest \
+            --push .
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service \
+            --cluster goodjob-cluster \
+            --service goodjob-task-service-td5txpxd \
+            --force-new-deployment \
+            --region ap-northeast-2

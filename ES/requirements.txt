@@ -17,8 +17,8 @@ cycler
 datasets
 dill
 effdet
-elastic-transport
-elasticsearch
+elasticsearch==8.17.2
+elastic-transport==8.17.1
 fastapi
 filelock
 fonttools
@@ -94,3 +94,11 @@ uvicorn
 # vila @ file:///Users/jeong-yonghun/Desktop/capstone/CV_Search/src/CV2DB/vila
 xxhash
 yarl
+httpx
+prometheus_client
+google-api-core
+google-auth
+google-cloud-vision
+googleapis-common-protos
+grpcio
+grpcio-status

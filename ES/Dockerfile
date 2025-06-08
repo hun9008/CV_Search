@@ -4,7 +4,8 @@ WORKDIR /app
 COPY . .
 
 # 필수 OS 패키지 설치
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y git \
     git \
     libgl1-mesa-glx \
     libglib2.0-0 \
@@ -13,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     gcc \
     build-essential \
+    poppler-utils \
  && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip
@@ -26,6 +28,8 @@ RUN pip install -r requirements.txt
 # 다시 원래 app 디렉토리로 이동하여 나머지 의존성 설치
 WORKDIR /app
 RUN pip install -r requirements.txt
+
+RUN pip install huggingface_hub[hf_xet]
 
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

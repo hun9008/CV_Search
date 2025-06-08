@@ -5,5 +5,11 @@ cv_env
 /src/CV2DB/vila
 __pycache__
 .pytest_cache
-.env.lambda
+.env.es
 
+readme.md
+experiments.md
+EDA
+
+capstone-461411-6906e44fef88.json
+encoded_google_json.txt
