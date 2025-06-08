@@ -1,0 +1,127 @@
+// src/components/pricing/PricingCard.module.scss
+
+.pricingCard {
+    background-color: var(--color-background-secondary, #ffffff);
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: 12px;
+    padding: 1.5rem 1.5rem;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    min-width: 260px;
+    max-width: 320px;
+    max-height: 510px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    &.popular {
+        border-color: var(--color-primary-accent, #1877f2); // 사이트의 주요 강조 색상
+        border-width: 2px;
+        box-shadow: 0 6px 20px rgba(124, 58, 237, 0.2); // 강조 색상에 맞춘 그림자
+        position: relative;
+
+        .popularBadge {
+            position: absolute;
+            top: -16px;
+            background-color: var(--color-primary-accent, #1877f2);
+            color: var(--color-text-on-primary, #ffffff);
+            padding: 0.4rem 1rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+    }
+
+    &__iconContainer {
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background-color: rgba(124, 58, 237, 0.1); // 아이콘 배경 (강조색 연하게)
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__icon {
+        color: var(--color-primary-accent, #1877f2); // 아이콘 색상
+    }
+
+    &__planName {
+        font-size: 1.5rem; // 기존 h3와 유사하게
+        font-weight: 600; // 기존 h3와 유사하게
+        margin-bottom: 0.75rem;
+        color: var(--color-text-primary, #333333); // 사이트의 주요 텍스트 색상
+    }
+
+    &__price {
+        font-size: 2.1rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: var(--color-primary-accent, #1877f2);
+    }
+
+    &__priceDescription {
+        font-size: 0.9rem;
+        color: var(--color-text-secondary, #666666); // 사이트의 보조 텍스트 색상
+        margin-bottom: 1.5rem;
+    }
+
+    &__features {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 0.5rem;
+        width: 100%;
+        text-align: left; // 가독성을 위해 왼쪽 정렬
+
+        li {
+            margin-bottom: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem; // 아이콘과 텍스트 사이 간격
+            font-size: 0.95rem;
+            color: var(--color-text-primary, #333333);
+
+            .featureIcon {
+                color: var(--color-success, #22c55e); // 성공/체크 아이콘 색상
+                flex-shrink: 0; // 아이콘 크기 유지
+            }
+        }
+    }
+
+    &__ctaButton {
+        background-color: var(--color-primary-accent, #1877f2);
+        color: var(--color-text-on-primary, #ffffff);
+        border: none;
+        padding: 0.85rem 1.5rem;
+        border-radius: 8px; // 버튼 둥근 모서리
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 1rem;
+        width: 100%;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+
+        &:hover {
+            background-color: var(--color-primary-accent-hover, #1877f2); // 버튼 호버 색상
+            transform: scale(1.02);
+        }
+
+        &:active {
+            transform: scale(0.98);
+        }
+    }
+
+    // .popular 클래스 내부 버튼은 다르게 스타일링 할 수 있습니다.
+    &.popular &__ctaButton {
+        // 기본 스타일과 동일하게 유지하거나, 더 강조할 수 있습니다.
+        // 예: background-color: var(--color-secondary-accent, #some_other_color);
+    }
+}

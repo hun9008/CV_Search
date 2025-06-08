@@ -1,0 +1,139 @@
+.container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.header {
+    margin-bottom: 2rem;
+
+    &__title {
+        display: flex;
+        align-items: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 0.5rem;
+    }
+
+    &__icon {
+        color: #f4b11f;
+        margin-right: 0.75rem;
+    }
+
+    &__subtitle {
+        font-size: 0.95rem;
+        color: #666;
+        margin: 0;
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem 0.25rem;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #d8edff;
+        border-radius: 4px;
+    }
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #d8edff #f1f1f1;
+}
+
+.loading {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+
+    &__spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #d8edff;
+        border-top: 3px solid #1877f2;
+        border-radius: 50%;
+        margin-bottom: 1rem;
+        animation: spin 1s linear infinite;
+    }
+}
+
+.empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 0;
+
+    &__icon {
+        color: #d8edff;
+        margin-bottom: 1.5rem;
+    }
+
+    &__title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 0.75rem;
+    }
+
+    &__message {
+        font-size: 0.95rem;
+        color: #666;
+        margin: 0;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .header {
+        margin-bottom: 1.5rem;
+
+        &__title {
+            font-size: 1.25rem;
+        }
+    }
+
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

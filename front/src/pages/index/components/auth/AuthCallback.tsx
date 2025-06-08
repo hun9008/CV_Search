@@ -1,28 +1,62 @@
+import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSearchParams } from 'react-router-dom';
+import useAuthStore from '../../../../store/authStore';
+import useUserStore from '../../../../store/userStore';
+import LoadingSpinner from '../../../../components/common/loading/LoadingSpinner';
+import { SERVER_IP } from '../../../../constants/env';
+import useJobStore from '../../../../store/jobStore';
 
 function AuthCallback() {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    const { setTokens, setIsLoggedIn } = useAuthStore();
+    const { fetchUserData } = useUserStore();
+    const { getSelectedCvId } = useJobStore();
 
     useEffect(() => {
-        const accessToken = searchParams.get('accessToken');
-        const refreshToken = searchParams.get('refreshToken');
+        axios
+            .get(`${SERVER_IP}/auth/callback-endpoint`, {
+                withCredentials: true,
+            })
+            .then(async (res) => {
+                console.log(res.data);
+                const { accessToken, firstLogin } = res.data;
 
-        console.log('Received JWT Token:', accessToken, refreshToken);
-        if (accessToken && refreshToken) {
-            console.log('Received JWT Token:', accessToken, refreshToken);
-            localStorage.setItem('jwt-token:access', accessToken);
-            localStorage.setItem('jwt-token:refresh', refreshToken);
-            navigate('/tempPage');
-        } else {
-            console.log('No token received');
-            navigate('/'); // 다시 로그인 페이지로 보내기
-        }
-    }, [searchParams, navigate]);
+                if (!accessToken) {
+                    console.error('Access token이 없습니다');
+                    navigate('/signIn');
+                    return;
+                }
 
-    return <div>인증 중입니다</div>; // pending 될 경우를 대비해 페이지 만들기
+                setTokens(accessToken);
+                setIsLoggedIn(true);
+                const isAdmin = await fetchUserData(accessToken);
+
+                if (isAdmin) {
+                    navigate('/main/admin/dashboard', { replace: true });
+                    return;
+                }
+
+                // 로컬 스토리지의 CV 여부 검사
+                if (!localStorage.getItem('cv-storage')) {
+                    await getSelectedCvId();
+                }
+
+                if (firstLogin) {
+                    navigate('/upload', { replace: true });
+                    return;
+                } else {
+                    navigate('/main/recommend', { replace: true });
+                    return;
+                }
+            })
+            .catch((err) => {
+                console.error('콜백 처리 중 오류', err);
+                navigate('/signIn', { replace: true });
+            });
+    }, [navigate, setTokens]);
+
+    return <LoadingSpinner />;
 }
 
 export default AuthCallback;

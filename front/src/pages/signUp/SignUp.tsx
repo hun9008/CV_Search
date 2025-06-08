@@ -1,24 +1,33 @@
+import KakaoSignIn from '../../pages/index/components/auth/KakaoSignIn';
+import GoogleSignIn from '../../pages/index/components/auth/GoogleSignIn';
 import { useNavigate } from 'react-router-dom';
 import style from './styles/SignUp.module.scss';
-import GoogleSignIn from '../index/components/auth/GoogleSignIn';
-import KakaoSignIn from '../index/components/auth/KakaoSignIn';
 
 function SignUp() {
     const navigate = useNavigate();
-
+    const navigateToLandingpage = () => {
+        navigate('/');
+    };
     return (
-        <div className={style.page}>
-            <h1 className={style.page__title}>goodJob</h1>
-            <p className={style.page__subtitle}>
-                goodJob이 찾아주는 당신만의 커리어, 지금 시작하세요.
-            </p>
+        <div className={style.pageWrapper}>
+            <div className={style.ratioContainer}>
+                <div className={style.login}>
+                    <div className={style.login__card}>
+                        <h1 className={style.login__title} onClick={navigateToLandingpage}>
+                            goodJob
+                        </h1>
 
-            <br />
-            <GoogleSignIn />
-            <KakaoSignIn />
-            <br />
-            <p>또는</p>
-            <button>회원가입</button>
+                        <p className={style.login__subtitle}>
+                            goodJob이 찾아주는 당신만의 커리어, 지금 시작하세요.{' '}
+                            {/* 모바일 최적화 필요.. 문장 두 개로 분리 */}
+                        </p>
+                        <div className={style.login__buttons}>
+                            <GoogleSignIn />
+                            <KakaoSignIn />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

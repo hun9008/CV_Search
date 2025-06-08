@@ -1,0 +1,105 @@
+.layout {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    max-height: 100vh;
+    min-height: 100vh;
+    background-color: #f5f9fd;
+    gap: 1rem;
+    padding: 1rem;
+}
+.layout__wrapper {
+    max-width: 1400px;
+    padding: 0 16px; /* 좌우 여백 */
+    width: 100%; /* 반응형 유지 */
+    box-sizing: border-box;
+    margin: 0 auto;
+    background-color: #f5f9fd;
+}
+
+.mainContent {
+    display: flex;
+    // flex: 1;
+    width: 100%;
+    max-height: 100%;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all 0.3s ease;
+
+    &__container {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+    }
+    &__bookmarkList {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        overflow-y: auto;
+    }
+
+    &__jobSection {
+        display: flex;
+        flex: 1;
+        gap: 1.5rem;
+        height: 100%;
+    }
+
+    &__jobList {
+        min-width: 545px; // 필요한 경우 축소 허용
+        max-width: 545px;
+        overflow-y: auto;
+        border-radius: 20px;
+        background-color: #ffffff;
+        // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    &__jobDetail {
+        display: flex;
+        flex: 1;
+        overflow-y: auto;
+        border-radius: 12px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+        @media (max-width: 1024px) {
+            display: none;
+        }
+    }
+
+    &__otherContent {
+        height: 100%;
+        overflow-y: auto;
+        border-radius: 12px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    &__placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #666666;
+    }
+
+    @media (max-width: 768px) {
+        margin-left: 70px;
+
+        &__container {
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        margin-left: 0;
+        padding-bottom: 60px;
+
+        &__container {
+            padding: 0.75rem;
+        }
+    }
+}

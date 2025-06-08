@@ -1,63 +1,65 @@
 import style from './styles/index.module.scss';
 import { useNavigate } from 'react-router-dom';
+import Header from '../../components/common/header/Header';
+import CVUpload from '../../components/common/fileInput/CVUpload';
+import useAuthStore from '../../store/authStore';
+import useUserStore from '../../store/userStore';
+import { useEffect } from 'react';
 
-function index() {
-    const navigate = useNavigate(); // 나중에 상단바 컴포넌트로 뺄 것
+function Index() {
+    const { fetchUserData } = useUserStore();
+    const navigate = useNavigate();
 
-    const navigateToSignIn = () => {
-        navigate('/signIn');
+    useEffect(() => {
+        const isMobile = window.matchMedia('only screen and (max-width: 768px)').matches;
+
+        // 예외 페이지를 정의하거나 조건 설정
+        const isException = location.pathname === '/mobile';
+
+        if (isMobile && !isException) {
+            navigate('/mobile');
+        }
+    }, [location.pathname]);
+
+    const handleMoveToMainPage = async () => {
+        try {
+            const accessToken = useAuthStore.getState().accessToken;
+            await fetchUserData(accessToken);
+            navigate('/main/recommend');
+        } catch (error) {
+            console.log('회원 검증 중 에러 발생: ', error);
+            navigate('./signIn');
+            return;
+        }
     };
-    const navigateToSignUp = () => {
-        navigate('/signUp');
-    };
+
     return (
         <div className={style.page}>
-            <nav className={style.navbar}>
-                <div className={style.logo}>goodJob</div>
-                <div className={style.nav_links}>
-                    <button
-                        className={style.signup_btn}
-                        onClick={navigateToSignUp}
-                    >
-                        회원가입
-                    </button>
-                    <button
-                        className={style.login_btn}
-                        onClick={navigateToSignIn}
-                    >
-                        로그인
-                    </button>
-                </div>
-            </nav>
-
-            <div className={style.container}>
-                <div className={style.text_section}>
-                    <h1>
-                        goodJob이 찾아주는
+            <Header />
+            <div className={style.page__main}>
+                <div className={style.page__content}>
+                    <div className={style.page__text}>
                         <br />
-                        당신만의 커리어, 지금 시작하세요.
-                    </h1>
-                    <p>Get matched with your perfect job</p>
-                    <button className={style.get_started_btn}>
-                        Get Started
-                    </button>
-                </div>
-                <div className={style.upload_box}>
-                    <img src="@assets/icons/upload.png" />
-                    <p>파일을 선택하세요</p>
+                        <h1 className={style.page__title}>
+                            goodJob이 찾아주는 당신만의 커리어,
+                            <br />
+                            지금 시작하세요.
+                        </h1>
+                        <br />
+                        <p className={style.page__subtitle}>Get matched with your perfect job</p>
+                        <br />
+                        <br />
+                        <button
+                            className={style.page__landingButton}
+                            onClick={handleMoveToMainPage}>
+                            Get Started
+                        </button>
+                    </div>
+                    <CVUpload />
                 </div>
             </div>
-
-            <footer>
-                <p>
-                    이력서를 업로드하면 맞춤 공고와 피드백을 제공합니다.
-                    <br />
-                    goodJob에 파일을 업로드함으로써, 당사 이용약관에 동의하고
-                    개인정보 보호 정책을 읽은 것으로 간주합니다.
-                </p>
-            </footer>
         </div>
     );
 }
 
-export default index;
+export default Index;

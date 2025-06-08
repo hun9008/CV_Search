@@ -1,0 +1,209 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    gap: 1.5rem;
+    background-color: #f5f9fd;
+    border-radius: 20px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: start;
+    gap: 1.5rem;
+
+    &__content {
+        min-height: 88%;
+        max-height: 88%;
+        display: flex;
+        flex-direction: column;
+        overflow-y: scroll;
+        border-radius: 16px;
+        background-color: white;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+
+        &__error {
+            justify-content: center;
+            min-height: 85%;
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px;
+            background-color: white;
+            padding: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 1rem 0;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+
+            &::before {
+                content: '';
+                display: inline-block;
+                width: 4px;
+                height: 1rem;
+                background-color: #1877f2;
+                margin-right: 0.75rem;
+                border-radius: 2px;
+            }
+        }
+
+        white-space: pre-line;
+        line-height: 1.6;
+        color: #444;
+    }
+}
+
+.buttons {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.button {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    border: none;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 500;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+        background-color: #f5f9fd;
+        color: #1877f2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    &:first-child {
+        color: #e53935;
+
+        &:hover {
+            background-color: rgba(229, 57, 53, 0.05);
+            color: #d32f2f;
+        }
+    }
+}
+
+.hiddenInput {
+    display: none;
+}
+
+.cvviewer {
+    min-width: 50%;
+    max-width: 50%;
+    display: flex;
+    flex-direction: column;
+    // background-color: white;
+    border-radius: 16px;
+    // overflow: hidden;
+    // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 992px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .info,
+    .cvviewer {
+        width: 100%;
+    }
+}
+
+.feedbackText {
+    font-size: 1rem;
+    line-height: 1;
+    color: #333;
+    // overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+
+    p {
+        margin-bottom: 1rem;
+        white-space: pre-wrap;
+    }
+
+    h2,
+    h3,
+    h4 {
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        color: #1877f2;
+        font-weight: 600;
+        border: none;
+    }
+
+    ul,
+    ol {
+        margin-bottom: 1rem;
+        padding-left: 1.5rem;
+    }
+
+    li {
+        margin-bottom: 0.5rem;
+    }
+
+    strong {
+        font-weight: 600;
+        color: #333;
+    }
+}
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 15px;
+        &__title {
+            font-size: 1.5em;
+        }
+        &__actions {
+            flex-direction: column; // Stack buttons
+            width: 100%;
+            gap: 10px;
+            button {
+                width: 100%;
+                font-size: 0.9em;
+                padding: 10px;
+            }
+        }
+    }
+    .noCvMessage {
+        font-size: 1em;
+        padding: 20px;
+        button {
+            font-size: 0.9em;
+            padding: 10px 15px;
+            margin-top: 15px;
+        }
+    }
+    // CVViewer styles are separate
+}

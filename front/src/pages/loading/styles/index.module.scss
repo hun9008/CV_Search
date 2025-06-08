@@ -1,9 +1,70 @@
+// styles/loadingScreen.module.scss
+
 .page {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    justify-content: flex-start;
-
-    width: 100%;
     height: 100vh;
+    background-color: #eef0fc;
+
+    &__loadingIndicator {
+        display: flex;
+        justify-content: center;
+
+        svg {
+            width: 40px;
+            height: 8px;
+
+            circle {
+                animation: fade 1.5s infinite ease-in-out;
+            }
+
+            circle:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            circle:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            circle:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+        }
+    }
+
+    &__logo {
+        font-size: 80px;
+        font-style: normal;
+        font-weight: 600;
+        color: #1877f2;
+
+        line-height: var(--Title-Small-Line-Height, 20px);
+        letter-spacing: var(--Title-Small-Tracking, 0.1px);
+
+        margin-bottom: 80px;
+    }
+
+    &__loadingText {
+        position: absolute;
+        bottom: 50px;
+        flex-shrink: 0;
+
+        color: #333333;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 160%;
+    }
+}
+
+@keyframes blink {
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 1;
+    }
 }

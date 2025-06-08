@@ -1,0 +1,31 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.container {
+    display: flex;
+    z-index: 1001;
+    flex-direction: row;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    width: 90%;
+    max-width: 450px;
+    overflow: hidden;
+    transform: translateY(0);
+    animation: slideUp 0.4s ease;
+    padding: 1.25rem 1.5rem;
+    justify-content: space-between;
+    gap: 1rem;
+}

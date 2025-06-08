@@ -1,0 +1,56 @@
+.container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    max-height: fit-content;
+    min-width: 240px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    position: relative;
+    flex: 1;
+}
+
+.compareData {
+    color: #666;
+    font-size: small;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #4a5568;
+    line-height: 1.2;
+}
+
+.mainData {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 0.5rem 0;
+    line-height: 1;
+}
+
+.changeSection {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.positive {
+    color: #38a169;
+}
+
+.negative {
+    color: #e53e3e;
+}

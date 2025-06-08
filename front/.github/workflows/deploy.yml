@@ -1,35 +1,49 @@
 name: Deploy goodJob_Client to S3
 
 on:
-    push:
-        branches:
-            - dev_wei
+  push:
+    branches:
+      - dev_front
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Install Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 18
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-            - name: Install dependencies
-              run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Build project
-              run: npm run build
+      - name: Create .env file
+        run: |
+          echo "VITE_SERVER_IP=${{ secrets.SERVER_IP }}" > .env
+          echo "VITE_REDIRECT_IP=${{ secrets.VITE_REDIRECT_IP }}" >> .env
 
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v2
-              with:
-                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ secrets.AWS_REGION }}
+      - name: Build project
+        run: npm run build
 
-            - name: Deploy to S3
-              run: aws s3 sync ./dist s3://goodjobucket/cv --delete
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.FRONT_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.FRONT_AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.FRONT_S3_AWS_REGION }}
+
+      - name: Check AWS identity (debug)
+        run: aws sts get-caller-identity
+
+      - name: Sync to S3
+        run: aws s3 sync ./dist s3://${{ secrets.FRONT_S3_BUCKET_NAME }} --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"

@@ -1,0 +1,104 @@
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+
+    // 회사 로고 스켈레톤
+    &__icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+
+    // 회사 이름 스켈레톤
+    &__company {
+        width: 150px;
+        height: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    // 제목 스켈레톤
+    &__title {
+        height: 1.8rem;
+        width: 90%;
+        margin-bottom: 0.5rem;
+    }
+
+    // 태그 스켈레톤
+    &__tags {
+        &__tag {
+            width: 80px;
+            height: 1.5rem;
+            border-radius: 20px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        &__location {
+            width: 100px;
+            height: 1.5rem;
+            border-radius: 20px;
+        }
+    }
+
+    // 북마크 버튼 스켈레톤
+    &__bookmark {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+    }
+
+    // 점수 스켈레톤
+    &__score {
+        width: 50px;
+        height: 1.8rem;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+    }
+}
+
+// 스켈레톤 UI 컨테이너 스타일
+.skeletonContainer {
+    background-color: #ffffff;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    width: 100%;
+    display: flex;
+
+    &__content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        margin-left: 1.5rem;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    &__tagsContainer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        &__left {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+}

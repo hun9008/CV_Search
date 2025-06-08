@@ -1,0 +1,531 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.dialog {
+    display: flex;
+    flex-direction: column;
+    min-width: 700px;
+    max-width: 700px;
+    min-height: 700px;
+    max-height: 700px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.4s ease;
+    padding: 1.5rem;
+    overflow-y: scroll;
+
+    &::-webkit-scrollbar {
+        width: 0px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #d8edff;
+        border-radius: 4px;
+    }
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+}
+
+.closeButton {
+    // display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+        background-color: #f5f5f5;
+        transform: scale(1.05);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .dialog {
+        width: 95%;
+        height: 95vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .dialog {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+    }
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    min-width: 100%;
+    padding: 1.5rem;
+    overflow-y: scroll;
+    background-color: #ffffff;
+    border-radius: 12px;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #d8edff;
+        border-radius: 4px;
+    }
+}
+
+.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #888;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    &__company {
+        display: flex;
+        align-items: center;
+    }
+
+    &__logo {
+        width: 40px;
+        height: 40px;
+        // border-radius: 8px;
+        padding: 4px;
+        margin-right: 0.6rem;
+    }
+
+    &__companyName {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    &__actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    &__actionButton {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        background-color: #f5f9fd;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        overflow: hidden;
+
+        &:hover {
+            background-color: #e6f0ff;
+            color: #1877f2;
+            transform: translateY(-2px);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        &.active {
+            color: #f4b11f;
+            background-color: rgba(244, 177, 31, 0.1);
+        }
+    }
+}
+
+.titleContainer {
+    margin-bottom: 1.5rem;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 1rem;
+    line-height: 1.3;
+}
+
+.metaInfo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    &__item {
+        display: flex;
+        align-items: center;
+        color: #666;
+        font-size: 0.75rem;
+    }
+
+    &__icon {
+        margin-right: 0.5rem;
+        color: #888;
+        flex-shrink: 0;
+    }
+}
+
+.actionButtons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    &__apply {
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        max-height: 45px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    &__apply {
+        background-color: #1877f2;
+        color: white;
+        border: none;
+        flex: 2;
+
+        &:hover {
+            background-color: #1464d8;
+            transform: translateY(-2px);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    &__icon {
+        margin-left: 0.5rem;
+    }
+}
+
+.content {
+    flex: 1;
+    width: 100%;
+}
+
+.section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f0f0f0;
+    width: 100%;
+
+    &:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    &__title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 1rem;
+        position: relative;
+        padding-left: 1rem;
+        width: 100%;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.25rem;
+            width: 4px;
+            height: 1rem;
+            background-color: #1877f2;
+            border-radius: 2px;
+        }
+    }
+
+    &__text {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #444;
+        white-space: pre-line;
+        width: 100%;
+        display: block;
+    }
+}
+
+// 스켈레톤 UI 스타일
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+
+    // 회사 로고 스켈레톤
+    &.header__logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+
+    // 회사 이름 스켈레톤
+    &.header__companyName {
+        width: 150px;
+        height: 1.5rem;
+        margin-right: 0.75rem;
+    }
+
+    // 액션 버튼 스켈레톤
+    &.header__actionButton {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+    }
+
+    // 제목 스켈레톤
+    &.title {
+        height: 2.5rem;
+        width: 90%;
+        margin-bottom: 1.5rem;
+    }
+
+    // 메타 정보 스켈레톤
+    &.metaInfo__item {
+        width: 150px;
+        height: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    // 점수 스켈레톤
+    &.score {
+        width: 120px;
+        height: 2rem;
+        border-radius: 20px;
+    }
+
+    // 버튼 스켈레톤
+    &.actionButtons__apply {
+        height: 3rem;
+        flex: 2;
+        border-radius: 8px;
+    }
+
+    &.actionButtons__feedback,
+    &.actionButtons__manage {
+        height: 3rem;
+        flex: 1;
+        border-radius: 8px;
+    }
+
+    // 섹션 제목 스켈레톤
+    &.section__title {
+        height: 1.5rem;
+        width: 200px;
+        margin-bottom: 1.5rem;
+    }
+
+    // 섹션 텍스트 스켈레톤
+    &.section__text {
+        height: 120px;
+        width: 100%;
+        margin-bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+
+        &::before {
+            content: '';
+            display: block;
+            height: 1rem;
+            width: 100%;
+            background: inherit;
+            border-radius: 4px;
+        }
+
+        &::after {
+            content: '';
+            display: block;
+            height: 1rem;
+            width: 90%;
+            background: inherit;
+            border-radius: 4px;
+        }
+    }
+
+    // 일반 텍스트 스켈레톤
+    &__text {
+        height: 1.2rem;
+        width: 100%;
+        max-width: 200px;
+    }
+
+    // 제목 스켈레톤
+    &__title {
+        height: 2.5rem;
+        width: 80%;
+        margin-bottom: 1.5rem;
+    }
+
+    // 단락 스켈레톤
+    &__paragraph {
+        height: 120px;
+        width: 100%;
+        margin-bottom: 2rem;
+        position: relative;
+
+        &::before,
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            height: 1rem;
+            background: inherit;
+            border-radius: 4px;
+        }
+
+        &::before {
+            top: 0;
+            width: 100%;
+        }
+
+        &::after {
+            top: 1.5rem;
+            width: 90%;
+        }
+    }
+}
+
+// 스켈레톤 UI 컨테이너 스타일 추가
+.skeletonContainer {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+// 반응형 스타일
+@media (max-width: 768px) {
+    .container {
+        padding: 1.25rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .actionButtons {
+        flex-direction: column;
+
+        &__apply,
+        &__feedback,
+        &__manage {
+            width: 100%;
+        }
+    }
+
+    .metaInfo {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .title {
+        font-size: 1.25rem;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+
+        &__actions {
+            align-self: flex-end;
+        }
+    }
+}

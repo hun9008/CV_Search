@@ -10,16 +10,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lottiefiles/dotlottie-react": "^0.13.5",
     "@react-oauth/google": "^0.12.1",
+    "@tosspayments/tosspayments-sdk": "^2.3.5",
     "axios": "^1.8.4",
     "dotenv": "^16.4.7",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.487.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-error-boundary": "^6.0.0",
     "react-router-dom": "^7.4.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^22.13.13",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

@@ -1,11 +1,26 @@
-@import '@assets/styles/font.scss';
+@use './font.scss';
 
+// 전체 초기화 및 글로벌 스타일
 * {
     padding: 0;
     margin: 0;
 
+    font-family: 'Noto Sans KR', 'Noto Sans';
+    font-weight: 400;
     box-sizing: border-box;
 
-    font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 400;
+    button {
+        cursor: pointer;
+    }
+}
+
+// ✅ 전체 배경색 통일
+html,
+body {
+    background-color: #f5f9fd !important;
+}
+
+// ✅ 언어별 폰트 설정
+:lang(ko) {
+    font-family: 'Noto Sans KR', 'Noto Sans', sans-serif;
 }

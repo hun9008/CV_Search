@@ -1,0 +1,107 @@
+.dialogOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); // 어두운 배경으로 가독성 확보
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; // 다른 요소들 위에 표시
+    padding: 1rem; // 모바일 화면에서 여백 확보
+    backdrop-filter: blur(4px); // 배경 블러 효과 (선택 사항)
+}
+
+.dialogContent {
+    background-color: var(--color-background, #f9fafb); // 사이트의 기본 배경색 사용
+    padding: 2rem 2.5rem; // 내부 여백
+    border-radius: 16px; // 부드러운 모서리
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    width: 95%;
+    max-width: 1000px; // 3개의 카드가 가로로 나열될 수 있는 충분한 너비
+    max-height: 94vh; // 화면 높이의 90%를 넘지 않도록
+    overflow-y: auto; // 내용이 길어지면 스크롤
+    position: relative;
+    animation: fadeInScale 0.3s ease-out; // 등장 애니메이션
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.45rem; // 제목과 설명 사이 간격
+    }
+
+    &__title {
+        font-size: 1.75rem; // 제목 크기
+        font-weight: 700; // 제목 굵기
+        color: var(--color-text-primary, #1f2937);
+    }
+
+    &__closeButton {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--color-text-secondary, #6b7280);
+        padding: 0.5rem;
+        line-height: 1;
+        border-radius: 50%;
+        transition: background-color 0.2s ease, color 0.2s ease;
+
+        &:hover {
+            background-color: var(--color-background-hover, #e5e7eb);
+            color: var(--color-text-primary, #1f2937);
+        }
+    }
+
+    &__description {
+        font-size: 1rem;
+        color: var(--color-text-secondary, #4b5563);
+        margin-bottom: 1rem; // 설명과 플랜 카드 사이 간격
+        line-height: 1.6;
+    }
+
+    &__plansContainer {
+        display: flex;
+        gap: 2rem; // 카드 사이 간격
+        justify-content: center;
+
+        // 모바일 및 태블릿 반응형 처리
+        @media (max-width: 900px) {
+            // 2개씩 보이도록 조정
+            flex-wrap: wrap;
+        }
+        @media (max-width: 640px) {
+            // 1개씩 세로로 쌓이도록
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+    }
+}
+
+// 등장 애니메이션
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+// CSS 변수 예시 (실제 프로젝트의 globals.css 또는 테마 파일에 정의되어 있어야 함)
+// :root {
+//   --color-background: #f9fafb;
+//   --color-background-secondary: #ffffff;
+//   --color-background-hover: #e5e7eb;
+//   --color-border: #e0e0e0;
+//   --color-primary-accent: #7c3aed; // 보라색 계열
+//   --color-primary-accent-hover: #6d28d9;
+//   --color-text-primary: #1f2937;
+//   --color-text-secondary: #4b5563;
+//   --color-text-on-primary: #ffffff;
+//   --color-success: #22c55e; // 초록색 계열
+// }

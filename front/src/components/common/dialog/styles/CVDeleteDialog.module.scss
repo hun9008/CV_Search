@@ -1,0 +1,224 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.container {
+    display: flex;
+    z-index: 1001;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    width: 90%;
+    max-width: 450px;
+    overflow: hidden;
+    transform: translateY(0);
+    animation: slideUp 0.4s ease;
+
+    &__header {
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem 1.5rem 1rem;
+        border-bottom: 1px solid #f0f0f0;
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #e53935;
+            margin: 0 0 0.75rem;
+            display: flex;
+            align-items: center;
+
+            svg {
+                margin-right: 0.75rem;
+                color: #e53935;
+            }
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #333;
+            margin: 0;
+
+            strong {
+                color: #e53935;
+                font-weight: 600;
+            }
+        }
+
+        .warning {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            font-size: 0.9rem;
+            color: #5d4037;
+        }
+    }
+    &__delete {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem 1.5rem 1rem;
+        color: #e53935;
+        overflow: hidden;
+    }
+
+    &__content {
+        display: flex;
+        padding: 1.25rem 1.5rem;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+}
+.deletingText {
+    text-align: center;
+    position: relative;
+    font-weight: 500;
+    font-size: 1.2rem;
+
+    ::after {
+        content: '.';
+        animation: dots 1.2s steps(3, end) infinite;
+        display: inline-block;
+        width: 1ch;
+        overflow: hidden;
+        vertical-align: bottom;
+    }
+}
+@keyframes dots {
+    0% {
+        content: '.';
+    }
+    33% {
+        content: '..';
+    }
+    66% {
+        content: '...';
+    }
+    100% {
+        content: '.';
+    }
+}
+
+.button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    height: 48px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+
+    &.cancel {
+        background-color: #1877f2;
+        color: white;
+        border: none;
+        box-shadow: 0 4px 12px rgba(24, 119, 242, 0.2);
+
+        &:hover {
+            background-color: #1464d8;
+            transform: translateY(-2px);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    &.delete {
+        background-color: transparent;
+        color: #666;
+        border: 1px solid #ddd;
+        font-size: 0.9rem;
+
+        &:hover {
+            background-color: #f5f5f5;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+        }
+    }
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+
+    input {
+        margin-right: 0.5rem;
+    }
+
+    label {
+        font-size: 0.9rem;
+        color: #666;
+    }
+}
+
+.countdown {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    font-size: 0.85rem;
+}
+
+.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        width: 95%;
+
+        &__header {
+            padding: 1.25rem 1.25rem 0.75rem;
+        }
+
+        &__content {
+            padding: 1rem 1.25rem;
+        }
+    }
+
+    .button {
+        padding: 0.75rem 1rem;
+    }
+}
