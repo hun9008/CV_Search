@@ -24,7 +24,7 @@ public class UserFeedback {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "satisfaction_score", nullable = false)
