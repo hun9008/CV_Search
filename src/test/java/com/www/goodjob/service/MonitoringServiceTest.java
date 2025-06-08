@@ -107,4 +107,29 @@ class MonitoringServiceTest {
         assertEquals(0.5, result.getUptime(), 1e-6);
         assertEquals(10.0, result.getResponseTime(), 1e-6);
     }
+
+    @Test
+    void queryMetricValue_whenRestTemplateThrowsException_returnsZero() {
+        String query = "up{job=\"redis\"}";
+
+        // 예외 발생하도록 설정
+        when(restTemplate.getForEntity(any(URI.class), eq(String.class)))
+                .thenThrow(new RuntimeException("연결 실패"));
+
+        double result = monitoringService.queryMetricValue(query);
+
+        assertEquals(0.0, result, 1e-6);
+    }
+
+    @Test
+    void parsePrometheusValue_whenMalformedJson_returnsZero() {
+        // given: 잘못된 JSON 문자열
+        String malformedJson = "{ this is not valid JSON";
+
+        // reflection으로 private 메서드 호출
+        double result = ReflectionTestUtils.invokeMethod(monitoringService, "parsePrometheusValue", malformedJson);
+
+        // then
+        assertEquals(0.0, result, 1e-6);
+    }
 }

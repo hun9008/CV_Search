@@ -10,6 +10,7 @@ import com.www.goodjob.dto.ScoredJobDto;
 import com.www.goodjob.repository.*;
 import com.www.goodjob.util.ClaudeClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -62,6 +63,8 @@ class AsyncServiceTest {
 
     @InjectMocks
     private AsyncService asyncService;
+
+    @Mock private ClaudeClient claudeClient;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -358,5 +361,24 @@ class AsyncServiceTest {
         // then
         verify(redisTemplate, never()).executePipelined(any(RedisCallback.class));
         verify(redisTemplate, never()).expire(any(), any());
+    }
+
+    @Test
+    @DisplayName("CV 요약 생성 - rawText가 Ready면 ClaudeClient 호출 없이 종료됨")
+    void generateCvSummaryAsync_readyStatus_shouldSkip() {
+        // given
+        Cv mockCv = new Cv();
+        mockCv.setId(123L);
+        mockCv.setRawText("Ready");
+
+        when(cvRepository.findById(123L)).thenReturn(Optional.of(mockCv));
+
+        // when
+        asyncService.generateCvSummaryAsync(123L);
+
+        // then
+        verify(cvRepository, times(1)).findById(123L);
+        verify(claudeClient, never()).generateCvSummary(any());
+        verify(cvRepository, never()).save(any());
     }
 }
