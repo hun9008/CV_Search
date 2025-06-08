@@ -25,14 +25,6 @@
         align-items: center;
     }
 
-    // &__logo {
-    //     width: 40px;
-    //     height: 40px;
-    //     border-radius: 8px;
-    //     object-fit: cover;
-    //     margin-right: 1rem;
-    // }
-
     &__companyName {
         font-size: 1.1rem;
         font-weight: 600;
@@ -70,6 +62,10 @@
 
     &__actions {
         display: flex;
+    }
+
+    &__dialog {
+        padding-right: 5rem;
     }
 
     &__bookmarkButton {

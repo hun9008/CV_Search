@@ -9,10 +9,12 @@ interface UserStore {
     name: string;
     plan: string;
     isAdmin: boolean;
+    good: number;
     setId: (id: string) => void;
     setEmail: (email: string) => void;
     setName: (name: string) => void;
     setIsAdmin: (isAdmin: boolean) => void;
+    setGood: () => void;
     fetchUserData: (accessToken: string | null) => Promise<boolean>;
 }
 
@@ -23,11 +25,13 @@ const useUserStore = create<UserStore>()(
             email: '',
             name: '',
             plan: '',
+            good: 0,
             isAdmin: false,
             setId: (id: string) => set({ id: id }),
             setEmail: (email: string) => set({ email: email }),
             setName: (name: string) => set({ name: name }),
             setIsAdmin: (isAdmin: boolean) => set({ isAdmin: isAdmin }),
+            setGood: () => set((state) => ({ good: state.good + 1 })),
             fetchUserData: async (accessToken) => {
                 try {
                     const res = await axios.get(`${SERVER_IP}/user/me`, {
@@ -55,6 +59,7 @@ const useUserStore = create<UserStore>()(
                 id: state.id,
                 email: state.email,
                 name: state.name,
+                good: state.good,
             }),
         }
     )

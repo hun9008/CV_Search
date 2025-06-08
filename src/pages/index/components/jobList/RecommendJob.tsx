@@ -6,11 +6,11 @@ function RecommendJob() {
     return (
         <div className={style.mainContent__jobSection}>
             <div className={style.mainContent__jobList}>
-                <JobList bookmarked={false} />
+                <JobList />
             </div>
 
             <div className={style.mainContent__jobDetail}>
-                <JobDetail />
+                <JobDetail isDialog={false} />
             </div>
         </div>
     );

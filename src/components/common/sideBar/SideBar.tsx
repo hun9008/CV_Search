@@ -30,7 +30,7 @@ function SideBar() {
     const location = useLocation();
     const path = location.pathname;
 
-    const [isPricingDialogOpen, setIsPricingDialogOpen] = useState(false); // 다이얼로그 상태 추가
+    const [isPricingDialogOpen, setIsPricingDialogOpen] = useState(false);
 
     useEffect(() => {
         const currentMenu = (path: string) => {
@@ -67,12 +67,6 @@ function SideBar() {
             path: 'mycv',
             icon: User,
         },
-
-        // {
-        //     id: 'CV 생성',
-        //     path: '/main',
-        //     icon: FileUser,
-        // },
     ] as const;
 
     const adminMenuItems = [
@@ -109,10 +103,13 @@ function SideBar() {
         setIsPricingDialogOpen(true);
     };
 
+    if (typeof isAdmin !== 'boolean') {
+        return null;
+    }
+
     return (
         <>
             {' '}
-            {/* Fragment로 감싸서 PricingDialog를 형제 요소로 추가 */}
             <div className={`${style.sidebar} ${isCompactMenu ? style.sidebar__hidden : ''}`}>
                 <div className={style.sidebar__container}>
                     {isAdmin ? (
@@ -165,7 +162,7 @@ function SideBar() {
                         </ul>
 
                         <div className={style.sidebar__subConatiner}>
-                            {isAdmin || userPlan === '베이직' ? (
+                            {isAdmin || userPlan === '' || userPlan === '베이직' ? (
                                 ''
                             ) : (
                                 <div className={style.plan}>
@@ -178,8 +175,7 @@ function SideBar() {
                                     </div>
                                     <button
                                         className={style.plan__upgrade}
-                                        onClick={handleUpgradeClick} // onClick 핸들러 연결
-                                    >
+                                        onClick={handleUpgradeClick}>
                                         업그레이드
                                     </button>
                                 </div>

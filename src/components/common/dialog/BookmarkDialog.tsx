@@ -5,7 +5,7 @@ function BookmarkDialog() {
     return (
         <div className={style.modalOverlay}>
             <div className={style.container}>
-                <JobDetail />
+                <JobDetail isDialog={true} />
             </div>
         </div>
     );
