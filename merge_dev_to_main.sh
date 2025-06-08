@@ -47,6 +47,9 @@ merge_service() {
   git rm -r --cached "$TARGET_DIR" 2>/dev/null || true
   [ -d "$TARGET_DIR" ] && rm -rf "$TARGET_DIR"
 
+  echo "Fetching latest dev branch..."
+  git fetch origin "dev_${SERVICE}":"dev_${SERVICE}" --update-head-ok 
+
   echo "Checking out $DEV_BRANCH to $TMP_DIR..."
   git worktree add "$TMP_DIR" "$DEV_BRANCH"
 
