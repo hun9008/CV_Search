@@ -6,6 +6,7 @@ import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.ScoredJobDto;
 import com.www.goodjob.repository.CvRepository;
 import com.www.goodjob.repository.JobRepository;
+import com.www.goodjob.repository.RecommendScoreJdbcRepository;
 import com.www.goodjob.repository.RecommendScoreRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,9 @@ class AsyncServiceTest {
 
     @Mock
     private RedisTemplate<String, String> redisTemplate;
+
+    @Mock
+    private RecommendScoreJdbcRepository jdbcRepository;
 
     @Mock
     private CvRepository cvRepository;
@@ -92,27 +96,19 @@ class AsyncServiceTest {
         verify(redisTemplate).expire(eq("recommendation:" + userId), eq(Duration.ofHours(6)));
     }
 
-
     @Test
-    void saveRecommendScores_savesAllScoresSuccessfully() {
+    void saveRecommendScores_callsBatchUpsertWithCorrectArguments() {
         // given
-        Long userId = 1L;
         Long cvId = 100L;
-        Cv mockCv = Cv.builder().id(cvId).build();
-
         List<ScoredJobDto> recommendations = List.of(
                 ScoredJobDto.from(JobDto.builder().id(101L).build(), 0.95, 0.0, 0.0),
                 ScoredJobDto.from(JobDto.builder().id(102L).build(), 0.87, 0.0, 0.0)
         );
 
-        when(cvRepository.findByUserId(userId)).thenReturn(Optional.of(mockCv));
-
         // when
-        asyncService.saveRecommendScores(userId, recommendations);
+        asyncService.saveRecommendScores(cvId, recommendations);
 
         // then
-        verify(cvRepository).findByUserId(userId);
-        verify(recommendScoreRepository).upsertScore(cvId, 101L, 0.95f);
-        verify(recommendScoreRepository).upsertScore(cvId, 102L, 0.87f);
+        verify(jdbcRepository).batchUpsert(eq(cvId), eq(recommendations));
     }
 }
