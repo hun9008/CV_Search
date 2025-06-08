@@ -66,7 +66,9 @@ function JobList() {
     }, [hasError]);
 
     useEffect(() => {
-        getSelectedCvId();
+        if (hasError) {
+            getSelectedCvId();
+        }
     }, [hasError]);
 
     const filterJobs = useCallback(() => {

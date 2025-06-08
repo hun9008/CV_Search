@@ -54,7 +54,9 @@ function MyCv() {
     }, [hasFile, userCvList, selectedCVId]);
 
     useEffect(() => {
-        getSelectedCvId();
+        if (hasError) {
+            getSelectedCvId();
+        }
     }, [hasError]);
 
     return (
