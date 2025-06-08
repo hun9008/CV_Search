@@ -6,12 +6,16 @@ import java.time.LocalDateTime;
 public class UserFeedbackDto {
 
     @Getter @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Create {
         private String content;
         private int satisfactionScore;
     }
 
     @Getter @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Update {
         private String content;
         private int satisfactionScore;

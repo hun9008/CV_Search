@@ -1,16 +1,16 @@
 package com.www.goodjob.controller;
 
-import com.www.goodjob.config.SecurityConfigTest;
+import com.www.goodjob.config.GlobalMockBeans;
+import com.www.goodjob.config.TestSecurityConfig;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.JwtTokenProvider;
 import com.www.goodjob.service.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockCookie;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,32 +21,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.mockito.Mockito.*;
 
-@Import({SecurityConfigTest.class, AuthControllerTest.MockedBeans.class})
+@Import({GlobalMockBeans.class, TestSecurityConfig.class})
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
-
-    @TestConfiguration
-    static class MockedBeans {
-        @Bean
-        public JwtTokenProvider jwtTokenProvider() {
-            return mock(JwtTokenProvider.class);
-        }
-
-        @Bean
-        public UserRepository userRepository() {
-            return mock(UserRepository.class);
-        }
-
-        @Bean
-        public UserOAuthRepository userOAuthRepository() {
-            return mock(UserOAuthRepository.class);
-        }
-
-        @Bean
-        public AuthService authService() {
-            return mock(AuthService.class);
-        }
-    }
 
     @Autowired
     private MockMvc mockMvc;

@@ -1,0 +1,139 @@
+package com.www.goodjob.service;
+
+import com.www.goodjob.domain.User;
+import com.www.goodjob.domain.UserFeedback;
+import com.www.goodjob.dto.UserFeedbackDto;
+import com.www.goodjob.repository.UserFeedbackRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+class UserFeedbackServiceTest {
+
+    @Mock
+    private UserFeedbackRepository feedbackRepository;
+
+    @InjectMocks
+    private UserFeedbackService userFeedbackService;
+
+    private AutoCloseable closeable;
+
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        closeable = MockitoAnnotations.openMocks(this);
+        user = User.builder().id(1L).name("홍길동").build();
+    }
+
+    @Test
+    @DisplayName("피드백 생성 성공")
+    void createFeedback_shouldSaveFeedback() {
+        UserFeedbackDto.Create dto = new UserFeedbackDto.Create("좋은 서비스입니다.", 5);
+        userFeedbackService.createFeedback(user, dto);
+
+        verify(feedbackRepository, times(1)).save(any(UserFeedback.class));
+    }
+
+    @Test
+    @DisplayName("피드백 수정 성공")
+    void updateFeedback_shouldUpdateAndSave() {
+        Long id = 1L;
+        UserFeedbackDto.Update dto = new UserFeedbackDto.Update("수정된 내용", 4);
+        UserFeedback feedback = UserFeedback.builder().id(id).user(user).content("이전 내용").satisfactionScore(3).build();
+
+        when(feedbackRepository.findById(id)).thenReturn(Optional.of(feedback));
+
+        userFeedbackService.updateFeedback(id, dto);
+
+        assertThat(feedback.getContent()).isEqualTo("수정된 내용");
+        assertThat(feedback.getSatisfactionScore()).isEqualTo(4);
+        verify(feedbackRepository).save(feedback);
+    }
+
+    @Test
+    @DisplayName("본인 피드백 삭제 성공")
+    void deleteMyFeedback_shouldDeleteIfOwner() {
+        Long id = 1L;
+        UserFeedback feedback = UserFeedback.builder().id(id).user(user).build();
+        when(feedbackRepository.findById(id)).thenReturn(Optional.of(feedback));
+
+        userFeedbackService.deleteMyFeedback(id, user);
+
+        verify(feedbackRepository).delete(feedback);
+    }
+
+    @Test
+    @DisplayName("본인 아닌 피드백 삭제 실패")
+    void deleteMyFeedback_shouldThrowIfNotOwner() {
+        Long id = 1L;
+        User anotherUser = User.builder().id(2L).build();
+        UserFeedback feedback = UserFeedback.builder().id(id).user(anotherUser).build();
+
+        when(feedbackRepository.findById(id)).thenReturn(Optional.of(feedback));
+
+        assertThrows(SecurityException.class, () -> userFeedbackService.deleteMyFeedback(id, user));
+        verify(feedbackRepository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("전체 피드백 조회")
+    void getAllFeedback_shouldReturnDtos() {
+        UserFeedback feedback = UserFeedback.builder()
+                .id(1L)
+                .user(user)
+                .content("내용")
+                .satisfactionScore(5)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        when(feedbackRepository.findAll()).thenReturn(List.of(feedback));
+
+        var result = userFeedbackService.getAllFeedback();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getContent()).isEqualTo("내용");
+    }
+
+    @Test
+    @DisplayName("기간별 피드백 조회 - week")
+    void getFeedbackByPeriod_shouldReturnWeekly() {
+        when(feedbackRepository.findByCreatedAtBetween(any(), any()))
+                .thenReturn(List.of(UserFeedback.builder().id(1L).user(user).content("이번주 피드백").satisfactionScore(4).createdAt(LocalDateTime.now()).build()));
+
+        var result = userFeedbackService.getFeedbackByPeriod("week");
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getContent()).contains("피드백");
+    }
+
+    @Test
+    @DisplayName("평균 만족도 조회")
+    void getAverageSatisfaction_shouldCallRepository() {
+        when(feedbackRepository.getAverageSatisfactionScore()).thenReturn(4.5);
+        Double result = userFeedbackService.getAverageSatisfaction();
+        assertThat(result).isEqualTo(4.5);
+    }
+
+    @Test
+    @DisplayName("총 피드백 수 조회")
+    void getTotalFeedbackCount_shouldCallRepository() {
+        when(feedbackRepository.countTotalFeedback()).thenReturn(10L);
+        Long result = userFeedbackService.getTotalFeedbackCount();
+        assertThat(result).isEqualTo(10L);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close();
+    }
+}

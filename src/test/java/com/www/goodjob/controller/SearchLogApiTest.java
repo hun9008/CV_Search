@@ -1,5 +1,6 @@
 package com.www.goodjob.controller;
 
+import com.www.goodjob.config.GlobalMockBeans;
 import com.www.goodjob.domain.User;
 import com.www.goodjob.dto.SearchLogDto;
 import com.www.goodjob.security.CustomUserDetails;
@@ -7,6 +8,7 @@ import com.www.goodjob.security.CustomUserDetailsService;
 import com.www.goodjob.service.JobService;
 import com.www.goodjob.service.SearchLogService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(JobController.class)
 @AutoConfigureMockMvc
-@Import(SearchLogApiTest.TestConfig.class)
+@Import(GlobalMockBeans.class)
 class SearchLogApiTest {
 
     @Autowired
@@ -58,26 +60,9 @@ class SearchLogApiTest {
         );
     }
 
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public SearchLogService searchLogService() {
-            return Mockito.mock(SearchLogService.class);
-        }
-
-        @Bean
-        public JobService jobService() {
-            return Mockito.mock(JobService.class);
-        }
-
-        @Bean
-        public CustomUserDetailsService customUserDetailsService() {
-            return Mockito.mock(CustomUserDetailsService.class);
-        }
-    }
-
     @Test
-    void 검색_기록_조회_API_테스트() throws Exception {
+    @DisplayName("검색 기록 조회 API 테스트")
+    void getSearchHistory_shouldReturnRecentSearchKeywords() throws Exception {
         List<SearchLogDto> dummy = List.of(
                 new SearchLogDto("토스", LocalDateTime.now()),
                 new SearchLogDto("백엔드", LocalDateTime.now().minusMinutes(10))
@@ -92,7 +77,8 @@ class SearchLogApiTest {
     }
 
     @Test
-    void 검색_기록_전체_삭제_API_테스트() throws Exception {
+    @DisplayName("검색 기록 전체 삭제 API 테스트")
+    void deleteAllSearchHistory_shouldRemoveAllKeywords() throws Exception {
         mockMvc.perform(delete("/jobs/search/history/delete")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
@@ -101,7 +87,8 @@ class SearchLogApiTest {
     }
 
     @Test
-    void 검색_기록_하나_삭제_API_테스트() throws Exception {
+    @DisplayName("검색 기록 하나 삭제 API 테스트")
+    void deleteSingleSearchKeyword_shouldRemoveSpecificKeyword() throws Exception {
         mockMvc.perform(delete("/jobs/search/history/delete-one")
                         .param("keyword", "토스")
                         .with(csrf()))

@@ -1,18 +1,15 @@
 package com.www.goodjob.controller;
 
-import com.www.goodjob.config.SecurityConfigTest;
+import com.www.goodjob.config.TestSecurityConfig;
 import com.www.goodjob.dto.CvDto;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.CvService;
 import com.www.goodjob.service.S3Service;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CvController.class)
-@Import(SecurityConfigTest.class)
+@Import(TestSecurityConfig.class)
 class CvControllerTest {
 
     @Autowired

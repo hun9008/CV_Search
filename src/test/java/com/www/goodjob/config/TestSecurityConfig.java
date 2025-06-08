@@ -6,7 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 @TestConfiguration
-public class SecurityConfigTest {
+public class TestSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -17,7 +17,7 @@ public class SecurityConfigTest {
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().authenticated() // 모든 요청 인증 필요
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) ->

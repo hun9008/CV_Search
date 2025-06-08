@@ -1,6 +1,7 @@
 package com.www.goodjob.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.www.goodjob.config.GlobalMockBeans;
 import com.www.goodjob.domain.TossPayment;
 import com.www.goodjob.domain.User;
 import com.www.goodjob.dto.tossdto.CancelPaymentRequest;
@@ -15,8 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
@@ -36,16 +35,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TossPaymentController.class)
-@Import(TossPaymentControllerTest.TestConfig.class)
+@Import(GlobalMockBeans.class)
 public class TossPaymentControllerTest {
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public TossPaymentService tossPaymentService() {
-            return mock(TossPaymentService.class);
-        }
-    }
 
     @Autowired
     private MockMvc mockMvc;
