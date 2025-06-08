@@ -7,6 +7,7 @@ import com.www.goodjob.dto.tossdto.CancelPaymentRequest;
 import com.www.goodjob.dto.tossdto.ConfirmPaymentRequest;
 import com.www.goodjob.dto.tossdto.SaveAmountRequest;
 import com.www.goodjob.enums.TossPaymentPlan;
+import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.TossPaymentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.net.http.HttpResponse;
@@ -53,6 +55,9 @@ public class TossPaymentControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     private MockHttpSession session;
 
