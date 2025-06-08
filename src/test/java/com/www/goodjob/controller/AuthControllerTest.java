@@ -1,7 +1,6 @@
 package com.www.goodjob.controller;
 
 import com.www.goodjob.config.GlobalMockBeans;
-import com.www.goodjob.config.TestConfig; // 전역 TestConfig import
 import com.www.goodjob.config.TestSecurityConfig;
 import com.www.goodjob.repository.UserOAuthRepository;
 import com.www.goodjob.repository.UserRepository;
@@ -12,9 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockCookie;
 import org.springframework.test.web.servlet.MockMvc;
