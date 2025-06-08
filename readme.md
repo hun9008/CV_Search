@@ -54,7 +54,7 @@
 <td>
 <a href="https://github.com/Carcassi0" target="_blank">위의종</a>
 </td>
-<td>blk</td>
+<td>FE</td>
 <td>blk</td>
 <td>
   <a href="https://github.com/hun9008/CV_Search/tree/dev_front">
