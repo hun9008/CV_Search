@@ -2,6 +2,7 @@ package com.www.goodjob.controller;
 
 import com.www.goodjob.config.TestSecurityConfig;
 import com.www.goodjob.domain.User;
+import com.www.goodjob.dto.UserDto;
 import com.www.goodjob.enums.UserRole;
 import com.www.goodjob.repository.UserRepository;
 import com.www.goodjob.security.CustomUserDetails;
@@ -10,12 +11,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -61,4 +66,24 @@ class UserControllerTest {
         mockMvc.perform(get("/user/me"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @DisplayName("userDetails가 null인 경우 - 403 Forbidden 반환")
+    void getCurrentUser_userDetailsIsNull() throws Exception {
+        mockMvc.perform(get("/user/me")
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(
+                                new TestingAuthenticationToken(null, null))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("getCurrentUser() - userDetails가 null이면 401 반환")
+    void getCurrentUser_unitTest_userDetailsNull() {
+        UserController controller = new UserController(userRepository);
+
+        ResponseEntity<UserDto> response = controller.getCurrentUser(null);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
 }
