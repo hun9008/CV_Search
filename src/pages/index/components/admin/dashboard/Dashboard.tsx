@@ -3,6 +3,7 @@ import style from './Dashboard.module.scss';
 import DashboardMetrics from './DashboardMetrics';
 import useAdminDashboardStore from '../../../../../store/adminDashboardStore';
 import useAdminServerInfoStore from '../../../../../store/adminServerInfoStore';
+import PlanStatus from './PlanStatus';
 
 function Dashboard() {
     const {
@@ -170,6 +171,7 @@ function Dashboard() {
                 </div>
                 <div className={style.rightColumn}>
                     <ServerStatus />
+                    <PlanStatus />
                 </div>
             </div>
         </div>
