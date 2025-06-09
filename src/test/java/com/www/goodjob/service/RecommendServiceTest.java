@@ -3,6 +3,7 @@ package com.www.goodjob.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.*;
+import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.ScoredJobDto;
 import com.www.goodjob.repository.CvFeedbackRepository;
 import com.www.goodjob.repository.CvRepository;
@@ -377,4 +378,44 @@ class RecommendServiceTest {
         assertEquals("추천 요청 실패", rse.getReason());
     }
 
+    @Test
+    @DisplayName("fetchSimilarJobsFromFastAPI - FastAPI로부터 유사 job_ids 응답 받아 JobDto로 변환")
+    void fetchSimilarJobsFromFastAPI_returnsJobDtoList() throws Exception {
+        // given
+        Long jobId = 7426L;
+        int topk = 3;
+
+        // FastAPI 응답 모킹
+        String mockJson = """
+        {
+          "job_ids": [101, 102, 103]
+        }
+        """;
+        ResponseEntity<String> mockResponse = ResponseEntity.ok(mockJson);
+        when(restTemplate.getForEntity(contains("/similar-jobs"), eq(String.class)))
+                .thenReturn(mockResponse);
+
+        // Job 엔티티 모킹
+        Job job1 = new Job(); job1.setId(101L); job1.setTitle("Job A");
+        Job job2 = new Job(); job2.setId(102L); job2.setTitle("Job B");
+        Job job3 = new Job(); job3.setId(103L); job3.setTitle("Job C");
+
+        when(jobRepository.findByIdInWithRegion(eq(List.of(101L, 102L, 103L))))
+                .thenReturn(List.of(job1, job2, job3));
+
+        ReflectionTestUtils.setField(recommendService, "fastapiHost", "http://mock-fastapi");
+
+        // private method 호출
+        Method method = RecommendService.class.getDeclaredMethod("fetchSimilarJobsFromFastAPI", Long.class, int.class);
+        method.setAccessible(true);
+
+        // when
+        @SuppressWarnings("unchecked")
+        List<JobDto> result = (List<JobDto>) method.invoke(recommendService, jobId, topk);
+
+        // then
+        assertEquals(3, result.size());
+        assertTrue(result.stream().map(JobDto::getId).toList().containsAll(List.of(101L, 102L, 103L)));
+        assertTrue(result.stream().map(JobDto::getTitle).toList().contains("Job A"));
+    }
 }
