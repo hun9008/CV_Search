@@ -100,3 +100,48 @@ def test_keyword_filter_query(index_name=JOBS_INDEX_NAME, size=10,
     except Exception as e:
         print(f"[ERROR] Keyword + Filter ES query failed: {e}")
         return []
+
+def get_similar_jobs_by_id(job_id: str, k: int = 5):
+    res = es.search(
+        index=JOBS_INDEX_NAME,
+        body={
+            "_source": ["vector"],
+            "query": {
+                "term": {
+                    "job_id": job_id
+                }
+            }
+        }
+    )
+    hits = res["hits"]["hits"]
+    if not hits:
+        raise ValueError("No job found with given job_id")
+    
+    target_vector = hits[0]["_source"]["vector"]
+
+    res = es.search(
+        index=JOBS_INDEX_NAME,
+        body={
+            "size": k,
+            "query": {
+                "script_score": {
+                    "query": {
+                        "bool": {
+                            "must_not": [
+                                {"term": {"job_id": job_id}}  
+                            ]
+                        }
+                    },
+                    "script": {
+                        "source": "cosineSimilarity(params.query_vector, 'vector') + 1.0",
+                        "params": {
+                            "query_vector": target_vector
+                        }
+                    }
+                }
+            }
+        }
+    )
+
+    job_ids = [hit["_source"]["job_id"] for hit in res["hits"]["hits"]]
+    return job_ids

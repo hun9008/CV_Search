@@ -424,33 +424,33 @@ def es_save_cv(s3_url, cv_id):
 
         print(f"Document to be indexed: {doc}")
          
-        # positive_vector_path = os.path.join(os.path.dirname(__file__), "positive_vector.json")
-        # negative_vector_path = os.path.join(os.path.dirname(__file__), "negative_vector.json")
+        positive_vector_path = os.path.join(os.path.dirname(__file__), "positive_vector.json")
+        negative_vector_path = os.path.join(os.path.dirname(__file__), "negative_vector.json")
 
-        # positive_vector = None
-        # negative_vector = None
+        positive_vector = None
+        negative_vector = None
 
-        # if os.path.exists(positive_vector_path):
-        #     with open(positive_vector_path, "r", encoding="utf-8") as f:
-        #         positive_vector = np.array(json.load(f)).reshape(1, -1)
+        if os.path.exists(positive_vector_path):
+            with open(positive_vector_path, "r", encoding="utf-8") as f:
+                positive_vector = np.array(json.load(f)).reshape(1, -1)
 
-        # if os.path.exists(negative_vector_path):
-        #     with open(negative_vector_path, "r", encoding="utf-8") as f:
-        #         negative_vector = np.array(json.load(f)).reshape(1, -1)
+        if os.path.exists(negative_vector_path):
+            with open(negative_vector_path, "r", encoding="utf-8") as f:
+                negative_vector = np.array(json.load(f)).reshape(1, -1)
 
-        # if positive_vector is not None and negative_vector is not None:
-        #     target_vector = np.array(vector).reshape(1, -1)
+        if positive_vector is not None and negative_vector is not None:
+            target_vector = np.array(vector).reshape(1, -1)
 
-        #     pos_sim = cosine_similarity(positive_vector, target_vector)[0][0]
-        #     neg_sim = cosine_similarity(negative_vector, target_vector)[0][0]
+            pos_sim = cosine_similarity(positive_vector, target_vector)[0][0]
+            neg_sim = cosine_similarity(negative_vector, target_vector)[0][0]
 
-        #     print(f"[INFO] Cosine similarity → Positive: {pos_sim:.4f}, Negative: {neg_sim:.4f}")
+            print(f"[INFO] Cosine similarity → Positive: {pos_sim:.4f}, Negative: {neg_sim:.4f}")
 
-        #     if pos_sim <= neg_sim:
-        #         print(f"[X] Negative similarity ≥ Positive → 저장 중단")
-        #         raise HTTPException(status_code=403, detail="[REJECT] CV 내용이 negative vector에 더 유사함")
-        # else:
-        #     print("[!] positive/negative vector가 하나 이상 없음 → 유사도 검사 생략")
+            if pos_sim <= neg_sim:
+                print(f"[X] Negative similarity ≥ Positive → 저장 중단")
+                raise HTTPException(status_code=403, detail="[REJECT] CV 내용이 negative vector에 더 유사함")
+        else:
+            print("[!] positive/negative vector가 하나 이상 없음 → 유사도 검사 생략")
 
         same_user_result = es.get(index=CV_INDEX_NAME, id=str(cv_id), ignore=[404])
 

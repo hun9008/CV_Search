@@ -37,3 +37,6 @@ class SearchESRequest(BaseModel):
     sigungu: Optional[List[str]] = None
     page: int = 0
     size: int = 10
+
+class JobIDListResponse(BaseModel):
+    job_ids: List[int]
