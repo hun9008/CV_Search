@@ -27,7 +27,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 0;
-        pointer-events: none; // Ensures it doesn't interfere with clicks
+        pointer-events: none;
 
         @media (max-width: 1200px) {
             width: 500px;
