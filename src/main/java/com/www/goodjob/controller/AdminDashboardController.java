@@ -55,6 +55,26 @@ public class AdminDashboardController {
         return dashboardService.getDashboardStats();
     }
 
+    @Operation(
+            summary = "유저 플랜 통계 조회",
+            description = """
+                    전체 유저 중 각 플랜(Starter, Basic, Enterprise)의 사용자 수와 총 유저 수를 반환합니다.
+                    
+                    📌 예시 응답:
+                    {
+                      "starter": 20,
+                      "basic": 1,
+                      "enterprise": 0,
+                      "total": 21
+                    }
+                    """
+    )
+    @GetMapping("/plan")
+    public ResponseEntity<Map<String, Long>> getUserPlanStats() {
+        Map<String, Long> stats = dashboardService.getUserPlanStats();
+        return ResponseEntity.ok(stats);
+    }
+
     @Operation(summary = "서버 상태 확인", description = "Prometheus를 통해 Redis, Spring, FastAPI 서버의 상태와 응답 시간을 조회합니다. " +
             "responseTime은 ms단위")
     @GetMapping("/server-status")

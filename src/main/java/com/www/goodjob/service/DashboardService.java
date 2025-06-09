@@ -2,6 +2,7 @@ package com.www.goodjob.service;
 
 import com.www.goodjob.dto.DashboardDto;
 import com.www.goodjob.dto.KeywordCount;
+import com.www.goodjob.enums.TossPaymentPlan;
 import com.www.goodjob.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -96,6 +98,21 @@ public class DashboardService {
                 ctr,
                 dailyCtrList,
                 topKeywords
+        );
+    }
+
+    // plan 비율
+    public Map<String, Long> getUserPlanStats() {
+        long total = userRepository.count();
+        long basic = userRepository.countByPlan(TossPaymentPlan.베이직);
+        long enterprise = userRepository.countByPlan(TossPaymentPlan.엔터프라이즈);
+        long starter = total - basic - enterprise;
+
+        return Map.of(
+                "starter", starter,
+                "basic", basic,
+                "enterprise", enterprise,
+                "total", total
         );
     }
 }

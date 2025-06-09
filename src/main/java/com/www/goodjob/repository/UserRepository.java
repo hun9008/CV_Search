@@ -1,6 +1,7 @@
 package com.www.goodjob.repository;
 
 import com.www.goodjob.domain.User;
+import com.www.goodjob.enums.TossPaymentPlan;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
@@ -11,4 +12,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     long countByCreatedAtAfter(LocalDateTime date);
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    long countByPlan(TossPaymentPlan plan);
 }
