@@ -88,7 +88,7 @@ function CvViewer() {
                     type="application/pdf"
                     className={style.fullScreenCvObject}
                     title={`${fullScreenPdfFileName} Preview`}>
-                    <div className={style.cvFallback}>
+                    {/* <div className={style.cvFallback}>
                         <AlertTriangle size={48} className={style.errorIcon} />
                         <p>CV를 불러오는 중 에러가 발생했습니다</p>
                         <p>에러가 지속되면 관리자에 문의하세요</p>
@@ -97,7 +97,7 @@ function CvViewer() {
                             className={`${style.fallbackCloseButton} ${style.actionButton}`}>
                             목록으로 돌아가기
                         </button>
-                    </div>
+                    </div> */}
                 </object>
             </div>
         );
