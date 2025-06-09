@@ -178,8 +178,8 @@ public class JobService {
         }
     }
 
-    public List<ValidJobDto> findAllJobWithValidType(Pageable pageable) {
-        return jobRepository.findAllWithValidType(pageable).toList();
+    public Page<ValidJobDto> findAllJobWithValidType(Pageable pageable) {
+        return jobRepository.findAllWithValidType(pageable);
     }
 
     @Transactional

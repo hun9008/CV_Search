@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -147,7 +148,7 @@ public class AdminDashboardController {
             Pageable pageable
     ){
         try{
-            List<ValidJobDto> JobList =jobService.findAllJobWithValidType(pageable);
+            Page<ValidJobDto> JobList =jobService.findAllJobWithValidType(pageable);
             return ResponseEntity.ok(JobList);
         }
         catch (Exception e){
