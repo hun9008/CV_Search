@@ -37,9 +37,7 @@ function Dashboard() {
                         <div key={index} className={style.keywordItem}>
                             <span className={style.keywordRank}>{index + 1}</span>
                             <span className={style.keywordText}>{keyword.keyword}</span>
-                            <span className={style.keywordCount}>
-                                {keyword.count || Math.floor(Math.random() * 1000 + 100)}회
-                            </span>
+                            <span className={style.keywordCount}>{keyword.count}회</span>
                         </div>
                     ))}
                 </div>

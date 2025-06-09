@@ -56,7 +56,7 @@ function JobDetailDialog({ isOpen, onClose }: JobDetailDialogProps) {
                     </button>
                 </div>
                 <div className={style.content}>
-                    <JobDetail />
+                    <JobDetail isDialog={true} />
                 </div>
             </div>
         </div>

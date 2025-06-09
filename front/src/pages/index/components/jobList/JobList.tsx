@@ -8,12 +8,12 @@ import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorFallback from '../../../../components/common/error/ErrorFallback';
 import LoadingAnime1 from '../../../../components/common/loading/LoadingAnime1';
+import useActionStore from '../../../../store/actionStore';
+import useUserStore from '../../../../store/userStore';
+import UserFeedbackDialog from '../../../../components/common/dialog/UserFeedbackDialog';
+import useLogStore from '../../../../store/logStore';
 
-interface jobListProps {
-    bookmarked: boolean;
-}
-
-function JobList({ bookmarked }: jobListProps) {
+function JobList() {
     const [activeFilter, setActiveFilter] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
@@ -21,6 +21,11 @@ function JobList({ bookmarked }: jobListProps) {
     const [isPending, setIsPending] = useState(false); // 업로드 직후 topk-list 요청 시 fallback 용
 
     const selectedCVId = useJobStore((state) => state.selectedCVId);
+    const { setIsJobListLoad } = useActionStore();
+    const { setGood } = useUserStore();
+    const visited = useUserStore((state) => state.good);
+
+    const [isDialogOpen, setIsDialogOpen] = useState(true);
 
     const jobListRef = useRef<HTMLDivElement>(null);
     const experienceFilterRef = useRef<HTMLDivElement>(null);
@@ -31,12 +36,13 @@ function JobList({ bookmarked }: jobListProps) {
     const { setSelectedJobDetail, jobList, getJobList, getSelectedCvId } = useJobStore(); // 추가
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
+    const { sendClickEvent } = useLogStore();
 
     const [experienceFilterVector, setExperienceFilterVector] = useState<string[]>([]);
     const [typeFilterVector, setTypeFilterVector] = useState<string[]>([]);
     const filterData = {
         jobExperience: ['신입', '경력', '경력무관'],
-        jobType: ['정규직', '계약직', '인턴', '아르바이트', '프리랜서', '파견직'],
+        jobType: ['정규직', '계약직', '인턴', '프리랜서', '파견직'],
     };
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -62,11 +68,13 @@ function JobList({ bookmarked }: jobListProps) {
     }, [hasError]);
 
     useEffect(() => {
-        getSelectedCvId();
+        if (hasError) {
+            getSelectedCvId();
+        }
     }, [hasError]);
 
     const filterJobs = useCallback(() => {
-        const filtered = (bookmarked ? filteredJobs || [] : jobList || []).filter((job) => {
+        const filtered = (jobList || []).filter((job) => {
             const matchesExperience =
                 experienceFilterVector.length === 0 ||
                 experienceFilterVector.includes(job.requireExperience || '');
@@ -80,20 +88,12 @@ function JobList({ bookmarked }: jobListProps) {
         if (filtered.length > 0) {
             setSelectedJobDetail(filtered[0]); // filtered[0].id
         }
-    }, [experienceFilterVector, typeFilterVector, jobList, bookmarked]);
+    }, [experienceFilterVector, typeFilterVector, jobList]);
 
     useEffect(() => {
         filterJobs();
         setCurrentPage(1);
     }, [filterJobs]);
-
-    // 추가됨
-    // useEffect(() => {
-    //     // filteredJobs가 바뀔 때마다 첫 번째 job을 자동 선택
-    //     if (filteredJobs.length > 0) {
-    //         setSelectedJobDetail(filteredJobs[0]);
-    //     }
-    // }, [filteredJobs, setSelectedJobDetail]);
 
     const handleFilterOutsideClick = (e: MouseEvent) => {
         const target = e.target as Node;
@@ -152,50 +152,34 @@ function JobList({ bookmarked }: jobListProps) {
 
         const fetchData = async () => {
             setIsLoading(true);
+            setIsJobListLoad(false);
             try {
-                if (bookmarked) {
-                    const updatedJob = await getBookmark();
-
-                    if (selectedCVId !== null) {
-                        await getJobList(TOTAL_JOB, selectedCVId);
-                    }
-                    if (Array.isArray(updatedJob)) {
-                        setFilteredJobs(updatedJob);
-                        setSelectedJobDetail(updatedJob[0]?.id ?? 0);
-                        pollingActive = false; // 성공했으면 polling 멈춤
-                    } else {
-                        throw new Error('북마크 응답이 배열이 아님');
-                    }
-                } else {
+                {
                     if (selectedCVId !== null) {
                         await getJobList(TOTAL_JOB, selectedCVId);
                     }
                     await getBookmark();
                     // setSelectedJobDetail(jobList[0]);
                     setIsLoading(false);
+                    setIsJobListLoad(true);
                     pollingActive = false;
                 }
                 setHasError(false);
             } catch (error) {
                 console.error('데이터 가져오기 에러:', error);
                 setHasError(true);
+                setIsJobListLoad(true);
             }
         };
 
         const startPolling = async () => {
-            await fetchData(); // 초기 1회 호출
+            await fetchData();
             pollingInterval = setInterval(() => {
                 if (pollingActive) {
                     fetchData();
-                    // 만약에 응답이 정상적으로 온다면 바로 polling 중단
                 }
-            }, 10000); // 10초 간격
+            }, 10000);
         };
-
-        // useJobStore.getState().setPollingCallback(() => {
-        //     console.log('🔁 외부에서 polling 실행 요청됨');
-        //     startPolling();
-        // });
 
         startPolling();
 
@@ -284,6 +268,11 @@ function JobList({ bookmarked }: jobListProps) {
 
     return (
         <div className={styles.jobList} ref={jobListRef}>
+            {visited === 9 && isDialogOpen ? (
+                <UserFeedbackDialog onClose={() => setIsDialogOpen(false)} />
+            ) : (
+                ''
+            )}
             {hasError || isLoading ? (
                 ''
             ) : (
@@ -333,7 +322,11 @@ function JobList({ bookmarked }: jobListProps) {
                                     isBookmarked: !!bookmarkedList?.some((b) => b.id === job.id),
                                 }}
                                 isSelected={false}
-                                onSelect={() => setSelectedJobDetail(job)}
+                                onSelect={() => {
+                                    setSelectedJobDetail(job);
+                                    setGood();
+                                    sendClickEvent(job.id);
+                                }}
                                 onToggleBookmark={() => toggleBookmark(job.id)}
                             />
                         ))

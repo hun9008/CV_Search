@@ -21,7 +21,7 @@ function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemPr
     const [isRenaming, setIsRenaming] = useState(false);
     const [newFileName, setNewFileName] = useState('');
     const userCvList = useCvStore((state) => state.userCvList);
-    const inputRef = useRef<HTMLInputElement>(null); // input 참조를 위한 ref
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (isRenaming && inputRef.current) {
@@ -78,6 +78,7 @@ function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemPr
                     isOpen={deleteDialogHidden}
                     onClose={() => setDeleteDialogHidden((prev) => !prev)}
                     cvId={cv.id}
+                    deleteAll={false}
                 />
             )}
             {userCvList.length === 1 && !isRenaming ? (

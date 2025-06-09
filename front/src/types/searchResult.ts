@@ -1,31 +1,31 @@
 export interface Region {
-    sido: string;
-    sigungu: string;
+    sido: string | null;
+    sigungu: string | null;
 }
 
 export interface JobContent {
     id: number;
-    regions: Region[];
+    regions: Region[] | null;
     companyName: string;
     title: string;
-    department: string;
-    requireExperience: string;
-    jobType: string;
-    requirements: string;
-    preferredQualifications: string;
-    idealCandidate: string;
+    department: string | null;
+    requireExperience: string | null;
+    jobType: string | null;
+    requirements: string | null;
+    preferredQualifications: string | null;
+    idealCandidate: string | null;
     jobDescription: string;
-    applyStartDate: string; // ISO date string
-    applyEndDate: string;
-    isPublic: boolean;
-    createdAt: string;
-    lastUpdatedAt: string;
-    expiredAt: string;
-    archivedAt: string;
-    rawJobsText: string;
-    url: string;
-    favicon: string;
-    regionText: string;
+    applyStartDate: string | null; // ISO date string
+    applyEndDate: string | null;
+    isPublic: boolean | null;
+    createdAt: string | null;
+    lastUpdatedAt: string | null;
+    expiredAt: string | null;
+    archivedAt: string | null;
+    rawJobsText: string | null;
+    url: string | null;
+    favicon: string | null;
+    regionText: string | null;
     isBookmarked: boolean;
 }
 

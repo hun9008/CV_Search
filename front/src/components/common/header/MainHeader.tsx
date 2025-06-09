@@ -1,15 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-    Search,
-    Bell,
-    ChevronRight,
-    X,
-    Moon,
-    ArrowRightToLine,
-    ArrowLeftToLine,
-} from 'lucide-react';
+import { Search, ChevronRight, X, ArrowRightToLine, ArrowLeftToLine } from 'lucide-react';
 import styles from './MainHeader.module.scss';
-import useAuthStore from '../../../store/authStore';
+// import useAuthStore from '../../../store/authStore';
 import axios from 'axios';
 import { debounce } from 'lodash';
 import usePageStore from '../../../store/pageStore';
@@ -28,15 +20,16 @@ const MainHeader = () => {
     const [selectedResult, setSelectedResult] = useState<Job>();
     const [history, setHistory] = useState<string[]>([]);
     const searchContainerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const { setCompactMenu } = usePageStore();
     const { setQuery } = useSearchStore();
-    const accessToken = useAuthStore((state) => state.accessToken);
+    // const accessToken = useAuthStore((state) => state.accessToken);
     const isCompactMenu = usePageStore((state) => state.isCompactMenu);
     const navigate = useNavigate();
 
-    const toggleDarkmode = () => {
-        alert('다크 모드 구현 예정');
-    };
+    // const toggleDarkmode = () => {
+    //     alert('다크 모드 구현 예정');
+    // };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
@@ -68,13 +61,11 @@ const MainHeader = () => {
         []
     );
 
-    /** 검색 자동 완성 결과 클릭 */
     const handleResultClick = (result: Job) => {
         setSelectedResult(result);
         setShowSingleSearchResult(true);
     };
 
-    /** 검색 기록을 클릭하면 해당 기록을 쿼리로 검색 */
     const handleHistoryClick = (result: string) => {
         setQuery(result);
         setIsSearching(false);
@@ -82,9 +73,9 @@ const MainHeader = () => {
         navigate('searchResult');
     };
 
-    /** 엔터키 처리, 입력된 값을 쿼리로 검색 */
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        inputRef.current?.blur();
         saveSearchHistory(searchQuery);
         setQuery(searchQuery);
         setIsSearching(false);
@@ -92,7 +83,6 @@ const MainHeader = () => {
         navigate('searchResult');
     };
 
-    /** 더 보기 버튼 클릭 처리, 기본적으로 엔터키 처리와 같음 */
     const handleViewMoreResults = () => {
         saveSearchHistory(searchQuery);
         setQuery(searchQuery);
@@ -103,9 +93,9 @@ const MainHeader = () => {
 
     const saveSearchHistory = (query: string) => {
         const key = 'search-history';
-        const history = JSON.parse(localStorage.getItem(key) || '[]');
-        history.push(query);
-        localStorage.setItem(key, JSON.stringify(history));
+        const oldHistory: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+        const newHistory = [query, ...oldHistory.filter((item) => item !== query)];
+        localStorage.setItem(key, JSON.stringify(newHistory));
         window.dispatchEvent(new Event('search-history-changed'));
     };
 
@@ -198,6 +188,7 @@ const MainHeader = () => {
                             <Search className={styles.header__searchIcon} size={20} />
                             <form onSubmit={handleSearchSubmit}>
                                 <input
+                                    ref={inputRef}
                                     type="text"
                                     placeholder="검색"
                                     value={searchQuery}
@@ -284,7 +275,7 @@ const MainHeader = () => {
                         )}
                     </div>
                 </div>
-                <div className={styles.header__actions}>
+                {/* <div className={styles.header__actions}>
                     {accessToken ? (
                         <>
                             <button
@@ -308,7 +299,7 @@ const MainHeader = () => {
                             <button className={styles.header__signInButton}>로그인</button>
                         </div>
                     )}
-                </div>
+                </div> */}
             </header>
         </>
     );

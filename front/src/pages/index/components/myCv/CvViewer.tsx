@@ -4,16 +4,19 @@ import useS3Store from '../../../../store/s3Store';
 import useCvStore, { type CvMe } from '../../../../store/cvStore';
 import { Loader2, AlertTriangle, X } from 'lucide-react';
 import CvItem from './CvItem';
+import useActionStore from '../../../../store/actionStore';
 
 function CvViewer() {
     const { getUserCvList } = useCvStore();
     const { getDownloadPresignedURL, reNameCv } = useS3Store();
     const userCvList = useCvStore((state) => state.userCvList);
+    const userCvError = useCvStore((state) => state.userCvError);
     const [fullScreenPdfUrl, setFullScreenPdfUrl] = useState<string | null>(null);
     const [fullScreenPdfFileName, setFullScreenPdfFileName] = useState<string | null>(null);
     const [isLoadingFullScreenPdf, setIsLoadingFullScreenPdf] = useState(false);
     const [fullScreenPdfError, setFullScreenPdfError] = useState<string | null>(null);
     const [currentlyLoadingCvName, setCurrentlyLoadingCvName] = useState<string | null>(null);
+    const action = useActionStore((state) => state.cvAction);
 
     async function handleViewCvFullScreen(fileName: string) {
         if (!fileName) {
@@ -55,7 +58,7 @@ function CvViewer() {
 
     useEffect(() => {
         getUserCvList();
-    }, []);
+    }, [action]);
 
     if (isLoadingFullScreenPdf && !fullScreenPdfUrl) {
         return (
@@ -114,7 +117,7 @@ function CvViewer() {
         );
     }
 
-    if (!Array.isArray(userCvList) || userCvList.length === 0) {
+    if (userCvError) {
         return <div className={style.noCvMessage}>등록된 CV가 없습니다. CV를 업로드해주세요.</div>;
     }
 

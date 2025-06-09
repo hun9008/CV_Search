@@ -10,16 +10,17 @@ import useJobStore from '../../../store/jobStore';
 interface CVDeleteDialogProps {
     isOpen: boolean;
     onClose: () => void;
-    cvId: number;
+    cvId?: number;
+    deleteAll: boolean;
 }
 
-function CVDeleteDialog({ isOpen, onClose, cvId }: CVDeleteDialogProps) {
+function CVDeleteDialog({ isOpen, onClose, cvId, deleteAll }: CVDeleteDialogProps) {
     const dialogRef = useRef<HTMLDivElement>(null);
     const [isChecked, setIsChecked] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [countdown, setCountdown] = useState(5);
     const [showCountdown, setShowCountdown] = useState(false);
-    const { removeFile, setHasFile } = useFileStore();
+    const { removeFile, setHasFile, removeAllFile } = useFileStore();
     const { setCVAction } = useActionStore();
     const { getUserCvList } = useCvStore();
     const { getSelectedCvId } = useJobStore();
@@ -39,18 +40,34 @@ function CVDeleteDialog({ isOpen, onClose, cvId }: CVDeleteDialogProps) {
             return;
         }
         setIsDeleting(true);
-        const res = await removeFile(cvId);
-        await getSelectedCvId();
 
-        if (res === 200) {
-            setCVAction((prev) => !prev);
-            setHasFile(false);
-            getUserCvList();
-            onClose();
-            setIsDeleting(false);
-            console.log('CV delete Success!!!');
+        if (deleteAll) {
+            const res = await removeAllFile();
+            if (res === 200) {
+                setCVAction((prev) => !prev);
+                setHasFile(false);
+                onClose();
+                setIsDeleting(false);
+                console.log('CV delete Success!!!');
+            } else {
+                console.log('CV delete Error!!!');
+            }
         } else {
-            console.log('CV delete Error!!!');
+            if (cvId) {
+                const res = await removeFile(cvId);
+                if (res === 200) {
+                    setCVAction((prev) => !prev);
+                    setHasFile(false);
+                    getUserCvList();
+                    onClose();
+                    setIsDeleting(false);
+                    console.log('CV delete Success!!!');
+                    getUserCvList();
+                    await getSelectedCvId();
+                } else {
+                    console.log('CV delete Error!!!');
+                }
+            }
         }
     };
 

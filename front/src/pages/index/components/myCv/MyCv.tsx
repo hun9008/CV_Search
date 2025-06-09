@@ -13,14 +13,18 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import useCvStore from '../../../../store/cvStore';
 import useJobStore from '../../../../store/jobStore';
 import usePageStore from '../../../../store/pageStore';
+import CVDeleteDialog from '../../../../components/common/dialog/CVDeleteDialog';
+import useActionStore from '../../../../store/actionStore';
 
 function MyCv() {
     const { getSummary } = useFileStore();
     const [hasError, setHasError] = useState(false);
     // 로딩
     const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+    const action = useActionStore((state) => state.cvAction);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [reuploadDialogHidden, setReuploadDialogHidden] = useState(false);
+    const [deleteDialogHidden, setDeleteDialogHidden] = useState(false);
     const hasFile = useFileStore((state) => state.hasFile);
     const summaryText = useFileStore((state) => state.summary);
     const userCvList = useCvStore((state) => state.userCvList);
@@ -30,6 +34,10 @@ function MyCv() {
     const navigate = useNavigate();
     const setPreviousPage = usePageStore((state) => state.setPreviousPage);
     const location = useLocation();
+
+    const handleDeleteCV = () => {
+        setDeleteDialogHidden((prev) => !prev);
+    };
 
     const handleButtonClick = () => {
         setPreviousPage(location.pathname);
@@ -51,14 +59,23 @@ function MyCv() {
             }
         };
         fetchCVSummary();
-    }, [hasFile, userCvList, selectedCVId]);
+    }, [hasFile, userCvList, selectedCVId, action]);
 
     useEffect(() => {
-        getSelectedCvId();
+        if (hasError) {
+            getSelectedCvId();
+        }
     }, [hasError]);
 
     return (
         <>
+            {deleteDialogHidden && (
+                <CVDeleteDialog
+                    isOpen={deleteDialogHidden}
+                    onClose={() => setDeleteDialogHidden((prev) => !prev)}
+                    deleteAll={true}
+                />
+            )}
             {reuploadDialogHidden && (
                 <CVReuploadDialog
                     isOpen={reuploadDialogHidden}
@@ -90,11 +107,7 @@ function MyCv() {
                     </ErrorBoundary>
 
                     <div className={style.buttons}>
-                        <button
-                            className={style.button}
-                            onClick={() => {
-                                alert('CV 전체 삭제 기능 구현 예정');
-                            }}>
+                        <button className={style.button} onClick={handleDeleteCV}>
                             <Trash size={18} />
                             업로드된 모든 CV 제거
                         </button>

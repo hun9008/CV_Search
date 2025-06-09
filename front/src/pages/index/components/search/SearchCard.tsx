@@ -2,9 +2,9 @@ import type React from 'react';
 import { Bookmark } from 'lucide-react';
 import style from './SearchCard.module.scss';
 import { JobContent } from '../../../../types/searchResult';
-import JobDetailDialog from '../bookmark/JobDetailDialog';
 import { useState } from 'react';
 import useJobStore from '../../../../store/jobStore';
+import UniversalDialog from '../../../../components/common/dialog/UniversalDialog';
 
 interface SearchCardProp {
     job: JobContent;
@@ -31,7 +31,11 @@ function SearchCard({ job, onToggleBookmark, isSelected }: SearchCardProp) {
     return (
         <>
             {isDialogOpen && selectedJobId && (
-                <JobDetailDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+                <UniversalDialog
+                    job={job}
+                    isOpen={isDialogOpen}
+                    onClose={() => setIsDialogOpen(false)}
+                />
             )}
             <div
                 className={`${style.jobCard} ${isSelected ? style.selected : ''}`}
@@ -39,13 +43,13 @@ function SearchCard({ job, onToggleBookmark, isSelected }: SearchCardProp) {
                 <div className={style.jobCard__header}>
                     <div className={style.jobCard__companyInfo}>
                         <div className={style.jobCard__icon}>
-                            {job.favicon && (
+                            {job.favicon ? (
                                 <img
                                     rel="icon"
                                     src={`data:image/x-icon;base64,${job.favicon}`}
                                     alt={job.companyName}
                                 />
-                            )}
+                            ) : null}
                         </div>
                         <div className={style.jobCard__companyName}>{job.companyName}</div>
                     </div>
@@ -81,13 +85,14 @@ function SearchCard({ job, onToggleBookmark, isSelected }: SearchCardProp) {
                     </div>
 
                     <div className={style.jobCard__footer}>
-                        {job.regions?.[0].sido && (
+                        {job.regions && job.regions.length > 0 && job.regions[0].sido && (
                             <p className={style.jobCard__location}>
-                                {`${job.regions?.[0].sido ? job.regions?.[0].sido : ''} ${
-                                    job.regions?.[0].sigungu ? job.regions?.[0].sigungu : ''
-                                }`}
+                                {job.regions[0].sido ?? ''} {job.regions[0].sigungu ?? ''}
                             </p>
                         )}
+                        {/* {job.regionText && (
+                            <p className={style.jobCard__location}>{job.regionText}</p>
+                        )} */}
                     </div>
                 </div>
             </div>
