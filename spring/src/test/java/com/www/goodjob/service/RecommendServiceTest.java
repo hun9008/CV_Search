@@ -3,6 +3,7 @@ package com.www.goodjob.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.*;
+import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.ScoredJobDto;
 import com.www.goodjob.repository.CvFeedbackRepository;
 import com.www.goodjob.repository.CvRepository;
@@ -11,6 +12,7 @@ import com.www.goodjob.repository.RecommendScoreRepository;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.util.ClaudeClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,10 +26,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -285,7 +291,131 @@ class RecommendServiceTest {
     }
 
     @Test
-    void cacheRecommendForUser() {
+    void getScoredFromCache_throwsNotFound_whenCacheIsEmpty() {
+        // given
+        Long cvId = 1L;
+        int topk = 5;
+        String key = "recommendation:" + cvId;
+
+        when(zSetOperations.reverseRangeWithScores(eq(key), eq(0L), eq(4L)))
+                .thenReturn(null); // or use Collections.emptySet() for empty case
+
+        // when & then
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> recommendService.getScoredFromCache(cvId, topk));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
+        assertEquals("캐시된 추천 결과가 없습니다.", ex.getReason());
     }
 
+    @Test
+    void getScoredFromCache_throwsExceptionOnInvalidJobId() {
+        // given
+        Long cvId = 1L;
+        int topk = 5;
+        String key = "recommendation:" + cvId;
+
+        ZSetOperations.TypedTuple<String> invalidTuple = new DefaultTypedTuple<>("INVALID_ID", 0.9);
+        Set<ZSetOperations.TypedTuple<String>> set = Set.of(invalidTuple);
+
+        when(zSetOperations.reverseRangeWithScores(eq(key), eq(0L), eq(4L))).thenReturn(set);
+
+        // when & then
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> recommendService.getScoredFromCache(cvId, topk)
+        );
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
+        assertTrue(Objects.requireNonNull(exception.getReason()).contains("추천 결과 조회 실패"));
+    }
+
+    @Test
+    void getScoredFromCache_throwsInternalServerError_onUnexpectedFailure() {
+        // given
+        Long cvId = 1L;
+        int topk = 5;
+        String key = "recommendation:" + cvId;
+
+        ZSetOperations.TypedTuple<String> validTuple = new DefaultTypedTuple<>("123", 0.8);
+        when(zSetOperations.reverseRangeWithScores(eq(key), eq(0L), eq(4L)))
+                .thenReturn(Set.of(validTuple));
+
+        // RDB 조회에서 예외 발생 유도
+        when(jobRepository.findByIdInWithRegion(any())).thenThrow(new RuntimeException("DB 오류"));
+
+        // when & then
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class,
+                () -> recommendService.getScoredFromCache(cvId, topk));
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getStatusCode());
+        assertEquals("추천 결과 조회 실패", ex.getReason());
+    }
+
+    @Test
+    @DisplayName("fetchRecommendationFromFastAPI - FastAPI 예외 발생 시 500 응답 예외 발생")
+    void fetchRecommendationFromFastAPI_throwsException_whenRestCallFails() throws Exception {
+        // given
+        Long cvId = 123L;
+        int topk = 10;
+
+        when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
+                .thenThrow(new RestClientException("FastAPI 호출 실패"));
+
+        ReflectionTestUtils.setField(recommendService, "fastapiHost", "http://fake-fastapi");
+
+        // when
+        Method method = RecommendService.class.getDeclaredMethod("fetchRecommendationFromFastAPI", Long.class, int.class);
+        method.setAccessible(true);
+
+        InvocationTargetException thrown = assertThrows(
+                InvocationTargetException.class,
+                () -> method.invoke(recommendService, cvId, topk)
+        );
+
+        Throwable targetException = thrown.getTargetException();
+        assertInstanceOf(ResponseStatusException.class, targetException);
+        ResponseStatusException rse = (ResponseStatusException) targetException;
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, rse.getStatusCode());
+        assertEquals("추천 요청 실패", rse.getReason());
+    }
+
+    @Test
+    @DisplayName("fetchSimilarJobsFromFastAPI - FastAPI로부터 유사 job_ids 응답 받아 JobDto로 변환")
+    void fetchSimilarJobsFromFastAPI_returnsJobDtoList() throws Exception {
+        // given
+        Long jobId = 7426L;
+        int topk = 3;
+
+        // FastAPI 응답 모킹
+        String mockJson = """
+        {
+          "job_ids": [101, 102, 103]
+        }
+        """;
+        ResponseEntity<String> mockResponse = ResponseEntity.ok(mockJson);
+        when(restTemplate.getForEntity(contains("/similar-jobs"), eq(String.class)))
+                .thenReturn(mockResponse);
+
+        // Job 엔티티 모킹
+        Job job1 = new Job(); job1.setId(101L); job1.setTitle("Job A");
+        Job job2 = new Job(); job2.setId(102L); job2.setTitle("Job B");
+        Job job3 = new Job(); job3.setId(103L); job3.setTitle("Job C");
+
+        when(jobRepository.findByIdInWithRegion(eq(List.of(101L, 102L, 103L))))
+                .thenReturn(List.of(job1, job2, job3));
+
+        ReflectionTestUtils.setField(recommendService, "fastapiHost", "http://mock-fastapi");
+
+        // private method 호출
+        Method method = RecommendService.class.getDeclaredMethod("fetchSimilarJobsFromFastAPI", Long.class, int.class);
+        method.setAccessible(true);
+
+        // when
+        @SuppressWarnings("unchecked")
+        List<JobDto> result = (List<JobDto>) method.invoke(recommendService, jobId, topk);
+
+        // then
+        assertEquals(3, result.size());
+        assertTrue(result.stream().map(JobDto::getId).toList().containsAll(List.of(101L, 102L, 103L)));
+        assertTrue(result.stream().map(JobDto::getTitle).toList().contains("Job A"));
+    }
 }

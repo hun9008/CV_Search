@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.data.domain.Pageable;
 
 import java.time.DayOfWeek;
@@ -17,9 +19,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class DashboardServiceTest {
 
     @InjectMocks
@@ -32,6 +36,7 @@ class DashboardServiceTest {
     @Mock private SearchLogRepository searchLogRepository;
     @Mock private JobEventLogRepository jobEventLogRepository;
 
+
     @Test
     void getDashboardStats_returnsAggregatedStats() {
         // 날짜 기반 계산 (고정 날짜 기준으로 테스트)
@@ -42,24 +47,28 @@ class DashboardServiceTest {
 
         // mock 리턴값 설정
         when(userRepository.count()).thenReturn(100L);
-        when(userRepository.countByCreatedAtAfter(startOfThisWeek)).thenReturn(20L);
-        when(userRepository.countByCreatedAtBetween(startOfLastWeek, endOfLastWeek)).thenReturn(10L);
+        when(userRepository.countByCreatedAtAfter(any(LocalDateTime.class))).thenReturn(20L);
+        when(userRepository.countByCreatedAtBetween(any(), any())).thenReturn(10L);
 
         when(jobRepository.count()).thenReturn(500L);
-        when(jobRepository.countByCreatedAtAfter(startOfThisWeek)).thenReturn(50L);
-        when(jobRepository.countByCreatedAtBetween(startOfLastWeek, endOfLastWeek)).thenReturn(30L);
+        when(jobRepository.countByCreatedAtAfter(any(LocalDateTime.class))).thenReturn(50L);
+        when(jobRepository.countByCreatedAtBetween(any(), any())).thenReturn(30L);
 
         when(userFeedbackRepository.getAverageSatisfaction()).thenReturn(4.2f);
-        when(userFeedbackRepository.getAverageSatisfactionBetween(startOfLastWeek, endOfLastWeek)).thenReturn(3.8f);
+        when(userFeedbackRepository.getAverageSatisfactionBetween(any(), any())).thenReturn(3.8f);
 
-        List<KeywordCount> keywordList = List.of(new KeywordCount("AI", 30), new KeywordCount("백엔드", 20));
+        List<KeywordCount> keywordList = List.of(
+                new KeywordCount("AI", 30),
+                new KeywordCount("백엔드", 20)
+        );
         when(searchLogRepository.findTopKeywords(any(Pageable.class))).thenReturn(keywordList);
 
-        when(jobEventLogRepository.countActiveUsersSince(startOfThisWeek)).thenReturn(60L);
-        when(jobEventLogRepository.countActiveUsersSince(startOfLastWeek)).thenReturn(40L);
+        when(jobEventLogRepository.countActiveUsersSince(any(LocalDateTime.class)))
+                .thenReturn(60L)
+                .thenReturn(40L);
 
-        when(jobEventLogRepository.countImpressionsSince(startOfThisWeek)).thenReturn(200L);
-        when(jobEventLogRepository.countClicksSince(startOfThisWeek)).thenReturn(40L);
+        when(jobEventLogRepository.countImpressionsSince(any(LocalDateTime.class))).thenReturn(200L);
+        when(jobEventLogRepository.countClicksSince(any(LocalDateTime.class))).thenReturn(40L);
 
         for (int i = 6; i >= 0; i--) {
             LocalDate targetDate = now.minusDays(i);

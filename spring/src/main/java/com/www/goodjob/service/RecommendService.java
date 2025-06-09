@@ -207,9 +207,9 @@ public class RecommendService {
             saveEnd = System.nanoTime();
             log.info("[Recommend] 스코어 저장 시간: {}ms (cvId={})", (saveEnd - saveStart) / 1_000_000, cvId);
 
-//            apiResult.stream()
-//                    .limit(5)
-//                    .forEach(scoredJob -> asyncService.generateFeedbackAsync(cvId, scoredJob.getId()));
+            apiResult.stream()
+                    .limit(3)
+                    .forEach(scoredJob -> asyncService.generateFeedbackAsync(cvId, scoredJob.getId()));
             return apiResult;
         } finally {
             endTime = System.nanoTime();
@@ -277,5 +277,39 @@ public class RecommendService {
         log.info("[Feedback] 전체 수행 시간: {}ms", (totalEnd - totalStart) / 1_000_000);
 
         return feedback;
+    }
+
+    public List<JobDto> fetchSimilarJobsFromFastAPI(Long jobId, int k) {
+        String url = fastapiHost + "/similar-jobs?job_id=" + jobId + "&k=" + k;
+
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            String responseBody = response.getBody();
+
+            JsonNode root = objectMapper.readTree(responseBody);
+            JsonNode jobIdsNode = root.get("job_ids");
+
+            List<Long> jobIds = new ArrayList<>();
+            for (JsonNode idNode : jobIdsNode) {
+                jobIds.add(idNode.asLong());
+            }
+
+            List<Job> jobs = jobRepository.findByIdInWithRegion(jobIds);
+            Map<Long, Job> jobMap = jobs.stream()
+                    .collect(Collectors.toMap(Job::getId, Function.identity()));
+
+            List<JobDto> result = new ArrayList<>();
+            for (Long id : jobIds) {
+                Job job = jobMap.get(id);
+                if (job != null) {
+                    result.add(JobDto.from(job));
+                }
+            }
+
+            return result;
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "유사 공고 요청 실패", e);
+        }
     }
 }

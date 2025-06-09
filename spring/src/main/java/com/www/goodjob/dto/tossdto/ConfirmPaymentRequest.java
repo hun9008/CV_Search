@@ -2,8 +2,10 @@ package com.www.goodjob.dto.tossdto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class ConfirmPaymentRequest {
     private String paymentKey;

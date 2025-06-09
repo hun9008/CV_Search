@@ -1,5 +1,6 @@
 package com.www.goodjob.controller;
 
+import com.www.goodjob.dto.JobDto;
 import com.www.goodjob.dto.ScoredJobDto;
 import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.AsyncService;
@@ -81,6 +82,19 @@ public class RecommendController {
     ) {
         String feedback = recommendService.getOrGenerateFeedback(cvId, jobId);
         return ResponseEntity.ok(feedback);
+    }
+
+    @PostMapping("/similar-jobs")
+    @Operation(
+            summary = "유사 직무 추천",
+            description = "[Job ID 필요] 특정 직무 ID와 유사한 직무 topK개를 추천합니다. 내부적으로 FastAPI의 `/similar-jobs`를 호출하고, 해당 결과를 반환합니다."
+    )
+    public ResponseEntity<List<JobDto>> getSimilarJobs(
+            @RequestParam Long jobId,
+            @RequestParam int topk
+    ) {
+        List<JobDto> result = recommendService.fetchSimilarJobsFromFastAPI(jobId, topk);
+        return ResponseEntity.ok(result);
     }
 }
 

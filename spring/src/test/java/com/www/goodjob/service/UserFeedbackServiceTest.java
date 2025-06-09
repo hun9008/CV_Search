@@ -117,6 +117,38 @@ class UserFeedbackServiceTest {
     }
 
     @Test
+    @DisplayName("기간별 피드백 조회 - month")
+    void getFeedbackByPeriod_shouldReturnMonthly() {
+        when(feedbackRepository.findByCreatedAtBetween(any(), any()))
+                .thenReturn(List.of(UserFeedback.builder().id(1L).user(user).content("이번달 피드백").satisfactionScore(4).createdAt(LocalDateTime.now()).build()));
+
+        var result = userFeedbackService.getFeedbackByPeriod("month");
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getContent()).contains("피드백");
+    }
+
+    @Test
+    @DisplayName("기간별 피드백 조회 - year")
+    void getFeedbackByPeriod_shouldReturnYearly() {
+        when(feedbackRepository.findByCreatedAtBetween(any(), any()))
+                .thenReturn(List.of(UserFeedback.builder().id(1L).user(user).content("올해 피드백").satisfactionScore(4).createdAt(LocalDateTime.now()).build()));
+
+        var result = userFeedbackService.getFeedbackByPeriod("year");
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getContent()).contains("피드백");
+    }
+
+    @Test
+    @DisplayName("기간별 피드백 조회 - 유효하지 않은 기간")
+    void getFeedbackByPeriod_shouldThrowOnInvalidPeriod() {
+        assertThrows(IllegalArgumentException.class, () -> userFeedbackService.getFeedbackByPeriod("invalid_period"));
+    }
+
+
+
+    @Test
     @DisplayName("평균 만족도 조회")
     void getAverageSatisfaction_shouldCallRepository() {
         when(feedbackRepository.getAverageSatisfactionScore()).thenReturn(4.5);
@@ -131,6 +163,50 @@ class UserFeedbackServiceTest {
         Long result = userFeedbackService.getTotalFeedbackCount();
         assertThat(result).isEqualTo(10L);
     }
+
+    @Test
+    @DisplayName("사용자별 피드백 조회")
+    void getFeedbackByUser_shouldReturnUserFeedback() {
+        UserFeedback feedback = UserFeedback.builder()
+                .id(1L)
+                .user(user)
+                .content("내 피드백")
+                .satisfactionScore(4)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        when(feedbackRepository.findByUser(user)).thenReturn(List.of(feedback));
+
+        var result = userFeedbackService.getFeedbackByUser(user);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getUserId()).isEqualTo(user.getId());
+        assertThat(result.get(0).getContent()).isEqualTo("내 피드백");
+    }
+
+
+    @Test
+    @DisplayName("키워드 기반 피드백 검색")
+    void searchFeedback_shouldReturnMatchingFeedback() {
+        String keyword = "좋아요";
+        UserFeedback feedback = UserFeedback.builder()
+                .id(1L)
+                .user(user)
+                .content("너무 좋아요!")
+                .satisfactionScore(5)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        when(feedbackRepository.findByContentContaining(keyword)).thenReturn(List.of(feedback));
+
+        var result = userFeedbackService.searchFeedback(keyword);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getContent()).contains("좋아요");
+    }
+
+
+
 
     @AfterEach
     void tearDown() throws Exception {
