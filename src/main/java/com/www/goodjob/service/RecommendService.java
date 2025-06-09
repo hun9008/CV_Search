@@ -207,9 +207,9 @@ public class RecommendService {
             saveEnd = System.nanoTime();
             log.info("[Recommend] 스코어 저장 시간: {}ms (cvId={})", (saveEnd - saveStart) / 1_000_000, cvId);
 
-//            apiResult.stream()
-//                    .limit(5)
-//                    .forEach(scoredJob -> asyncService.generateFeedbackAsync(cvId, scoredJob.getId()));
+            apiResult.stream()
+                    .limit(3)
+                    .forEach(scoredJob -> asyncService.generateFeedbackAsync(cvId, scoredJob.getId()));
             return apiResult;
         } finally {
             endTime = System.nanoTime();
