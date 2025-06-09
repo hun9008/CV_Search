@@ -223,7 +223,7 @@ function Manage() {
                             <div
                                 className={style.listView__cell}
                                 onClick={() => handleSort('createdAt')}>
-                                북마크 일자 {getSortIcon('createdAt')}
+                                관리 시작 일자 {getSortIcon('createdAt')}
                             </div>
                             <div className={style.listView__cell}>메모</div>
                             <div className={style.listView__cell}>상태</div>
