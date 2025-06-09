@@ -11,6 +11,7 @@ import LoadingAnime1 from '../../../../components/common/loading/LoadingAnime1';
 import useActionStore from '../../../../store/actionStore';
 import useUserStore from '../../../../store/userStore';
 import UserFeedbackDialog from '../../../../components/common/dialog/UserFeedbackDialog';
+import useLogStore from '../../../../store/logStore';
 
 function JobList() {
     const [activeFilter, setActiveFilter] = useState('');
@@ -35,6 +36,7 @@ function JobList() {
     const { setSelectedJobDetail, jobList, getJobList, getSelectedCvId } = useJobStore(); // 추가
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
+    const { sendClickEvent } = useLogStore();
 
     const [experienceFilterVector, setExperienceFilterVector] = useState<string[]>([]);
     const [typeFilterVector, setTypeFilterVector] = useState<string[]>([]);
@@ -323,6 +325,7 @@ function JobList() {
                                 onSelect={() => {
                                     setSelectedJobDetail(job);
                                     setGood();
+                                    sendClickEvent(job.id);
                                 }}
                                 onToggleBookmark={() => toggleBookmark(job.id)}
                             />
