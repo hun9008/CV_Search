@@ -23,6 +23,8 @@ public class UserFeedbackDto {
 
     @Getter @Setter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Response {
         private Long id;
         private Long userId;
