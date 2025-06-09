@@ -14,11 +14,13 @@ export interface CvMe {
 
 interface cvStore {
     userCvList: CvMe[];
+    userCvError: string | null;
     getUserCvList: () => Promise<void>;
 }
 
 const useCvStore = create<cvStore>((set) => ({
     userCvList: [],
+    userCvError: null,
     getUserCvList: async () => {
         try {
             const accessToken = useAuthStore.getState().accessToken;
@@ -26,8 +28,12 @@ const useCvStore = create<cvStore>((set) => ({
                 headers: { Authorization: `Bearer ${accessToken}` },
                 withCredentials: true,
             });
-            set({ userCvList: res.data });
+            set({
+                userCvList: res.data,
+                userCvError: null,
+            });
         } catch (error) {
+            set({ userCvError: '유저 CV 정보 가져오기 오류' });
             console.error('유저 CV 정보 가져오기 오류: ', error);
             throw error;
         }

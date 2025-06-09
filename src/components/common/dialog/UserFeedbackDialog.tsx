@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import style from './styles/UserFeedbackDialog.module.scss';
 import { X } from 'lucide-react';
 import useUserFeedbackStore from '../../../store/userFeedbackStore';
+import useUserStore from '../../../store/userStore';
 
 interface BaseProps {
     onClose: () => void;
@@ -9,6 +10,7 @@ interface BaseProps {
 
 function UserFeedbackDialog(props: BaseProps) {
     const { postUserFeedback } = useUserFeedbackStore();
+    const { setGood } = useUserStore();
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const [userFeedbackText, setUserFeedbackText] = useState('');
     const [userFeedbackScore, setUserFeedbackScore] = useState(0);
@@ -20,7 +22,10 @@ function UserFeedbackDialog(props: BaseProps) {
             setSubmitPlease(true);
             return;
         }
+        setGood();
+
         await postUserFeedback({ content: userFeedbackText, satisfactionScore: userFeedbackScore });
+        props.onClose();
     };
 
     return (

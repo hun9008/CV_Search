@@ -2,6 +2,7 @@ import type React from 'react';
 import { Bookmark } from 'lucide-react';
 import style from './styles/JobCard.module.scss';
 import type Job from '../../../../types/job';
+import { useImpression } from '../../../../useImpression';
 
 interface JobCardProps {
     job: Job;
@@ -17,8 +18,13 @@ function JobCard({ job, isSelected, onSelect, onToggleBookmark }: JobCardProps) 
         onToggleBookmark();
     };
 
+    const impressionRef = useImpression(job.id);
+
     return (
-        <div className={`${style.jobCard} ${isSelected ? style.selected : ''}`} onClick={onSelect}>
+        <div
+            className={`${style.jobCard} ${isSelected ? style.selected : ''}`}
+            onClick={onSelect}
+            ref={impressionRef}>
             <div className={style.jobCard__icon}>
                 <img rel="icon" src={`data:image/x-icon;base64,${job.favicon}`} />
             </div>

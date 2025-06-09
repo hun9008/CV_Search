@@ -78,6 +78,7 @@ function CvItem({ cv, onView, onRename, isViewingThis, isLoadingThis }: CvItemPr
                     isOpen={deleteDialogHidden}
                     onClose={() => setDeleteDialogHidden((prev) => !prev)}
                     cvId={cv.id}
+                    deleteAll={false}
                 />
             )}
             {userCvList.length === 1 && !isRenaming ? (
