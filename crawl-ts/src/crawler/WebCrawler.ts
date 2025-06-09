@@ -202,7 +202,7 @@ async processQueue(processNumber : number, concurrency: number): Promise<void> {
         }
 
         const context = await this.browserManager.getBrowserContext(processNumber);
-        const visitResult = await this.visitUrl(nextUrlInfo.url, nextUrlInfo.domain ,context)
+        const visitResult = await timeoutAfter(this.visitUrl(nextUrlInfo.url, nextUrlInfo.domain ,context), 120_000, new TimeoutError('visitUrl 수집 시간 초과'))
           .catch((error) => {
             logger.error(`[Crawler][process] URL 방문 중 오류 발생: ${error.message}`);
             this.urlManager.setURLStatus(nextUrlInfo.url, URLSTAUS.NOT_VISITED);

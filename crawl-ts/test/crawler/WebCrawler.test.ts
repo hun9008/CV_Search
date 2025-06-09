@@ -1,12 +1,12 @@
-import{ Browser, Page } from 'puppeteer';
+import{ Browser, BrowserContext, Page } from 'puppeteer';
 import express from 'express';
 import * as http from 'http';
 import path from 'path';
 import { WebCrawler } from '../../src/crawler/WebCrawler';
 import { IUrlManager } from '../../src/url/IUrlManager';
-import { IBrowserManager } from '../../src/browser/IBrowserManager';
 import { IContentExtractor } from '../../src/content';
 import { Producer } from '@message/Producer';
+import { ChromeBrowserManager } from '@browser/ChromeBrowserManager';
 
 
 describe('WebCrawler', () => {
@@ -14,11 +14,12 @@ describe('WebCrawler', () => {
   let serverUrl: string;
   let crawler: WebCrawler;
   let mockUrlManager: jest.Mocked<IUrlManager>;
-  let mockBrowserManager: jest.Mocked<IBrowserManager>;
+  let mockBrowserManager: jest.Mocked<ChromeBrowserManager>;
   let mockContentExtractor: jest.Mocked<IContentExtractor>;
   let mockProducer: jest.Mocked<Producer>;
   let mockPage: jest.Mocked<Page>;
   let mockBrowser: jest.Mocked<Browser>;
+  let mockContext: jest.Mocked<BrowserContext>;
 
   const fixturesDir = path.join(__dirname, './');
 
@@ -52,6 +53,7 @@ describe('WebCrawler', () => {
       url: jest.fn().mockReturnValue(serverUrl),
       waitForNavigation: jest.fn().mockResolvedValue(null),
       close: jest.fn().mockResolvedValue(null),
+      isClosed: jest.fn().mockResolvedValue(false),
       content: jest.fn().mockResolvedValue('<html><body>Test Content</body></html>')
     } as unknown as jest.Mocked<Page>;
 
@@ -60,6 +62,12 @@ describe('WebCrawler', () => {
       newPage: jest.fn().mockResolvedValue(mockPage),
       close: jest.fn().mockResolvedValue(null)
     } as unknown as jest.Mocked<Browser>;
+
+     // Create mock Browser
+     mockContext = {
+      newPage: jest.fn().mockResolvedValue(mockPage),
+      close: jest.fn().mockResolvedValue(null)
+    } as unknown as jest.Mocked<BrowserContext>;
 
     // Create mock UrlManager
     mockUrlManager = {
@@ -82,12 +90,16 @@ describe('WebCrawler', () => {
 
     // Create mock BrowserManager
     mockBrowserManager = {
+      browser: undefined,
+      browserPid: undefined,
+      getBrowser: jest.fn(),               // 누락된 부분 추가
+      getBrowserContext: jest.fn().mockResolvedValue(mockContext),        // 누락된 부분 추가
       initBrowser: jest.fn().mockResolvedValue(mockBrowser),
       closeBrowser: jest.fn().mockResolvedValue(undefined),
       getNewPage : jest.fn().mockResolvedValue(mockPage),
       killChromeProcesses: jest.fn(),
       saveErrorScreenshot: jest.fn().mockResolvedValue('/path/to/screenshot.png')
-    };
+    } as unknown as jest.Mocked<ChromeBrowserManager>;
 
    // Create mock ContentExtractor
     mockContentExtractor = {
@@ -113,16 +125,27 @@ describe('WebCrawler', () => {
   });
 
   describe('visitUrl', () => {
-    test('should successfully visit a URL and extract data', async () => {
-      const result = await crawler.visitUrl( serverUrl, 'localhost' );
 
+    let context: BrowserContext;
+    beforeEach(async () => {
+
+      context = await mockBrowserManager.getBrowserContext(0);
+    })
+
+    test('should successfully visit a URL and extract data', async () => {
+      const result = await crawler.visitUrl( serverUrl, 'localhost' ,context);
+
+      expect(result).toBeDefined();
       // Verify the result
-      expect(result.success).toBe(true);
-      expect(result.url).toBe(serverUrl);
-      expect(result.title).toBe('Test Crawler Page');
-      expect(result.text).toContain('This is a test page');
-      expect(result.herfUrls).toContain('https://localhost/normal');
-      expect(result.onclickUrls).toContain('http://localhost/onclick1.html');
+      if (result) {
+        expect(result.success).toBe(true);
+        expect(result.url).toBe(serverUrl);
+        expect(result.title).toBe('Test Crawler Page');
+        expect(result.text).toContain('This is a test page');
+        expect(result.herfUrls).toContain('https://localhost/normal');
+        expect(result.onclickUrls).toContain('http://localhost/onclick1.html');
+
+      }
 
       // Verify browser interactions
       // expect(mockBrowserManager.initBrowser).toHaveBeenCalled();
@@ -138,7 +161,7 @@ describe('WebCrawler', () => {
       mockBrowserManager.initBrowser.mockRejectedValueOnce(new Error('Browser error'));
 
       try {
-        await crawler.visitUrl( serverUrl, 'localhost' );
+        await crawler.visitUrl( serverUrl, 'localhost',context );
       } catch(error)
       {
         expect((error as Error).message).toContain('Browser');
@@ -152,7 +175,7 @@ describe('WebCrawler', () => {
       // Mock navigation error
       mockPage.goto.mockRejectedValue(new Error('Navigation error'));
       try {
-        const result = await crawler.visitUrl(serverUrl, 'localhost');
+        const result = await crawler.visitUrl(serverUrl, 'localhost',context);
         fail('Expected error was not thrown');
       } catch (error) {
         expect((error as Error).message).toContain('Navigation error');

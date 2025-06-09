@@ -57,10 +57,13 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.14.0",
     "node-fetch": "^3.3.2",
+    "p-limit": "^6.2.0",
+    "psl": "^1.15.0",
     "puppeteer": "^24.7.2",
     "redis": "^4.7.0",
     "robots-parser": "^3.0.1",
     "sequelize": "^6.37.7",
+    "tldts": "^7.0.8",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

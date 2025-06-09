@@ -1,5 +1,6 @@
 **/.env
 **/.env*
+**/.deploy.env
 .env
 **/node_modules
 #**/package-lock.json
@@ -10,3 +11,4 @@ __pycache__
 **/data
 **/screenshot
 **/logs/*
+**/.gitignore

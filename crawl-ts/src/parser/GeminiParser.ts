@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import {
   GoogleGenerativeAI,
   Schema,
@@ -84,6 +85,8 @@ const geminiRegionCdScema = {
         },
         job_type: {
           type: SchemaType.STRING,
+          format: "enum",
+          enum: ['정규직', '계약직', '인턴', '아르바이트', '프리랜서', '파견직'],
           description: "고용 형태 (정규직, 계약직, 인턴, 아르바이트, 프리랜서, 파견직)",
           nullable: true
         },
@@ -118,6 +121,23 @@ const geminiRegionCdScema = {
       required: ["is_recruit_info" ,"is_it_recruit_info"]
  } as Schema;
 
+ const geminiRecruitInfoValidationSechma = {
+  type: SchemaType.OBJECT,
+  properties: {
+    result: {
+      type: SchemaType.STRING,
+      nullable: false,
+      enum: ['적합', '부적합'],
+      format: "enum",
+      description: "채용 공고가 적합한지 여부 (적합, 부적합)",
+    },
+    reason: {
+      type: SchemaType.STRING,
+      nullable: false,
+      description: "채용 공고가 적합하지 않은 이유",
+    }
+  }
+ } as Schema
 
  function geminiRegionTextPrompt(content : string) {
       return `
@@ -163,7 +183,7 @@ function geminiRecruitInfoPrompt(content : string) {
      - region_id: region_text의 값을 대한민국 법정동 코드로 변환하세요 경기 안산시, 안산시 상록구 => [4127000000 ,4127100000]
      - require_experience: 요구되는 경력 수준 ("경력무관", "신입", "경력"). 가능하면 이 세 가지 카테고리로 매핑해주세요.
      - job_description: 주요 업무 내용이나 직무기술서에 대한 내용을 기술하세요.
-     - job_type: 고용 형태. 표준 용어를 사용하세요 (정규직, 계약직, 인턴, 아르바이트, 프리랜서, 파견직).만약 여러가지라면 /로 구분해서 작성해주세요(예 정규직/피견직)
+     - job_type: 고용 형태. 표준 용어를 사용하세요 (정규직, 계약직, 인턴, 아르바이트, 프리랜서, 파견직) 중 하나를 선택하세요.
        나와있지 않은 고용형태는 "무관"으로 설정하세요.
      - apply_start_date: 지원 시작일 또는 게시일 (가능한 YYYY-MM-DD 형식으로 맞추어주세요)
      - apply_end_date: 지원 마감일 (가능한 YYYY-MM-DD 형식으로 맞추어주세요)
@@ -184,6 +204,51 @@ ${content}
 `;
  }
 
+function geminiRecruitInfoValidationPrompt(content: string): string {
+return  `프롬프트 제목: 채용 공고 필터링: 국내 IT 기업 식별
+
+역할: 당신은 채용 공고 분석 전문가입니다. 주어진 채용 공고 텍스트를 분석하여, 다음 두 가지 핵심 조건에 따라 필터링하고 결과를 제시해야 합니다.
+
+입력 (Input):
+채용 공고 웹사이트에서 추출된 원본 텍스트 (string)
+
+출력 (Output):
+결과는 다음 형식으로 엄격하게 제한되며, result와 reason 필드는 반드시 값을 가져야 합니다 (NOT NULL).
+result : reason
+
+필터링 조건:
+
+국내 기업 여부: 회사는 외국계 기업이 아니어야 합니다. (즉, 대한민국에 법인 또는 본사를 둔 국내 기업이어야 합니다.)
+IT 산업군 여부: 회사는 IT 관련 산업군의 회사여야 합니다. (예: 소프트웨어 개발, 정보통신, 데이터 분석/처리, AI, 클라우드 서비스, 플랫폼 운영, 시스템 통합(SI), 게임 개발, IT 컨설팅 등)
+처리 규칙 및 출력 예시:
+
+조건 1과 조건 2를 모두 충족하는 경우:
+
+result: 적합
+reason: 국내 IT 기업으로 판단됩니다.
+조건 1을 충족하지 못하는 경우 (외국계 기업으로 판단될 시):
+
+result: 부적합
+reason: 외국계 기업으로 판단됩니다. (IT 기업 여부와 관계없이 우선적으로 이 사유를 적용합니다.)
+조건 1은 충족하지만 조건 2를 충족하지 못하는 경우 (국내 기업이지만 IT 기업이 아닐 시):
+
+result: 부적합
+reason: IT 관련 산업군 기업이 아닌 것으로 판단됩니다.
+두 조건 모두 충족하지 못하는 경우 (외국계 기업이면서 IT 기업도 아닐 시):
+
+result: 부적합
+reason: 외국계 기업이며 IT 관련 산업군 기업이 아닌 것으로 판단됩니다. (또는 "외국계 기업으로 판단됩니다."로 외국계 기업임을 우선 명시해도 됩니다.)
+지시사항:
+주어진 텍스트 내에서 회사명, 회사 소개, 사업 분야, 본사 위치, 기업 국적 관련 언급(예: "글로벌", "외국계", "OO지사" 등) 등을 종합적으로 분석하여 위 조건에 따라 판단하십시오. 판단 근거가 명확하지 않을 경우, 텍스트에서 가장 유력하게 추론할 수 있는 내용을 바탕으로 결정하고, reason에 간략하게라도 그 뉘앙스를 포함할 수 있습니다.
+반드시 result와 reason 필드를 포함한 JSON 형식으로 결과를 출력해야 합니다. 예시 출력 형식은 다음과 같습니다:
+{
+  "result": "적합",
+  "reason": "국내 IT 기업으로 판단됩니다."
+}
+입력 :${content}
+
+`;
+}
 
 export class ParseError extends Error {
   public cause: unknown;
@@ -275,6 +340,71 @@ export class GeminiParser implements IParser {
     }
   }
 
+
+async validateRecruitInfo(rawText: string, retryNumber: number ,retryDelay: number=1000): Promise<{ result: string, reason: string } | undefined> {
+    for (let attempt = 1; attempt <= retryNumber; attempt++) {
+      try {
+        const model = new GoogleGenerativeAI(this.apiKeyGenerator.next().value).getGenerativeModel({
+          model: this.modelName,
+          generationConfig: {
+            responseMimeType: JSON_MIME_TYPE,
+            responseSchema: geminiRecruitInfoValidationSechma,
+          },
+        });
+        // API 호출로 채용 정보 파싱
+        logger.debug('[GeminiParser][validateRecruitInfo] Gemini API 요청 시작...');
+        const result = await model.generateContent(geminiRecruitInfoValidationPrompt(rawText))
+          .then((result) =>
+            result.response?.text()
+          )
+          .catch(
+            (error) => {
+              logger.error(`[GeminiParser][validateRecruitInfo] Gemini API에서 텍스트 응답을 받지 못했습니다.${attempt}/${retryNumber}`);
+              if (retryNumber === attempt) {
+                throw error;
+              }
+            }
+          )
+          .then((responseText) => {
+            logger.debug(`${responseText}`);
+            if (!responseText) {
+              logger.error(`[GeminiParser][validateRecruitInfo] Gemini API에서 빈 응답을 받았습니다.${attempt}/${retryNumber}`);
+              throw new ParseError('Gemini API에서 빈 응답을 받았습니다.');
+            }
+            const data = JSON.parse(responseText) as { result: string, reason: string };
+            // API 응답 유효성 처리
+            if (!data.result) {
+              logger.error(`[GeminiParser][validateRecruitInfo] Gemini API 응답이 유효하지 않습니다.${attempt}/${retryNumber}`);
+              throw new ParseError('Gemini API 응답이 유효하지 않습니다.');
+            }
+            return data;
+          })
+          .catch(
+            (error) => {
+              logger.error(`[GeminiParser][validateRecruitInfo] 텍스트 응답에에서 json 파싱을을 실패했습니다. ${attempt}/${retryNumber}`);
+              if (retryNumber === attempt) {
+                throw error;
+              }
+            }
+        )
+        if (result) {
+          if (result.result === '적합') {
+            logger.debug(`[GeminiParser][validateRecruitInfo] 채용공고로 적합합니다. ${attempt}/${retryNumber}`);
+            return result;
+          }
+          logger.debug(`[GeminiParser][validateRecruitInfo] 채용공고로 부적합합니다. ${attempt}/${retryNumber}`);
+          return result;
+        }
+        await new Promise((resolve) => setTimeout(resolve, retryDelay)); // 1초 대기
+      } catch (error) {
+        logger.error(`[GeminiParser][validateRecruitInfo] 재시도 횟수 ${attempt}/${retryNumber} 증 에러 발생`);
+        if (retryNumber === attempt) {
+          throw new ParseError("Failed to validate recruitment info ", error);
+        }
+      }
+    }
+    return undefined;
+  }
 
   async ParseRegionText(rawContent: string, retryNumber: number ,retryDelay: number=1000): Promise<string[]|undefined> {
     for (let attempt = 1; attempt <= retryNumber; attempt++) {
@@ -414,7 +544,7 @@ export class GeminiParser implements IParser {
   }
 
 
-  
+
 
   verifyRecruitInfo( response :GeminiResponseRecruitInfoDTO): boolean {
 
@@ -448,6 +578,7 @@ export class GeminiParser implements IParser {
     return {
       ...rawContent,
       ...botRecruitInfo,
+      job_valid_type: 0,
       favicon: favicon?? undefined,
       created_at: now,
       updated_at: now,

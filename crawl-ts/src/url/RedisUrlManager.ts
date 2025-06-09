@@ -141,6 +141,23 @@ export const enum URLSTAUS
       }
     }
 
+    async getAllFavicon(): Promise<{ domain: string, logo: string }[]> {
+
+      const keys = await this.redisClient.keys('favicon*');
+      const faviconList: { domain: string, logo: string }[] = [];
+      for (const key of keys) {
+        const domain = key.split(':')[1];
+        const logo = await this.redisClient.get(key);
+        if (logo) {
+          faviconList.push({ domain, logo });
+        }
+      }
+      return faviconList;
+     }
+
+
+
+
 
       /**
      * favicon 가져오기
@@ -154,8 +171,7 @@ export const enum URLSTAUS
           const favicon = await this.redisClient.get(redisKey);
           return favicon;
         } catch (error) {
-          logger.error(`[RedisUrlManager][getFavicon] URL 상태 가져오기 중 오류 (${domain}):`, error);
-          return null;
+          throw new Error(`[getFavicon] 파비콘 가져오기 중 오류 (${domain}): ${error}`);
         }
       }
 
@@ -191,6 +207,8 @@ export const enum URLSTAUS
         return [];
       }
     }
+
+
 
     /**
      * 특정 도메인의 특정 상태 URL 가져오기
@@ -382,18 +400,22 @@ export const enum URLSTAUS
      */
     public async addUrl(url: string, domain: string, urlStatus: UrlStatus ): Promise<void> {
       try {
-        const urlOriginStatus = await redis.hGet(`status:${domain}`, url)
+        const urlOriginStatus = await this.redisClient.hGet(`status:${domain}`, url)
         // logger.debug(`add URL ${urlOriginStatus}`);
         if (!urlOriginStatus) {
+          const multi = this.redisClient.multi();
           logger.debug(`[RedisUrlManger] add URL ${url}`);
           // URL을 도메인 세트에 추가
-          await redis.sAdd(`urls:${domain}:${urlStatus}`, url);
+          await multi.sAdd(`urls:${domain}:${urlStatus}`, url);
           // status set에 추가
-          await redis.sAdd(URLSTAUS.NOT_VISITED, url);
+          await multi.sAdd(URLSTAUS.NOT_VISITED, url);
           // URL 상태 설정
-          await redis.hSet(`status:${domain}`, url, urlStatus);
+          await multi.hSet(`status:${domain}`, url, urlStatus);
           // 도메인을 전체 도메인 세트에 추가
-          await redis.sAdd('domains', domain);
+          await multi.sAdd('domains', domain);
+
+          await multi.exec();
+
         }
       } catch (error) {
         console.error(`Error adding URL ${url} to Redis:`, error);

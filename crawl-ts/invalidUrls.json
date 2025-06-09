@@ -1,0 +1,1442 @@
+[
+  {
+    "url": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003200&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003201&sw=&subJobCdArr=&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003209&sw=&subJobCdArr=1010001%2C1010002%2C1010003%2C1010004%2C1010005%2C1010006%2C1010007%2C1010008%2C1010009%2C1010020%2C1020001%2C1030001%2C1030002%2C1040001%2C1040002%2C1040003%2C1050001%2C1050002%2C1060001&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003209&sw=&subJobCdArr=1010004&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003200&sw=&subJobCdArr=3030001&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://recruit.navercorp.com/rcrt/view.do?annoId=3000017",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003201&sw=&subJobCdArr=3010001&sysCompanyCdArr=&empTypeCdArr=&entTypeCdArr=&workAreaCdArr=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003200&lang=ko",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://recruit.navercorp.com/rcrt/view.do?annoId=30003201&lang=ko",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://careers.abb/global/fr/job/95667971/Intern",
+    "status": 410,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.abb/global/fr/job/94055597/Project-Manager",
+    "status": 410,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.abb/global/fr/job/92595655/Product-Engineer",
+    "status": 410,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.abb/global/fr/job/95670755/Operations-Management-Team-Lead-Run-Services",
+    "status": 410,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.abb/global/fr/job/95670861/Operations-Management-Run-Services",
+    "status": 410,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.renault.co.kr/ko/model/detail_spec.jsp?mcode=H615&carname=car03&mtcode=TEKALDZH61PDH",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=63581&boardid=cbid2&page=1&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://recruit.kkpc.com/main/recruit/27_4/login1.jsp",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=63285&boardid=cbid2&page=1&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=1399&boardid=cbid2&page=1631&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=63525&boardid=cbid2&page=1&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://careers.hybecorp.com/o/119274",
+    "status": 404,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=2738&boardid=cbid2&page=1623&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://example.com/job/124",
+    "status": 404,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://example.com/job/125",
+    "status": 404,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250443",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250258",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://recruit.kccworld.co.kr/recruit/recruitMain?SiteType=C&SEQ=11312&SEQ=11372",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250798",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://hire-r1.mokahr.com/social-recruitment/tesla/100004099#/job/561a7619-8968-4b3f-b40b-daefaef13381",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250799",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250417",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=200",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=1385&boardid=cbid2&page=1631&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250802",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250845",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=63866&boardid=cbid2&page=1&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250789",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250364",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250856",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=2742&boardid=cbid2&page=1623&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250527",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250863",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250853",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?workingRegion=106011",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250810",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://recruit.kccworld.co.kr/recruit/recruitMain?SiteType=C&SEQ=11372&SEQ=11372",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250931",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250302",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=63323&boardid=cbid2&page=1&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?corpCode=10018",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250950",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.hybecorp.com/o/119307",
+    "status": 404,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250279",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250891",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250866",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=2759&boardid=cbid2&page=1623&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=440",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250864",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250283",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250910",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250070",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250883",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250861",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=63415&boardid=cbid2&page=1&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=63597&boardid=cbid2&page=1&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://careers.linecorp.com/ko/jobs/639",
+    "status": 403,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.hwrc.co.kr/hwrc/recruit/recruit_view.do?empy_seq=3470&pg=6",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=63565&boardid=cbid2&page=1&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.hwrc.co.kr/hwrc/recruit/recruit_view.do?empy_seq=3365&pg=11",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.hwrc.co.kr/hwrc/recruit/recruit_view.do?empy_seq=3386&pg=10&",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=2718&boardid=cbid2&page=1624&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=63310&boardid=cbid2&page=1&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://careers.linecorp.com/jobs/2440",
+    "status": 403,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=2729&boardid=cbid2&page=1623&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=1663&boardid=cbid2&page=1632&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://recruit.ehyundai.com/recruit-info/announcement/view.nhd?hireId=2025350&regCoCd=HDZINUS",
+    "status": 200,
+    "success": false,
+    "reason": "CLOSED_OR_INVALID_CONTENT"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=63514&boardid=cbid2&page=1&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=2722&boardid=cbid2&page=1624&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.bohun.or.kr/go_URL.php?site_name=62",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.bohun.or.kr/060notice/notice03_view.php?left=3&postidx=1661&boardid=cbid2&page=1633&opt=&keyword=&tcheck=",
+    "status": 200,
+    "success": false,
+    "reason": "NOT_HTML"
+  },
+  {
+    "url": "https://www.schmc.ac.kr/cheonan/goFormAuth.do;jsessionid=N16iFiGhtAPpwU25MBstIZUzTk1MgHsZobLyGdSU9OqrknPOvSe9yl8xqkdN7ttD.hccwww02_servlet_sch1?key=2896&siteNm=&getIp=175.45.201.225&cntntsDetailTitle=&siteId=cheonan&key=2905&isExistCntntsFile=true&isLogined=false",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://recruit.kccworld.co.kr/recruit/recruitMain.do?SiteType=A&SEQ=7812&SEQ=11092",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.albamon.com/jobs/detail/109519653?logpath=11&productCount=1",
+    "status": 200,
+    "success": false,
+    "reason": "CLOSED_OR_INVALID_CONTENT"
+  },
+  {
+    "url": "https://hire-r1.mokahr.com/social-recruitment/tesla/#/job/09d1d87a-2aba-4fe0-9ba8-077a082121d4",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250840",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250880",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250968",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://hire-r1.mokahr.com/social-recruitment/tesla/#/job/57a53354-f411-4e4f-8a23-2b8488634cf5",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250993",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R240531",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250295",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=394",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250084",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250992",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250907",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.linecorp.com/ko/jobs/638",
+    "status": 403,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250849",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250995",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.hybecorp.com/o/147443",
+    "status": 404,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=388",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.sk-materials.com/apply/jobView/381017196",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251005",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250816",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250497",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250938",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250951",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=307",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=457",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.sk-materials.com/apply/jobView/381017513",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251018",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250424",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.sk-materials.com/apply/jobView/381004342",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.sk-materials.com/apply/jobView/381017133",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250425",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://samdong.com/kr/employ/employment1.do",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R241611",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.sk-materials.com/apply/jobView/381020711",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250933",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250989",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250418",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250871",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250952",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?corpCode=10004",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250937",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251017",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://recruit.kccworld.co.kr/recruit/recruitMain?SiteType=A&SEQ=7532",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.linecorp.com/ko/jobs/2667",
+    "status": 403,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.linecorp.com/jobs/639",
+    "status": 403,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250634",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250824",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250512",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250843",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250884",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251022",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250216",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250806",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250959",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250855",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250906",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?workingRegion=106013",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250044",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250960",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250796",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250827",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250413",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250964",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250516",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.sk-materials.com/apply/jobView/381020658",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250785",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=247",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R240532",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=465",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.sk-materials.com/apply/jobView/381017309",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250486",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=262",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250932",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250991",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250519",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250415",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250714",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250953",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251003",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250830",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250335",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250143",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250939",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250911",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?corpCode=10070",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250980",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251016",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250468",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250890",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=228",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250820",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250217",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250923",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250929",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R241741",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251001",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250370",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.linecorp.com/jobs/2667",
+    "status": 403,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250491",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250962",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250665",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250965",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250282",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://recruit.kccworld.co.kr/recruit/recruitMain.do?SiteType=A&SEQ=7832&SEQ=11212&SEQ=11052&SEQ=11332&SEQ=11152&SEQ=7832",
+    "status": "UNKNOWN_ERROR",
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R241561",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250969",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250917",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250558",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250876",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250873",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250822",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250870",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250130",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250775",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=450",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250935",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?workingRegion=106008",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250836",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251009",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.abb/global/fr/job/95670755/Customer%20events",
+    "status": 410,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250869",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250842",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250925",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250852",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250823",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250533",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250983",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250900",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250640",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=239",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://careers.sk-materials.com/apply/jobView/381017276",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250936",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250909",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250755",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250898",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=443",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?corpCode=10015",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251007",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250807",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250419",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250981",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250958",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251011",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R241746",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251029",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=163",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251006",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250835",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250927",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250963",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?corpCode=10074",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250934",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250908",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit?role=167",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250913",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R250782",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  },
+  {
+    "url": "https://www.skcareers.com/Recruit/Detail/R251008",
+    "status": 500,
+    "success": false,
+    "reason": "REQUEST_ERROR"
+  }
+]

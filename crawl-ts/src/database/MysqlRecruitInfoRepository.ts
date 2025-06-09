@@ -3,6 +3,10 @@ import { MysqlRecruitInfoSequelize  ,MysqlJobRegionSequelize} from '../models/My
 import { defaultLogger as logger } from '../utils/logger';
 import { IRecruitInfoRepository } from './IRecruitInfoRepository';
 import axios from 'axios';
+
+
+
+
 /**
  * MySQL 데이터베이스 서비스 클래스
  * 채용 정보를 MySQL 데이터베이스에 저장하고 관리하는 서비스
@@ -118,18 +122,19 @@ export class MysqlRecruitInfoRepository implements IRecruitInfoRepository {
   }
 
 
+
 /**
  * 채용 정보 업데이트
  * @param recruitInfo 업데이트할 채용 정보 객체
  * @returns 업데이트된 채용 정보 객체 또는 null (업데이트 실패 시)
  */
-async deleteRecruitInfoById(id: number): Promise<void> {
+  async deleteRecruitInfoById(id: number, token : string ): Promise<void> {
   try {
     const response = await axios.delete(
       `${process.env.SPRING_API_DOMAIN}/jobs/delete-one-job?jobId=${id}`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.SPRING_ACCESS_TOKEN}`, // ✅ 토큰 추가
+          Authorization: `Bearer ${token}`, // ✅ 토큰 추가
         },
       }
     );
@@ -143,5 +148,38 @@ async deleteRecruitInfoById(id: number): Promise<void> {
     console.error(`❌ Job ${id} 삭제 실패`, error);
     throw error;
   }
+  }
+
+  /**
+ * 채용 정보 업데이트
+ * @param recruitInfo 업데이트할 채용 정보 객체
+ * @returns 업데이트된 채용 정보 객체 또는 null (업데이트 실패 시)
+ */
+  async deleteRecruitInfoByIdValidType(id: number, validType:number ,token : string ): Promise<void> {
+    try {
+      const response = await axios.delete(
+        `${process.env.SPRING_API_DOMAIN}/admin/dashboard/delete-one-job-valid-type?jobId=${id}&validType=${validType}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // ✅ 토큰 추가
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        console.log(`✅ Job ${id} 삭제 성공`);
+      } else {
+        console.warn(`⚠️ Job ${id} 삭제 응답 코드: ${response.status}`);
+      }
+    } catch (error) {
+      console.error(`❌ Job ${id} 삭제 실패`, error);
+      throw error;
+    }
+    }
+
+
 }
-}
+
+
+
+

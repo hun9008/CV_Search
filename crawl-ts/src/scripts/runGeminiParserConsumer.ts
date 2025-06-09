@@ -49,7 +49,7 @@ dotenv.config();
             }
         )
           .then(() => {
-            logger.info('[consumer] 채용 공고 저장 성공');
+            logger.eventInfo('[consumer] 채용 공고 저장 성공');
           })
           .catch(
             (error) => {

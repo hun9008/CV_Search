@@ -16,6 +16,7 @@ export class Messenger {
 
   async connect() {
     try {
+      logger.debug(`[RabbitMQ] Connecting to ${config.RABBITMQ_URL} with queue ${this.queue}`);
       this.connection = await amqp.connect(config.RABBITMQ_URL);
       this.channel = await this.connection.createChannel();
       await this.channel.assertQueue(this.queue, { durable: true });

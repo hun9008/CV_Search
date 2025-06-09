@@ -1,7 +1,9 @@
 import { Sequelize ,DataTypes ,Model} from 'sequelize'
 import { CreateDBRecruitInfoDTO } from '../models/RecruitInfoModel';
-import { z } from 'zod';
 
+export const VLAID_TYPE_EXPIRED = 2;
+export const VLAID_TYPE_ACTIVE =  1;
+export const VLAID_TYPE_DEFAULT = 0;
 
 export const mysqlRecruitInfoSequelize = new Sequelize(
     process.env.MYSQL_DATABASE ?? 'localhost',
@@ -37,17 +39,24 @@ export class MysqlRecruitInfoSequelize extends Model<CreateDBRecruitInfoDTO, Cre
   public updated_at!: Date;
   public is_public!: boolean;
   public favicon?: string;
+  public favicon_id?: number; // 파비콘 ID 추가
   public company_name?: string;
   public department?: string;
   public region_text?: string;
   public require_experience?: string;
   public job_description?: string;
+
+  // 0: 기본 , 1: 채용 마감 , 2:  오류
+  public job_valid_type?: number;
+
   public job_type?: string;
   public apply_start_date?: Date;
   public apply_end_date?: Date;
   public requirements?: string;
   public preferred_qualifications?: string;
   public ideal_candidate?: string;
+
+
 }
 
 export class MysqlJobRegionSequelize extends Model {
@@ -56,6 +65,17 @@ export class MysqlJobRegionSequelize extends Model {
   public region_id!: number;
 }
 
+export class MysqlFaviconSequelize extends Model {
+  public id!: number;
+  public domain!: string;
+  public favicon!: string;
+}
+
+export class MysqlJobValidTypeSequelize extends Model {
+  public id!: number;
+  public job_id!: number;
+  public valid_type!: boolean;
+}
 
 
 MysqlRecruitInfoSequelize.init(
@@ -97,6 +117,15 @@ MysqlRecruitInfoSequelize.init(
       },
       favicon: {
         type: DataTypes.TEXT,
+    },
+
+    favicon_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'MysqlFaviconSequelize', // 참조할 모델 이름
+          key: 'id', // 참조할 컬럼
+        },
       },
       company_name: {
         type: DataTypes.STRING(255),
@@ -116,7 +145,12 @@ MysqlRecruitInfoSequelize.init(
       },
       job_type: {
         type: DataTypes.STRING(100),
-      },
+    },
+    job_valid_type: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+       defaultValue: 0, // 기본값을 0으로 설정
+    },
       apply_start_date: {
         type: DataTypes.DATE,
         validate: {
@@ -197,8 +231,49 @@ MysqlJobRegionSequelize.init({
   ]
 })
 
+MysqlFaviconSequelize.init({
+  domain: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    primaryKey: true,
+  },
+  logo: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  }
+}, {
+  sequelize: mysqlRecruitInfoSequelize,
+  tableName: process.env.MYSQL_FAVICON_TABLE,
+  timestamps: false,
+});
 
+MysqlJobValidTypeSequelize.init({
 
+  job_id: {
+    type: DataTypes.BIGINT,
+    allowNull: false,
+  },
+  valid_type: {
+    type: DataTypes.BIGINT,
+    allowNull: false,
+  }
+}, {
+  sequelize: mysqlRecruitInfoSequelize,
+  tableName: process.env.MYSQL_JOB_VALID_TYPE_TABLE,
+  timestamps: false,
+  indexes: [
+    {
+      unique: true,
+      fields: ['job_id']
+    }
+  ]
+});
+
+MysqlRecruitInfoSequelize.hasOne(MysqlJobValidTypeSequelize, {
+  foreignKey: 'job_id', // MysqlJobValidTypeSequelize 테이블에 있는 외래 키
+  as: 'jobValidTypes',
+  onDelete: 'CASCADE',// 선택적: 관계에 대한 별칭
+});
 
 
 

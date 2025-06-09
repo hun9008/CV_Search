@@ -105,6 +105,8 @@ export interface CreateDBRecruitInfoDTO extends BaseRecruitInfoDTO {
 
   title: string;
 
+  job_valid_type?: number;
+
   created_at?: Date;
 
   updated_at?: Date;
@@ -112,6 +114,8 @@ export interface CreateDBRecruitInfoDTO extends BaseRecruitInfoDTO {
   is_public: boolean;
 
   favicon?: string;
+
+  favicon_id?: number; // 파비콘 ID 추가
 
 }
 /**

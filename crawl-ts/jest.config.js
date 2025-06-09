@@ -5,7 +5,8 @@ module.exports = {
   moduleFileExtensions: [ "ts",
     "tsx",
     "js"],
-  coveragePathIgnorePatterns: ['WebContentExtractor.ts'],
+  coveragePathIgnorePatterns: ['WebContentExtractor.ts',  '.*[iI]ntergration.*\\.test\\.(ts|js)$'
+  ],
   testMatch: ['**/test/**/*.test.ts'],
   transform: {
     '^.+\\.ts$': 'ts-jest',
