@@ -5,7 +5,7 @@ import JobManageItem from './JobManageItem';
 import LoadingSpinner from '../../../../../components/common/loading/LoadingSpinner';
 import useAdminJobManageStore from '../../../../../store/adminJobManageStore';
 import React from 'react';
-import { JobBrief } from '../../../../../types/jobBrief';
+// import { JobBrief } from '../../../../../types/jobBrief';
 
 type SortField = 'companyName' | 'jobTitle' | 'createdAt' | 'applyStatus';
 type SortOrder = 'asc' | 'desc';
@@ -17,7 +17,7 @@ function JobManage() {
     const removeJob = useAdminJobManageStore((state) => state.removeJob);
 
     /** 필터링 */
-    const [filteredJob, setFilteredJob] = useState<JobBrief[]>();
+    // const [filteredJob, setFilteredJob] = useState<JobBrief[]>();
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilters, setShowFilters] = useState(false);
     const [sortConfig, setSortConfig] = useState<{ field: SortField; order: SortOrder }>({
@@ -28,8 +28,12 @@ function JobManage() {
     const [isLoading, setIsLoading] = useState(false);
 
     /** 페이지네이션 */
-    const [currentPage, setCurrentPage] = useState(1);
-    const jobsPerPage = 60;
+    // const jobsPerPage = 40;
+    const totalPage = useAdminJobManageStore((state) => state.totalPage);
+    const currentPage = useAdminJobManageStore((state) => state.currentPage);
+    // const isFirstPage = useAdminJobManageStore((state) => state.isFirstPage);
+    // const isLastPage = useAdminJobManageStore((state) => state.isLastPage);
+    const { goToNextPage, goToPrevPage } = useAdminJobManageStore();
     const jobListRef = useRef<HTMLDivElement>(null);
 
     // 상태 옵션 목록
@@ -37,7 +41,7 @@ function JobManage() {
 
     const handleApplicationRemove = async (jobId: number, vaildType: number | null) => {
         await removeJob(jobId, vaildType);
-        await getTotalJob();
+        await getTotalJob(currentPage, 40);
     };
 
     const handleStatusChange = async (jobId: number, status: number) => {
@@ -104,19 +108,17 @@ function JobManage() {
             return sortConfig.order === 'asc' ? comparison : -comparison;
         });
 
-        setFilteredJob(filtered);
+        // setFilteredJob(filtered);
     }, [totalJob, searchQuery, statusFilter, sortConfig]);
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
-            await getTotalJob();
+            await getTotalJob(currentPage, 40);
             setIsLoading(false);
         };
-        if (!totalJob || totalJob.length === 0) {
-            fetchData();
-        }
-        // fetchData();
+
+        fetchData();
     }, []);
 
     const getSortIcon = (field: SortField) => {
@@ -124,24 +126,13 @@ function JobManage() {
         return sortConfig.order === 'asc' ? '↑' : '↓';
     };
 
-    const totalItems = filteredJob?.length ?? 0;
-    const calculatedTotalPages = Math.ceil(totalItems / jobsPerPage);
-    const currentJobs = (filteredJob ?? []).slice(
-        (currentPage - 1) * jobsPerPage,
-        currentPage * jobsPerPage
-    );
+    // const currentJobs = (filteredJob ?? []).slice(
+    //     (currentPage - 1) * jobsPerPage,
+    //     currentPage * jobsPerPage
+    // );
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
+    const handlePageChange = () => {
         jobListRef.current?.querySelector(`.${style.jobList__content}`)?.scrollTo(0, 0);
-    };
-
-    const goToPreviousPage = () => {
-        if (currentPage > 1) handlePageChange(currentPage - 1);
-    };
-
-    const goToNextPage = () => {
-        if (currentPage < calculatedTotalPages) handlePageChange(currentPage + 1);
     };
 
     return (
@@ -252,8 +243,8 @@ function JobManage() {
                         </div>
 
                         <div className={style.listView__body} ref={jobListRef}>
-                            {currentJobs && currentJobs.length > 0 ? (
-                                currentJobs?.map((job) => (
+                            {totalJob && totalJob.length > 0 ? (
+                                totalJob?.map((job) => (
                                     <JobManageItem
                                         key={job.id}
                                         job={job}
@@ -279,27 +270,24 @@ function JobManage() {
                                 ''
                             ) : (
                                 <div className={style.jobList__pagination}>
-                                    {calculatedTotalPages > 1 && (
+                                    {totalPage > 1 && (
                                         <>
                                             <button
                                                 className={`${style.jobList__paginationButton} ${
                                                     currentPage === 1 ? style.disabled : ''
                                                 }`}
-                                                onClick={goToPreviousPage}
+                                                onClick={goToPrevPage}
                                                 disabled={currentPage === 1}>
                                                 이전
                                             </button>
 
                                             <div className={style.jobList__paginationNumbers}>
-                                                {Array.from(
-                                                    { length: calculatedTotalPages },
-                                                    (_, i) => i + 1
-                                                )
+                                                {Array.from({ length: totalPage }, (_, i) => i)
                                                     .filter(
                                                         (page) =>
-                                                            page === 1 ||
-                                                            page === calculatedTotalPages ||
-                                                            Math.abs(page - currentPage) <= 1
+                                                            page === 0 || // 첫 페이지
+                                                            page === totalPage - 1 || // 마지막 페이지
+                                                            Math.abs(page - currentPage) <= 1 // 현재 페이지 전후 1쪽
                                                     )
                                                     .map((page, index, array) => {
                                                         if (
@@ -324,9 +312,9 @@ function JobManage() {
                                                                                 : ''
                                                                         }`}
                                                                         onClick={() =>
-                                                                            handlePageChange(page)
+                                                                            handlePageChange()
                                                                         }>
-                                                                        {page}
+                                                                        {page + 1}
                                                                     </button>
                                                                 </React.Fragment>
                                                             );
@@ -341,10 +329,8 @@ function JobManage() {
                                                                         ? style.active
                                                                         : ''
                                                                 }`}
-                                                                onClick={() =>
-                                                                    handlePageChange(page)
-                                                                }>
-                                                                {page}
+                                                                onClick={() => handlePageChange()}>
+                                                                {page + 1}
                                                             </button>
                                                         );
                                                     })}
@@ -352,12 +338,10 @@ function JobManage() {
 
                                             <button
                                                 className={`${style.jobList__paginationButton} ${
-                                                    currentPage === calculatedTotalPages
-                                                        ? style.disabled
-                                                        : ''
+                                                    currentPage === totalPage ? style.disabled : ''
                                                 }`}
                                                 onClick={goToNextPage}
-                                                disabled={currentPage === calculatedTotalPages}>
+                                                disabled={currentPage === totalPage}>
                                                 다음
                                             </button>
                                         </>
