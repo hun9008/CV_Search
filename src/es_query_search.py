@@ -46,21 +46,52 @@ def test_keyword_filter_query(index_name=JOBS_INDEX_NAME, size=10,
                                sido=None, sigungu=None):
     try:
         must_clause = []
+
         if keyword:
+            should_clauses = [
+                {
+                    "multi_match": {
+                        "query": keyword,
+                        "fields": [
+                            "company_name^3",
+                            "title^2",
+                            "requirements",
+                            "job_description",
+                            "preferred_qualifications",
+                            "ideal_candidate",
+                            "experience",
+                            "job_type"
+                        ],
+                        "type": "most_fields"
+                    }
+                }
+            ]
+
+            # match_phrase_prefix로 접두사 부분일치도 함께 지원
+            prefix_fields = [
+                ("company_name", 2),
+                ("title", 2),
+                ("requirements", 1),
+                ("job_description", 1),
+                ("preferred_qualifications", 1),
+                ("ideal_candidate", 1),
+                ("experience", 1),
+                ("job_type", 1)
+            ]
+
+            for field, boost in prefix_fields:
+                should_clauses.append({
+                    "match_phrase_prefix": {
+                        field: {
+                            "query": keyword,
+                            "boost": boost
+                        }
+                    }
+                })
+
             must_clause.append({
-                "multi_match": {
-                    "query": keyword,
-                    "fields": [
-                        "company_name^3",
-                        "title^2",
-                        "requirements",
-                        "job_description",
-                        "preferred_qualifications",
-                        "ideal_candidate",
-                        "experience",
-                        "job_type"
-                    ],
-                    "type": "most_fields"
+                "bool": {
+                    "should": should_clauses
                 }
             })
 
@@ -100,6 +131,7 @@ def test_keyword_filter_query(index_name=JOBS_INDEX_NAME, size=10,
     except Exception as e:
         print(f"[ERROR] Keyword + Filter ES query failed: {e}")
         return []
+
 
 def get_similar_jobs_by_id(job_id: str, k: int = 5):
     res = es.search(
