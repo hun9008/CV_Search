@@ -35,8 +35,6 @@ goodJob은 사용자의 이력서(CV)를 기반으로 맞춤형 채용 공고 �
 - **Axios** (API 통신)
 - **React Router**
 - **Lucide-react** (아이콘)
-- **S3 Presigned URL** (파일 업로드/다운로드)
-- **ErrorBoundary, Suspense** (에러/로딩 처리)
 
 ---
 
