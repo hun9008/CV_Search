@@ -1,7 +1,6 @@
 package com.www.goodjob.dto;
 
 import com.www.goodjob.domain.Job;
-import com.www.goodjob.domain.JobValidType;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -14,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class ValidJobDto {
+public class JobWithValidTypeDto {
 
     private Long id;
     private String companyName;
@@ -26,9 +25,9 @@ public class ValidJobDto {
     private String url;
 
 
-    public static ValidJobDto from(Job job) {
+    public static JobWithValidTypeDto from(Job job) {
         List<RegionDto> regions = RegionDto.fromJob(job);
-        return ValidJobDto.builder()
+        return JobWithValidTypeDto.builder()
                 .id(job.getId())
                 .companyName(job.getCompanyName())
                 .title(job.getTitle())

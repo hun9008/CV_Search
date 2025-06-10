@@ -1,6 +1,5 @@
 package com.www.goodjob.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.www.goodjob.domain.*;
 import com.www.goodjob.dto.*;
 import com.www.goodjob.repository.JobRegionRepository;
@@ -415,51 +414,78 @@ class JobServiceTest {
     }
 
     @Test
-    void findAllJobWithValidType_returnsCorrectList() {
+    void searchJobsWithValidType_withFilters_returnsCorrectPage() {
         // given
         Pageable pageable = PageRequest.of(0, 2);
+        String keyword = "Backend";
+        List<String> jobTypes = List.of("정규직", "계약직");
+        List<String> experienceFilters = List.of("신입", "경력");
+        List<String> sidoFilters = List.of("서울특별시", "경기도");
+        List<String> sigunguFilters = List.of("강남구", "분당구");
+
         LocalDateTime createdAt = LocalDateTime.now();
         LocalDate applyEndDate = LocalDate.now().plusDays(10);
 
-        List<ValidJobDto> mockDtos = List.of(
-                ValidJobDto.builder()
-                        .id(1L)
-                        .companyName("Company A")
-                        .title("Backend Engineer")
-                        .jobValidType(1)
-                        .isPublic(true)
-                        .createdAt(createdAt)
-                        .applyEndDate(applyEndDate)
-                        .url("https://companyA.com/job1")
-                        .build(),
-                ValidJobDto.builder()
-                        .id(2L)
-                        .companyName("Company B")
-                        .title("Data Scientist")
-                        .jobValidType(1)
-                        .isPublic(false)
-                        .createdAt(createdAt.minusDays(1))
-                        .applyEndDate(applyEndDate.minusDays(2))
-                        .url("https://companyB.com/job2")
-                        .build()
-        );
+        Job job1 = new Job();
+        job1.setId(1L);
+        job1.setCompanyName("Company A");
+        job1.setTitle("Backend Engineer");
+        job1.setJobValidType(1);
+        job1.setIsPublic(true);
+        job1.setCreatedAt(createdAt);
+        job1.setApplyEndDate(applyEndDate);
+        job1.setUrl("https://companyA.com/job1");
 
-        when(jobRepository.findAllWithValidType(pageable)).thenReturn(new PageImpl<>(mockDtos));
+        Job job2 = new Job();
+        job2.setId(2L);
+        job2.setCompanyName("Company B");
+        job2.setTitle("Backend Developer");
+        job2.setJobValidType(1);
+        job2.setIsPublic(false);
+        job2.setCreatedAt(createdAt.minusDays(1));
+        job2.setApplyEndDate(applyEndDate.minusDays(2));
+        job2.setUrl("https://companyB.com/job2");
+
+        List<Job> mockJobs = List.of(job1, job2);
+
+        Page<Job> mockPage = new PageImpl<>(mockJobs, pageable, 2);
+
+        when(jobRepository.searchJobsWithFilters(
+                eq(keyword),
+                eq(jobTypes),
+                eq(experienceFilters),
+                eq(sidoFilters),
+                eq(sigunguFilters),
+                eq(pageable)
+        )).thenReturn(mockPage);
 
         // when
-        List<ValidJobDto> result = jobService.findAllJobWithValidType(pageable);
+        Page<JobWithValidTypeDto> result = jobService.searchJobsWithValidType(
+                keyword, jobTypes, experienceFilters, sidoFilters, sigunguFilters, pageable
+        );
 
         // then
-        assertEquals(2, result.size());
+        assertEquals(2, result.getContent().size());
+        assertEquals(2, result.getTotalElements());
+        assertEquals(1, result.getTotalPages());
+        assertEquals(0, result.getNumber());
+        assertEquals(2, result.getSize());
 
-        ValidJobDto first = result.get(0);
+        JobWithValidTypeDto first = result.getContent().get(0);
         assertEquals("Company A", first.getCompanyName());
         assertEquals("Backend Engineer", first.getTitle());
         assertEquals("https://companyA.com/job1", first.getUrl());
         assertTrue(first.getIsPublic());
 
-        ValidJobDto second = result.get(1);
+        JobWithValidTypeDto second = result.getContent().get(1);
         assertEquals("Company B", second.getCompanyName());
+        assertEquals("Backend Developer", second.getTitle());
         assertFalse(second.getIsPublic());
+
+        // 메서드 호출 검증
+        verify(jobRepository).searchJobsWithFilters(
+                keyword, jobTypes, experienceFilters, sidoFilters, sigunguFilters, pageable
+        );
     }
+
 }
