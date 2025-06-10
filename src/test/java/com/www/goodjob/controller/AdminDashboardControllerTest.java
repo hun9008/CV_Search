@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -129,7 +128,7 @@ class AdminDashboardControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("/admin/dashboard/job-valid-type - 유효 공고 목록 조회 성공")
     void getJobWithValidType_success() throws Exception {
-        ValidJobDto dto = ValidJobDto.builder()
+        JobWithValidTypeDto dto = JobWithValidTypeDto.builder()
                 .id(1L)
                 .companyName("테스트")
                 .title("채용공고")
@@ -140,19 +139,30 @@ class AdminDashboardControllerTest {
                 .url("https://job.com")
                 .build();
 
-        given(jobService.findAllJobWithValidType(any())).willReturn(List.of(dto));
+        Page<JobWithValidTypeDto> page = new PageImpl<>(
+                List.of(dto),
+                PageRequest.of(0, 10),
+                1
+        );
+        given(jobService.searchJobsWithValidType(any(),any(),any(),any(),any(),any())).willReturn(page);
 
-        mockMvc.perform(get("/admin/dashboard/job-valid-type"))
+        mockMvc.perform(get("/admin/dashboard/job-valid-type")
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].companyName").value("테스트"));
+                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].companyName").value("테스트"))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.size").value(10))
+                .andExpect(jsonPath("$.number").value(0));
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("/admin/dashboard/job-valid-type - 예외 발생 시 500 반환")
     void getJobWithValidType_exception_returns500() throws Exception {
-        given(jobService.findAllJobWithValidType(any(Pageable.class)))
+        given(jobService.searchJobsWithValidType(any(),any(),any(),any(),any(),any()))
                 .willThrow(new RuntimeException("조회 실패"));
 
         mockMvc.perform(get("/admin/dashboard/job-valid-type"))

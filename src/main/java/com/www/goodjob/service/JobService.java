@@ -20,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -107,6 +106,7 @@ public class JobService {
             }
         }
 
+
         // keyword 없이 RDB 검색
         List<String> safeJobTypes = (jobTypes == null || jobTypes.isEmpty()) ? null : jobTypes;
         List<String> safeExperience = (expandedExperienceFilters == null || expandedExperienceFilters.isEmpty()) ? null : expandedExperienceFilters;
@@ -178,8 +178,34 @@ public class JobService {
         }
     }
 
-    public Page<ValidJobDto> findAllJobWithValidType(Pageable pageable) {
-        return jobRepository.findAllWithValidType(pageable);
+    public Page<JobWithValidTypeDto> searchJobsWithValidType(String keyword,
+                                                             List<String> jobTypes,
+                                                             List<String> experienceFilters,
+                                                             List<String> sidoFilters,
+                                                             List<String> sigunguFilters,
+                                                             Pageable pageable) {
+        List<String> expandedExperienceFilters = experienceFilters == null ? null :
+                experienceFilters.stream()
+                        .flatMap(f -> f.equals("경력무관")
+                                ? Stream.of("경력무관", "신입", "경력")
+                                : Stream.of(f))
+                        .distinct()
+                        .toList();
+        // keyword 없이 RDB 검색
+        List<String> safeJobTypes = (jobTypes == null || jobTypes.isEmpty()) ? null : jobTypes;
+        List<String> safeExperience = (expandedExperienceFilters == null || expandedExperienceFilters.isEmpty()) ? null : expandedExperienceFilters;
+        List<String> safeSido = (sidoFilters == null || sidoFilters.isEmpty()) ? null : sidoFilters;
+        List<String> safeSigungu = (sigunguFilters == null || sigunguFilters.isEmpty()) ? null : sigunguFilters;
+
+        Page<Job> jobPage = jobRepository.searchJobsWithFilters(
+                keyword,
+                safeJobTypes,
+                safeExperience,
+                safeSido,
+                safeSigungu,
+                pageable
+        );
+        return jobPage.map(JobWithValidTypeDto::from);
     }
 
     @Transactional

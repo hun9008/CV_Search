@@ -1,26 +1,23 @@
 package com.www.goodjob.repository;
 
 import com.www.goodjob.domain.Job;
-import com.www.goodjob.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import com.www.goodjob.dto.ValidJobDto;
+import com.www.goodjob.dto.JobWithValidTypeDto;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
 
     @Query(value = """
     SELECT DISTINCT j FROM Job j
-    LEFT JOIN j.jobRegions jr
-    LEFT JOIN jr.region r
-    LEFT JOIN j.favicon f
+    LEFT JOIN FETCH j.jobRegions jr
+    LEFT JOIN FETCH jr.region r
+    LEFT JOIN FETCH j.favicon f
     WHERE j.isPublic = true
     AND (
         :keyword IS NULL OR
@@ -48,8 +45,8 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     """,
             countQuery = """
     SELECT COUNT(DISTINCT j.id) FROM Job j
-    LEFT JOIN j.jobRegions jr
-    LEFT JOIN jr.region r
+    LEFT JOIN  j.jobRegions jr
+    LEFT JOIN  jr.region r
     WHERE j.isPublic = true
     AND (
         :keyword IS NULL OR
@@ -92,12 +89,6 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             "WHERE j.id IN :ids")
     List<Job> findByIdInWithRegion(@Param("ids") List<Long> ids);
 
-    @Query("SELECT new com.www.goodjob.dto.ValidJobDto(" +
-            "j.id, j.companyName, j.title, j.jobValidType, j.isPublic, j.createdAt, j.applyEndDate, j.url) " +
-            "FROM Job j "
-       )
-
-    Page<ValidJobDto> findAllWithValidType(Pageable pageable);
 
     long countByCreatedAtAfter(LocalDateTime date);
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
