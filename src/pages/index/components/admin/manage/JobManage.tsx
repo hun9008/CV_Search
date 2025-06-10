@@ -33,7 +33,7 @@ function JobManage() {
     const currentPage = useAdminJobManageStore((state) => state.currentPage);
     // const isFirstPage = useAdminJobManageStore((state) => state.isFirstPage);
     // const isLastPage = useAdminJobManageStore((state) => state.isLastPage);
-    const { goToNextPage, goToPrevPage } = useAdminJobManageStore();
+    const { goToNextPage, goToPrevPage, setCurrentPage } = useAdminJobManageStore();
     const jobListRef = useRef<HTMLDivElement>(null);
 
     // 상태 옵션 목록
@@ -66,50 +66,50 @@ function JobManage() {
     const handleJobAdd = () => {};
 
     // 검색, 필터링, 정렬 적용
-    useEffect(() => {
-        if (!totalJob) return;
+    // useEffect(() => {
+    //     if (!totalJob) return;
 
-        let filtered = [...totalJob];
+    //     let filtered = [...totalJob];
 
-        // 검색어 필터링
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            filtered = filtered.filter(
-                (job) =>
-                    (job.title && job.title.toLowerCase().includes(query)) ||
-                    (job.companyName && job.companyName.toLowerCase().includes(query))
-            );
-        }
+    //     // 검색어 필터링
+    //     if (searchQuery) {
+    //         const query = searchQuery.toLowerCase();
+    //         filtered = filtered.filter(
+    //             (job) =>
+    //                 (job.title && job.title.toLowerCase().includes(query)) ||
+    //                 (job.companyName && job.companyName.toLowerCase().includes(query))
+    //         );
+    //     }
 
-        // 상태 필터링
-        if (statusFilter.length > 0) {
-            filtered = filtered.filter((job) => statusFilter.includes(String(job.jobVaildType)));
-        }
+    //     // 상태 필터링
+    //     if (statusFilter.length > 0) {
+    //         filtered = filtered.filter((job) => statusFilter.includes(String(job.jobVaildType)));
+    //     }
 
-        // 정렬
-        filtered.sort((a, b) => {
-            let comparison = 0;
+    //     // 정렬
+    //     filtered.sort((a, b) => {
+    //         let comparison = 0;
 
-            switch (sortConfig.field) {
-                case 'companyName':
-                    comparison = a.companyName.localeCompare(b.companyName);
-                    break;
-                case 'jobTitle':
-                    comparison = a.title.localeCompare(b.title);
-                    break;
-                case 'createdAt':
-                    comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-                    break;
-                case 'applyStatus':
-                    comparison = String(a.jobVaildType).localeCompare(String(b.jobVaildType));
-                    break;
-            }
+    //         switch (sortConfig.field) {
+    //             case 'companyName':
+    //                 comparison = a.companyName.localeCompare(b.companyName);
+    //                 break;
+    //             case 'jobTitle':
+    //                 comparison = a.title.localeCompare(b.title);
+    //                 break;
+    //             case 'createdAt':
+    //                 comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    //                 break;
+    //             case 'applyStatus':
+    //                 comparison = String(a.jobVaildType).localeCompare(String(b.jobVaildType));
+    //                 break;
+    //         }
 
-            return sortConfig.order === 'asc' ? comparison : -comparison;
-        });
+    //         return sortConfig.order === 'asc' ? comparison : -comparison;
+    //     });
 
-        // setFilteredJob(filtered);
-    }, [totalJob, searchQuery, statusFilter, sortConfig]);
+    //     // setFilteredJob(filtered);
+    // }, [totalJob, searchQuery, statusFilter, sortConfig]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -119,7 +119,7 @@ function JobManage() {
         };
 
         fetchData();
-    }, []);
+    }, [currentPage]);
 
     const getSortIcon = (field: SortField) => {
         if (sortConfig.field !== field) return null;
@@ -131,7 +131,8 @@ function JobManage() {
     //     currentPage * jobsPerPage
     // );
 
-    const handlePageChange = () => {
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
         jobListRef.current?.querySelector(`.${style.jobList__content}`)?.scrollTo(0, 0);
     };
 
@@ -312,7 +313,7 @@ function JobManage() {
                                                                                 : ''
                                                                         }`}
                                                                         onClick={() =>
-                                                                            handlePageChange()
+                                                                            handlePageChange(page)
                                                                         }>
                                                                         {page + 1}
                                                                     </button>
@@ -329,7 +330,9 @@ function JobManage() {
                                                                         ? style.active
                                                                         : ''
                                                                 }`}
-                                                                onClick={() => handlePageChange()}>
+                                                                onClick={() =>
+                                                                    handlePageChange(page)
+                                                                }>
                                                                 {page + 1}
                                                             </button>
                                                         );

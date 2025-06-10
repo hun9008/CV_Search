@@ -21,8 +21,6 @@ function JobDetail({ isDialog }: DialogSet) {
     const [isBookmarked, setIsBookmarked] = useState(job?.isBookmarked || false);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     const [isManaging, setIsManaging] = useState(false);
-    // const [showManageModal, setShowManageModal] = useState(false);
-    const [manageButtonClicked, setManageButtonClicked] = useState(false);
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const selectedCVId = useJobStore((state) => state.selectedCVId);
@@ -121,9 +119,7 @@ function JobDetail({ isDialog }: DialogSet) {
                 const res = await deleteApplications(jobId);
                 if (res === 204) {
                     setIsManaging(false);
-                    setManageButtonClicked(false);
                     console.log('관리 해제 완료:', res);
-                    setManageButtonClicked(false); // 지우기
                     // 지원 목록 다시 가져오기
                     await useApplyStore.getState().getApplications();
                 }
@@ -132,7 +128,6 @@ function JobDetail({ isDialog }: DialogSet) {
                 const res = await setApplications(jobId);
                 if (res === 201) {
                     setIsManaging(true);
-                    setManageButtonClicked(true);
                     console.log('관리 등록 완료:', res);
                     // 지원 목록 다시 가져오기
                     await useApplyStore.getState().getApplications();
@@ -288,9 +283,7 @@ function JobDetail({ isDialog }: DialogSet) {
                 </button>
 
                 <button
-                    className={`${style.actionButtons__manage} ${
-                        manageButtonClicked ? '' : style.clicked
-                    }`}
+                    className={`${style.actionButtons__manage} ${isManaging ? style.clicked : ''}`}
                     onClick={() => selectedJobDetail && handleManagement(selectedJobDetail.id)}>
                     {isManaging ? '관리중' : '관리 시작'}
                 </button>

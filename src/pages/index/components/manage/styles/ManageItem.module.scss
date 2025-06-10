@@ -141,7 +141,6 @@
 
     &__statusDropdown {
         position: absolute;
-        top: calc(100% + 5px);
         left: 0;
         width: 150px;
         background-color: white;
@@ -150,6 +149,17 @@
         z-index: 10;
         overflow: hidden;
         animation: fadeIn 0.2s ease;
+
+        // 아래로 오버플로우될 때 위로 띄우는 스타일
+        &.dropUp {
+            top: auto;
+            bottom: calc(100% + 5px);
+        }
+        // 기본(아래로)
+        &:not(.dropUp) {
+            top: calc(100% + 5px);
+            bottom: auto;
+        }
     }
 
     &__statusOption {

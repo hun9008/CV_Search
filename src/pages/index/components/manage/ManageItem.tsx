@@ -22,6 +22,7 @@ function ManageItem({
     const [showStatusDropdown, setShowStatusDropdown] = useState(false);
     const [showActions, setShowActions] = useState(false);
     const [editedNote, setEditedNote] = useState(job.note || '');
+    const [dropUp, setDropUp] = useState(false);
     const noteInputRef = useRef<HTMLTextAreaElement>(null);
     const statusDropdownRef = useRef<HTMLDivElement>(null);
     const actionsMenuRef = useRef<HTMLDivElement>(null);
@@ -77,6 +78,19 @@ function ManageItem({
             noteInputRef.current.focus();
         }
     }, [isEditingNote]);
+
+    // 드롭다운 위치 계산
+    useEffect(() => {
+        if (showStatusDropdown && statusDropdownRef.current) {
+            const rect = statusDropdownRef.current.getBoundingClientRect();
+            const dropdownHeight = 40 + statusOptions.length * 36; // 대략적인 높이(옵션당 36px)
+            if (rect.bottom + dropdownHeight > window.innerHeight) {
+                setDropUp(true);
+            } else {
+                setDropUp(false);
+            }
+        }
+    }, [showStatusDropdown, statusOptions.length]);
 
     const handleNoteEdit = () => {
         setIsEditingNote(true);
@@ -151,7 +165,10 @@ function ManageItem({
                     </button>
 
                     {showStatusDropdown && (
-                        <div className={style.item__statusDropdown}>
+                        <div
+                            className={`${style.item__statusDropdown} ${
+                                dropUp ? style.dropUp : ''
+                            }`}>
                             {statusOptions.map((status) => (
                                 <div
                                     key={status}
