@@ -1,54 +1,85 @@
-# React + TypeScript + Vite
+# goodJob 프론트엔드
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## 소개
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+goodJob은 사용자의 이력서(CV)를 기반으로 맞춤형 채용 공고 추천, AI 피드백, 지원 현황 관리, 북마크, 관리자 대시보드 등 다양한 채용 관련 기능을 제공하는 플랫폼입니다.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## What I do
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- 이력서 업로드 및 관리, 맞춤형 채용 공고 추천, AI 기반 피드백, 지원 현황 관리, 북마크, 관리자 대시보드 등 채용 서비스의 핵심 프론트엔드 기능을 구현했습니다.
+
+---
+
+## 주요 기능
+
+- **CV 업로드 및 관리**: PDF 이력서 업로드, 별명 지정, 삭제, 이름 변경
+- **맞춤형 채용 공고 추천**: 업로드한 CV를 기반으로 AI가 공고 추천
+- **공고 상세/피드백**: 공고별 상세 정보, AI 기반 피드백 제공
+- **지원 현황 관리**: 지원 상태 변경, 메모, 정렬/검색/필터, 지원 이력 관리
+- **북마크**: 관심 공고 북마크 및 관리
+- **관리자 대시보드**: 통계, 서버 상태, 키워드 분석 등
+- **반응형 UI**: 데스크탑/모바일 모두 지원
+
+---
+
+## 기술 스택
+
+- **React** (CRA 기반)
+- **TypeScript**
+- **Zustand** (상태 관리)
+- **SCSS Modules** (스타일링)
+- **Axios** (API 통신)
+- **React Router**
+- **Lucide-react** (아이콘)
+- **S3 Presigned URL** (파일 업로드/다운로드)
+- **ErrorBoundary, Suspense** (에러/로딩 처리)
+
+---
+
+## 프로젝트 구조
+
+```
+src/
+  components/         // 공통 컴포넌트 및 페이지별 UI
+  pages/              // 라우트별 페이지
+  store/              // Zustand 상태 관리
+  types/              // 타입 정의
+  utils/              // 유틸리티 함수
+  constants/          // 환경 변수 등 상수
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 개발 및 실행
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+1. 패키지 설치  
+   ```bash
+   npm install
+   ```
+
+2. 개발 서버 실행  
+   ```bash
+   npm start
+   ```
+
+3. 빌드  
+   ```bash
+   npm run build
+   ```
+
+---
+
+## 환경 변수
+
+- `/src/constants/env.ts`에서 서버 주소 등 환경 변수 관리
+
+---
+
+## 기타
+
+- 문의 및 피드백은 이슈로 남겨주세요.
+- 관리자 기능은 별도의 권한이 필요합니다.
