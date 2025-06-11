@@ -157,9 +157,6 @@ class RecommendServiceTest {
         when(restTemplate.postForEntity(anyString(), any(), eq(String.class)))
                 .thenReturn(mockResponse);
 
-//        JsonNode mockRoot = new ObjectMapper().readTree(mockJson);
-//        when(objectMapper.readTree(mockJson)).thenReturn(mockRoot);
-
         Job mockJob = mock(Job.class);
         when(mockJob.getId()).thenReturn(42L);
         when(mockJob.getFavicon()).thenReturn(new Favicon(null, "some-domain", "base64string"));

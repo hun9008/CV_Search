@@ -16,3 +16,8 @@ AWS_ACCESS_KEY_ID: test-key
 AWS_SECRET_ACCESS_KEY: test-secret
 AWS_S3_BUCKET: test-bucket
 AWS_REGION: ap-northeast-2
+
+
+monitoring:
+  prometheus:
+    url: ${PROMETHEUS_HOST}

@@ -1,21 +1,23 @@
 package com.www.goodjob.controller;
 
 import com.www.goodjob.domain.Job;
-import com.www.goodjob.dto.CreateJobDto;
-import com.www.goodjob.dto.DashboardDto;
-import com.www.goodjob.dto.ServerStatus;
-import com.www.goodjob.dto.ValidJobDto;
+import com.www.goodjob.domain.User;
+import com.www.goodjob.dto.*;
+import com.www.goodjob.security.CustomUserDetails;
 import com.www.goodjob.service.DashboardService;
 import com.www.goodjob.service.JobService;
 import com.www.goodjob.service.MonitoringService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,6 +54,26 @@ public class AdminDashboardController {
     @GetMapping
     public DashboardDto getDashboardStats() {
         return dashboardService.getDashboardStats();
+    }
+
+    @Operation(
+            summary = "유저 플랜 통계 조회",
+            description = """
+                    전체 유저 중 각 플랜(Starter, Basic, Enterprise)의 사용자 수와 총 유저 수를 반환합니다.
+                    
+                    📌 예시 응답:
+                    {
+                      "starter": 20,
+                      "basic": 1,
+                      "enterprise": 0,
+                      "total": 21
+                    }
+                    """
+    )
+    @GetMapping("/plan")
+    public ResponseEntity<Map<String, Long>> getUserPlanStats() {
+        Map<String, Long> stats = dashboardService.getUserPlanStats();
+        return ResponseEntity.ok(stats);
     }
 
     @Operation(summary = "서버 상태 확인", description = "Prometheus를 통해 Redis, Spring, FastAPI 서버의 상태와 응답 시간을 조회합니다. " +
@@ -135,8 +157,25 @@ public class AdminDashboardController {
               },
             ]
             """)
-    @GetMapping("/job-valid-type" )
-    public ResponseEntity<?> getJobWithValidType(
+
+
+    @GetMapping("/job-valid-type")
+    public ResponseEntity<?> searchJobs(
+            @Parameter(description = "키워드 검색. 회사명, 공고 제목, 부서, 직무 설명, 조건 등에서 부분 일치로 검색됨")
+            @RequestParam(required = false) String keyword,
+
+            @Parameter(description = "근무 유형 필터. < 정규직, 계약직, 인턴, 아르바이트, 프리랜서, 파견직 > 중 선택 (다중 선택 가능)")
+            @RequestParam(required = false) List<String> jobType,
+
+            @Parameter(description = "요구 경력 필터. < 신입, 경력, 경력무관 > 중 선택 (다중 선택 가능)")
+            @RequestParam(required = false) List<String> experience,
+
+            @Parameter(description = "시도 필터. 예: '서울', '경기' 등 (다중 선택 가능)")
+            @RequestParam(required = false) List<String> sido,
+
+            @Parameter(description = "시군구 필터. 예: '강남구', '성남시' 등 (다중 선택 가능)")
+            @RequestParam(required = false) List<String> sigungu,
+
             @ParameterObject
             @PageableDefault(
                     page = 0,
@@ -144,16 +183,18 @@ public class AdminDashboardController {
                     sort = "createdAt",
                     direction = Sort.Direction.DESC
             )
-            Pageable pageable
-    ){
-        try{
-            List<ValidJobDto> JobList =jobService.findAllJobWithValidType(pageable);
-            return ResponseEntity.ok(JobList);
-        }
-        catch (Exception e){
+            Pageable pageable,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        User user = userDetails != null ? userDetails.getUser() : null;
+        try {
+            Page<JobWithValidTypeDto> result = jobService.searchJobsWithValidType(keyword, jobType, experience, sido, sigungu, pageable);
+            return ResponseEntity.ok(result);
+        }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", e.getMessage()));
         }
+
     }
 
 
