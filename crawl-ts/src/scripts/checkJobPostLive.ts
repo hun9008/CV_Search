@@ -1,6 +1,6 @@
 import 'dotenv/config'; // 환경 변수 로딩
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { MysqlRecruitInfoSequelize, VLAID_TYPE_EXPIRED } from '../models/MysqlRecruitInfoModel';
+import { MysqlRecruitInfoSequelize, VALID_TYPE } from '../models/MysqlRecruitInfoModel';
 import pLimit from 'p-limit';
 
 // 입력 인터페이스
@@ -51,7 +51,10 @@ async function checkLiveUrl(url: string, browser: Browser): Promise<JobPostingAn
           // alert 발생 시 resolve 호출
         page.on('dialog', async (dialog) => {
           await dialog.dismiss();
-          if (dialog.message().includes('마감') || dialog.message().includes('아닙니다.') || dialog.message().includes('종료되었습니다.')){
+            if (dialog.message().includes('마감') ||
+                dialog.message().includes('아닙니다.') ||
+                dialog.message().includes('종료되었습니다.') ||
+                dialog.message().includes('만료')) {
             console.log(`[${url}] 페이지에서 알림창 발생: ${dialog.message()}`);
             if (page) await page.close();
             return resolve({
@@ -153,7 +156,7 @@ async function runExamples() {
               console.log(`\n--- URL: ${tc.url} 확인 시작 ---`);
               const result = await checkJobPostingExpiry(browser, tc.url, tc.text);
               if (result.status === '마감') {
-                  await MysqlRecruitInfoSequelize.update({ job_valid_type: VLAID_TYPE_EXPIRED }, {
+                  await MysqlRecruitInfoSequelize.update({ job_valid_type: VALID_TYPE.EXPIRED }, {
                         where: { url: tc.url }
                   })
               }

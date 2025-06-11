@@ -240,3 +240,5 @@ async initBrowser(concurrency = 8,  retries = 3, delay = 2000): Promise<Browser 
     }
   }
 }
+
+export const chromeBrowserManager = new ChromeBrowserManager();

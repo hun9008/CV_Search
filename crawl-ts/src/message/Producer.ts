@@ -2,6 +2,7 @@
 import { defaultLogger as logger } from '../utils/logger';
 import { IRawContent, RawContentSchema } from '../models/RawContentModel';
 import { Messenger } from './Messenger';
+import { QueueNames } from './enums';
 
 export class Producer extends Messenger {
 
@@ -30,3 +31,5 @@ export class Producer extends Messenger {
     logger.debug(`[RabbitMQ] Sent message to ${this.queue}: ${message}`);
   }
 }
+
+export const producer = new Producer(QueueNames.VISIT_RESULTS);

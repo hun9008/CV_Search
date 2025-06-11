@@ -1,7 +1,8 @@
 import { CreateDBRecruitInfoDTO } from '../models/RecruitInfoModel';
+import { URLSTAUS } from '../models/ReidsModel';
 import { IRecruitInfoRepository } from './IRecruitInfoRepository';
 import { MysqlRecruitInfoRepository } from './MysqlRecruitInfoRepository';
-import { RedisUrlManager, URLSTAUS } from '../url/RedisUrlManager';
+import { RedisUrlManager } from '../url/RedisUrlManager';
 import { defaultLogger as logger } from '../utils/logger';
 export class RecruitInfoRepository implements IRecruitInfoRepository {
 
@@ -27,7 +28,7 @@ export class RecruitInfoRepository implements IRecruitInfoRepository {
           logger.error('[RecruitInfoRepository][createRecruitInfo] Failed to create recruit info');
           throw new Error('Failed to create recruit info');
         }
-        return this.urlManager.setURLStatus(result.url, URLSTAUS.HAS_RECRUITINFO)
+        return this.urlManager.setURLStatusByOldStatus(result.url,URLSTAUS.VISITED ,URLSTAUS.HAS_RECRUITINFO)
       }
     )
     .catch((error) => {

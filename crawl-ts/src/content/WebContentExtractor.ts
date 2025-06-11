@@ -1,7 +1,8 @@
 import { IContentExtractor } from './IContentExtractor';
 import { defaultLogger as logger } from '../utils/logger';
 import { isUrlAllowed } from '../url/urlUtils';
-import { Page, Target  } from 'puppeteer';
+import { Page, Target } from 'puppeteer';
+import { timeoutAfter } from '../browser/ChromeBrowserManager';
 
 /**
  * 웹 콘텐츠 추출 구현체
@@ -242,34 +243,37 @@ export class WebContentExtractor implements IContentExtractor {
 
         page.browserContext().once('targetcreated', popUpPageHandler)
 
-        await tempPage.goto(page.url(), { waitUntil: 'load', timeout: 3000 });
+       await tempPage.goto(page.url(), { waitUntil: 'load', timeout: 3000 });
         await Promise.all(
-          [ tempPage.evaluate(script).catch((err) => {}),
-            tempPage.waitForNavigation({ waitUntil: 'load', timeout: 3000 }).catch((error) => { })
+          [ timeoutAfter(tempPage.evaluate(script).catch((err) => {}),5000, new Error('[extract onclick link] onclick script 실행 시간 초과') ),
+            tempPage.waitForNavigation({ waitUntil: 'networkidle0', timeout: 5000 }).catch((error) => { })
           ]
         ).then(() => {
           if(tempPage) {
-            logger.debug(`[extract onclick link] 스크립트 실행 완료: ${tempPage.url}`);
+            logger.debug(`[extract onclick link] 스크립트 실행 완료: ${tempPage.url()}`);
+            redirectedUrls.push(tempPage.url());
           }
+          page.browserContext().off('targetcreated', popUpPageHandler);
         })
-        page.browserContext().off('targetcreated', popUpPageHandler);
-        redirectedUrls.push(tempPage.url());
       } catch (err) {
         logger.error('[extract onclick link] 스크립트 url 수집 증 오류가 발생 했습니다.', err);
-        // throw err;
       } finally {
         if (tempPage) {
           await tempPage.close().catch(()=>{});
         }
       }
       })
-  );
+      );
+    logger.info(`[extract onclick link] 총 ${redirectedUrls.length}개의 URL이 수집되었습니다.`);
+    redirectedUrls.forEach((url) => {
+      logger.info(`[extract onclick link] 수집된 URL: ${url}`);
+    });
 
   return Array.from(
   new Set(
-    redirectedUrls.filter((url): url is string =>
-      !!url && allowedDomains.some(domain => url.includes(domain))
-    )
+    redirectedUrls
+    .filter(url => typeof url === 'string') // 문자열만 남기고
+    .filter(url => allowedDomains.some(domain => url.includes(domain)))
   )
 );
 }
@@ -284,6 +288,7 @@ async  collectOnclickScriptsWithScroll(page: Page): Promise<string[]> {
     );
     newOnclicks.forEach((s) => collected.add(s));
 
+
     // 스크롤을 아래로 내림
     const currentHeight = await page.evaluate(() => {
       window.scrollBy(0, window.innerHeight);
@@ -295,7 +300,11 @@ async  collectOnclickScriptsWithScroll(page: Page): Promise<string[]> {
     // 새 콘텐츠 로딩을 기다림
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-
+  collected.forEach((s) => {
+    logger.debug(`[extract onclick link] 수집된 onclick 스크립트: ${s}`);
+  });
   return Array.from(collected);
 }
 }
+
+export const webContentExtractor = new WebContentExtractor();

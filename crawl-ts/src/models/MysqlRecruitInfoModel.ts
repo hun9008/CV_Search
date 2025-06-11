@@ -1,10 +1,13 @@
 import { Sequelize ,DataTypes ,Model} from 'sequelize'
 import { CreateDBRecruitInfoDTO } from '../models/RecruitInfoModel';
 
-export const VLAID_TYPE_EXPIRED = 2;
-export const VLAID_TYPE_ACTIVE =  1;
-export const VLAID_TYPE_DEFAULT = 0;
+export enum VALID_TYPE {
+  ERROR = 3,
+  EXPIRED = 2,
+  ACTIVE = 1,
+  DEFAULT = 0
 
+};
 export const mysqlRecruitInfoSequelize = new Sequelize(
     process.env.MYSQL_DATABASE ?? 'localhost',
     process.env.MYSQL_USER ?? 'root' ,
@@ -50,8 +53,8 @@ export class MysqlRecruitInfoSequelize extends Model<CreateDBRecruitInfoDTO, Cre
   public job_valid_type?: number;
 
   public job_type?: string;
-  public apply_start_date?: Date;
-  public apply_end_date?: Date;
+  public apply_start_date?: Date | null;
+  public apply_end_date?: Date | null;
   public requirements?: string;
   public preferred_qualifications?: string;
   public ideal_candidate?: string;
@@ -164,7 +167,8 @@ MysqlRecruitInfoSequelize.init(
           }
         }
       },
-      apply_end_date: {
+    apply_end_date: {
+        allowNull: true,
         type: DataTypes.DATE,
            validate: {
           isAfter: {

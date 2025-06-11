@@ -1,6 +1,7 @@
 import  { ConsumeMessage } from 'amqplib';
 import { Messenger } from './Messenger';
 import { defaultLogger as logger } from '../utils/logger';
+import { QueueNames } from './enums';
 
 
 export class Consumer extends Messenger{
@@ -8,6 +9,7 @@ export class Consumer extends Messenger{
   constructor(queue: string) {
     super(queue);
   }
+
 
 
  async handleLiveMessage( onMessage: (msg : ConsumeMessage| null  )=> Promise<void> ,delay :number =1000): Promise<void> {
@@ -23,12 +25,20 @@ export class Consumer extends Messenger{
   await this.channel.consume(this.queue, (msg) => {
     if (msg !== null) {
       onMessage(msg).then(() =>
-        new Promise(() => { setTimeout(() => { this.channel!.ack(msg) } ,delay )})
+        new Promise(() => {
+          setTimeout(() => {
+            try {
+              this.channel!.ack(msg)
+            } catch (error) {
+              logger.error('[Consumer][handleLiveMessage] Error acknowledging message:', error);
+            }
+          }, delay)
+        })
         )
-      .catch((err) => {
-        console.error('Error processing message:', err);
-        this.channel!.nack(msg, false, false);
-      });
+       .catch((err) => {
+         logger.error('[Consumer][handleLiveMessage] Error processing message:', err);
+         this.channel!.nack(msg, false, false);
+      })
     }
   }, { noAck: false });
 

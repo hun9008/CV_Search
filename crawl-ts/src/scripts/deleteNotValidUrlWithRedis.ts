@@ -10,26 +10,7 @@ const redisClient = createClient({
 
 
 
-async function updateNotValidUrlWithRedis() {
 
-  try {
-    await redisClient.connect();
-    logger.info('Connected to Redis successfully');
-
-    const keys = await redisClient.hKeys('validated_job:fail');
-    logger.info(`Found ${keys.length} keys in 'validated_job:fail'`);
-    for (const key of keys) {
-      await MysqlRecruitInfoSequelize.update({ job_valid_type: 2 }, { where: { id: key } });
-      logger.info(`Updated job_valid_type to 2 for ID: ${key}`);
-    }
-  }
-  catch (error) {
-    if (error instanceof Error) {
-      logger.error(`Error connecting to Redis or updating database: ${error.message}`);
-      throw new Error("Failed to connect to Redis or update database");
-    }
-  }
-}
 
 
 async function deleteNotValidUrlWithRedis() {

@@ -14,7 +14,7 @@ dotenv.config();
 
 
 (async () => {
-
+                                                   
   const parser = new GeminiParser();
   const consumer = new Consumer(QueueNames.VISIT_RESULTS);
   const urlManager = new RedisUrlManager();

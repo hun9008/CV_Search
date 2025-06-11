@@ -1,6 +1,5 @@
 import regions from '../../static/regions.json';
-import { GeminiParser } from '@parser/GeminiParser';
-import { defaultLogger as logger } from '../utils/logger';
+
 
 export const OTHER_REGION_ID = 282
 export const OTHER_COUNTY_ID = 281
@@ -75,41 +74,4 @@ export function regionText2RegionIds(input: string): number[] {
 
 
 
-export async function regionText2RegionIdsAi(parser : GeminiParser ,input: string |undefined): Promise<number[]> {
 
-  if (!input) {
-    return [OTHER_REGION_ID];
-  }
-  const baseIds = regionText2RegionIds(input);
-  logger.debug('baseIds', baseIds);
-  return await parser.ParseRegionText(input, 100,3000).then(
-    (results) => {
-      if (!results) return [];
-      const ids = results.
-        filter(cd => cd.length == 10)
-        .map(cd => cdToRegionMap[simplifyRegionCode(cd)]?.id)
-        .filter(id => id !== undefined);
-      return [...new Set([...ids, ...baseIds])]
-    }
-  ).catch(
-    (error) => {
-      logger.error('Region Text 로 변환하는데 실패하였습니다.')
-      throw error
-    }
-  ).then(
-    (results) => {
-      if (results.length == 0) {
-        logger.error('Region Text 로 변환한 결과가 없습니다.')
-        return [OTHER_REGION_ID]
-      }
-      return results
-    }
-  )
-  .catch(
-    (error) => {
-      logger.error('Region Cd를 id로 변환하는데 실패하였습니다.')
-      throw error
-    }
-  )
-
-}

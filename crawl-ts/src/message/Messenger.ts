@@ -28,13 +28,15 @@ export class Messenger {
   }
 
   async close() {
-      try {
+    try {
+
+      if (this.connection) {
+        await this.connection.close();
+      }
         if (this.channel) {
           await this.channel.close();
         }
-        if (this.connection) {
-          await this.connection.close();
-        }
+
         logger.debug(`[RabbitMQ] Close to ${config.RABBITMQ_URL}`);
       }
       catch (error) {

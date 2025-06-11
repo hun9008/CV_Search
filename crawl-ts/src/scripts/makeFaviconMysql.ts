@@ -26,15 +26,12 @@ async function main() {
   });
 
   for (const favicon of favicon_ids) {
-    try {
         await MysqlRecruitInfoSequelize.update({favicon_id : favicon.id}, {where :{ url: {
           [Op.like]: `%${favicon.domain}%`
         }
         }
         })
-      logger.debug('[MysqlRecruitInfoRepository][createRecruitInfo] 파비콘 ID 업데이트 성공:', favicon.id);
-    }
-    catch (error) { }
+    logger.debug('[MysqlRecruitInfoRepository][createRecruitInfo] 파비콘 ID 업데이트 성공:', favicon.id);
   }
 
 }

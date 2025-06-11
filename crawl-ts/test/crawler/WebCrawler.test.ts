@@ -3,17 +3,17 @@ import express from 'express';
 import * as http from 'http';
 import path from 'path';
 import { WebCrawler } from '../../src/crawler/WebCrawler';
-import { IUrlManager } from '../../src/url/IUrlManager';
 import { IContentExtractor } from '../../src/content';
 import { Producer } from '@message/Producer';
 import { ChromeBrowserManager } from '@browser/ChromeBrowserManager';
+import { RedisUrlManager } from '@url/RedisUrlManager';
 
 
 describe('WebCrawler', () => {
   let server: http.Server;
   let serverUrl: string;
   let crawler: WebCrawler;
-  let mockUrlManager: jest.Mocked<IUrlManager>;
+  let mockUrlManager: jest.Mocked<RedisUrlManager>;
   let mockBrowserManager: jest.Mocked<ChromeBrowserManager>;
   let mockContentExtractor: jest.Mocked<IContentExtractor>;
   let mockProducer: jest.Mocked<Producer>;
@@ -73,12 +73,12 @@ describe('WebCrawler', () => {
     mockUrlManager = {
       getNextUrl: jest.fn().mockResolvedValue({ url: serverUrl, domain: 'localhost' }),
       addUrl: jest.fn().mockResolvedValue(undefined),
-      setURLStatus: jest.fn().mockResolvedValue(undefined),
+      setURLStatusByOldStatus : jest.fn().mockResolvedValue(undefined),
       textExists: jest.fn().mockResolvedValue(false),
       saveTextHash: jest.fn().mockResolvedValue(true),
       connect: jest.fn().mockResolvedValue(undefined),
       getNextUrlFromDomain: jest.fn().mockResolvedValue(undefined),
-    };
+    } as unknown as jest.Mocked<RedisUrlManager>;
 
     // Create mock MessageService
     mockProducer = {
@@ -168,7 +168,7 @@ describe('WebCrawler', () => {
       }
       // Verify error handling
       expect(mockProducer.sendMessage).toHaveBeenCalledTimes(0);
-      expect(mockUrlManager.setURLStatus).toHaveBeenCalledTimes(0);
+      expect(mockUrlManager.setURLStatusByOldStatus).toHaveBeenCalledTimes(0);
     });
 
     test('should handle navigation errors', async () => {
@@ -182,6 +182,8 @@ describe('WebCrawler', () => {
       }
     });
   });
+
+
 
 
 });

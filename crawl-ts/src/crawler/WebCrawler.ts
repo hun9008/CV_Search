@@ -2,12 +2,13 @@ import { IContentExtractor } from '../content/IContentExtractor';
 import { SubUrl } from '../models/VisitResult';
 import { defaultLogger as logger } from '../utils/logger';
 import { extractDomain } from '../url/urlUtils';
-import puppeteer, { BrowserContext, Dialog ,Page, TimeoutError} from 'puppeteer';
-import { IUrlManager } from '../url/IUrlManager';
-import { URLSTAUS } from '../url/RedisUrlManager';
-import { Producer } from '../message/Producer';
+import  { BrowserContext, Dialog ,Page, TimeoutError} from 'puppeteer';
+import {redisUrlManager, RedisUrlManager } from '../url/RedisUrlManager';
+import { URLSTAUS } from '../models/ReidsModel';
+import { producer, Producer } from '../message/Producer';
 import { IRawContent, RawContentSchema } from '../models/RawContentModel';
-import { ChromeBrowserManager, timeoutAfter } from '../browser/ChromeBrowserManager';
+import { chromeBrowserManager, ChromeBrowserManager, timeoutAfter } from '../browser/ChromeBrowserManager';
+import { webContentExtractor } from '../content/WebContentExtractor';
 
   /**
    * 웹 크롤러 구현체
@@ -16,8 +17,9 @@ import { ChromeBrowserManager, timeoutAfter } from '../browser/ChromeBrowserMana
   export class WebCrawler  {
     browserManager: ChromeBrowserManager;
     contentExtractor: IContentExtractor;
-    urlManager: IUrlManager;
+    urlManager: RedisUrlManager;
     rawContentProducer: Producer;
+    running: boolean = false;
 
     /**
      * 웹 크롤러 생성자
@@ -27,7 +29,7 @@ import { ChromeBrowserManager, timeoutAfter } from '../browser/ChromeBrowserMana
       browserManager: ChromeBrowserManager;
       contentExtractor: IContentExtractor;
       rawContentProducer: Producer;
-      urlManager: IUrlManager;
+      urlManager: RedisUrlManager;
 
     }) {
       this.browserManager = options.browserManager;
@@ -47,7 +49,32 @@ import { ChromeBrowserManager, timeoutAfter } from '../browser/ChromeBrowserMana
 
       await this.browserManager.initBrowser(10, 3000);
 
-      logger.debug('크롤러 초기화 완료');
+      this.running = true;
+
+      logger.info('크롤러 초기화 완료');
+    }
+
+
+    async stop(): Promise<void> {
+      try {
+        await this.browserManager.closeBrowser();
+      } catch (error) {
+        if (error instanceof Error) {
+          logger.error(`[Crawler][stop] 브라우저 종료 중 오류 발생: ${error.message}`);
+        }
+      }
+
+      try {
+        await this.rawContentProducer.close();
+      } catch (error) {
+        if (error instanceof Error) {
+          logger.error(`[Crawler][stop] 브라우저 종료 중 오류 발생: ${error.message}`);
+        }
+      }
+
+      logger.info('크롤러 정지 완료');
+
+      this.running = false;
     }
 
   /**
@@ -121,6 +148,10 @@ import { ChromeBrowserManager, timeoutAfter } from '../browser/ChromeBrowserMana
           allowed_after_robots: subUrlResult.crawledUrls.length
         };
         subUrlResult.success = true;
+        logger.eventInfo(`[Crawler][visitUrl] URL 방문 성공: ${url} (${subUrlResult.crawlStats.total}개 링크)`);
+        subUrlResult.onclickUrls.forEach((url) => {
+          logger.debug(url);
+        })
         logger.eventInfo(`[Crawler][visitUrl] URL 방문 완료: ${url} (${subUrlResult.crawlStats.total}개 링크)`);
         return subUrlResult
       }).catch((error) => {
@@ -145,22 +176,6 @@ import { ChromeBrowserManager, timeoutAfter } from '../browser/ChromeBrowserMana
       )
   }
 
-  /**
-   * 방문한 URL 링크 레디스에 저장
-   * @param result 방문 결과
-   * @returns
-   */
-  async saveLinkUrls(result: SubUrl): Promise<boolean> {
-
-    return await Promise.all(result.crawledUrls.map((url) => {
-      this.urlManager.addUrl(url, result.domain, URLSTAUS.NOT_VISITED)
-    })).then(() => true)
-      .catch((error) => {
-        logger.error(`[Redis] 링크 URL 저장 중 오류 발생: ${error.message}`);
-        throw error;
-      }
-    )
-    }
 
 
   /**
@@ -193,7 +208,7 @@ import { ChromeBrowserManager, timeoutAfter } from '../browser/ChromeBrowserMana
 
 
 async processQueue(processNumber : number, concurrency: number): Promise<void> {
-    while (true) {
+    while (this.running===true) {
       try {
         const nextUrlInfo = await this.urlManager.getNextUrl();
         if (!nextUrlInfo) {
@@ -202,10 +217,10 @@ async processQueue(processNumber : number, concurrency: number): Promise<void> {
         }
 
         const context = await this.browserManager.getBrowserContext(processNumber);
-        const visitResult = await timeoutAfter(this.visitUrl(nextUrlInfo.url, nextUrlInfo.domain ,context), 120_000, new TimeoutError('visitUrl 수집 시간 초과'))
+        const visitResult = await timeoutAfter(this.visitUrl(nextUrlInfo.url, nextUrlInfo.domain ,context), 60_000, new TimeoutError('visitUrl 수집 시간 초과'))
           .catch((error) => {
             logger.error(`[Crawler][process] URL 방문 중 오류 발생: ${error.message}`);
-            this.urlManager.setURLStatus(nextUrlInfo.url, URLSTAUS.NOT_VISITED);
+            this.urlManager.setURLStatusByOldStatus(nextUrlInfo.url, URLSTAUS.VISITED ,URLSTAUS.NOT_VISITED);
             throw new Error("[Crawler][process] 큐 처리 중 오류 발생");
           });
 
@@ -215,19 +230,23 @@ async processQueue(processNumber : number, concurrency: number): Promise<void> {
         }
 
         const isSaveSuccess = await this.urlManager.saveTextHash(visitResult.text);
-        if (isSaveSuccess===false) {
+        if (isSaveSuccess && await this.urlManager.checkIsSeedUrl(visitResult.domain, visitResult.url) === false) {
           logger.debug("[Crawler] 중복된 텍스트, 저장하지 않음.");
-          this.urlManager.setURLStatus(visitResult.url, URLSTAUS.NO_RECRUITINFO);
+          this.urlManager.setURLStatusByOldStatus(visitResult.url,URLSTAUS.VISITED , URLSTAUS.NO_RECRUITINFO);
           continue;
         }
 
-        await this.saveLinkUrls(visitResult).then(() => {
-          logger.debug(`[Crawler] URL 방문 결과 저장 완료: ${visitResult.url}`)
+        // allowed_prefix_필터링
+        await this.urlManager.saveUrlLinks(visitResult.domain ,visitResult.crawledUrls).then(() => {
+          logger.info(`[Crawler] URL 방문 결과 저장 완료: ${visitResult.url}`)
         });
 
-        await this.sendRawContent(visitResult).then(() => {
-          logger.debug(`[Crawler] URL 방문 결과 저장 완료: ${visitResult.url}`)
-        });
+        //url Manger allowed_prefix 사용
+        if (await this.urlManager.checkAllowedUrlPrefix(visitResult.url) === true) {
+          await this.sendRawContent(visitResult).then(() => {
+            logger.info(`[Crawler][RabbitMQ] URL 방문 전송 완료: ${visitResult.url}`)
+          });
+        }
 
       } catch (error) {
         if (error instanceof Error) {
@@ -240,6 +259,12 @@ async processQueue(processNumber : number, concurrency: number): Promise<void> {
     }
 }
 
+  }
 
+export const webCralwer = new WebCrawler({
 
-}
+  browserManager: chromeBrowserManager,
+  contentExtractor: webContentExtractor,
+  rawContentProducer: producer,
+  urlManager: redisUrlManager,
+});

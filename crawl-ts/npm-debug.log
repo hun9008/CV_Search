@@ -1,0 +1,36 @@
+0 info it worked if it ends with ok
+1 verbose cli [
+1 verbose cli   '/usr/local/bin/node',
+1 verbose cli   '/Users/yuksehyun/project/CV_Search/crawl-ts/node_modules/.bin/npm',
+1 verbose cli   'ls',
+1 verbose cli   '@scarf/scarf',
+1 verbose cli   '--json',
+1 verbose cli   '--long'
+1 verbose cli ]
+2 info using npm@2.15.12
+3 info using node@v22.14.0
+4 error extraneous: @scarf/scarf@1.4.0 /Users/yuksehyun/project/CV_Search/crawl-ts/node_modules/@scarf/scarf
+5 verbose exit [ 1, true ]
+6 verbose stack Error: write EPIPE
+6 verbose stack     at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+6 verbose stack     at writeGeneric (node:internal/stream_base_commons:150:3)
+6 verbose stack     at Socket._writeGeneric (node:net:971:11)
+6 verbose stack     at Socket._write (node:net:983:8)
+6 verbose stack     at writeOrBuffer (node:internal/streams/writable:572:12)
+6 verbose stack     at _write (node:internal/streams/writable:501:10)
+6 verbose stack     at Writable.write (node:internal/streams/writable:510:10)
+6 verbose stack     at stream.write (/Users/yuksehyun/project/CV_Search/crawl-ts/node_modules/npm/node_modules/ansi/lib/newlines.js:36:21)
+6 verbose stack     at Cursor.write (/Users/yuksehyun/project/CV_Search/crawl-ts/node_modules/npm/node_modules/ansi/lib/ansi.js:157:23)
+6 verbose stack     at log.write (/Users/yuksehyun/project/CV_Search/crawl-ts/node_modules/npm/node_modules/npmlog/log.js:218:15)
+7 verbose cwd /Users/yuksehyun/project/CV_Search/crawl-ts
+8 error Darwin 24.1.0
+9 error argv "/usr/local/bin/node" "/Users/yuksehyun/project/CV_Search/crawl-ts/node_modules/.bin/npm" "ls" "@scarf/scarf" "--json" "--long"
+10 error node v22.14.0
+11 error npm  v2.15.12
+12 error code EPIPE
+13 error errno -32
+14 error syscall write
+15 error write EPIPE
+16 error If you need help, you may report this error at:
+16 error     <https://github.com/npm/npm/issues>
+17 verbose exit [ -32, true ]

@@ -1,6 +1,7 @@
 // __tests__/RedisUrlManager.test.ts
 import { RedisUrlManager} from '../../src/url/RedisUrlManager';
 import { createClient } from 'redis';
+import { RedisKey, URLSTAUS } from '../../src/models/ReidsModel'; // Ensure RedisKey and URLSTAUS are imported
 
 jest.mock('redis', () => {
   const multiMock = {
@@ -17,7 +18,8 @@ jest.mock('redis', () => {
     sAdd: jest.fn(),
     sRem: jest.fn(),
     multi: jest.fn(()=> multiMock),
-    sMembers: jest.fn(),
+    sIsMember: jest.fn(),
+    sMembers : jest.fn(),
     sPop: jest.fn(),
     get: jest.fn(),
     set: jest.fn(),
@@ -33,7 +35,7 @@ describe('RedisUrlManager', () => {
   let mockClient: any;
 
   beforeEach(() => {
-    manager = new RedisUrlManager(['example.com']);
+    manager = new RedisUrlManager(['www.example.com']);
     // @ts-ignore
     mockClient = createClient();
   });
@@ -53,20 +55,29 @@ describe('RedisUrlManager', () => {
     const url = 'https://example.com/test';
     mockClient.hGet.mockResolvedValue('notvisited');
 
-    await manager.setURLStatus(url, 'visited');
-    expect(mockClient.multi().hSet).toHaveBeenCalledWith('status:example.com', url, 'visited');
-    expect(mockClient.multi().sAdd).toHaveBeenCalledWith('urls:example.com:visited', url);
-    expect(mockClient.multi().sAdd).toHaveBeenCalledWith('visited', url);
+    await manager.setURLStatusByOldStatus(url, URLSTAUS.NOT_VISITED, URLSTAUS.VISITED);
+    expect(mockClient.multi().sRem).toHaveBeenCalledWith(RedisKey.URLSTATUS_KEY_BY_DOMAIN('example.com', URLSTAUS.NOT_VISITED), url);
+    expect(mockClient.multi().sAdd).toHaveBeenCalledWith(RedisKey.URLSTATUS_KEY_BY_DOMAIN('example.com', URLSTAUS.VISITED), url);
+    expect(mockClient.multi().exec).toHaveBeenCalled();
   });
 
   it('should add URL correctly if not already stored', async () => {
     const url = 'https://example.com/test';
     mockClient.hGet.mockResolvedValue(null);
+    mockClient.sIsMember.mockResolvedValue(false);
+    await manager.addUrl(url, 'example.com', URLSTAUS.NOT_VISITED);
+    expect(mockClient.multi().sAdd).toHaveBeenCalledWith(RedisKey.URLSTATUS_KEY_BY_DOMAIN('example.com', URLSTAUS.NOT_VISITED), url);
 
-    await manager.addUrl(url, 'example.com', 'notvisited');
-    expect(mockClient.multi().hSet).toHaveBeenCalledWith('status:example.com', url, 'notvisited');
-    expect(mockClient.multi().sAdd).toHaveBeenCalledWith('urls:example.com:notvisited', url);
-    expect(mockClient.multi().sAdd).toHaveBeenCalledWith('notvisited', url);
+  });
+
+  it('should set URL status correctly with old and new status', async () => {
+    const url = 'https://example.com/test';
+    mockClient.hGet.mockResolvedValue('notvisited');
+
+    await manager.setURLStatusByOldStatus(url, URLSTAUS.NOT_VISITED, URLSTAUS.VISITED);
+    expect(mockClient.multi().sRem).toHaveBeenCalledWith(RedisKey.URLSTATUS_KEY_BY_DOMAIN('example.com', URLSTAUS.NOT_VISITED), url);
+    expect(mockClient.multi().sAdd).toHaveBeenCalledWith(RedisKey.URLSTATUS_KEY_BY_DOMAIN('example.com', URLSTAUS.VISITED), url);
+    expect(mockClient.multi().exec).toHaveBeenCalled();
   });
 
   it('should get URL status', async () => {
@@ -78,29 +89,47 @@ describe('RedisUrlManager', () => {
     expect(mockClient.hGet).toHaveBeenCalledWith('status:example.com', url);
   });
 
-  it('should return null for malformed URL', async () => {
-    mockClient.hGet.mockResolvedValue(null);
-    const result = await manager.getUrlStatus('not a url');
+
+  it('should get next URL from domain', async () => {
+    const url = 'https://example.com/test/resource';
+    mockClient.sPop.mockResolvedValue([url]);
+
+    const result = await manager.getNextUrlFromDomain('example.com');
+    expect(result).toEqual({ url, domain: 'example.com' });
+    expect(mockClient.sPop).toHaveBeenCalledWith(RedisKey.URLSTATUS_KEY_BY_DOMAIN('example.com', URLSTAUS.NOT_VISITED), 1);
+  });
+
+  it('should handle domain error and return null after retries', async () => {
+    mockClient.sPop.mockResolvedValue([]);
+    const result = await manager.handleDomainError();
     expect(result).toBeNull();
   });
 
-  it('should get next URL', async () => {
-    const url = 'https://example.com/test/resource';
-    mockClient.sPop.mockResolvedValue([url]);
-    const result = await manager.getNextUrl();
-    if (!result) {
-      fail('Expected a URL to be returned');
-    }
-    expect(result.url).toBe(url);
-    // expect(mockClient.sPop).toHaveBeenCalledWith('urls:example.com:notvisited');
+  it('should save URL links correctly', async () => {
+    const domain = 'example.com';
+    const urls = ['https://example.com/page1', 'https://example.com/page2'];
+    mockClient.sMembers.mockResolvedValue(['https://example.com']);
+
+    await manager.saveUrlLinks(domain, urls);
+    expect(mockClient.multi().sAdd).toHaveBeenCalledWith(RedisKey.URLSTATUS_KEY_BY_DOMAIN(domain, URLSTAUS.NOT_VISITED), urls[0]);
+    expect(mockClient.multi().sAdd).toHaveBeenCalledWith(RedisKey.URLSTATUS_KEY_BY_DOMAIN(domain, URLSTAUS.NOT_VISITED), urls[1]);
+    expect(mockClient.multi().exec).toHaveBeenCalled();
   });
 
+  it('should check if text exists in Redis', async () => {
+    const text = 'sample text';
+    mockClient.exists.mockResolvedValue(1);
 
-  it('should get next URL', async () => {
-    const url = 'https://example.com/test/resource.zip';
-    mockClient.sPop.mockResolvedValue([url]);
-    const result = await manager.getNextUrl();
-    expect(result).toBe(null);
-    // expect(mockClient.sPop).toHaveBeenCalledWith('urls:example.com:notvisited');
+    const result = await manager.textExists(text);
+    expect(result).toBe(true);
+  });
+
+  it('should save text hash if not exists', async () => {
+    const text = 'sample text';
+    mockClient.exists.mockResolvedValue(0);
+
+    const result = await manager.saveTextHash(text);
+    expect(result).toBe(true);
+    expect(mockClient.set).toHaveBeenCalled();
   });
 });

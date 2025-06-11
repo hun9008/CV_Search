@@ -1,0 +1,619 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for parser/prompt.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">parser</a> prompt.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">62.5% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>5/8</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/0</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">25% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/4</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">62.5% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>5/8</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line medium'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export function <span class="fstat-no" title="function not covered" >geminiRegionTextPrompt(</span>content : string) {
+<span class="cstat-no" title="statement not covered" >  return `</span>
+당신은 행정동코드를 정확히 지역에 따라 전환해야합니다.
+다음과같은 주의사항을 지켜주세요
+&nbsp;
+1.지역정보가 명확할경우 행정코드로 변환해주세요
+regionText : 서울시 강남구 =&gt; [1168000000]
+&nbsp;
+2.같이 지역이 여러개로 들어오면 여러개의 행정동코드를 넣어서 리스트로 반환해주세요.
+regionText :  경기 안산시, 안산시 상록구 =&gt; [4127000000 ,4127100000]
+&nbsp;
+3.발음이 비슷한 지역은 비슷한 지역의 한국어지역으로 맵핑해서 행정동코드를 반환해주세요
+예)seoul -&gt; 서울 ,bundang -&gt; 경기도 성남시 분당 ,Seocho-&gt; 서울시 서초구
+&nbsp;
+4.만약 불확실한 경우나, 서울시, 경기 등 시도만 나와있다면 두 자리까지만 코드를 출력해주세요
+에 서울 -&gt; [1100000000] , 경기-&gt;[4100000000]
+&nbsp;
+5.다른 나라의 지역은 빈배열로 반환해주세요
+예 베이징 -&gt; [] , 파리 -&gt; []
+&nbsp;
+6.코너 케이스를 주의해주세요, 다른 시설과 지역이 붙어있다면 그 지역의 이름만 분석해서
+행정동 코드를반환해주세요
+예 신세계백화점 서울점 -&gt; 서울, 매장천안점 -&gt;천안, 천안 공장 -&gt; 천안
+&nbsp;
+${content}
+`;
+}
+export function <span class="fstat-no" title="function not covered" >geminiRecruitInfoPrompt(</span>content : string) {
+<span class="cstat-no" title="statement not covered" >  return `</span>
+당신은 전문적인 IT 채용 정보 분석가입니다. 다음 텍스트가 채용 공고인지 분석하세요.
+채용공고인 동시에 IT직군 이여야합니다.
+&nbsp;
+지시사항:
+1. 텍스트가  IT 채용 공고인지 여부를 판단하세요.(회사 소개 글은 채용공고가 아님을 유의해서 판단하세요)
+2. IT 채용 공고가 맞다면:
+ - "is_recruit_info" 필드를 true로 설정하세요. 아니면 flase로 설정하고 , 나머지 필드는 null로 설정하세요.
+ - 다음 정보를 추출하여 해당 필드에 입력하세요. 정보가 없다면 null이나 빈 문자열로 설정하세요.
+ - title: 적절한 채용 공고 제목을 작성하세요. (예: "토스 프론트엔드 개발자 채용") 회사명과 직무를 포함하세요.
+ - company_name: 채용하는 회사명
+ - department: 채용하는 부서 또는 팀
+ - region_text: 근무 지역 또는 회사 위치 시도구 기준으로 한국어로 작성하세요. 여러 지역이 있다면 쉼표로 구분하세요. 예) 서울시 강남구, 경기도 성남시 분당구
+ - region_id: region_text의 값을 대한민국 법정동 코드로 변환하세요 경기 안산시, 안산시 상록구 =&gt; [4127000000 ,4127100000]
+ - require_experience: 요구되는 경력 수준 ("경력무관", "신입", "경력"). 가능하면 이 세 가지 카테고리로 매핑해주세요.
+ - job_description: 주요 업무 내용이나 직무기술서에 대한 내용을 기술하세요.
+ - job_type: 고용 형태. 표준 용어를 사용하세요 (정규직, 계약직, 인턴, 아르바이트, 프리랜서, 파견직) 중 하나를 선택하세요.
+   나와있지 않은 고용형태는 "무관"으로 설정하세요.
+ - apply_start_date: 지원 시작일 또는 게시일 (가능한 YYYY-MM-DD 형식으로 맞추어주세요)
+ - apply_end_date: 지원 마감일 (가능한 YYYY-MM-DD 형식으로 맞추어주세요)
+ - requirements: 필수 자격 요건
+ - preferred_qualifications: 우대 사항
+ - ideal_candidate: 회사가 찾는 인재상
+3. 채용 공고가 아니라면:
+- "is_recruit_info" 필드를 false로 설정하세요.
+- 나머지 필드는 null로 설정하세요.
+4. 결과는 한국어로 작성하세요.
+&nbsp;
+다음 텍스트를 분석하세요:
+---
+${content}
+---
+&nbsp;
+지정된 스키마 속성에 따라 JSON 형식으로 결과를 출력하세요.
+`;
+}
+&nbsp;
+export function geminiRecruitInfoValidationPrompt(content: string): string {
+return  `프롬프트 제목: 채용 공고 필터링: 국내 IT 기업 식별
+&nbsp;
+역할: 당신은 채용 공고 분석 전문가입니다. 주어진 채용 공고 텍스트를 분석하여, 다음 두 가지 핵심 조건에 따라 필터링하고 결과를 제시해야 합니다.
+&nbsp;
+입력 (Input):
+채용 공고 웹사이트에서 추출된 원본 텍스트 (string)
+&nbsp;
+출력 (Output):
+결과는 다음 형식으로 엄격하게 제한되며, result와 reason 필드는 반드시 값을 가져야 합니다 (NOT NULL).
+result : reason
+&nbsp;
+필터링 조건:
+&nbsp;
+국내 기업 여부: 회사는 외국계 기업이 아니어야 합니다. (즉, 대한민국에 법인 또는 본사를 둔 국내 기업이어야 합니다.)
+IT 산업군 여부: 회사는 IT 관련 산업군의 회사여야 합니다. (예: 소프트웨어 개발, 정보통신, 데이터 분석/처리, AI, 클라우드 서비스, 플랫폼 운영, 시스템 통합(SI), 게임 개발, IT 컨설팅 등)
+처리 규칙 및 출력 예시:
+&nbsp;
+조건 1과 조건 2를 모두 충족하는 경우:
+&nbsp;
+result: 적합
+reason: 국내 IT 기업으로 판단됩니다.
+조건 1을 충족하지 못하는 경우 (외국계 기업으로 판단될 시):
+&nbsp;
+result: 부적합
+reason: 외국계 기업으로 판단됩니다. (IT 기업 여부와 관계없이 우선적으로 이 사유를 적용합니다.)
+조건 1은 충족하지만 조건 2를 충족하지 못하는 경우 (국내 기업이지만 IT 기업이 아닐 시):
+&nbsp;
+result: 부적합
+reason: IT 관련 산업군 기업이 아닌 것으로 판단됩니다.
+두 조건 모두 충족하지 못하는 경우 (외국계 기업이면서 IT 기업도 아닐 시):
+&nbsp;
+result: 부적합
+reason: 외국계 기업이며 IT 관련 산업군 기업이 아닌 것으로 판단됩니다. (또는 "외국계 기업으로 판단됩니다."로 외국계 기업임을 우선 명시해도 됩니다.)
+지시사항:
+주어진 텍스트 내에서 회사명, 회사 소개, 사업 분야, 본사 위치, 기업 국적 관련 언급(예: "글로벌", "외국계", "OO지사" 등) 등을 종합적으로 분석하여 위 조건에 따라 판단하십시오. 판단 근거가 명확하지 않을 경우, 텍스트에서 가장 유력하게 추론할 수 있는 내용을 바탕으로 결정하고, reason에 간략하게라도 그 뉘앙스를 포함할 수 있습니다.
+반드시 result와 reason 필드를 포함한 JSON 형식으로 결과를 출력해야 합니다. 예시 출력 형식은 다음과 같습니다:
+{
+"result": "적합",
+"reason": "국내 IT 기업으로 판단됩니다."
+}
+입력 :${content}
+&nbsp;
+`;
+}
+&nbsp;
+/**
+ * 채용 공고 원문 텍스트에서 마감일을 추출하기 위한 Gemini 프롬프트를 생성합니다.
+ *
+ * @param content 채용 공고의 원문 텍스트 (raw_text)
+ * @returns Gemini에게 전달할 완성된 프롬프트 문자열
+ */
+export function <span class="fstat-no" title="function not covered" >geminiJobEndDatePrompt(</span>content: string): string {
+<span class="cstat-no" title="statement not covered" >  return `</span>
+### 역할
+당신은 채용 공고 텍스트에서 '마감일' 정보만을 정확하게 추출하고, 지정된 JSON 형식으로 반환하는 전문 분석가입니다.
+&nbsp;
+### 지시사항
+주어진 채용 공고 내용에서 마감일을 찾아 "YYYY-MM-DD" 형식의 날짜 문자열로 변환해 주세요. 아래 규칙을 반드시 준수해야 합니다.
+&nbsp;
+1.  **'상시채용' 및 유사 케이스**: '상시채용', '수시채용', '채용시 마감', '인재풀 등록', '마감기한 없음' 등 구체적인 날짜가 명시되어 있지 않다면, "job_end_date" 값을 반드시 \"null\"로 설정해야 합니다.
+2.  **날짜 형식 정규화**: 날짜는 '2024년 8월 15일', '24.08.15', '2024/08/15', '~8/15' 등 다양한 형식으로 표현될 수 있습니다. 어떤 형식이든 "YYYY-MM-DD"로 정규화해야 합니다. 연도가 명시되지 않은 경우, 현재 연도로 가정합니다.
+3.  **기간 명시**: '접수 기간: 2024.08.01 ~ 2024.08.15'와 같이 기간이 명시된 경우, 반드시 '종료일'을 추출해야 합니다.
+4.  **월만 명시**: '8월까지'와 같이 월만 명시된 경우, 해당 월의 마지막 날짜를 마감일로 간주합니다. (예: '8월까지' -&gt; "YYYY-08-31")
+5.  **상대적 날짜**: 'D-7', '마감 7일 전'과 같이 상대적인 날짜 표기는 정확한 날짜를 특정할 수 없으므로 \"null\"로 처리합니다.
+6.  **정보 없음**: 공고 내용에서 마감일에 대한 어떠한 정보도 찾을 수 없다면, \"null\"을 반환합니다.
+7.  **시간 정보 무시**: '오후 6시', '24:00' 등 시간 정보는 무시하고 날짜만 추출합니다.
+&nbsp;
+### 예시
+&nbsp;
+**입력 1:** "접수기간: 2024년 12월 16일(월) ~ 2024년 12월 31일(화) 18:00"
+**출력 1:**
+\`\`\`json
+{
+  "job_end_date": "2024-12-31"
+}
+\`\`\`
+&nbsp;
+**입력 2:** "본 채용은 상시채용으로 진행됩니다."
+**출력 2:**
+\`\`\`json
+{
+  "job_end_date": null
+}
+\`\`\`
+&nbsp;
+**입력 3:** "서류 접수 마감: ~ 9. 15.(일) 까지"
+**출력 3:**
+\`\`\`json
+{
+  "job_end_date": "2024-09-15"
+}
+\`\`\`
+&nbsp;
+**입력 4:** "채용이 완료될 때까지 지원서를 받습니다."
+**출력 4:**
+\`\`\`json
+{
+  "job_end_date": null
+}
+\`\`\`
+&nbsp;
+**입력 5:** "자격요건: ... 우대사항: ... 근무조건: ..." (마감일 정보 없음)
+**출력 5:**
+\`\`\`json
+{
+  "job_end_date": null
+}
+\`\`\`
+&nbsp;
+### 입력 텍스트
+${content}
+`;
+}</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2025-06-11T17:32:49.800Z
+            </div>
+        <script src="../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../sorter.js"></script>
+        <script src="../block-navigation.js"></script>
+    </body>
+</html>
+    
