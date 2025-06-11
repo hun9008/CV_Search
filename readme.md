@@ -55,7 +55,7 @@
 <a href="https://github.com/Carcassi0" target="_blank">위의종</a>
 </td>
 <td>FE</td>
-<td>blk</td>
+<td>프론트엔드 및 UX/UI</td>
 <td>
   <a href="https://github.com/hun9008/CV_Search/tree/dev_front">
     <img src="https://img.shields.io/badge/click--here-dev--front-skyblue?style=for-the-badge&logo=react" alt="Go to Dev">
