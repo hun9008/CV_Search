@@ -5,6 +5,8 @@ import JobManageItem from './JobManageItem';
 import LoadingSpinner from '../../../../../components/common/loading/LoadingSpinner';
 import useAdminJobManageStore from '../../../../../store/adminJobManageStore';
 import React from 'react';
+import JobCreateModal from './JobCreateModal';
+import { Plus } from 'lucide-react';
 
 type SortField = 'createdAt' | 'applyEndDate';
 type SortOrder = 'asc' | 'desc';
@@ -37,6 +39,12 @@ function JobManage() {
 
     // 상태 옵션 목록
     const statusOptions = ['확인필요', '정상', '마감', '에러'];
+
+    const [showModal, setShowModal] = useState(false);
+
+    const refreshJobs = async () => {
+        await getTotalJob(currentPage, ITEMS_PER_PAGE, `${sortConfig.field},${sortConfig.order}`);
+    };
 
     const handleApplicationRemove = async (jobId: number, vaildType: number | null) => {
         const res = await removeJob(jobId, vaildType);
@@ -127,15 +135,21 @@ function JobManage() {
 
     return (
         <div className={style.container}>
+                {showModal && (
+                <JobCreateModal
+                    onClose={() => setShowModal(false)}
+                    onSuccess={refreshJobs}
+                />
+                )}
             <div className={style.header}>
                 <div className={style.headerText}>
                     <h2 className={style.header__title}>공고 관리</h2>
                     <p className={style.header__subtitle}>등록된 공고를 관리하세요</p>
                 </div>
-                {/* <button className={style.addButton} onClick={handleJobAdd}>
-                    <Plus />
-                    <p className={style.addButton__text}>공고 등록</p>
-                </button> */}
+                <button className={style.addButton} onClick={() => setShowModal(true)}>
+                <Plus />
+                <p className={style.addButton__text}>공고 등록</p>
+                </button>
             </div>
             <div className={style.header__actions}>
                 <div className={style.header__searchBar}>
