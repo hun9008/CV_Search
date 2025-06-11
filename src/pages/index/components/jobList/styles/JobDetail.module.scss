@@ -24,6 +24,12 @@
         display: flex;
         align-items: center;
     }
+    // &__company img {
+    //     width: 100%;
+    //     height: 100%;
+    //     object-fit: contain; // 또는 'cover'
+    //     border-radius: 8px; // 필요시 둥글게
+    // }
 
     &__companyName {
         font-size: 1.1rem;
@@ -287,8 +293,8 @@
     &__logo {
         width: 40px;
         height: 40px;
-        // border-radius: 8px;
-        padding: 4px;
+        border-radius: 8px;
+        // padding: 4px;
         margin-right: 0.6rem;
     }
 

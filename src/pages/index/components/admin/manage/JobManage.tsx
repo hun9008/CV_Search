@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import style from './JobManage.module.scss';
-import { Filter, Plus, Search, Ban } from 'lucide-react';
+import { Filter, Search, Ban } from 'lucide-react';
 import JobManageItem from './JobManageItem';
 import LoadingSpinner from '../../../../../components/common/loading/LoadingSpinner';
 import useAdminJobManageStore from '../../../../../store/adminJobManageStore';
 import React from 'react';
-// import { JobBrief } from '../../../../../types/jobBrief';
 
-type SortField = 'companyName' | 'jobTitle' | 'createdAt' | 'applyStatus';
+type SortField = 'createdAt' | 'applyEndDate';
 type SortOrder = 'asc' | 'desc';
+
+const ITEMS_PER_PAGE = 20;
 
 function JobManage() {
     /** 공고 불러오기 */
@@ -17,38 +18,66 @@ function JobManage() {
     const removeJob = useAdminJobManageStore((state) => state.removeJob);
 
     /** 필터링 */
-    // const [filteredJob, setFilteredJob] = useState<JobBrief[]>();
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilters, setShowFilters] = useState(false);
     const [sortConfig, setSortConfig] = useState<{ field: SortField; order: SortOrder }>({
         field: 'createdAt',
         order: 'desc',
     });
-    const [statusFilter, setStatusFilter] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [searchSubmitted, setSearchSubmitted] = useState(false);
 
     /** 페이지네이션 */
-    // const jobsPerPage = 40;
     const totalPage = useAdminJobManageStore((state) => state.totalPage);
     const currentPage = useAdminJobManageStore((state) => state.currentPage);
-    // const isFirstPage = useAdminJobManageStore((state) => state.isFirstPage);
-    // const isLastPage = useAdminJobManageStore((state) => state.isLastPage);
-    const { goToNextPage, goToPrevPage, setCurrentPage } = useAdminJobManageStore();
+    const isFirstPage = useAdminJobManageStore((state) => state.isFirstPage);
+    const isLastPage = useAdminJobManageStore((state) => state.isLastPage);
+    const { goToNextPage, goToPrevPage, setCurrentPage, jobSearch } = useAdminJobManageStore();
     const jobListRef = useRef<HTMLDivElement>(null);
 
     // 상태 옵션 목록
     const statusOptions = ['확인필요', '정상', '마감', '에러'];
 
     const handleApplicationRemove = async (jobId: number, vaildType: number | null) => {
-        await removeJob(jobId, vaildType);
-        await getTotalJob(currentPage, 40);
+        const res = await removeJob(jobId, vaildType);
+        if (res === 200) {
+            if (searchQuery) {
+                await jobSearch(
+                    currentPage,
+                    ITEMS_PER_PAGE,
+                    searchQuery,
+                    `${sortConfig.field},${sortConfig.order}`
+                );
+            } else {
+                await getTotalJob(
+                    currentPage,
+                    ITEMS_PER_PAGE,
+                    `${sortConfig.field},${sortConfig.order}`
+                );
+            }
+        }
     };
 
     const handleStatusChange = async (jobId: number, status: number) => {
         if (status === 2) {
-            await removeJob(jobId, status);
+            const res = await removeJob(jobId, status);
+            if (res === 200) {
+                if (searchQuery) {
+                    await jobSearch(
+                        currentPage,
+                        ITEMS_PER_PAGE,
+                        searchQuery,
+                        `${sortConfig.field},${sortConfig.order}`
+                    );
+                } else {
+                    await getTotalJob(
+                        currentPage,
+                        ITEMS_PER_PAGE,
+                        `${sortConfig.field},${sortConfig.order}`
+                    );
+                }
+            }
         }
-        // 상태 수정하고 로컬 스토리지에서 가져오기
     };
 
     const handleSort = (field: SortField) => {
@@ -58,78 +87,38 @@ function JobManage() {
         }));
     };
 
-    const toggleStatusFilter = (status: string) => {
-        setStatusFilter((prev) =>
-            prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
-        );
-    };
-    const handleJobAdd = () => {};
-
-    // 검색, 필터링, 정렬 적용
-    // useEffect(() => {
-    //     if (!totalJob) return;
-
-    //     let filtered = [...totalJob];
-
-    //     // 검색어 필터링
-    //     if (searchQuery) {
-    //         const query = searchQuery.toLowerCase();
-    //         filtered = filtered.filter(
-    //             (job) =>
-    //                 (job.title && job.title.toLowerCase().includes(query)) ||
-    //                 (job.companyName && job.companyName.toLowerCase().includes(query))
-    //         );
-    //     }
-
-    //     // 상태 필터링
-    //     if (statusFilter.length > 0) {
-    //         filtered = filtered.filter((job) => statusFilter.includes(String(job.jobVaildType)));
-    //     }
-
-    //     // 정렬
-    //     filtered.sort((a, b) => {
-    //         let comparison = 0;
-
-    //         switch (sortConfig.field) {
-    //             case 'companyName':
-    //                 comparison = a.companyName.localeCompare(b.companyName);
-    //                 break;
-    //             case 'jobTitle':
-    //                 comparison = a.title.localeCompare(b.title);
-    //                 break;
-    //             case 'createdAt':
-    //                 comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    //                 break;
-    //             case 'applyStatus':
-    //                 comparison = String(a.jobVaildType).localeCompare(String(b.jobVaildType));
-    //                 break;
-    //         }
-
-    //         return sortConfig.order === 'asc' ? comparison : -comparison;
-    //     });
-
-    //     // setFilteredJob(filtered);
-    // }, [totalJob, searchQuery, statusFilter, sortConfig]);
-
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            await getTotalJob(currentPage, 40);
-            setIsLoading(false);
-        };
-
-        fetchData();
-    }, [currentPage]);
+        if (searchQuery) {
+            const fetchData = async () => {
+                setIsLoading(true);
+                await jobSearch(
+                    currentPage,
+                    ITEMS_PER_PAGE,
+                    searchQuery,
+                    `${sortConfig.field},${sortConfig.order}`
+                );
+                setIsLoading(false);
+            };
+            fetchData();
+        }
+        if (!searchQuery) {
+            const fetchData = async () => {
+                setIsLoading(true);
+                await getTotalJob(
+                    currentPage,
+                    ITEMS_PER_PAGE,
+                    `${sortConfig.field},${sortConfig.order}`
+                );
+                setIsLoading(false);
+            };
+            fetchData();
+        }
+    }, [currentPage, getTotalJob, removeJob, searchSubmitted, sortConfig]);
 
     const getSortIcon = (field: SortField) => {
         if (sortConfig.field !== field) return null;
         return sortConfig.order === 'asc' ? '↑' : '↓';
     };
-
-    // const currentJobs = (filteredJob ?? []).slice(
-    //     (currentPage - 1) * jobsPerPage,
-    //     currentPage * jobsPerPage
-    // );
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -143,21 +132,27 @@ function JobManage() {
                     <h2 className={style.header__title}>공고 관리</h2>
                     <p className={style.header__subtitle}>등록된 공고를 관리하세요</p>
                 </div>
-                <button className={style.addButton} onClick={handleJobAdd}>
+                {/* <button className={style.addButton} onClick={handleJobAdd}>
                     <Plus />
                     <p className={style.addButton__text}>공고 등록</p>
-                </button>
+                </button> */}
             </div>
             <div className={style.header__actions}>
                 <div className={style.header__searchBar}>
                     <Search className={style.header__searchIcon} size={16} />
-                    <input
-                        type="text"
-                        placeholder="검색..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className={style.header__searchInput}
-                    />
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            setSearchSubmitted((prev) => !prev); // 트리거용 state 변경
+                        }}>
+                        <input
+                            type="text"
+                            placeholder="검색..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className={style.header__searchInput}
+                        />
+                    </form>
                 </div>
 
                 <button
@@ -170,22 +165,6 @@ function JobManage() {
             {showFilters && (
                 <div className={style.filters}>
                     <div className={style.filters__section}>
-                        <h3 className={style.filters__title}>상태</h3>
-                        <div className={style.filters__options}>
-                            {statusOptions.map((status) => (
-                                <button
-                                    key={status}
-                                    className={`${style.filters__option} ${
-                                        statusFilter.includes(status) ? style.active : ''
-                                    }`}
-                                    onClick={() => toggleStatusFilter(status)}>
-                                    {status}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className={style.filters__section}>
                         <h3 className={style.filters__title}>정렬</h3>
                         <div className={style.filters__sortOptions}>
                             <button
@@ -193,21 +172,14 @@ function JobManage() {
                                     sortConfig.field === 'createdAt' ? style.active : ''
                                 }`}
                                 onClick={() => handleSort('createdAt')}>
-                                날짜 {getSortIcon('createdAt')}
+                                등록일 {getSortIcon('createdAt')}
                             </button>
                             <button
                                 className={`${style.filters__sortOption} ${
-                                    sortConfig.field === 'companyName' ? style.active : ''
+                                    sortConfig.field === 'applyEndDate' ? style.active : ''
                                 }`}
-                                onClick={() => handleSort('companyName')}>
-                                회사명 {getSortIcon('companyName')}
-                            </button>
-                            <button
-                                className={`${style.filters__sortOption} ${
-                                    sortConfig.field === 'applyStatus' ? style.active : ''
-                                }`}
-                                onClick={() => handleSort('applyStatus')}>
-                                상태 {getSortIcon('applyStatus')}
+                                onClick={() => handleSort('applyEndDate')}>
+                                마감일 {getSortIcon('applyEndDate')}
                             </button>
                         </div>
                     </div>
@@ -219,16 +191,8 @@ function JobManage() {
                 <>
                     <div className={style.listView}>
                         <div className={style.listView__header}>
-                            <div
-                                className={style.listView__cell}
-                                onClick={() => handleSort('jobTitle')}>
-                                공고명 {getSortIcon('jobTitle')}
-                            </div>
-                            <div
-                                className={style.listView__cell}
-                                onClick={() => handleSort('companyName')}>
-                                회사 {getSortIcon('companyName')}
-                            </div>
+                            <div className={style.listView__cell}>공고명</div>
+                            <div className={style.listView__cell}>회사</div>
                             <div
                                 className={style.listView__cell}
                                 onClick={() => handleSort('createdAt')}>
@@ -249,9 +213,7 @@ function JobManage() {
                                     <JobManageItem
                                         key={job.id}
                                         job={job}
-                                        onRemove={() =>
-                                            handleApplicationRemove(job.id, job.jobVaildType)
-                                        }
+                                        onRemove={() => handleApplicationRemove(job.id, 2)}
                                         onStatusChange={(status) =>
                                             handleStatusChange(job.id, status)
                                         }
@@ -275,10 +237,10 @@ function JobManage() {
                                         <>
                                             <button
                                                 className={`${style.jobList__paginationButton} ${
-                                                    currentPage === 1 ? style.disabled : ''
+                                                    isFirstPage ? style.disabled : ''
                                                 }`}
                                                 onClick={goToPrevPage}
-                                                disabled={currentPage === 1}>
+                                                disabled={isFirstPage}>
                                                 이전
                                             </button>
 
@@ -341,10 +303,10 @@ function JobManage() {
 
                                             <button
                                                 className={`${style.jobList__paginationButton} ${
-                                                    currentPage === totalPage ? style.disabled : ''
+                                                    isLastPage ? style.disabled : ''
                                                 }`}
                                                 onClick={goToNextPage}
-                                                disabled={currentPage === totalPage}>
+                                                disabled={isLastPage}>
                                                 다음
                                             </button>
                                         </>

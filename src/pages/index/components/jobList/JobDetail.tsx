@@ -299,7 +299,7 @@ function JobDetail({ isDialog }: DialogSet) {
             <div className={style.content}>
                 {job.jobDescription && (
                     <section className={style.section}>
-                        <h2 className={style.section__title}>업무</h2>
+                        <h2 className={style.section__title}>이런 일을 하게 돼요</h2>
                         <p className={style.section__text}>{job.jobDescription}</p>
                     </section>
                 )}
@@ -318,7 +318,7 @@ function JobDetail({ isDialog }: DialogSet) {
                     </section>
                 )}
                 <section className={style.section}>
-                    <h2 className={style.section__title}>이 공고와 유사한 공고에요</h2>
+                    <h2 className={style.section__title}>이 공고와 비슷한 공고들을 모아봤어요</h2>
                     <div className={style.similarJobListContainer}>
                         {similarJobList.map((item) => (
                             <SimilarJobCard job={item} />

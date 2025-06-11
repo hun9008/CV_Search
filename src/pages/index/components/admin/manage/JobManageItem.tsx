@@ -20,13 +20,13 @@ function JobManageItem({ job, onRemove, onStatusChange, statusOptions }: JobMana
     const getStatusColor = (vaildType: number | null) => {
         switch (vaildType) {
             case 0:
-                return '#4caf50';
+                return '#22c55e';
             case 1:
-                return '#f44336';
+                return '#6b7280';
             case 2:
-                return '#f44336';
+                return '#ef4444';
             default:
-                return '#9e9e9e';
+                return '#f59e0b';
         }
     };
 
@@ -115,11 +115,6 @@ function JobManageItem({ job, onRemove, onStatusChange, statusOptions }: JobMana
                                         onStatusChange(statusNumber);
                                         setShowStatusDropdown(false);
                                     }}>
-                                    <span
-                                        className={style.item__statusDot}
-                                        style={{
-                                            backgroundColor: getStatusColor(job.jobVaildType),
-                                        }}></span>
                                     {status}
                                 </div>
                             ))}
