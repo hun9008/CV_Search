@@ -15,6 +15,7 @@ interface CvMe {
 }
 interface JobStore {
     jobList: Job[];
+    similarJobList: Job[];
     selectedCVId: number | null;
     filteredJobList: Job[] | null;
     selectedJob: Job | null;
@@ -30,6 +31,7 @@ interface JobStore {
     setJobList: (list: Job[]) => void;
     setFilteredJobList: (list: Job[] | null) => void;
     getJobList: (count: number, cvId: number) => Promise<Job[]>;
+    getSimilarJobList: (count: number, cvId: number) => Promise<Job[]>;
     getJobListwithBookmark: (count: number, cvId: number) => Promise<Job[]>;
     getSelectedCvId: () => Promise<number>;
 }
@@ -38,6 +40,7 @@ const useJobStore = create<JobStore>()(
     persist(
         (set, get) => ({
             jobList: [],
+            similarJobList: [],
             filteredJobList: [],
             selectedJob: null,
             selectedJobDetail: null,
@@ -96,6 +99,28 @@ const useJobStore = create<JobStore>()(
                     );
                     const jobList: Job[] = res.data || [];
                     set({ jobList });
+                    return jobList;
+                } catch (error) {
+                    console.error('잡 리스트 에러: ', error);
+                    throw error;
+                }
+            },
+            getSimilarJobList: async (count, cvId) => {
+                try {
+                    const accessToken = useAuthStore.getState().accessToken;
+
+                    const res = await axios.post(
+                        `${SERVER_IP}/rec/similar-jobs?jobId=${cvId}&topk=${count}`,
+                        null,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`,
+                            },
+                            withCredentials: true,
+                        }
+                    );
+                    const jobList: Job[] = res.data || [];
+                    set({ similarJobList: jobList });
                     return jobList;
                 } catch (error) {
                     console.error('잡 리스트 에러: ', error);

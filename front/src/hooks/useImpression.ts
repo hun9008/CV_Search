@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import axios from 'axios';
-import { SERVER_IP } from '../src/constants/env'; // 실제 서버 주소 import 경로로 수정
-import useAuthStore from './store/authStore';
+import { SERVER_IP } from '../constants/env'; // 실제 서버 주소 import 경로로 수정
+import useAuthStore from '../store/authStore';
 
 const sentSet = new Set<number>();
 

@@ -190,7 +190,7 @@ const MainHeader = () => {
                                 <input
                                     ref={inputRef}
                                     type="text"
-                                    placeholder="검색"
+                                    placeholder="최신 채용 공고 검색하기"
                                     value={searchQuery}
                                     onChange={handleSearchChange}
                                     onFocus={handleSearchFocus}

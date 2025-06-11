@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useJobStore from '../../../../store/jobStore';
 import style from './styles/JobDetail.module.scss';
 import { Bookmark, Share2, MapPin, Calendar, Clock, Briefcase, Bot } from 'lucide-react';
@@ -6,30 +6,31 @@ import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
 import useBookmarkStore from '../../../../store/bookmarkStore';
 import useActionStore from '../../../../store/actionStore';
+import SimilarJobCard from './SimilarJobCard';
 
 interface DialogSet {
     isDialog: boolean;
 }
 function JobDetail({ isDialog }: DialogSet) {
-    const { getSelectedJobDetail, getFeedback } = useJobStore();
+    const { getSelectedJobDetail, getFeedback, getSimilarJobList } = useJobStore();
     const applications = useApplyStore((state) => state.applications);
     const { setApplications, deleteApplications, getApplications } = useApplyStore();
     const selectedJobDetail = useJobStore((state) => state.selectedJobDetail);
     const feedbackText = useJobStore((state) => state.feedback);
     const job = useJobStore((state) => state.selectedJobDetail);
-    const [isFeedbackLoading, setIsFeedbackLoading] = useState(false);
+    const isFeedbackLoadingRef = useRef(false);
     const [isBookmarked, setIsBookmarked] = useState(job?.isBookmarked || false);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     const [isManaging, setIsManaging] = useState(false);
-    // const [showManageModal, setShowManageModal] = useState(false);
-    const [manageButtonClicked, setManageButtonClicked] = useState(false);
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const selectedCVId = useJobStore((state) => state.selectedCVId);
+    const similarJobList = useJobStore((state) => state.similarJobList);
     const isJobListLoad = useActionStore((state) => state.isJobListLoad);
 
     useEffect(() => {
-        setIsFeedbackLoading(false); // 다른 공고 선택하면 피드백 로딩 제거
+        isFeedbackLoadingRef.current = false;
+
         const initializeApplications = async () => {
             await getApplications();
         };
@@ -57,6 +58,22 @@ function JobDetail({ isDialog }: DialogSet) {
             setIsBookmarked(isCurrentJobBookmarked);
         }
     }, [bookmarkedList, selectedJobDetail]);
+
+    // 피드백 아이콘 bounce 클래스 자동 제거
+    useEffect(() => {
+        if (selectedJobDetail) {
+            const icon = document.querySelector(`#bot-icon-${selectedJobDetail.id}`);
+            if (icon && icon.classList.contains(style.bounce)) {
+                icon.classList.remove(style.bounce);
+            }
+        }
+    }, [selectedJobDetail, style.bounce]);
+
+    useEffect(() => {
+        if (job?.id) {
+            getSimilarJobList(7, job.id);
+        }
+    }, [job?.id, getSimilarJobList]);
 
     const handleApply = () => {
         window.open(`${job?.url}`, '_blank');
@@ -89,20 +106,18 @@ function JobDetail({ isDialog }: DialogSet) {
     const handleFeedback = async (jobId: number) => {
         const icon = document.querySelector(`#bot-icon-${jobId}`);
         icon?.classList.add(style.bounce);
+        isFeedbackLoadingRef.current = true;
 
         try {
-            setIsFeedbackLoading(true);
-
             if (selectedCVId !== null && (await getFeedback(jobId, selectedCVId)) === 200) {
-                setShowFeedbackModal(true);
+                if (isFeedbackLoadingRef.current === true) setShowFeedbackModal(true);
             }
         } catch (error) {
             console.error('피드백 요청 에러: ', error);
             throw error;
-        } finally {
-            setIsFeedbackLoading(false);
-            icon?.classList.remove(style.bounce);
         }
+        isFeedbackLoadingRef.current = false;
+        icon?.classList.remove(style.bounce);
     };
 
     const handleManagement = async (jobId: number) => {
@@ -112,9 +127,7 @@ function JobDetail({ isDialog }: DialogSet) {
                 const res = await deleteApplications(jobId);
                 if (res === 204) {
                     setIsManaging(false);
-                    setManageButtonClicked(false);
                     console.log('관리 해제 완료:', res);
-                    setManageButtonClicked(false); // 지우기
                     // 지원 목록 다시 가져오기
                     await useApplyStore.getState().getApplications();
                 }
@@ -123,7 +136,6 @@ function JobDetail({ isDialog }: DialogSet) {
                 const res = await setApplications(jobId);
                 if (res === 201) {
                     setIsManaging(true);
-                    setManageButtonClicked(true);
                     console.log('관리 등록 완료:', res);
                     // 지원 목록 다시 가져오기
                     await useApplyStore.getState().getApplications();
@@ -260,7 +272,7 @@ function JobDetail({ isDialog }: DialogSet) {
                 </button>
                 <button
                     className={`${style.actionButtons__feedback} ${
-                        isFeedbackLoading ? 'loading' : ''
+                        isFeedbackLoadingRef.current ? 'loading' : ''
                     }`}
                     onClick={() => handleFeedback(job.id)}
                     disabled={
@@ -274,14 +286,12 @@ function JobDetail({ isDialog }: DialogSet) {
                         id={`bot-icon-${job.id}`}
                     />
                     <span style={{ whiteSpace: 'pre' }}>
-                        {isFeedbackLoading ? '' : '  AI 피드백'}
+                        {isFeedbackLoadingRef.current ? '' : '  AI 피드백'}
                     </span>
                 </button>
 
                 <button
-                    className={`${style.actionButtons__manage} ${
-                        manageButtonClicked ? '' : style.clicked
-                    }`}
+                    className={`${style.actionButtons__manage} ${isManaging ? style.clicked : ''}`}
                     onClick={() => selectedJobDetail && handleManagement(selectedJobDetail.id)}>
                     {isManaging ? '관리중' : '관리 시작'}
                 </button>
@@ -289,7 +299,7 @@ function JobDetail({ isDialog }: DialogSet) {
             <div className={style.content}>
                 {job.jobDescription && (
                     <section className={style.section}>
-                        <h2 className={style.section__title}>업무</h2>
+                        <h2 className={style.section__title}>이런 일을 하게 돼요</h2>
                         <p className={style.section__text}>{job.jobDescription}</p>
                     </section>
                 )}
@@ -307,6 +317,14 @@ function JobDetail({ isDialog }: DialogSet) {
                         <p className={style.section__text}>{job.preferredQualifications}</p>
                     </section>
                 )}
+                <section className={style.section}>
+                    <h2 className={style.section__title}>이 공고와 비슷한 공고들을 모아봤어요</h2>
+                    <div className={style.similarJobListContainer}>
+                        {similarJobList.map((item) => (
+                            <SimilarJobCard job={item} />
+                        ))}
+                    </div>
+                </section>
             </div>
             {job && (
                 <Feedback

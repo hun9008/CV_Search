@@ -18,7 +18,6 @@ function JobList() {
     const [isLoading, setIsLoading] = useState(false);
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
     const [hasError, setHasError] = useState(false);
-    const [isPending, setIsPending] = useState(false); // 업로드 직후 topk-list 요청 시 fallback 용
 
     const selectedCVId = useJobStore((state) => state.selectedCVId);
     const { setIsJobListLoad } = useActionStore();
@@ -56,16 +55,16 @@ function JobList() {
     // setTimeout 70000
     // 최초 업로드 및 재업로드에 70000~80000ms
     // 최초 업로드시에는 업로드 페이지에서 10000ms 확보
-    useEffect(() => {
-        const checkPending = () => {
-            setTimeout(() => {
-                console.log('pending end');
-                setIsPending(false);
-            }, 80000);
-        };
-        setIsPending(true);
-        checkPending();
-    }, [hasError]);
+    // useEffect(() => {
+    //     const checkPending = () => {
+    //         setTimeout(() => {
+    //             console.log('pending end');
+    //             setIsPending(false);
+    //         }, 80000);
+    //     };
+    //     setIsPending(true);
+    //     checkPending();
+    // }, [hasError]);
 
     useEffect(() => {
         if (hasError) {
@@ -266,6 +265,8 @@ function JobList() {
         </div>
     );
 
+    // 피드백 다이얼로그와 연관 공고 다이얼로그 분리해야함
+
     return (
         <div className={styles.jobList} ref={jobListRef}>
             {visited === 9 && isDialogOpen ? (
@@ -306,11 +307,7 @@ function JobList() {
             <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <div className={styles.jobList__content}>
                     {hasError ? (
-                        isPending ? (
-                            <LoadingAnime1 />
-                        ) : (
-                            <ErrorFallback />
-                        )
+                        <ErrorFallback />
                     ) : isLoading ? (
                         <LoadingAnime1 />
                     ) : (
