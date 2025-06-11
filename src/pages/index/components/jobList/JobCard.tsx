@@ -2,7 +2,7 @@ import type React from 'react';
 import { Bookmark } from 'lucide-react';
 import style from './styles/JobCard.module.scss';
 import type Job from '../../../../types/job';
-import { useImpression } from '../../../../useImpression';
+import { useImpression } from '../../../../hooks/useImpression';
 
 interface JobCardProps {
     job: Job;
