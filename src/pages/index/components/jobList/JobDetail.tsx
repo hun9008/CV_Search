@@ -6,12 +6,13 @@ import Feedback from './FeedbackDialog';
 import useApplyStore from '../../../../store/applyStore';
 import useBookmarkStore from '../../../../store/bookmarkStore';
 import useActionStore from '../../../../store/actionStore';
+import SimilarJobCard from './SimilarJobCard';
 
 interface DialogSet {
     isDialog: boolean;
 }
 function JobDetail({ isDialog }: DialogSet) {
-    const { getSelectedJobDetail, getFeedback } = useJobStore();
+    const { getSelectedJobDetail, getFeedback, getSimilarJobList } = useJobStore();
     const applications = useApplyStore((state) => state.applications);
     const { setApplications, deleteApplications, getApplications } = useApplyStore();
     const selectedJobDetail = useJobStore((state) => state.selectedJobDetail);
@@ -24,6 +25,7 @@ function JobDetail({ isDialog }: DialogSet) {
     const bookmarkedList = useBookmarkStore((state) => state.bookmarkList);
     const { addBookmark, removeBookmark, getBookmark } = useBookmarkStore();
     const selectedCVId = useJobStore((state) => state.selectedCVId);
+    const similarJobList = useJobStore((state) => state.similarJobList);
     const isJobListLoad = useActionStore((state) => state.isJobListLoad);
 
     useEffect(() => {
@@ -66,6 +68,10 @@ function JobDetail({ isDialog }: DialogSet) {
             }
         }
     }, [selectedJobDetail, style.bounce]);
+
+    useEffect(() => {
+        if (job?.id) getSimilarJobList(7, job.id);
+    }, []);
 
     const handleApply = () => {
         window.open(`${job?.url}`, '_blank');
@@ -309,6 +315,14 @@ function JobDetail({ isDialog }: DialogSet) {
                         <p className={style.section__text}>{job.preferredQualifications}</p>
                     </section>
                 )}
+                <section className={style.section}>
+                    <h2 className={style.section__title}>이 공고와 유사한 공고에요</h2>
+                    <div className={style.similarJobListContainer}>
+                        {similarJobList.map((item) => (
+                            <SimilarJobCard job={item} />
+                        ))}
+                    </div>
+                </section>
             </div>
             {job && (
                 <Feedback

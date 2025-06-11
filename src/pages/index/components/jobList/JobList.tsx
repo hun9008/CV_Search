@@ -265,6 +265,8 @@ function JobList() {
         </div>
     );
 
+    // 피드백 다이얼로그와 연관 공고 다이얼로그 분리해야함
+
     return (
         <div className={styles.jobList} ref={jobListRef}>
             {visited === 9 && isDialogOpen ? (

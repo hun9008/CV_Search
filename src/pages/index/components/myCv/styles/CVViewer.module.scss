@@ -183,6 +183,7 @@
 .renameInput {
     flex-grow: 1; // Take available space
     padding: 0.45rem 0.6rem; // 입력 필드 내부 패딩 (기존 제목과 높이 맞추도록 조정)
+    max-width: 100%;
     border: none;
     border-radius: 4px;
     font-size: 1.25rem;
