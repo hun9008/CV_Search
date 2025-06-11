@@ -312,4 +312,8 @@ public class RecommendService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "유사 공고 요청 실패", e);
         }
     }
+
+    public List<ScoredJobDto> testFetchRecommendationOnly(Long cvId, int topk) {
+        return fetchRecommendationFromFastAPI(cvId, topk);
+    }
 }

@@ -37,4 +37,5 @@ out/
 .vscode/
 
 .env
+src/test/resources/.env.test
 **/.DS_Store
