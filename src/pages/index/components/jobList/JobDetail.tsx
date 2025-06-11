@@ -70,8 +70,10 @@ function JobDetail({ isDialog }: DialogSet) {
     }, [selectedJobDetail, style.bounce]);
 
     useEffect(() => {
-        if (job?.id) getSimilarJobList(7, job.id);
-    }, []);
+        if (job?.id) {
+            getSimilarJobList(7, job.id);
+        }
+    }, [job?.id, getSimilarJobList]);
 
     const handleApply = () => {
         window.open(`${job?.url}`, '_blank');
