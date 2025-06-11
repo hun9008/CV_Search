@@ -24,7 +24,18 @@ function Dashboard() {
 
     const topKeywords = useAdminDashboardStore((state) => state.topKeywords);
 
-    const days = ['월', '화', '수', '목', '금', '토', '일'];
+    const DateList = (index: number) => {
+        const today = new Date();
+        const calculatedIndex = index - 1;
+
+        const date = new Date(today);
+        date.setDate(today.getDate() - (6 - calculatedIndex));
+
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+
+        return <div className={style.barLabel}>{`${month}월 ${day}일`}</div>;
+    };
 
     const TopKeywordsContainer = () => {
         return (
@@ -66,7 +77,7 @@ function Dashboard() {
                                         style={{ height: `${(data / maxValue) * 100}%` }}
                                     />
                                 </div>
-                                <div className={style.barLabel}>{days[index]}</div>
+                                {DateList(index)}
                             </div>
                         ))}
                     </div>
