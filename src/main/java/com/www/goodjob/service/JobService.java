@@ -197,14 +197,10 @@ public class JobService {
         List<String> safeSido = (sidoFilters == null || sidoFilters.isEmpty()) ? null : sidoFilters;
         List<String> safeSigungu = (sigunguFilters == null || sigunguFilters.isEmpty()) ? null : sigunguFilters;
 
-        Page<Job> jobPage = jobRepository.searchJobsWithFilters(
-                keyword,
-                safeJobTypes,
-                safeExperience,
-                safeSido,
-                safeSigungu,
-                pageable
-        );
+        Page<Job> jobPage = (keyword != null)
+                ? jobRepository.searchJobsWithFilters(keyword, safeJobTypes, safeExperience, safeSido, safeSigungu, pageable)
+                : jobRepository.searchJobsWithFiltersWithOutKeyword(safeJobTypes, safeExperience, safeSido, safeSigungu, pageable);
+
         return jobPage.map(JobWithValidTypeDto::from);
     }
 

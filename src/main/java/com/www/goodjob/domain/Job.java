@@ -9,6 +9,20 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@NamedEntityGraph(
+        name = "Job.withJobRegionsAndRegion",
+        attributeNodes = {
+                @NamedAttributeNode(value = "jobRegions", subgraph = "jobRegions-subgraph")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "jobRegions-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("region")
+                        }
+                )
+        }
+)
 @Entity
 @Table(name = "jobs")
 @Getter
