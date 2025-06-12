@@ -38,7 +38,8 @@ function JobManage() {
     const jobListRef = useRef<HTMLDivElement>(null);
 
     // 상태 옵션 목록
-    const statusOptions = ['확인필요', '정상', '마감', '에러'];
+    // const statusOptions = ['확인필요', '정상', '마감', '에러'];
+    const statusOptions = ['마감', '에러'];
 
     const [showModal, setShowModal] = useState(false);
 
@@ -67,7 +68,7 @@ function JobManage() {
     };
 
     const handleStatusChange = async (jobId: number, status: number) => {
-        if (status === 2) {
+        if (status === 2 || status === 1) {
             const res = await removeJob(jobId, status);
             if (res === 200) {
                 if (searchQuery) {
@@ -135,20 +136,17 @@ function JobManage() {
 
     return (
         <div className={style.container}>
-                {showModal && (
-                <JobCreateModal
-                    onClose={() => setShowModal(false)}
-                    onSuccess={refreshJobs}
-                />
-                )}
+            {showModal && (
+                <JobCreateModal onClose={() => setShowModal(false)} onSuccess={refreshJobs} />
+            )}
             <div className={style.header}>
                 <div className={style.headerText}>
                     <h2 className={style.header__title}>공고 관리</h2>
                     <p className={style.header__subtitle}>등록된 공고를 관리하세요</p>
                 </div>
                 <button className={style.addButton} onClick={() => setShowModal(true)}>
-                <Plus />
-                <p className={style.addButton__text}>공고 등록</p>
+                    <Plus />
+                    <p className={style.addButton__text}>공고 등록</p>
                 </button>
             </div>
             <div className={style.header__actions}>
