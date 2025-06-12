@@ -16,6 +16,7 @@ public class RecommendScoreJdbcRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    // test
     public void batchUpsert(Long cvId, List<ScoredJobDto> scores) {
         String sql = """
             INSERT INTO recommend_score (cv_id, job_id, score, created_at)
