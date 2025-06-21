@@ -18,9 +18,9 @@ jobs:
 
       - name: Deploy to EC2
         env:
-          EC2_USER: ${{ secrets.EC2_USER }}
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_PASSWORD: ${{ secrets.EC2_PASSWORD }}
+          HUNIAN_USER: hun
+          HUNIAN_HOST: main.hunian.site
+          HUNIAN_PASSWORD: ${{ secrets.HUNIAN_PASSWORD }}
           RDB_URL: ${{ secrets.RDB_URL }}
           RDB_USERNAME: ${{ secrets.RDB_USERNAME }}
           RDB_PASSWORD: ${{ secrets.RDB_PASSWORD }}
@@ -45,8 +45,8 @@ jobs:
           TOSS_SECRET_KEY : ${{ secrets.TOSS_SECRET_KEY }}
 
         run: |
-          sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
-            cd CV_Search
+          sshpass -p "$HUNIAN_PASSWORD" ssh -o StrictHostKeyChecking=no $HUNIAN_USER@$HUNIAN_HOST << EOF
+            cd Desktop/CV_Search
           
             git pull origin dev_spring
           
