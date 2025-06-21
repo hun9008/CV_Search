@@ -34,4 +34,5 @@ services:
 
 networks:
   goodjob-net:
+    name: goodjob-net
     driver: bridge
