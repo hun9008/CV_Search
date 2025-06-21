@@ -21,6 +21,7 @@ jobs:
           HUNIAN_USER: hun
           HUNIAN_HOST: main.hunian.site
           HUNIAN_PASSWORD: ${{ secrets.HUNIAN_PASSWORD }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
           RDB_URL: ${{ secrets.RDB_URL }}
           RDB_USERNAME: ${{ secrets.RDB_USERNAME }}
           RDB_PASSWORD: ${{ secrets.RDB_PASSWORD }}
