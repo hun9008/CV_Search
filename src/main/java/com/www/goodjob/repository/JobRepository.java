@@ -14,9 +14,7 @@ import java.util.List;
 public interface JobRepository extends JpaRepository<Job, Long> {
 
     @Query(value = """
-    SELECT DISTINCT j FROM Job j
-    LEFT JOIN FETCH j.jobRegions jr
-    LEFT JOIN FETCH jr.region r
+    SELECT j FROM Job j
     LEFT JOIN FETCH j.favicon f
     WHERE j.isPublic = true
     AND (
@@ -36,7 +34,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     AND (
         (:sidos IS NULL AND :sigungus IS NULL)
         OR EXISTS (
-            SELECT 1 FROM JobRegion jr2
+            SELECT 1 FROM j.jobRegions jr2
             WHERE jr2.job = j
             AND (:sidos IS NULL OR jr2.region.sido IN :sidos)
             AND (:sigungus IS NULL OR jr2.region.sigungu IN :sigungus)
@@ -73,8 +71,57 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     )
     """
     )
+    @EntityGraph(value = "Job.withJobRegionsAndRegion")
     Page<Job> searchJobsWithFilters(
             @Param("keyword") String keyword,
+            @Param("jobTypes") List<String> jobTypes,
+            @Param("experiences") List<String> experiences,
+            @Param("sidos") List<String> sidos,
+            @Param("sigungus") List<String> sigungus,
+            Pageable pageable
+    );
+
+
+    @Query(value = """
+SELECT new com.www.goodjob.dto.JobWithValidTypeDto(j.id,
+                                                      j.companyName,
+                                                       j.title,
+                                                       j.jobValidType,
+                                                       j.isPublic,
+                                                       j.createdAt,
+                                                       j.applyEndDate,
+                                                       j.url) FROM Job j
+WHERE j.isPublic = true
+AND (:jobTypes IS NULL OR j.jobType IN :jobTypes)
+AND (:experiences IS NULL OR j.experience IN :experiences)
+AND (
+    (:sidos IS NULL AND :sigungus IS NULL)
+    OR EXISTS (
+        SELECT 1 FROM JobRegion jr
+        WHERE jr.job = j
+        AND (:sidos IS NULL OR jr.region.sido IN :sidos)
+        AND (:sigungus IS NULL OR jr.region.sigungu IN :sigungus)
+    )
+)
+""",
+            countQuery = """
+SELECT COUNT(j.id) FROM Job j
+WHERE j.isPublic = true
+AND (:jobTypes IS NULL OR j.jobType IN :jobTypes)
+AND (:experiences IS NULL OR j.experience IN :experiences)
+AND (
+    (:sidos IS NULL AND :sigungus IS NULL)
+    OR EXISTS (
+        SELECT 1 FROM JobRegion jr
+        WHERE jr.job = j
+        AND (:sidos IS NULL OR jr.region.sido IN :sidos)
+        AND (:sigungus IS NULL OR jr.region.sigungu IN :sigungus)
+    )
+)
+"""
+    )
+    @EntityGraph(value = "Job.withJobRegionsAndRegion") // 이 부분을 추가!
+    Page<JobWithValidTypeDto> searchJobsWithFiltersWithOutKeyword(
             @Param("jobTypes") List<String> jobTypes,
             @Param("experiences") List<String> experiences,
             @Param("sidos") List<String> sidos,
